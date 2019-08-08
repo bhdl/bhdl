@@ -1,4 +1,120 @@
 #+TITLE: Rackematic: a framework for Schematic/PCB design
 
+* KiCAD
+- file formats: http://www.kicad-pcb.org/help/file-formats/
+
+* Design
+
+- A language for modeling schematic components
+- A visualizer
 
 
+** Visualizer
+Like the schematic wire connection using labels, I probably don't want
+to connect every components physically.
+
+** Gerber file generation
+gerber file format
+- website: https://www.ucamco.com/en/gerber
+- specification:
+  https://www.ucamco.com/files/downloads/file/81/the_gerber_file_format_specification.pdf
+- online Reference Gerber Viewer: https://gerber-viewer.ucamco.com/
+
+from computer-aided design (CAD) to computer-aided manufacturing (CAM)
+
+** Components
+
+This includes schematic symbols and PCB footprints.
+
+- logical gates
+  - 4001, 4002, 4011, 4023, 4025
+  - 4017, 4020, 4040
+- operational amplifiers
+  - AD8063, LM2902
+- ADC
+  - ADC1173, AD7819
+- DAC
+  - AD7304, MAX5138
+- Comparator
+- MCU
+  - Z80
+- connectors
+- small components
+  - diode
+  - resistors
+
+** A list of components
+
+Power:
+- ground
+- VCC
+- battery
+
+passive components:
+- resistors (R)
+- capacitors (C)
+- coils (L)
+- push buttons (SW)
+- switches (SW) (single pull double throw)
+
+active components:
+- diodes (D)
+- transistors (Q):
+  - BJT: NPN, PNP
+  - MOSFET: N-channel, P-channel
+- Op Amps (U)
+- IC (U):
+  - circle: inverted, active low
+  - triangle: clock signal
+
+wires connections:
+- not connected (draw a curve or just leave it there but no dot)
+- dot connected
+
+** sections of schematic
+*** power section
+- decoupling capacitors
+- voltage divider resistors, selected by op-amps (e.g. LMV358) to
+  select 3.3v or 5v
+*** (power) LED section
+- LED
+- current limiting resistors
+
+*** voltage regulator (e.g. 7805)
+- decoupling capacitors on both input and output of the voltage regulator
+- 3v3 volt regulator (e.g. LP2985, NCP1117)
+- barrel jack for power input
+
+Some tips:
+- for linear regulator, the output capacitor should be smaller than
+  the input capacitor
+- the output capacitor is a filter capacitor
+- the input capacitor is a decoupling capacitor, since it decouples it
+  from the input power
+
+*** reset button
+- button
+- pull-up resistors
+
+*** IC
+- ATMega328 (just a lot of pins)
+- oscillator (crystral)
+
+** Frequently used components
+- 7805 voltage regulator
+- pin headers
+
+** Start with an Arduino Uno
+- bootloader auto-reset
+- USB socket
+- ICSP (SPI, i.e. MISO, MOSI, SCK, RESET) header for programming the
+  Arduino bootloader
+- serial to USB chip (e.g. FTDI)
+
+Custom Arduino Design Series, Schematic, PCB, Test
+https://www.youtube.com/playlist?list=PLRIGIzu0Z7KllhKqPsNDwitjpK45SHoKg
+
+* Examples
+** 555 timer
+** Arduino Uno
+** Novena laptop
