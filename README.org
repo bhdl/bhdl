@@ -22,6 +22,117 @@ gerber file format
 
 from computer-aided design (CAD) to computer-aided manufacturing (CAM)
 
+*** %% commands
+All commands must be =%...*%= format.
+
+Declaring commands, can appear only once:
+- FS :: format specification
+  - %FSLAX26Y26*%: 2 digit integer part, 6 digit decimal part. The
+    *leading* 0s are omitted.
+- MO :: set mode. %MOMM*%: set the unit to MM or (IN)
+
+Mode
+- LP :: Load polarity. %LPD%, %LPC%: set the polarity to either dark
+  or clear. The polarity is used for either clear a region or darken
+  it. Since the gerber file interprets as superimposing in the order
+  of generation, the later image overwrites the former.
+- LM :: Load mirror
+- LR :: load rotation
+- LS :: load scale
+
+
+Aperture:
+  - AD :: aperture define. %AD%: Aperture define.
+    - standard pre-defined appentures: 
+      - circle (C), diameter, [hole diameter]
+      - rectangle (R), X, Y, [hole diameter]
+      - obround (O), X, Y, [hole diameter]
+      - regular polygon (P), outer diameter, #vertices, rotation, [hole diameter]
+    - ADDnn,2.5X.25X.01*
+    - %ADD123R,2.5X1.5*%: create an aperture with D-code D123, use
+      pre-defined aperture R, parameter is 2.5mmX1.5mm for the
+      rectangle. A single =D100*= command can be used to set the
+      aperture.
+  - AM :: Aperture macro.  %AM%: Aperture Macro, creates macro
+    apertures, used for custom shapes. This does not associate the
+    aperture with a D-code, another AD should be used (TODO examples).
+    - %AM<name>*...*...*%, one * per-line
+    - TODO
+  - AB :: Aperture block. %AB%: Aperture block, creates block
+    apertures.
+  - SR :: Step and repeat. Seems to be another block creation command
+
+Attributes (X2: TF, TA, TO, TD):
+- TF :: attribute File. 
+  - %TF.FileFunction,Soldermask,Top*%: the file represents the top
+    solder mask
+  - %TF.Part,Other,example*%
+- TA :: attribute Aperture
+- TO :: attribute Object
+- TD :: attribute Delete
+
+*** non-%% commands
+All commands must be =...*= format.
+
+- G04: line comment
+- M02 :: end of file
+
+Graphical commands:
+- G01 :: set interpolation mode to linear
+- G02 :: set interpolation mode to clockwise circular
+- G03 :: set interpolation mode to counter-clockwise circular
+- G74 :: set quadrant mode to single quadrant
+- G75 :: set quadrant mode to multi quadrant
+
+Operations: X...Y...D01. The coordinates can be negative. The X or Y
+section can be omitted to use the current value.
+- D02 :: move the current point to the coordinate
+- D01 :: create a straight or circular line from current point to the
+  coordinate. Usually used for tracks.
+  - The only allowed apertures are pre-defined solid circle and
+    rectangle. custom apertures are not allowed.
+  - Only circle can be used for arc. This can be achieved by D01 in
+    "circular interpolation mode".
+  - a circle with 0 diameter can be used to draw non-image
+    information, e.g. an outline.
+  - a draw of 0 length is allowed, and appears the same as flash, but
+    DO NOT USE THIS, in particular a pad should only be flashed.
+- D03 :: create a flash object. Each aperture has an origin, and that is
+  positioned at the coordinate. Usually used for pads.
+
+Region statement, used for pour. A region is defined by its contour.
+- G36 command begins a region statement, G37 ends it. 
+- In between G36 and G37, D01 draws the region, and D02 ENDS it. 
+  - D02 is not allowed if the drawing of this region is not closed, so
+    D02 basically declares an end of one region, and starts
+    another. 
+  - That is, G36 G37 can define multiple sub regions. G37 ends the
+    region statement, the last one needs not be closed by D02.
+- when a region is ended with G37, all sub regions are filled. I guess
+  for a pour fill, it should be performs first.
+
+*** Formal grammar
+
+#+BEGIN_EXAMPLE
+<data block> ::= <character>* '*'
+<command> ::= <function code command> | <extended command>
+<function code command> ::= <data block>
+
+;; the multiple data block case is AM command
+<extended command> ::= %<data block>+%
+
+<extended command> :== <FS command> | ...
+<FS command> ::= FSLAX<digit><digit>Y<digit><digit> '*'
+#+END_EXAMPLE
+
+<extended command> ::= %<data block>+%
+
+
+
+
+
+
+
 ** Components
 
 This includes schematic symbols and PCB footprints.
