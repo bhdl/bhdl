@@ -1,130 +1,104 @@
 #lang racket
 
 (require (for-syntax syntax/parse
-                     racket/string)
+                     racket/string
+                     ;; "schematic.rkt"
+                     racket/list)
          syntax/parse/define
          rackunit
+         "schematic.rkt"
+         "footprint.rkt"
          pict
          racket/draw)
 
 ;; (provide (all-defined-out))
 
 (struct IC
+  ;; pins should be ((1 PA0) (2 PA1) ...)
   (pins
-   subIC
-   connections
-   ;; footprint
-   )
+   symbol
+   footprint)
   #:prefab)
+
+(struct comp-IC
+  (pins
+   children
+   connections)
+  #:prefab)
+
+;; symbol should be (pict (PA0 x y) ...)
 
 (define-syntax (make-simple-IC stx)
   (syntax-parse stx
     [(_ pin ...)
-     #'(IC '(pin ...) #f #f)]))
-
-(define-syntax (sch-group stx)
-  (syntax-parse stx
-    [(_ (in a ...)
-        (out b ...)
-        (conn (x ...) ...))
-     ;; #'(list a ... b ... (x ...) ...)
-     #'(IC '(b ...) '(a ...) '((x ...) ...))]))
-
-(define a (make-simple-IC PA0 PA1 PA2))
-(define b (make-simple-IC PB0 PB1 PB2))
-(define c (make-simple-IC PC0 PC1 PC2))
-(define d (make-simple-IC PD0 PD1 PD2 PD3))
-
-(define g (sch-group (in a b c d)
-                     (out a.PA0 a.PA2 c.PC2)
-                     (conn (a.PA2 b.PB2 c.PC2)
-                           (a.PA1 d.PD1))))
-
-;; read KiCAD symbols
-;; /home/hebi/github/reading/kicad-symbols/74xx.lib
-
-;; I need to write a parser for it
-
-
-(define (fp-circle diameter)
-  (circle diameter))
-(define (fp-rectangle w h)
-  (rectangle w h))
-#;
-(sch-group (in a b c d)
-           (out (all-from a #:prefix a)
-                (rename-out b.PB5 PP5)
-                c.PAD)
-           (conn (a.PD0 b.VCC c.RESET)
-                 (a.X b.Y))
-           )
-
-;; MCU
-(define ATMEGA16U2-MU
-  (make-simple-IC PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7
-                  PC0 PC1 PC2 PC3 PC4 PC5
-                  PB0 PB1 PB2 PB3 PB4 PB5
-                  RESET
-                  XTAL1 XTAL2
-                  AREF AVCC AGND
-                  VCC GND))
-(define ATMEGA328P-PU
-  (make-simple-IC PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7
-                  PC2 PC4 PC5 PC6 PC7
-                  PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
-                  RESET
-                  XTAL1 XTAL2
-                  AVCC
-                  VCC GND
-                  UCAP UVCC UGND
-                  D- D+
-                  PAD))
-
-;; (make-pict )
-;; (draw-pict (colorize (hline 30 0) "red") dc 0 0)
-;; (define target (make-bitmap 30 30))
-;; (define dc (new bitmap-dc% [bitmap target]))
-;; (send target save-file "box.png" 'png)
-
-(hc-append (hline 10 20) (hline 10 20))
-(circle 10 #:border-color "red")
-
-;; power
-(define gnd #f)
-(define 5v #f)
-(define 3v3 #f)
-
-;; basic components
-(define (capacitor v) #f)
-(define (resistor v) #f)
-(define diode #f)
-(define (crystal v) #f)
-
-;; connectors
-(define usb-b-micro #f)
-(define usb-c #f)
-(define (connector w h m?)
-  "width, height, male?"
-  #f)
+     #`(IC '#,(for/list ([i (range (length (syntax->list #'(pin ...))))]
+                         [p (syntax->list #'(pin ...))])
+                (list i p))
+           (make-simple-symbol (pin ...))
+           ;; I'm using DIP-8 ..
+           DIP-8)]))
 
 (module+ test
-  (connector 3 2 'male)
-  (connector 2 2 'male)
-  (connector 10 1 'female)
-  (connector 8 1 'female)
-  (connector 6 1 'female))
+  (IC '((0 PA0)
+        (1 PA1)
+        (2 PA2)) #f #f)
+
+  (define a (make-simple-IC PA0 PA1 PA2))
+  (define b (make-simple-IC PB0 PB1 PB2))
+  (define c (make-simple-IC PC0 PC1 PC2))
+  (define d (make-simple-IC PD0 PD1 PD2 PD3))
+
+  (symbol->pict (IC-symbol a))
+
+  (footprint-pict (IC-footprint a))
+  (footprint-locs (IC-footprint a))
+
+  (IC-pins a)
+
+  (define g (make-group
+             ;; input ICs
+             ;; These symbols are significant, they are used to mark the 
+             #:in (a b c d)
+             ;; Output pins mapped to input IC pins.  This mapping is only useful
+             ;; for connecting outer and inner circuit.
+             #:out (x y)
+             ;; pair connections
+             #:conn ([x (a PA0) (b PB1) (d PD2)]
+                     [y (a PA2) (c PC0)])))
+
+  (sch-visualize g)
+  )
+
+(define-syntax (make-group stx)
+  "Make a new IC by connecting sub ICs."
+  (syntax-parse stx
+    [(_ #:in (in ...) #:out (out ...)
+        #:conn ((conn ...) ...))
+     ;; 1. save the mapping of output pins and input pins
+     ;; 2. save and merge the connected pins
+     #`(comp-IC (list 'out ...)
+                (list (cons 'in in) ...)
+                (list (list 'conn ...) ...))]))
 
 
-(define (LED color) #f)
+(define (sch-visualize sch)
+  "Visualize SCH. Return a (pict out-pin-locs)"
+  (cond
+    ;; this is just a simple IC, draw its symbol
+    [(IC? sch)
+     (begin
+       (unless (IC-symbol sch)
+         (error "simple IC should have a symbol in order to visualize"))
+       (let-values ([(pict locs) (symbol->pict (IC-symbol sch))])
+         pict))]
+    ;; for all its children, visualize and get pict
+    ;; draw all the picts and draw connections, add output pins
+    [(comp-IC? sch)
+     (let ([picts (for/list ([child (comp-IC-children sch)])
+                    (sch-visualize (cdr child)))])
+       picts)]))
 
-;; FIXME NCP?
-(define NCP1117 #f)
 
-(define LP2985 #f)
-;; FIXME -P?
-(define OPA340P #f)
+;; (sch-visualize g)
 
-(define LMV358 #f)
-
-;; TODO BLM21 coil
-;; TODO CG0603MLC-05E protector
+;; (IC-children g)

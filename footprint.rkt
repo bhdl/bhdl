@@ -7,10 +7,12 @@
          pict
          racket/draw)
 
+(provide (struct-out footprint)
 
-;; footprint. must be precise
-
-;; every footprint
+         DIP-8 DIP-22 DIP-24
+         TQFP-32 TQFP-44 TQFP-64 TQFP-128
+         TSSOP-14 TSSOP-16 TSSOP-18 TSSOP-24
+         SOIC-8 SOIC-14 SOIC-16)
 
 #|
 
@@ -33,37 +35,43 @@ The footprint contains three parts
 
 (define (dual-line-package num pitch width pad
                            #:first-pad (first-pad #f))
-  (define row1
-    (let* ([nums (range 1 (+ (/ num 2) 1))]
-           [row1-pads (let ([pads (for/list ([i nums])
-                                    (numbered-pad pad i))])
-                        (if first-pad
-                            (cons
-                             (numbered-pad first-pad 1)
-                             (rest pads))
-                            pads))])
-      (apply vc-append
-             (- pitch (pict-height pad))
-             row1-pads)))
+  "Return (pict ((1 x y) ...))"
+  
 
-  (define row2
-    (let* ([nums (range (+ (/ num 2) 1) (+ num 1))]
-           [row2-pads (reverse
-                       (for/list ([i nums])
-                         (numbered-pad pad i)))])
-      (apply vc-append
-             (- pitch (pict-height pad))
-             row2-pads)))
+  (define row1-pads
+    (let* ([nums (range 1 (+ (/ num 2) 1))])
+      (let ([pads (for/list ([i nums])
+                    (numbered-pad pad i))])
+        (if first-pad
+            (cons
+             (numbered-pad first-pad 1)
+             (rest pads))
+            pads))))
+
+  (define row2-pads
+    (let* ([nums (range (+ (/ num 2) 1) (+ num 1))])
+      (reverse
+       (for/list ([i nums])
+         (numbered-pad pad i)))))
   
   (define whole (hc-append (- width (pict-width pad))
-                           row1 row2))
+                           (apply vc-append
+                                  (- pitch (pict-height pad))
+                                  row1-pads)
+                           (apply vc-append
+                                  (- pitch (pict-height pad))
+                                  row2-pads)))
   
   (define arc (inset (circle (/ width 2))
                      0 (/ width -4) 0 0))
   
   (define frame (rectangle (+ (pict-width whole) 10)
                            (+ (pict-height whole) 10)))
-  (cc-superimpose (ct-superimpose whole arc) frame))
+  (let ([pict (cc-superimpose (ct-superimpose whole arc) frame)])
+    (values pict
+            (for/list ([p (flatten (list row1-pads (reverse row2-pads)))])
+              (let-values ([(x y) (cc-find pict p)])
+                (list x y))))))
 
 (define (partition-into lst num)
   "Partition the lst into num lists."
@@ -84,24 +92,26 @@ The footprint contains three parts
   (partition-into '(1 2 3 8) 2))
 
 (define (quad-line-package num pitch pad)
-  (define rows (let* ([lst (for/list ([i (range 1 (+ num 1))])
-                             (numbered-pad pad i))]
-                      [lsts (partition-into lst 4)]
-                      ;; reverse the last two lists
-                      [lsts2 (list (first lsts)
-                                   (second lsts)
-                                   (reverse (third lsts))
-                                   (reverse (last lsts)))])
-                 ;; divide into 4 sections
-                 ;; append each of them
-                 ;; get them into square
-                 (for/list ([lst lsts2])
-                   (inset (apply vc-append
-                                 (- pitch (pict-height pad))
-                                 lst)
-                          ;; FIXME this 10 is 1.0mm for TQFP
-                          0 (- 10 (/ (pict-height pad) 2))
-                          0 (- 10 (/ (pict-height pad) 2))))))
+  (define-values (rows pads)
+    (let* ([lst (for/list ([i (range 1 (+ num 1))])
+                  (numbered-pad pad i))]
+           [lsts (partition-into lst 4)]
+           ;; reverse the last two lists
+           [lsts2 (list (first lsts)
+                        (second lsts)
+                        (reverse (third lsts))
+                        (reverse (last lsts)))])
+      ;; divide into 4 sections
+      ;; append each of them
+      ;; get them into square
+      (values (for/list ([lst lsts2])
+                (inset (apply vc-append
+                              (- pitch (pict-height pad))
+                              lst)
+                       ;; FIXME this 10 is 1.0mm for TQFP
+                       0 (- 10 (/ (pict-height pad) 2))
+                       0 (- 10 (/ (pict-height pad) 2))))
+              lsts2)))
   (define whole
     (match rows
       [(list l b r t)
@@ -112,7 +122,11 @@ The footprint contains three parts
   
   (define frame (rectangle (+ (pict-width whole) 10)
                            (+ (pict-height whole) 10)))
-  (cc-superimpose whole frame))
+  (let ([pict (cc-superimpose whole frame)])
+    (values pict
+            (for/list ([p (flatten pads)])
+              (let-values ([(x y) (cc-find pict p)])
+                (list x y))))))
 
 
 (define (DIP num width)
@@ -202,24 +216,49 @@ The footprint contains three parts
 
 
 
-(module+ test
-  (scale (DIP 22 76.2) 3)
-  (scale (DIP 8 76.2) 3)
-  (scale (DIP 24 152.4) 3)
-  (scale (DIP 24 101.6) 3)
+(struct footprint
+  (pict locs))
 
-  (scale (TQFP 32) 3)
-  (scale (TQFP 44) 3)
-  (scale (TQFP 64) 3)
-  (scale (TQFP 128) 3)
-  
-  (scale (TSSOP 14) 3)
-  (scale (TSSOP 16) 3)
-  (scale (TSSOP 18) 3)
-  (scale (TSSOP 24) 3)
-  
-  (scale (SOIC 8) 3)
-  (scale (SOIC 14) 3)
-  (scale (SOIC 16) 3))
 
+(define (make-DIP num)
+  (let ([width (case num
+                 [(8) 76.2]
+                 [(22) 76.2]
+                 ;; FIXME multiple choices for width
+                 ;; (scale (DIP 24 152.4) 3)
+                 ;; (scale (DIP 24 101.6) 3)
+                 [(24) 152.4]
+                 [else (error (format "Invalid num ~a" num))])])
+    (let-values ([(pict locs) (DIP num width)])
+      (footprint pict locs))))
+
+(define DIP-8 (make-DIP 8))
+(define DIP-22 (make-DIP 22))
+(define DIP-24 (make-DIP 24))
+
+(define (make-TQFP num)
+  (let-values ([(pict locs) (TQFP num)])
+    (footprint pict locs)))
+
+(define TQFP-32 (make-TQFP 32))
+(define TQFP-44 (make-TQFP 44))
+(define TQFP-64 (make-TQFP 64))
+(define TQFP-128 (make-TQFP 128))
+
+(define (make-TSSOP num)
+  (let-values ([(pict locs) (TSSOP num)])
+    (footprint pict locs)))
+
+(define TSSOP-14 (make-TSSOP 14))
+(define TSSOP-16 (make-TSSOP 16))
+(define TSSOP-18 (make-TSSOP 18))
+(define TSSOP-24 (make-TSSOP 24))
+
+(define (make-SOIC num)
+  (let-values ([(pict locs) (SOIC num)])
+    (footprint pict locs)))
+
+(define SOIC-8 (make-SOIC 8))
+(define SOIC-14 (make-SOIC 14))
+(define SOIC-16 (make-SOIC 16))
 

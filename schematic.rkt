@@ -7,6 +7,12 @@
          pict
          racket/draw)
 
+(provide (struct-out rect-symbol)
+         make-rect-symbol
+         make-simple-symbol
+         symbol->pict
+         rect-symbol->pict)
+
 #;
 (require parser-tools/lex
          (prefix-in : parser-tools/lex-sre))
@@ -15,80 +21,91 @@
 ;; maintain the symbols in that format. Instead, I'll use my s-exp
 ;; format directly from start.
 
-(struct sch-symbol
-  (outline pins)
+(struct rect-symbol
+  (left right top down)
   #:prefab)
 
-(struct sch-symbol-pin
-  (num name x y)
-  #:prefab)
-
-(define-syntax (make-sch-symbol stx)
+(define-syntax (make-simple-symbol stx)
   (syntax-parse stx
-    [(_ (outline out)
-        (pin num name x y) ...)
-     #'(sch-symbol 'out (list (sch-symbol-pin num name x y) ...))]))
+    [(_ pin ...)
+     #'(rect-symbol '(pin ...) '() '() '())]))
 
-(struct rect-IC
-  (left-pins right-pins top-pins down-pins)
-  #:prefab)
+;; (make-simple-symbol PA0 PA1)
 
-(define-syntax (make-rect-IC stx)
+(define-syntax (make-rect-symbol stx)
   (syntax-parse stx
     [(_ (left l ...)
         (right r ...)
         (top t ...)
         (down d ...))
-     #'(rect-IC '(l ...)
-                '(r ...)
-                '(t ...)
-                '(d ...))]))
+     #'(rect-symbol '(l ...)
+                    '(r ...)
+                    '(t ...)
+                    '(d ...))]))
 
-;; trying another way: automatically compute the symbols
-(define tmp-74469 (make-rect-IC (left (D0 D1 D2 D3 D4 D5 D6 D7)
-                                      (CLK LD UD CBI))
-                                (right (Q0 Q1 Q2 Q3 Q4 Q5 Q6 Q7)
-                                       (OE CBO))
-                                (top (VCC))
-                                (down (GND))))
-
-
-;; (apply + '(1 2 3))
-
-(define (lsts-of-texts lsts combine-func)
-  "combine-func is either vl-append or vr-append."
+(define (symbol-section pict-lsts combine-func)
   (apply combine-func 10
-         (for/list ([lst lsts])
-           (apply combine-func
-                  (for/list ([t lst])
-                    (colorize (text (symbol->string t) 'default 15)
-                              "darkgreen"))))))
+         (for/list ([lst pict-lsts])
+           (apply combine-func lst))))
 
-(define (IC->pict ic)
-  (let ([left (lsts-of-texts (rect-IC-left-pins ic)
-                             vl-append)]
-        [right (lsts-of-texts (rect-IC-right-pins ic)
-                              vr-append)]
-        [top (rotate
-              (lsts-of-texts (rect-IC-top-pins ic)
-                             vr-append)
-              (/ pi 2))]
-        [down (rotate
-               (lsts-of-texts (rect-IC-down-pins ic)
-                              vl-append)
-               (/ pi 2))])
-    (define mid (vl-append (- (max (pict-height left)
-                                   (pict-height right))
-                              (pict-height top)
-                              (pict-height down))
-                           top down))
-    (define whole (ht-append 20 left mid right))
-    (define frame (filled-rectangle (+ (pict-width whole) 25)
-                                    (+ (pict-height whole) 25)
-                                    #:color "Khaki"
-                                    #:border-color "Brown"
-                                    #:border-width 10))
-    (cc-superimpose frame whole)))
+(define (symbol-texts lsts)
+  (for/list ([lst lsts])
+    (for/list ([t lst])
+      (colorize (text (symbol->string t) 'default 15)
+                "darkgreen"))))
+
+(define (symbol->pict sym)
+  (cond
+    [(rect-symbol? sym) (rect-symbol->pict sym)]))
+
+(define (rect-symbol->pict sym)
+  "Return (pict, ((name x y) ...)"
+  (unless (rect-symbol? sym)
+    (error "sym is not rect-symbol"))
+  (let ([pinl (rect-symbol-left sym)]
+        [pinr (rect-symbol-right sym)]
+        [pint (rect-symbol-top sym)]
+        [pind (rect-symbol-down sym)])
+    (let ([left-picts (symbol-texts pinl)]
+          [right-picts (symbol-texts pinr)]
+          [top-picts (symbol-texts pint)]
+          [down-picts (symbol-texts pind)])
+      
+      (let ([left (symbol-section left-picts vl-append)]
+            [right (symbol-section right-picts vr-append)]
+            [top (rotate
+                  (symbol-section top-picts vl-append)
+                  (/ pi 2))]
+            [down (rotate
+                   (symbol-section down-picts vl-append)
+                   (/ pi 2))])
+        (define mid (vl-append (- (max (pict-height left)
+                                       (pict-height right))
+                                  (pict-height top)
+                                  (pict-height down))
+                               top down))
+        (define whole (ht-append 20 left mid right))
+        (define frame (filled-rectangle (+ (pict-width whole) 25)
+                                        (+ (pict-height whole) 25)
+                                        #:color "Khaki"
+                                        #:border-color "Brown"
+                                        #:border-width 10))
+        (let ([res (cc-superimpose frame whole)])
+          (values
+           ;; the whole pict
+           res
+           ;; the position information for all the pins
+           (for/list ([p (flatten (list left-picts right-picts top-picts down-picts))]
+                      [id (flatten (list pinl pinr pint pind))])
+             (let-values ([(x y) (cc-find res p)])
+               (list id x y)))))))))
 
 (module+ test
-  (IC->pict tmp-74469))
+  ;; trying another way: automatically compute the symbols
+  (define symbol-74469 (make-rect-symbol (left (D0 D1 D2 D3 D4 D5 D6 D7)
+                                               (CLK LD UD CBI))
+                                         (right (Q0 Q1 Q2 Q3 Q4 Q5 Q6 Q7)
+                                                (OE CBO))
+                                         (top (VCC))
+                                         (down (GND))))
+  (rect-symbol->pict symbol-74469))

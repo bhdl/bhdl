@@ -40,3 +40,33 @@
                (+ (sch-symbol-pin-x pin) 300)
                (- 1400 (+ (sch-symbol-pin-y pin) 700))
                (text (sch-symbol-pin-name pin) 'default 50)))))
+(struct sch-symbol
+  (pins
+   children
+   connections)
+  #:prefab)
+
+(struct sch-symbol-pin
+  (name x y)
+  #:prefab)
+
+(define-syntax (make-sch-symbol stx)
+  (syntax-parse stx
+    [(_ (outline out)
+        (pin num name x y) ...)
+     #'(sch-symbol 'out (list (sch-symbol-pin num name x y) ...))]))
+
+(define-syntax (make-rect-symbol stx)
+  (syntax-parse stx
+    [(_ (left l ...)
+        (right r ...)
+        (top t ...)
+        (down d ...))
+     
+     #'(list (rect-IC->pict #'(rect-IC-symbol '(l ...)
+                                              '(r ...)
+                                              '(t ...)
+                                              '(d ...)))
+             (list l ... r ... t ... d ...))]))
+
+

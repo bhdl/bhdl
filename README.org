@@ -8,6 +8,18 @@
 - A language for modeling schematic components
 - A visualizer
 
+** IC
+An IC should have the following informations:
+- pins
+- index mapping of pins (HEBI: would the mapping be the same for
+  symbol and footprint?)
+- symbol: and location of pins on the symbol
+- footprint: and location of pins on the footprint
+
+A component should have:
+- pins
+- children components
+- the connections
 
 ** Visualizer
 Like the schematic wire connection using labels, I probably don't want
