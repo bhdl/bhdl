@@ -1,111 +1,131 @@
 #lang racket
 
 (require (for-syntax syntax/parse
-                     racket/string)
+                     racket/string
+                     racket/list)
          syntax/parse/define
          rackunit
+         "symbol.rkt"
+         "footprint.rkt"
          pict
          racket/draw)
 
-(provide (struct-out rect-symbol)
-         make-rect-symbol
-         make-simple-symbol
-         symbol->pict
-         rect-symbol->pict)
+(provide (struct-out IC)
+         (struct-out comp-IC)
+         visualize-IC
+         gen-indexed-IC-pins)
 
-#;
-(require parser-tools/lex
-         (prefix-in : parser-tools/lex-sre))
-
-;; I'm not going to write reader for kicad library, because I won't
-;; maintain the symbols in that format. Instead, I'll use my s-exp
-;; format directly from start.
-
-(struct rect-symbol
-  (left right top down)
+(struct IC
+  ;; pins should be ((1 PA0) (2 PA1) ...)
+  (pins
+   symbol
+   footprint
+   ;; FIXME If loc is not #f, the user needs to make sure this and any
+   ;; comp-IC containing it are not reused. Currently there is no
+   ;; facility to detect this and give warnings.
+   loc
+   ;; name of hte IC, e.g. 'resistor, '1117, 'ATMEGA328P
+   ;; name
+   ;; attributes, e.g. value of the resistor
+   ;; attr
+   )
   #:prefab)
 
-(define-syntax (make-simple-symbol stx)
+(define (visualize-IC ic)
+  (values 'symbol (sch-symbol-pict (IC-symbol ic))
+          'footprint (scale (footprint-pict (IC-footprint ic)) 3)))
+
+(struct comp-IC
+  (pins
+   children
+   connections)
+  #:prefab)
+
+;; symbol should be (pict (PA0 x y) ...)
+
+(define-syntax (gen-indexed-IC-pins stx)
   (syntax-parse stx
     [(_ pin ...)
-     #'(rect-symbol '(pin ...) '() '() '())]))
-
-;; (make-simple-symbol PA0 PA1)
-
-(define-syntax (make-rect-symbol stx)
-  (syntax-parse stx
-    [(_ (left l ...)
-        (right r ...)
-        (top t ...)
-        (down d ...))
-     #'(rect-symbol '(l ...)
-                    '(r ...)
-                    '(t ...)
-                    '(d ...))]))
-
-(define (symbol-section pict-lsts combine-func)
-  (apply combine-func 10
-         (for/list ([lst pict-lsts])
-           (apply combine-func lst))))
-
-(define (symbol-texts lsts)
-  (for/list ([lst lsts])
-    (for/list ([t lst])
-      (colorize (text (symbol->string t) 'default 15)
-                "darkgreen"))))
-
-(define (symbol->pict sym)
-  (cond
-    [(rect-symbol? sym) (rect-symbol->pict sym)]))
-
-(define (rect-symbol->pict sym)
-  "Return (pict, ((name x y) ...)"
-  (unless (rect-symbol? sym)
-    (error "sym is not rect-symbol"))
-  (let ([pinl (rect-symbol-left sym)]
-        [pinr (rect-symbol-right sym)]
-        [pint (rect-symbol-top sym)]
-        [pind (rect-symbol-down sym)])
-    (let ([left-picts (symbol-texts pinl)]
-          [right-picts (symbol-texts pinr)]
-          [top-picts (symbol-texts pint)]
-          [down-picts (symbol-texts pind)])
-      
-      (let ([left (symbol-section left-picts vl-append)]
-            [right (symbol-section right-picts vr-append)]
-            [top (rotate
-                  (symbol-section top-picts vl-append)
-                  (/ pi 2))]
-            [down (rotate
-                   (symbol-section down-picts vl-append)
-                   (/ pi 2))])
-        (define mid (vl-append (- (max (pict-height left)
-                                       (pict-height right))
-                                  (pict-height top)
-                                  (pict-height down))
-                               top down))
-        (define whole (ht-append 20 left mid right))
-        (define frame (filled-rectangle (+ (pict-width whole) 25)
-                                        (+ (pict-height whole) 25)
-                                        #:color "Khaki"
-                                        #:border-color "Brown"
-                                        #:border-width 10))
-        (let ([res (cc-superimpose frame whole)])
-          (values
-           ;; the whole pict
-           res
-           ;; the position information for all the pins
-           (for/list ([p (flatten (list left-picts right-picts top-picts down-picts))]
-                      [id (flatten (list pinl pinr pint pind))])
-             (let-values ([(x y) (cc-find res p)])
-               (list id x y)))))))))
+     ;; FIXME do I have to do this #`'#, ??
+     #`'#,(for/list ([i (range 1 (add1 (length (syntax->list #'(pin ...)))))]
+                     [p (syntax->list #'(pin ...))])
+            (list i p))]))
 
 (module+ test
-  ;; trying another way: automatically compute the symbols
-  (define symbol-74469 (make-rect-symbol (left (D0 D1 D2 D3 D4 D5 D6 D7)
-                                               (CLK LD UD CBI))
-                                         (right (Q0 Q1 Q2 Q3 Q4 Q5 Q6 Q7)
-                                                (OE CBO))
-                                         (top (VCC))
-                                         (down (GND))))
-  (rect-symbol->pict symbol-74469))
+  (check-equal? (gen-indexed-IC-pins PA0 PA1 PA2)
+                '((0 PA0) (1 PA1) (2 PA2))))
+
+(define-syntax (make-group stx)
+  "Make a new IC by connecting sub ICs."
+  (syntax-parse stx
+    [(_ #:in (in ...) #:out (out ...)
+        #:conn ((conn ...) ...))
+     ;; 1. save the mapping of output pins and input pins
+     ;; 2. save and merge the connected pins
+     #`(comp-IC (list 'out ...)
+                (list (cons 'in in) ...)
+                (list (list 'conn ...) ...))]))
+
+(define (sch-visualize sch)
+  "Visualize SCH. Return a (pict out-pin-locs)"
+  (cond
+    ;; this is just a simple IC, draw its symbol
+    [(IC? sch)
+     (begin
+       (unless (IC-symbol sch)
+         (error "simple IC should have a symbol in order to visualize"))
+       (sch-symbol-pict (IC-symbol sch)))]
+    ;; for all its children, visualize and get pict
+    ;; draw all the picts and draw connections, add output pins
+    [(comp-IC? sch)
+     (let ([picts (for/list ([child (comp-IC-children sch)])
+                    (sch-visualize (cdr child)))])
+       picts)]))
+
+(define-syntax (make-simple-IC stx)
+  "FIXME this should not be used."
+  (syntax-parse stx
+    [(_ pin ...)
+     #`(IC
+        (gen-indexed-IC-pins pin ...)
+        (make-rect-symbol (left (pin ...))
+                          (right)
+                          (top)
+                          (down))
+        ;; I'm using DIP-8 ..
+        DIP-8
+        #f)]))
+
+(module+ test
+  (IC '((0 PA0)
+        (1 PA1)
+        (2 PA2)) #f #f #f)
+
+  (define a (make-simple-IC PA0 PA1 PA2))
+  (define b (make-simple-IC PB0 PB1 PB2))
+  (define c (make-simple-IC PC0 PC1 PC2))
+  (define d (make-simple-IC PD0 PD1 PD2 PD3))
+
+  (sch-symbol-pict (IC-symbol a))
+  (sch-symbol-locs (IC-symbol a))
+
+  (footprint-pict (IC-footprint a))
+  (footprint-locs (IC-footprint a))
+
+  (IC-pins a)
+
+  (define g (make-group
+             ;; input ICs
+             ;; These symbols are significant, they are used to mark the 
+             #:in (a b c d)
+             ;; Output pins mapped to input IC pins.  This mapping is only useful
+             ;; for connecting outer and inner circuit.
+             #:out (x y)
+             ;; pair connections
+             #:conn ([x (a PA0) (b PB1) (d PD2)]
+                     [y (a PA2) (c PC0)])))
+
+  (sch-visualize g)
+  )
+
+

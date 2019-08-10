@@ -21,6 +21,33 @@ A component should have:
 - children components
 - the connections
 
+Position of IC on gerber files:
+- I should be able to specify a coordinate of a IC?
+- should I specify the location for all ICs?
+- how about schematic symbols?
+- how about another coordinate system, like relative positioning?
+- I probably want to just use the PCB layout, no visualizing of the
+  schematic at all
+
+If position (and orientation) is fixed, the component is no longer
+reusable. Well, it is reusable by providing parameter for all the
+fixed locations.
+
+** footprint
+https://eesemi.com/ic-package-types.htm
+
+*** QFN (Quad Flat No Leads)
+
+| Part Number | No. of Pads | Body Size     | Body Thickness | Pad Pitch |
+|-------------+-------------+---------------+----------------+-----------|
+| QFN-16      |          16 | 3 mm x 3 mm   | 0.9 mm         | 0.5 mm    |
+| QFN-24      |          24 | 4 mm x 4 mm   | 0.9 mm         | 0.5 mm    |
+| QFN-32      |          32 | 5 mm x 5 mm   | 0.9 mm         | 0.5 mm    |
+| QFN-44      |          32 | 5 mm x 5 mm   | 0.9 mm         | 0.5 mm    |
+| QFN-50      |          50 | 5 mm x 10 mm  | 1.0 mm         | 0.5 mm    |
+| QFN-72      |          72 | 10 mm x 10 mm | 0.9 mm         | 0.5 mm    |
+
+
 ** Visualizer
 Like the schematic wire connection using labels, I probably don't want
 to connect every components physically.

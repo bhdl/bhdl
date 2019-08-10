@@ -9,14 +9,12 @@
 
 (provide (struct-out footprint)
 
-         DIP-8 DIP-22 DIP-24
+         DIP-8 DIP-22 DIP-24 DIP-28
          TQFP-32 TQFP-44 TQFP-64 TQFP-128
          TSSOP-14 TSSOP-16 TSSOP-18 TSSOP-24
          SOIC-8 SOIC-14 SOIC-16)
 
 #|
-
-- https://eesemi.com/ic-package-types.htm
 
 The footprint contains three parts
 - the cut outline
@@ -24,6 +22,9 @@ The footprint contains three parts
 - the pad number, loc, shape, size, type
 
 |#
+
+(struct footprint
+  (pict locs))
 
 
 (define (numbered-pad pad num)
@@ -216,9 +217,6 @@ The footprint contains three parts
 
 
 
-(struct footprint
-  (pict locs))
-
 
 (define (make-DIP num)
   (let ([width (case num
@@ -227,7 +225,8 @@ The footprint contains three parts
                  ;; FIXME multiple choices for width
                  ;; (scale (DIP 24 152.4) 3)
                  ;; (scale (DIP 24 101.6) 3)
-                 [(24) 152.4]
+                 [(24) 76.2]
+                 [(28) 76.2]
                  [else (error (format "Invalid num ~a" num))])])
     (let-values ([(pict locs) (DIP num width)])
       (footprint pict locs))))
@@ -235,6 +234,7 @@ The footprint contains three parts
 (define DIP-8 (make-DIP 8))
 (define DIP-22 (make-DIP 22))
 (define DIP-24 (make-DIP 24))
+(define DIP-28 (make-DIP 28))
 
 (define (make-TQFP num)
   (let-values ([(pict locs) (TQFP num)])
