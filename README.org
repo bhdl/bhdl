@@ -33,6 +33,37 @@ If position (and orientation) is fixed, the component is no longer
 reusable. Well, it is reusable by providing parameter for all the
 fixed locations.
 
+** Functional components
+The functional pict library in racket does not suit my needs very
+well. In particular, it does not support converting to gerber file,
+obviously. But it is very hard to add this functionality. pict-lib
+maintains an internal format that is not well documented, and not
+exposed. It can be draw on a dc%, via its internal render function
+that reads the internal format, and draw on dc% by calling dc%'s
+method, that's it. It is impossible to turn a drawn dc% into
+gerber. The pict internal format is not readily usable. Thus, this
+task is impossible. Also in another perspective, the dc% (and
+pict-lib) is richer than gerber format, thus we should not convert dc%
+into gerber.
+
+So the plan is to have my own internal format, and write several
+generators for it:
+1. generate dc% (via pict-lib) for user visualization purpose only
+2. generate gerber file for fabrication
+3. generate KiCAD file for use in KiCAD
+
+
+*** KiCAD footprint reader
+
+From the footprint, generate a gerber file.
+
+*** entire board gerber generator
+Given an abstraction of board with many components, and given a list
+of position and oritation information, draw them in a gerber file.
+
+*** Gerber viewer
+
+
 ** footprint
 https://eesemi.com/ic-package-types.htm
 
@@ -71,7 +102,7 @@ Declaring commands, can appear only once:
 - MO :: set mode. %MOMM*%: set the unit to MM or (IN)
 
 Mode
-- LP :: Load polarity. %LPD%, %LPC%: set the polarity to either dark
+- LP :: Load polarity. %LPD*%, %LPC*%: set the polarity to either dark
   or clear. The polarity is used for either clear a region or darken
   it. Since the gerber file interprets as superimposing in the order
   of generation, the later image overwrites the former.
