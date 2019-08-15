@@ -1,0 +1,140 @@
+#+TITLE: Design document
+
+* Design
+
+** IC
+IC should have pins (pairs of (pin-number pin-name)), and attributes,
+which can contain:
+- value of resistors
+- name to be shown in visualization and gerber file
+- specified fixed location on PCB.  If loc is not #f, the user needs
+  to make sure this and any comp-IC containing it are not
+  reused. Currently there is no facility to detect this and give
+  warnings.
+- footprint to be used in gerber
+- optional: symbol for schematic visualization
+** Different kinds of IC
+*** Simple ICs
+Simple ICs such as resistors and capacitors, do not have polarity. But
+in the program representation we should have distinct pins for them,
+so that we can connect them to the desired pins of other
+components. The current design is to use symbol =a= and =b= for that.
+
+Power:
+- ground
+- VCC
+- battery
+
+passive components:
+- resistors (R)
+- capacitors (C)
+- coils (L)
+- push buttons (SW)
+- switches (SW) (single pull double throw)
+
+- pin headers
+- oscillator (crystral)
+
+*** chip ICs
+These ICs have well defined pins, and thus is easy.
+
+active components:
+- diodes (D)
+- transistors (Q):
+  - BJT: NPN, PNP
+  - MOSFET: N-channel, P-channel
+- Op Amps (U)
+- IC (U):
+  - circle: inverted, active low
+  - triangle: clock signal
+
+*** popular ICs
+- ATMega328 (just a lot of pins)
+- 7805 voltage regulator
+- logical gates
+  - 4001, 4002, 4011, 4023, 4025
+  - 4017, 4020, 4040
+- operational amplifiers
+  - AD8063, LM2902
+- ADC
+  - ADC1173, AD7819
+- DAC
+  - AD7304, MAX5138
+- Comparator
+- MCU
+  - Z80
+- connectors
+- small components
+  - diode
+  - resistors
+
+** connecting ICs
+A component should have:
+- pins
+- children components
+- the connections
+
+A group is a list of ICs connected together. At the definition of a
+group, the output pins of this group is defined. The outside world can
+only connect to those pins.
+
+I should support parameterizing the group.
+
+** Footprint
+The IC should be seperate from footprint. One IC can have multiple
+footprints. When should the footprints be assigned? Should be at the
+point of visualization and gerber generation. How to do this
+functionally?
+
+footprint. These will be read from kicad module. The module has the
+(num, pad loc) associations.
+
+** Visualization
+In order to visualize a comp-IC, I need to assign footprint. I'm not
+considering skipping the schematic symbol part entirely.
+
+** Gerber generation
+
+Position of IC on gerber files:
+- I should be able to specify a coordinate of a IC?
+- should I specify the location for all ICs?
+- how about schematic symbols?
+- how about another coordinate system, like relative positioning?
+- I probably want to just use the PCB layout, no visualizing of the
+  schematic at all
+
+If position (and orientation) is fixed, the component is no longer
+reusable. Well, it is reusable by providing parameter for all the
+fixed locations.
+
+*** DONE KiCAD footprint reader
+    CLOSED: [2019-08-14 Wed 16:42]
+
+From the footprint, generate a gerber file.
+
+*** entire board gerber generator
+Given an abstraction of board with many components, and given a list
+of position and oritation information, draw them in a gerber file.
+
+*** DONE Gerber viewer
+    CLOSED: [2019-08-14 Wed 16:42]
+
+** On using pict library
+The functional pict library in racket does not suit my needs very
+well. In particular, it does not support converting to gerber file,
+obviously. But it is very hard to add this functionality. pict-lib
+maintains an internal format that is not well documented, and not
+exposed. It can be draw on a dc%, via its internal render function
+that reads the internal format, and draw on dc% by calling dc%'s
+method, that's it. It is impossible to turn a drawn dc% into
+gerber. The pict internal format is not readily usable. Thus, this
+task is impossible. Also in another perspective, the dc% (and
+pict-lib) is richer than gerber format, thus we should not convert dc%
+into gerber.
+
+So the plan is to have my own internal format, and write several
+generators for it:
+1. generate dc% (via pict-lib) for user visualization purpose only
+2. generate gerber file for fabrication
+3. generate KiCAD file for use in KiCAD
+

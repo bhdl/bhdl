@@ -1,115 +1,9 @@
 #+TITLE: Rackematic: a framework for Schematic/PCB design
 
-* KiCAD
+
+* References
+** KiCAD
 - file formats: http://www.kicad-pcb.org/help/file-formats/
-
-* Design
-
-- A language for modeling schematic components
-- A visualizer
-
-** IC
-An IC should have the following informations:
-- pins
-- index mapping of pins (HEBI: would the mapping be the same for
-  symbol and footprint?)
-- symbol: and location of pins on the symbol
-- footprint: and location of pins on the footprint
-
-A component should have:
-- pins
-- children components
-- the connections
-
-Position of IC on gerber files:
-- I should be able to specify a coordinate of a IC?
-- should I specify the location for all ICs?
-- how about schematic symbols?
-- how about another coordinate system, like relative positioning?
-- I probably want to just use the PCB layout, no visualizing of the
-  schematic at all
-
-If position (and orientation) is fixed, the component is no longer
-reusable. Well, it is reusable by providing parameter for all the
-fixed locations.
-
-*** [#A] New design
-IC should have pins (pairs of (pin-number pin-name)), and attributes,
-which can contain:
-- value of resistors
-- name to be shown in visualization and gerber file
-- specified fixed location on PCB.  If loc is not #f, the user needs
-  to make sure this and any comp-IC containing it are not
-  reused. Currently there is no facility to detect this and give
-  warnings.
-
-- footprint to be used in gerber
-- optional: symbol for schematic visualization
-
-In order to visualize a comp-IC, I need to assign footprint. I'm not
-considering skipping the schematic symbol part entirely.
-
-
-*** Simple ICs
-Simple ICs such as resistors and capacitors, do not have polarity. But
-in the program representation we should have distinct pins for them,
-so that we can connect them to the desired pins of other
-components. The current design is to use symbol =a= and =b= for that.
-
-*** chip ICs
-These ICs have well defined pins, and thus is easy.
-
-*** Groups
-A group is a list of ICs connected together. At the definition of a
-group, the output pins of this group is defined. The outside world can
-only connect to those pins.
-
-I should support parameterizing the group.
-
-*** Components
-- footprint. These will be read from kicad module. The module has the
-  (num, pad loc) associations.
-- schematic symbols
-
-** Footprint
-The IC should be seperate from footprint. One IC can have multiple
-footprints. When should the footprints be assigned? Should be at the
-point of visualization and gerber generation. How to do this
-functionally?
-
-** Functional components
-The functional pict library in racket does not suit my needs very
-well. In particular, it does not support converting to gerber file,
-obviously. But it is very hard to add this functionality. pict-lib
-maintains an internal format that is not well documented, and not
-exposed. It can be draw on a dc%, via its internal render function
-that reads the internal format, and draw on dc% by calling dc%'s
-method, that's it. It is impossible to turn a drawn dc% into
-gerber. The pict internal format is not readily usable. Thus, this
-task is impossible. Also in another perspective, the dc% (and
-pict-lib) is richer than gerber format, thus we should not convert dc%
-into gerber.
-
-So the plan is to have my own internal format, and write several
-generators for it:
-1. generate dc% (via pict-lib) for user visualization purpose only
-2. generate gerber file for fabrication
-3. generate KiCAD file for use in KiCAD
-
-
-*** DONE KiCAD footprint reader
-    CLOSED: [2019-08-14 Wed 16:42]
-
-From the footprint, generate a gerber file.
-
-*** entire board gerber generator
-Given an abstraction of board with many components, and given a list
-of position and oritation information, draw them in a gerber file.
-
-*** DONE Gerber viewer
-    CLOSED: [2019-08-14 Wed 16:42]
-
-
 ** footprint
 https://eesemi.com/ic-package-types.htm
 
@@ -125,213 +19,12 @@ https://eesemi.com/ic-package-types.htm
 | QFN-72      |          72 | 10 mm x 10 mm | 0.9 mm         | 0.5 mm    |
 
 
-** Visualizer
-Like the schematic wire connection using labels, I probably don't want
-to connect every components physically.
+* GTD
 
-** Gerber file generation
-gerber file format
-- website: https://www.ucamco.com/en/gerber
-- specification:
-  https://www.ucamco.com/files/downloads/file/81/the_gerber_file_format_specification.pdf
-- online Reference Gerber Viewer: https://gerber-viewer.ucamco.com/
+** Implement popular boards
+*** 555 timer
 
-from computer-aided design (CAD) to computer-aided manufacturing (CAM)
-
-*** %% commands
-All commands must be =%...*%= format.
-
-Declaring commands, can appear only once:
-- FS :: format specification
-  - %FSLAX26Y26*%: 2 digit integer part, 6 digit decimal part. The
-    *leading* 0s are omitted.
-- MO :: set mode. %MOMM*%: set the unit to MM or (IN)
-
-Mode
-- LP :: Load polarity. %LPD*%, %LPC*%: set the polarity to either dark
-  or clear. The polarity is used for either clear a region or darken
-  it. Since the gerber file interprets as superimposing in the order
-  of generation, the later image overwrites the former.
-- LM :: Load mirror
-- LR :: load rotation
-- LS :: load scale
-
-
-Aperture:
-  - AD :: aperture define. %AD%: Aperture define.
-    - standard pre-defined appentures: 
-      - circle (C), diameter, [hole diameter]
-      - rectangle (R), X, Y, [hole diameter]
-      - obround (O), X, Y, [hole diameter]
-      - regular polygon (P), outer diameter, #vertices, rotation, [hole diameter]
-    - ADDnn,2.5X.25X.01*
-    - %ADD123R,2.5X1.5*%: create an aperture with D-code D123, use
-      pre-defined aperture R, parameter is 2.5mmX1.5mm for the
-      rectangle. A single =D100*= command can be used to set the
-      aperture.
-  - AM :: Aperture macro.  %AM%: Aperture Macro, creates macro
-    apertures, used for custom shapes. This does not associate the
-    aperture with a D-code, another AD should be used (TODO examples).
-    - %AM<name>*...*...*%, one * per-line
-    - TODO
-  - AB :: Aperture block. %AB%: Aperture block, creates block
-    apertures.
-  - SR :: Step and repeat. Seems to be another block creation command
-
-Attributes (X2: TF, TA, TO, TD):
-- TF :: attribute File. 
-  - %TF.FileFunction,Soldermask,Top*%: the file represents the top
-    solder mask
-  - %TF.Part,Other,example*%
-- TA :: attribute Aperture
-- TO :: attribute Object
-- TD :: attribute Delete
-
-*** non-%% commands
-All commands must be =...*= format.
-
-- G04: line comment
-- M02 :: end of file
-
-Graphical commands:
-- G01 :: set interpolation mode to linear
-- G02 :: set interpolation mode to clockwise circular
-- G03 :: set interpolation mode to counter-clockwise circular
-- G74 :: set quadrant mode to single quadrant
-- G75 :: set quadrant mode to multi quadrant
-
-Operations: X...Y...D01. The coordinates can be negative. The X or Y
-section can be omitted to use the current value.
-- D02 :: move the current point to the coordinate
-- D01 :: create a straight or circular line from current point to the
-  coordinate. Usually used for tracks.
-  - The only allowed apertures are pre-defined solid circle and
-    rectangle. custom apertures are not allowed.
-  - Only circle can be used for arc. This can be achieved by D01 in
-    "circular interpolation mode".
-  - a circle with 0 diameter can be used to draw non-image
-    information, e.g. an outline.
-  - a draw of 0 length is allowed, and appears the same as flash, but
-    DO NOT USE THIS, in particular a pad should only be flashed.
-- D03 :: create a flash object. Each aperture has an origin, and that is
-  positioned at the coordinate. Usually used for pads.
-
-Region statement, used for pour. A region is defined by its contour.
-- G36 command begins a region statement, G37 ends it. 
-- In between G36 and G37, D01 draws the region, and D02 ENDS it. 
-  - D02 is not allowed if the drawing of this region is not closed, so
-    D02 basically declares an end of one region, and starts
-    another. 
-  - That is, G36 G37 can define multiple sub regions. G37 ends the
-    region statement, the last one needs not be closed by D02.
-- when a region is ended with G37, all sub regions are filled. I guess
-  for a pour fill, it should be performs first.
-
-*** Formal grammar
-
-#+BEGIN_EXAMPLE
-<data block> ::= <character>* '*'
-<command> ::= <function code command> | <extended command>
-<function code command> ::= <data block>
-
-;; the multiple data block case is AM command
-<extended command> ::= %<data block>+%
-
-<extended command> :== <FS command> | ...
-<FS command> ::= FSLAX<digit><digit>Y<digit><digit> '*'
-#+END_EXAMPLE
-
-<extended command> ::= %<data block>+%
-
-
-
-
-
-
-
-** Components
-
-This includes schematic symbols and PCB footprints.
-
-- logical gates
-  - 4001, 4002, 4011, 4023, 4025
-  - 4017, 4020, 4040
-- operational amplifiers
-  - AD8063, LM2902
-- ADC
-  - ADC1173, AD7819
-- DAC
-  - AD7304, MAX5138
-- Comparator
-- MCU
-  - Z80
-- connectors
-- small components
-  - diode
-  - resistors
-
-** A list of components
-
-Power:
-- ground
-- VCC
-- battery
-
-passive components:
-- resistors (R)
-- capacitors (C)
-- coils (L)
-- push buttons (SW)
-- switches (SW) (single pull double throw)
-
-active components:
-- diodes (D)
-- transistors (Q):
-  - BJT: NPN, PNP
-  - MOSFET: N-channel, P-channel
-- Op Amps (U)
-- IC (U):
-  - circle: inverted, active low
-  - triangle: clock signal
-
-wires connections:
-- not connected (draw a curve or just leave it there but no dot)
-- dot connected
-
-** sections of schematic
-*** power section
-- decoupling capacitors
-- voltage divider resistors, selected by op-amps (e.g. LMV358) to
-  select 3.3v or 5v
-*** (power) LED section
-- LED
-- current limiting resistors
-
-*** voltage regulator (e.g. 7805)
-- decoupling capacitors on both input and output of the voltage regulator
-- 3v3 volt regulator (e.g. LP2985, NCP1117)
-- barrel jack for power input
-
-Some tips:
-- for linear regulator, the output capacitor should be smaller than
-  the input capacitor
-- the output capacitor is a filter capacitor
-- the input capacitor is a decoupling capacitor, since it decouples it
-  from the input power
-
-*** reset button
-- button
-- pull-up resistors
-
-*** IC
-- ATMega328 (just a lot of pins)
-- oscillator (crystral)
-
-** Frequently used components
-- 7805 voltage regulator
-- pin headers
-
-** Start with an Arduino Uno
+*** Arduino Uno
 - bootloader auto-reset
 - USB socket
 - ICSP (SPI, i.e. MISO, MOSI, SCK, RESET) header for programming the
@@ -341,7 +34,31 @@ Some tips:
 Custom Arduino Design Series, Schematic, PCB, Test
 https://www.youtube.com/playlist?list=PLRIGIzu0Z7KllhKqPsNDwitjpK45SHoKg
 
-* Examples
-** 555 timer
-** Arduino Uno
-** Novena laptop
+**** sections of schematic
+***** power section
+  - decoupling capacitors
+  - voltage divider resistors, selected by op-amps (e.g. LMV358) to
+    select 3.3v or 5v
+***** (power) LED section
+  - LED
+  - current limiting resistors
+
+***** voltage regulator (e.g. 7805)
+  - decoupling capacitors on both input and output of the voltage regulator
+  - 3v3 volt regulator (e.g. LP2985, NCP1117)
+  - barrel jack for power input
+
+  Some tips:
+  - for linear regulator, the output capacitor should be smaller than
+    the input capacitor
+  - the output capacitor is a filter capacitor
+  - the input capacitor is a decoupling capacitor, since it decouples it
+    from the input power
+
+***** reset button
+  - button
+  - pull-up resistors
+
+
+*** Novena laptop
+

@@ -1,0 +1,8 @@
+#+TITLE: Backup documents
+
+** Wire connections
+
+wires connections:
+- not connected (draw a curve or just leave it there but no dot)
+- dot connected
+
