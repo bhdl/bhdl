@@ -7,8 +7,11 @@
          pict
          racket/draw)
 
+(provide view-gerber)
+
 ;; draw a given gerber file onto dc%
 
+;; xref--marker-ring
 
 (define (gbr->instructions gbr-file)
   (filter
@@ -150,7 +153,8 @@
   "Return a pict for the gerber file."
   (scale (execute-gbr-instructions (gbr->instructions gbr-file)) 30))
 
+;; (+ 1 2)
+
 (module+ test
-  (view-gerber "out.gbr")
-  )
+  (view-gerber "out.gbr"))
 

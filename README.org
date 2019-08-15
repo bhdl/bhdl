@@ -33,6 +33,50 @@ If position (and orientation) is fixed, the component is no longer
 reusable. Well, it is reusable by providing parameter for all the
 fixed locations.
 
+*** [#A] New design
+IC should have pins (pairs of (pin-number pin-name)), and attributes,
+which can contain:
+- value of resistors
+- name to be shown in visualization and gerber file
+- specified fixed location on PCB.  If loc is not #f, the user needs
+  to make sure this and any comp-IC containing it are not
+  reused. Currently there is no facility to detect this and give
+  warnings.
+
+- footprint to be used in gerber
+- optional: symbol for schematic visualization
+
+In order to visualize a comp-IC, I need to assign footprint. I'm not
+considering skipping the schematic symbol part entirely.
+
+
+*** Simple ICs
+Simple ICs such as resistors and capacitors, do not have polarity. But
+in the program representation we should have distinct pins for them,
+so that we can connect them to the desired pins of other
+components. The current design is to use symbol =a= and =b= for that.
+
+*** chip ICs
+These ICs have well defined pins, and thus is easy.
+
+*** Groups
+A group is a list of ICs connected together. At the definition of a
+group, the output pins of this group is defined. The outside world can
+only connect to those pins.
+
+I should support parameterizing the group.
+
+*** Components
+- footprint. These will be read from kicad module. The module has the
+  (num, pad loc) associations.
+- schematic symbols
+
+** Footprint
+The IC should be seperate from footprint. One IC can have multiple
+footprints. When should the footprints be assigned? Should be at the
+point of visualization and gerber generation. How to do this
+functionally?
+
 ** Functional components
 The functional pict library in racket does not suit my needs very
 well. In particular, it does not support converting to gerber file,
@@ -53,7 +97,8 @@ generators for it:
 3. generate KiCAD file for use in KiCAD
 
 
-*** KiCAD footprint reader
+*** DONE KiCAD footprint reader
+    CLOSED: [2019-08-14 Wed 16:42]
 
 From the footprint, generate a gerber file.
 
@@ -61,7 +106,8 @@ From the footprint, generate a gerber file.
 Given an abstraction of board with many components, and given a list
 of position and oritation information, draw them in a gerber file.
 
-*** Gerber viewer
+*** DONE Gerber viewer
+    CLOSED: [2019-08-14 Wed 16:42]
 
 
 ** footprint
