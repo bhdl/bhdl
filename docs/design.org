@@ -2,6 +2,10 @@
 
 * Design
 
+** Language
+Instead of specifying a/b port of a resistor when connecting them, can
+we have some dot-graph syntax?
+
 ** IC
 IC should have pins (pairs of (pin-number pin-name)), and attributes,
 which can contain:
@@ -13,6 +17,7 @@ which can contain:
   warnings.
 - footprint to be used in gerber
 - optional: symbol for schematic visualization
+
 ** Different kinds of IC
 *** Simple ICs
 Simple ICs such as resistors and capacitors, do not have polarity. But

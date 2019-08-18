@@ -6,9 +6,11 @@
          rackunit
          pict
          "footprint.rkt"
+         "gerber-viewer.rkt"
          racket/draw)
 
-(provide footprint->gerber)
+(provide footprint->gerber
+         footprint->pict)
 
 (define (gerber-format-xy x y)
   (format "X~aY~a"
@@ -31,7 +33,8 @@
                           (case shape
                             [(rect) (~a "R," s1 "X" s2)]
                             [(oval) (~a "O," s1 "X" s2)]
-                            [(roundrect) (~a "R," s1 "X" s2)])))))])
+                            [(roundrect) (~a "R," s1 "X" s2)]
+                            [(circle) (~a "O," s1 "X" s2)])))))])
     (for/list ([i (range 10 (+ 10 (length lst)))]
                [l lst])
       `(,l ,i))))
@@ -42,22 +45,25 @@
      (~a "%ADD" (second l) (first l) "*%"))
    "\n"))
 
-(define select-aperture
-  (let ([aperture ""])
-    (λ (s)
-      ;; if no change from last time, no need to change
-      (if (string=? s aperture) ""
-          (begin
-            (set! aperture s)
-            (string-append s "\n"))))))
-
-(define (select-aperture-by-id id aperture-lst)
-  (select-aperture (~a "D" (second (assoc id aperture-lst)) "*")))
 
 (define (footprint->gerber fp)
   "Given a kicad footprint expr, write a gerber file. This will parse
 the kicad footprint format and generate gerber."
 
+  ;; this has to be inside footprint->gerber, otherwise it is not pure
+  ;; functional
+  (define select-aperture
+    (let ([aperture ""])
+      (λ (s)
+        ;; if no change from last time, no need to change
+        (if (string=? s aperture) ""
+            (begin
+              (set! aperture s)
+              (string-append s "\n"))))))
+
+  (define (select-aperture-by-id id aperture-lst)
+    (select-aperture (~a "D" (second (assoc id aperture-lst)) "*")))
+  
   (define aperture-lst (footprint->aperture-lst fp))
 
   (string-join
@@ -94,9 +100,20 @@ the kicad footprint format and generate gerber."
                [(oval) (~a "O," s1 "X" s2)]
                ;; TODO roundrect
                [(roundrect) (~a "R," s1 "X" s2)]
+               ;; TODO circle
+               [(circle) (~a "O," s1 "X" s2)]
                [else (error (format "invalid shape: ~a" shape))])
              aperture-lst)
             (gerber-format-xy x y) "D03*")))
      "M02*")
    "\n"))
 
+(define (footprint->pict fp)
+  (let ([fname (make-temporary-file)])
+    ;; (println fname)
+    (call-with-output-file fname
+       #:exists 'replace
+       (λ (out)
+         (write-string (footprint->gerber fp)
+                       out)))
+    (gerber-file->pict fname)))

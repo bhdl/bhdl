@@ -34,19 +34,27 @@
                      identity
                      (for/list [(e body)]
                        (match e
-                         [(list 'fp_text _ text (list 'at x y) (list 'layer l) (list 'effects ef))
+                         ;; TODO
+                         ;; FIXME optional z
+                         [`(fp_text ,_ ,text (at ,x ,y ,z ...) (layer ,l) ,other ...)
                           #f]
                          [`(fp_arc (start ,sx ,sy) (end ,ex ,ey) (angle ,ag) (layer ,l) (width ,w))
                           #f]
                          [`(fp_line (start ,sx ,sy) (end ,ex ,ey) (layer ,l) (width ,w))
                           (line-spec sx sy ex ey w)]
-                         [`(pad ,num ,type ,shape (at ,x ,y) (size ,s1 ,s2) ,other-attrs ...)
-                          (pad-spec x y num type shape `((size ,s1 ,s2)))]
-                         [(list 'tedit rest ...) #f]
-                         [(list 'descr rest ...) #f]
-                         [(list 'tags rest ...) #f]
-                         [(list 'model rest ...) #f]
-                         [(list 'attr rest ...) #f])))])])
+                         ;; FIXME optional z
+                         [`(pad ,num ,mounting-type ,shape (at ,x ,y ,z ...)
+                                (size ,s1 ,s2) ,other-attrs ...)
+                          (pad-spec x y num mounting-type shape `((size ,s1 ,s2)))]
+                         ;; TODO
+                         [`(fp_circle ,other ...)
+                          #f]
+                         [`(tedit ,other ...) #f]
+                         [`(descr ,other ...) #f]
+                         [`(tags ,other ...) #f]
+                         [`(model ,other ...) #f]
+                         [`(attr ,other ...) #f])))])])
       (let ([line-specs (filter line-spec? specs)]
             [pad-specs (filter pad-spec? specs)])
         (footprint line-specs pad-specs)))))
+

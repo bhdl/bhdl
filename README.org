@@ -21,6 +21,12 @@ https://eesemi.com/ic-package-types.htm
 
 * GTD
 
+** Libraries
+- define all popular libraries
+- compose them together
+- write visualization and gerber generation for comp-IC
+- assign footprint
+
 ** Implement popular boards
 *** 555 timer
 

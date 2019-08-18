@@ -7,7 +7,7 @@
          pict
          racket/draw)
 
-(provide view-gerber)
+(provide gerber-file->pict)
 
 ;; draw a given gerber file onto dc%
 
@@ -51,6 +51,7 @@
   (define unit #f)
   (define cur-LP #f)
   (define cur-aperture #f)
+  ;; FIXME define aperture data structure
   (define-values (add-aperture set-aperture)
     (let ([aperture '()])
       (values (λ (dcode shape attr)
@@ -72,26 +73,11 @@
       [(list 'AD dcode shape (list attr ...))
        (add-aperture dcode shape attr)]
       [else #f]))
-
-  ;; I'll need to known the size of the plot to create a dc%
-  (define-values (xmax xmin ymax ymin)
-    (let ([res (filter
-                identity
-                (for/list ([instruction instructions])
-                  (match instruction
-                    [(list 'XY x y i j d)
-                     (list (/ x (expt 10 FS-x))
-                           (/ y (expt 10 FS-y)))]
-                    [else #f])))])
-      (values (apply max (map first res))
-              (apply min (map first res))
-              (apply max (map second res))
-              (apply min (map second res)))))
-
+  
   (define (xx x)
-    (- (/ x (expt 10 FS-x)) xmin))
+    (/ x (expt 10 FS-x)))
   (define (yy y)
-    (- (/ y (expt 10 FS-y)) ymin))
+    (/ y (expt 10 FS-y)))
 
   (define (flash-rectangle dc x y)
     (let-values ([(dx dy) (values (first (second cur-aperture))
@@ -104,9 +90,32 @@
             dx
             dy)))
 
-  (define (draw dc dx dy)
+  (define (flash-ellipse dc x y)
+    (let-values ([(dx dy) (values (first (second cur-aperture))
+                                  (second (second cur-aperture)))])
+      (send dc draw-ellipse
+            (- x (/ dx 2))
+            (- y (/ dy 2))
+            dx
+            dy)))
+
+  (define-values (update-bounding-box get-bounding-box)
+    (let-values ([(xmax xmin ymax ymin) (values 0 0 0 0)])
+      (values (λ (x y (dx 0) (dy 0))
+                (set! xmax (max (+ x dx) xmax))
+                (set! xmin (min (- x dx) xmin))
+                (set! ymax (max (+ y dy) ymax))
+                (set! ymin (min (- y dy) ymin)))
+              (λ ()
+                (values xmax xmin ymax ymin)))))
+
+  ;; FIXME This draw function is called everytime the picture is
+  ;; rendered
+  ;;
+  (define (draw dc)
     (define cur-pos #f)
     ;; the default pen is sooooo big
+    ;; FIXME fixed line width 0.05
     (send dc set-pen "black" 0.05 'solid)
     ;; for pads
     (send dc set-brush "red" 'solid)
@@ -118,43 +127,68 @@
         [(list 'D dcode)
          (set-aperture dcode)]
         [(list 'XY x y i j d)
+         (unless cur-aperture
+           (error "cur aperture not set"))
          (case d
-           ;; TODO actually draw
-           [(1)
-            (send dc draw-line
-                  (car cur-pos) (cdr cur-pos)
-                  (xx x) (yy y))
-            #f]
-           [(2) #f]
+           ;; Compute min max of x,y during the draw, because I need
+           ;; to access the current aperture
+           ;;
+           ;; FIXME magic number 0.05 repeated
+           [(1) (update-bounding-box (xx x) (yy y) 0.05 0.05)
+                (send dc draw-line
+                      (car cur-pos) (cdr cur-pos)
+                      (xx x) (yy y))]
+           [(2) (update-bounding-box (xx x) (yy y) 0.05 0.05)]
            ;; flash current aperture
-           [(3)
-            (case (first cur-aperture)
-              [("R") (flash-rectangle dc (xx x) (yy y))]
-              [("O") (send dc draw-ellipse (xx x) (yy y)
-                           (first (second cur-aperture))
-                           (second (second cur-aperture)))])
-            #f])
+           [(3) (let-values ([(dx dy) (values (first (second cur-aperture))
+                                              (second (second cur-aperture)))])
+                  (update-bounding-box (xx x) (yy y) (/ dx 2) (/ dy 2)))
+                (case (first cur-aperture)
+                  [("R") (flash-rectangle dc (xx x) (yy y))]
+                  ;; FIXME I should flash the ellipse
+                  [("O") (flash-ellipse dc (xx x) (yy y))])])
          (set! cur-pos (cons (xx x) (yy y)))]
         ;; TODO check if this instruction is present at the last
         [(list 'M02) "end"]
         [else #f])))
   
   ;; return dc as a pict
-  (dc (λ (dc dx dy)
-        (define old-brush (send dc get-brush))
-        (define old-pen (send dc get-pen))
-        (draw dc dx dy)
-        (send dc set-brush old-brush)
-        (send dc set-pen old-pen))
-      (* (- xmax xmin) 1.05)
-      (* (- ymax ymin) 1.05)))
+  (define res (dc (λ (dc dx dy)
+                    (define old-brush (send dc get-brush))
+                    (define old-pen (send dc get-pen))
+                    (define-values (old-x old-y) (send dc get-origin))
+                    (send dc set-origin dx dy)
+                    
+                    (draw dc)
+                    
+                    (send dc set-brush old-brush)
+                    (send dc set-pen old-pen)
+                    (send dc set-origin old-x old-y))
+                  0 0))
 
-(define (view-gerber gbr-file)
+  ;; FIXME get-bounding-box should be called AFTER the drawing
+  (define-values (xmax xmin ymax ymin) (get-bounding-box))
+
+  ;; (println (list xmax xmin ymax ymin))
+  
+  (inset res
+         (- 0 xmin) (- 0 ymin) xmax ymax))
+
+(define (gerber-file->pict gbr-file)
   "Return a pict for the gerber file."
-  (scale (execute-gbr-instructions (gbr->instructions gbr-file)) 30))
+  (scale
+   (execute-gbr-instructions (gbr->instructions gbr-file))
+   30))
 
-;; (+ 1 2)
+
+;; (pict-path? p)
 
 (module+ test
-  (view-gerber "out.gbr"))
+
+  (match '(#f)
+    [8 1]
+    [_ (println "hello")])
+  
+  ;; FIXME NOW HEBI mounting hole pict
+  (gerber-file->pict "out.gbr"))
 
