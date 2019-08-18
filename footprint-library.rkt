@@ -275,3 +275,96 @@
   (for/list ([ct '(32 44 48 64 80 100 120 128 144 176)])
     (footprint->pict (kicad-TQFP ct))))
 
+(define (kicad-DIP ct)
+  ;; DIP-4_W7.62mm.kicad_mod
+  ;; DIP-6_W7.62mm.kicad_mod
+  ;; DIP-8_W7.62mm.kicad_mod
+  ;; DIP-40_W15.24mm.kicad_mod
+  ;; DIP-42_W15.24mm.kicad_mod
+  ;; DIP-48_W15.24mm.kicad_mod
+  ;; DIP-64_W15.24mm.kicad_mod
+  (let ([width (case ct
+                 [(4 6 8 10 12 14 16 18 20 22 24 28 32)
+                  7.62]
+                 [(40 42 48 64)
+                  15.24])])
+    (kicad-helper "Package_DIP.pretty/"
+                  (~a "DIP-" ct "_W" width "mm.kicad_mod"))))
+
+(module+ test
+  (for/list ([ct '(4 6 8 10 12 14 16 18 20 22 24 28 32
+                     40 42 48 64)])
+    (footprint->pict (kicad-DIP ct))))
+
+
+(define (kicad-SOIC ct)
+  ;; SOIC-8_3.9x4.9mm_P1.27mm.kicad_mod
+  ;; SOIC-14_3.9x8.7mm_P1.27mm.kicad_mod
+  ;; SOIC-16W_7.5x10.3mm_P1.27mm.kicad_mod
+  ;; SOIC-18W_7.5x11.6mm_P1.27mm.kicad_mod
+  ;; SOIC-20W_7.5x12.8mm_P1.27mm.kicad_mod
+  ;; SOIC-24W_7.5x15.4mm_P1.27mm.kicad_mod
+  ;; SOIC-28W_7.5x17.9mm_P1.27mm.kicad_mod
+  (kicad-helper "Package_SO.pretty/"
+                (~a "SOIC-" ct "W_7.5x"
+                    (case ct
+                      [(16) 10.3]
+                      [(18) 11.6]
+                      [(20) 12.8]
+                      [(24) 15.4]
+                      [(28) 17.9])
+                    "mm_P1.27mm.kicad_mod")))
+
+(module+ test
+  (for/list ([ct '(16 18 20 24 28)])
+    (footprint->pict (kicad-SOIC ct))))
+
+(define (kicad-TSSOP ct)
+  
+
+  ;; TSSOP-56_6.1x14mm_P0.5mm.kicad_mod
+  
+  (let ([data (case ct
+                [(8) '(4.4 3 0.65)]
+                [(14) '(4.4 5 0.65)]
+                [(16) '(4.4 5 0.65)]
+                [(20) '(4.4 6.5 0.65)]
+                [(24) '(4.4 7.8 0.65)]
+                [(28) '(4.4 9.7 0.65)]
+
+                [(30) '(4.4 7.8 0.5)]
+                [(32) '(6.1 11 0.65)]
+                [(38) '(6.1 12.5 0.65)]
+                [(48) '(6.1 12.5 0.5)]
+                [(56) '(6.1 14 0.5)])])
+    (kicad-helper "Package_SO.pretty/"
+                  (~a "TSSOP-" ct "_"
+                      (first data) "x" (second data)
+                      "mm_P" (third data) "mm.kicad_mod"))))
+
+(module+ test
+  (for/list ([ct '(8 14 16 20 24 28 30 32 38 48 56)])
+    (footprint->pict (kicad-TSSOP ct))))
+
+(define (kicad-switch-keyboard spacing pcb-or-plate)
+  ;; SW_Cherry_MX_1.00u_PCB.kicad_mod
+  ;; SW_Cherry_MX_1.00u_Plate.kicad_mod
+  ;; SW_Cherry_MX_1.25u_PCB.kicad_mod
+  ;; SW_Cherry_MX_1.25u_Plate.kicad_mod
+  (unless (member spacing '(1 1.25 1.5 1.75 2 2.25 2.75 6.25))
+    (error "Error: uknown spacing" spacing))
+  (kicad-helper "Button_Switch_Keyboard.pretty/"
+                (~a "SW_Cherry_MX_"
+                    (~r spacing #:precision '(= 2))
+                    "u_"
+                    (case pcb-or-plate
+                      [(pcb) "PCB"]
+                      [(plate) "Plate"]
+                      [else (error "Unknown pcb-or-place.")])
+                    ".kicad_mod")))
+
+
+(module+ test
+  (for*/list ([spacing '(1 1.25 1.5 1.75 2 2.25 2.75 6.25)]
+              [pcb-or-plate '(pcb plate)])
+    (footprint->pict (kicad-switch-keyboard spacing pcb-or-plate))))
