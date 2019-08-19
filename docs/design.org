@@ -121,6 +121,20 @@ From the footprint, generate a gerber file.
 Given an abstraction of board with many components, and given a list
 of position and oritation information, draw them in a gerber file.
 
+- I will need to have the footprint for all simple ICs
+- first get all apertures
+- generate header
+- assign position for all ICs
+  - manual assign
+  - automatically placement
+    - position connected components close
+    - do not overlap
+- generate gerber sections for each IC
+- generate airwire connections
+  - compute the position of each pad
+  - connect hierarchically? or get all connections beforehand?
+    - I'll try before hand first
+
 *** DONE Gerber viewer
     CLOSED: [2019-08-14 Wed 16:42]
 

@@ -16,7 +16,7 @@
 (define (gbr->instructions gbr-file)
   (filter
    identity
-   (for/list ([line (port->lines (open-input-file gbr-file))])
+   (for/list ([line (filter non-empty-string? (port->lines (open-input-file gbr-file)))])
      (match line
        [(regexp #rx"^G04 (.*)$" (list _ a)) #f]
        [(pregexp

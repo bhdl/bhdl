@@ -28,6 +28,19 @@
    connections)
   #:prefab)
 
+(define (IC->pict ic)
+  "Generate gerber file for IC and show the pict."
+  ;; check whether all ICs have footprint associated
+  ;; check whether all ICs have location associated
+  ;; generate gerber section for each IC
+  ;; gather the list of aperture
+  (cond
+    [(IC? ic) (let ([fp (second (assoc 'footprint (IC-attrs ic)))])
+                )]
+    [(comp-IC? ic) ()])
+  )
+
+
 (define-syntax (gen-indexed-IC-pins stx)
   (syntax-parse stx
     [(_ pin ...)

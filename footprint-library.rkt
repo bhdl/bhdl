@@ -83,7 +83,7 @@
 
 (module+ test
   (footprint->pict kicad-sw-push)
-  (pict-width (footprint->pict kicad-sw-push))
+  (footprint->pict kicad-sw-push)
   (footprint->pict kicad-jack-audio)
   (footprint->pict kicad-jack-barrel))
 
