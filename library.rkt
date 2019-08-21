@@ -8,13 +8,12 @@
          "schematic.rkt"
          "footprint.rkt"
          racket/draw)
-
-
+(provide GND VCC
+         capacitor resistor diode crystal LM555)
 
 ;; power
-(define/IC gnd (a))
-(define/IC 5v (a))
-(define/IC 3v3 (a))
+(define/IC GND (a))
+(define/IC VCC (a))
 
 ;; basic components
 (define/IC capacitor (a b))
