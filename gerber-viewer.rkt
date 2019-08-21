@@ -7,7 +7,8 @@
          pict
          racket/draw)
 
-(provide gerber-file->pict)
+(provide gerber-file->pict
+         gerber-file->offset)
 
 ;; draw a given gerber file onto dc%
 
@@ -170,25 +171,25 @@
   (define-values (xmax xmin ymax ymin) (get-bounding-box))
 
   ;; (println (list xmax xmin ymax ymin))
-  
-  (inset res
-         (- 0 xmin) (- 0 ymin) xmax ymax))
+  (values (inset res
+                 (- 0 xmin) (- 0 ymin) xmax ymax)
+          (list xmax xmin ymax ymin)))
 
 (define (gerber-file->pict gbr-file)
   "Return a pict for the gerber file."
-  (scale
-   (execute-gbr-instructions (gbr->instructions gbr-file))
-   30))
+  (let-values ([(p _) (execute-gbr-instructions (gbr->instructions gbr-file))])
+    (scale p 30)))
+
+(define (gerber-file->offset gbr-file)
+  (let-values ([(_ box)
+                (execute-gbr-instructions (gbr->instructions gbr-file))])
+    (let ([xmin (second box)]
+          [ymin (last box)])
+      (values xmin ymin))))
 
 
 ;; (pict-path? p)
 
 (module+ test
-
-  (match '(#f)
-    [8 1]
-    [_ (println "hello")])
-  
-  ;; FIXME NOW HEBI mounting hole pict
   (gerber-file->pict "out.gbr"))
 

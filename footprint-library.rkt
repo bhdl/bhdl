@@ -15,7 +15,8 @@
          (struct-out pad-spec)
          read-kicad-mod
 
-         kicad-mounting-hole)
+         kicad-mounting-hole
+         (all-defined-out))
 
 
 (define kicad-footprint-path "/home/hebi/github/reading/kicad-footprints/")

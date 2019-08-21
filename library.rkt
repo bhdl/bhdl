@@ -21,6 +21,10 @@
 (define/IC diode (a b))
 (define/IC crystal (a b))
 
+;; http://www.ti.com/lit/ds/symlink/lm555.pdf
+(define/IC LM555
+  (GND TRIGGER OUTPUT RESET CONTROL THRESHOLD DISCHARGE VCC))
+
 ;; MCU
 (define/IC ATMEGA16U2-MU (XTAL1 XTAL2 GND VCC PC2 PD0 PD1 PD2
                                 PD3 PD4 PD5 PD6 PD7 PB0 PB1 PB2

@@ -11,9 +11,9 @@
 
 (provide (struct-out IC)
          (struct-out comp-IC)
+         (struct-out attribute)
          gen-indexed-IC-pins
          define/IC
-         assign-footprint!
          make-group
          connect)
 
@@ -35,19 +35,6 @@
    connections)
   #:prefab)
 
-(define (IC->pict ic)
-  "Generate gerber file for IC and show the pict."
-  ;; check whether all ICs have footprint associated
-  ;; check whether all ICs have location associated
-  ;; generate gerber section for each IC
-  ;; gather the list of aperture
-  (cond
-    [(IC? ic) (let ([fp (second (assoc 'footprint (IC-attrs ic)))])
-                )]
-    [(comp-IC? ic) ()])
-  )
-
-
 (define-syntax (gen-indexed-IC-pins stx)
   (syntax-parse stx
     [(_ pin ...)
@@ -59,12 +46,13 @@
 (define-syntax (define/IC stx)
   (syntax-parse stx
     [(_ name (pin ...))
-     #'(define name (IC 'name (gen-indexed-IC-pins pin ...) #f))]))
+     #'(define (name)
+         (IC 'name (gen-indexed-IC-pins pin ...)
+             (attribute #f #f #f)))]))
 
 (module+ test
   (check-equal? (gen-indexed-IC-pins PA0 PA1 PA2)
                 '((1 PA0) (2 PA1) (3 PA2))))
-
 
 
 (define-syntax (connect stx)
@@ -172,6 +160,7 @@
      ;; 1. save the mapping of output pins and input pins
      ;; 2. save and merge the connected pins
      #`(comp-IC (list 'out ...)
+                ;; CAUTION the cdr is the child IC itself
                 (list (cons 'in in) ...)
                 (connect conn ...))]))
 
@@ -276,9 +265,14 @@
   ;; (define d (make-simple-IC PD0 PD1 PD2 PD3))
 
   (define/IC a (PA0 PA1 PA2))
+
+  (set-IC-attrs! a '(loc footprint))
+  
   (define/IC b (PB0 PB1 PB2))
   (define/IC c (PC0 PC1 PC2))
   (define/IC d (PD0 PD1 PD2 PD3))
+
+  ;; (set-IC-attrs! (cdr (assoc 'a (comp-IC-children g))) 'hello)
 
   (define x a)
   (define y b)

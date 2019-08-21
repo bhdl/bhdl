@@ -78,12 +78,33 @@
     [(_ (@ a b)) #'()]))
 
 (module+ test-555
-  (define Rl1 resistor)
-  (define Rl2 resistor)
-  (define Ra resistor)
-  (define lm555 LM555)
-  (define C1 capacitor)
-  (define C2 capacitor)
+  ;; TODO check whether all footprints are associated
+  ;;
+  ;; TODO resistor value
+  ;;
+  ;; TODO create new components rather than direct assignment
+  (define Rl1 (resistor))
+  (assign-footprint! Rl1 kicad-resistor-0603)
+  (define Rl2 (resistor))
+  (assign-footprint! Rl2 kicad-resistor-0603)
+  (define Ra (resistor))
+  (assign-footprint! Ra kicad-resistor-0603)
+  (define lm555 (LM555))
+  (assign-footprint! lm555 (kicad-DIP 8))
+  (define C1 (capacitor))
+  (assign-footprint! C1 kicad-capacitor-0603)
+  (define C2 (capacitor))
+  (assign-footprint! C2 kicad-capacitor-0603)
+  (define vcc (VCC))
+  (define gnd (GND))
+
+  ;; (IC->pict C2)
+  ;; (IC->pict lm555)
+  (IC-size lm555)
+
+  (assign-footprint! vcc (kicad-pin-header 1))
+  (assign-footprint! gnd (kicad-pin-header 1))
+  
   #;
   (make-group
    #:in ()
@@ -110,17 +131,21 @@
   ;; error if #-degree is wrong
   ;; will print out warning if same connection defined multiple times
   ;; will print out warning if polarization is skeptical
-  (make-group
-   #:in (lm555 Rl2 C1 C2 Ra VCC GND)
-   #:out ()
-   #:conn ((- lm555.GND GND)
-           (- lm555.OUTPUT Rl2 GND) 
-           (- lm555.CONTROL C1 GND)
-           (- (< lm555.THRESHOLD lm555.DISCHARGE)
-              (< (- C2 GND)
-                 (- Ra VCC)))
-           (- lm555.VCC VCC)))
+  (define g (make-group
+             #:in (lm555 Rl2 C1 C2 Ra vcc gnd)
+             #:out ()
+             #:conn ((- lm555.GND gnd)
+                     (- lm555.OUTPUT Rl2 gnd) 
+                     (- lm555.CONTROL C1 gnd)
+                     (- (< lm555.THRESHOLD lm555.DISCHARGE)
+                        (< (- C2 gnd)
+                           (- Ra vcc)))
+                     (- lm555.VCC vcc))))
 
+
+  (IC-size g)
+  (assign-layout! g)
+  (IC->pict g)
 
   #;
   (dot (+ A B.b C.c D)
