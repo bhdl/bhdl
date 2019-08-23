@@ -105,28 +105,6 @@
   (assign-footprint! vcc (kicad-pin-header 1))
   (assign-footprint! gnd (kicad-pin-header 1))
   
-  #;
-  (make-group
-   #:in ()
-   #:out ()
-   ;; this is the fully expanded form
-   #:conn ([(lm555 GND) GND (Rl2 b) (C1 b) (C2 b)]
-           ;; [(lm555 TRIGGER)]
-           [(lm555 OUTPUT) (Rl2 a) (Rl1 b)]
-           ;; [(lm555 RESET)]
-           [(lm555 CONTROL) (C1 a)]
-           [(lm555 THRESHOLD) (lm555 DISCHARGE) (C2 a) (Ra b)]
-           [(lm555 VCC) VCC (Ra a)]))
-
-  #;
-  (make-group
-   #:in ()
-   #:out ()
-   #:conn ([lm555.GND GND Rl2.b C1.b C2.b]
-           [lm555.OUTPUT Rl2.a Rl1.b]
-           [lm555.CONTROL C1.a]
-           [lm555.THRESHOLD lm555.DISCHARGE C2.a Ra.b]
-           [lm555.VCC VCC Ra.a]))
   ;; will throw error if conflicting or short
   ;; error if #-degree is wrong
   ;; will print out warning if same connection defined multiple times
@@ -145,26 +123,4 @@
 
   (IC-size g)
   (assign-layout! g)
-  (IC->pict g)
-
-  #;
-  (dot (+ A B.b C.c D)
-       ;; the start and end must be 1-degree. Otherwise, the pin must
-       ;; be specified
-       (- X.x
-          ;; In a (< ) names alternative paths
-          (< A B C)
-          ;; In the path, the components must be 2-degree
-          D
-          ;; It is also possible to use component with 1-degree, without
-          ;; special syntax. Here S and S.s have same effect.
-          S.s
-          ;; If 3-degree or more, or for polarized components, you need
-          ;; to specify the pin.
-          (@ N.a N.b)
-          ;; can be nested
-          (< (- E F) G (- H I J))
-          Y))
-  )
-
-;; #reader"a.rkt"fds 
+  (IC->pict g))

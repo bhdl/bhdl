@@ -1,5 +1,707 @@
 #+TITLE: Gerber file format
 
+* Auto-routing
+
+- Spectra: https://cdn.hackaday.io/files/1666717130852064/specctra.pdf
+- layouteditor: https://layouteditor.com/
+- freerouting: https://freerouting.org/
+  - Spectra Design File (.DSN)
+  - Spectra Session File (.SES)
+
+** Syntax
+*** pcb
+#+BEGIN_SRC racket
+(pcb <ID>
+     (parser
+      (string_quote \")
+      (space_in_quoted_tokens on)
+      ;; not sure if this is significant. I'm gonna use rackematic 1.0
+      (host_cad "KiCad's Pcbnew")
+      (host_version "5.1.0"))
+     (resolution um 10)
+     (unit um)
+     (structure ...)
+     (placement ...)
+     (library ...)
+     (network ...))
+#+END_SRC
+
+*** structure
+#+BEGIN_SRC racket
+(structure
+ (layer F.Cu
+        (type signal)
+        (property
+         (index 0)))
+ (layer B.Cu
+        (type signal)
+        (property
+         (index 1)))
+ (boundary (path ...))
+ (plane +5V (polygon F.Cu 0 339217 -34036 339217 -34036))
+ (plane GND (polygon B.Cu 0 11938 -36576 11938 -36576))
+ (via ...)
+ (rule
+  (width 250)
+  (clearance 200.1)
+  (clearance 200.1 (type default_smd))
+  (clearance 50 (type smd_smd))))
+#+END_SRC
+
+- plane :: =(plane <net-id> <shape-desc>)=
+- via :: =(via <padstack-id>)= Seems the via must be declared here to
+  be used in routing.
+
+*** placement
+Define what components are placed on board at what location.
+
+#+BEGIN_SRC racket
+(placement (component <image-id> 
+                      (place <component-id> <x> <y> <front|back> <rotation:real> (PN <part-number>))
+                      ...)
+           ...)
+
+(component Connector
+           (place J3 172974 -133858 front 0 (PN Conn_01x07))
+           (place J1 107748 -44338 front 75 (PN Conn_01x07)))
+#+END_SRC
+
+- Seems <part-number> is not significant. 
+- <component-id> is a declare. It will be used to refer to this
+  component in network and routing wires
+
+*** library
+Defines all libraries to use for components, the outline, the pin
+index and location, the pad shape.
+
+Seems all the coordinates are relative, i.e. have their own origin.
+
+#+BEGIN_SRC racket
+(library (image) ... (padstack) ...)
+#+END_SRC
+
+#+BEGIN_SRC racket
+(image <image-id>
+       (outline <shape>)
+       ...
+       (pin <padstack-id> <pin-id> <x> <y>)
+       ...
+       (keepout ["name"] <shape>))
+#+END_SRC
+
+- pin-id is the index of the pin for this component, starting from 1
+- the outline should cover all pins, but in case not coverred, the
+  "tool" automatically extend the bounding-box.
+
+#+BEGIN_SRC racket
+(padstack <padstack-id> (shape <shape>) ...))
+#+END_SRC
+
+- There are multiple shape, because each for a layer. The layer is
+  specified in the <shape> descriptor.
+- The attach control determines whether a via padstack can be
+  positioned under an SMD pad.  The default is on, which allows vias
+  under SMD pads.
+
+*** network
+This specifies how components are connected, i.e. which pins of which
+components are connected.
+
+#+BEGIN_SRC racket
+(network (net <net-id>
+              (pins <component-id>-<pin-id> ...))
+         ...
+         (class))
+#+END_SRC
+
+- <component-id> is the J2, U5, etc
+- <pin-id> is the pin index
+
+#+BEGIN_SRC racket
+(class <class-id> <net-id> ...
+  (circuit (use_via <padstack-id>))
+  (rule
+         (width 250)
+         (clearance 200.1)))
+#+END_SRC
+
+*** path
+#+BEGIN_SRC racket
+path ::= (path <layer_id> <aperture-width> <vertex> ...)
+<vertex> ::= <x> <y>
+#+END_SRC
+
+<layer_id> ::= <reserved_id> | <id>
+<reserved_id> ::= [pcb | signal | power]
+
+- The pcb reserved layer can be used only to define the PCB boundary
+- Signal implies all signal layers, and power implies all power layers
+
+*** shape descriptor
+#+BEGIN_SRC racket
+(polygon <layer-id> <aperture-width> <vertex> ...)
+(rect <layer-id> <vertex> <vertex>)
+(path ...)
+#+END_SRC
+
+- circle :: =(circle <layer-id> <diameter> [<vertex>])= The default
+  vertex is PCB origin.
+- arc :: =(qarc <layer-id> <aperture-width> <vertex> <vertex>
+  <vertex>)= from-vertex, to-vertex, center-vertex
+
+*** routes
+This is in the output .ses file. Thus
+#+BEGIN_SRC racket
+(session hbkb.ses
+         (base_design hbkb.dsn)
+         (placement
+          (resolution um 10)
+          (component MountingHole:MountingHole_3.2mm_M3
+                     (place REF** 1739900 -1016000 front 0)))
+         (was_is)
+         (routes 
+          (resolution um 10)
+          (parser
+           (host_cad "KiCad's Pcbnew")
+           (host_version 5.1.0))
+          (network_out (net <net-id>
+                            (wire <shape>) ...
+                            ;; wire and via can be mixed in any order
+                            (via <padstack-id> <vertex>) ...))))
+#+END_SRC
+
+Example:
+#+BEGIN_SRC racket
+(net /KeyscanMatrix/ROW4
+     (wire
+      (path F.Cu 2500
+            1401062 -1334664
+            1517796 -1217930
+            1727200 -1217930))
+     (via "Via[0-1]_800:400_um" 2321277 -1239378)
+     (wire
+      (path F.Cu 2500
+            3108764 -1059746
+            3074212 -1094298
+            2938322 -1094298
+            2924614 -1108006)))
+#+END_SRC
+
+** HBKB example
+dsn file:
+
+#+BEGIN_SRC racket
+(PCB /path/to/dsn
+     (parser
+      ;; no backslack
+      (string_quote \")
+      (space_in_quoted_tokens on)
+      (host_cad "KiCad's Pcbnew")
+      (host_version "5.1.0"))
+     (resolution um 10)
+     (unit um)
+     (structure
+      (layer F.Cu
+             (type signal)
+             (property
+              (index 0)))
+      (layer B.Cu
+             (type signal)
+             (property
+              (index 1)))
+      (boundary
+       (path pcb 0  328110 -38120  328556 -38179.7  328996 -38278.7  329424 -38416.2
+             ...
+             328110 -38120))
+      (plane GND (polygon B.Cu 0  11938 -36576  12319 -184531  341630 -182118  338201 -33655
+                          11684 -36576  11938 -36576))
+      (plane +5V (polygon F.Cu 0  339217 -34036  336804 -187071  -5588 -179070  15748 -23876
+                          338709 -34290  339217 -34036))
+      (via "Via[0-1]_800:400_um")
+      (rule
+       (width 250)
+       (clearance 200.1)
+       (clearance 200.1 (type default_smd))
+       (clearance 50 (type smd_smd))))
+
+     (placement
+      (component MountingHole:MountingHole_3.2mm_M3
+                 (place REF** 173990 -101600 front 0 (PN MountingHole_3.2mm_M3)))
+      (component Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical
+                 (place J3 172974 -133858 front 0 (PN Conn_01x07))
+                 (place J1 107748 -44338 front 75 (PN Conn_01x07)))
+      (component mx1a:MX1A
+                 (place S2 65913 -57150 front 345 (PN MX1A))
+                 ...
+                 (place S58 101346 -145796 front 345 (PN MX1A)))
+      (component "Package_DIP:DIP-16_W7.62mm"
+                 (place U3 276606 -158242 back 105 (PN 74HC595))
+                 (place U1 42164 -151638 back 75 (PN 74HC595)))
+      (component "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal"
+                 (place D1 42799 -60960 front 165 (PN 1N4148))
+                 ...
+                 (place D68 269621 -149733 front 15 (PN 1N4148))))
+     (library
+         (image MountingHole:MountingHole_3.2mm_M3
+                (outline (path signal 50  3450 0  3369.34 -741.648  3131.14 -1448.62  2746.52 -2087.85
+                               ...
+                               3369.34 741.648  3450 0))
+                (outline (path signal 150  3200 0  3119.77 -712.067  2883.1 -1388.43  2501.86 -1995.17
+                               ...
+                               2501.86 1995.17  2883.1 1388.43  3119.77 712.067  3200 0))
+                (keepout "" (circle F.Cu 3200))
+                (keepout "" (circle B.Cu 3200)))
+       (image Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical
+              (outline (path signal 50  1800 1800  -1800 1800))
+              ...
+              (outline (path signal 100  -635 1270  1270 1270))
+              (pin Oval[A]Pad_1700x1700_um 7 0 -15240)
+              (pin Oval[A]Pad_1700x1700_um 6 0 -12700)
+              (pin Oval[A]Pad_1700x1700_um 5 0 -10160)
+              (pin Oval[A]Pad_1700x1700_um 4 0 -7620)
+              (pin Oval[A]Pad_1700x1700_um 3 0 -5080)
+              (pin Oval[A]Pad_1700x1700_um 2 0 -2540)
+              (pin Rect[A]Pad_1700x1700_um 1 0 0)
+              )
+       (image mx1a:MX1A
+              (outline (path signal 381  -7620 7620  7620 7620))
+              (outline (path signal 381  -7620 -7620  -7620 7620))
+              (pin Round[A]Pad_2499.36_um 2 2540 5080)
+              (pin Round[A]Pad_2499.36_um 1 -3810 2540)
+              (keepout "" (circle F.Cu 3980.18))
+              (keepout "" (circle B.Cu 1699.26 5080 0))
+              )
+       (image "Package_DIP:DIP-16_W7.62mm"
+              (outline (path signal 50  8700 1550  -1100 1550))
+              (outline (path signal 100  1635 1270  6985 1270))
+              (pin Oval[A]Pad_1600x1600_um 16 7620 0)
+              (pin Rect[A]Pad_1600x1600_um 1 0 0)
+              )
+       (image "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal"
+              (outline (path signal 50  8670 1250  -1050 1250))
+              (outline (path signal 100  1810 1000  1810 -1000))
+              (pin Oval[A]Pad_1600x1600_um 2 7620 0)
+              (pin Rect[A]Pad_1600x1600_um 1 0 0))
+       
+       (padstack Round[A]Pad_2499.36_um
+                 (shape (circle F.Cu 2499.36))
+                 (shape (circle B.Cu 2499.36))
+                 (attach off))
+       (padstack Oval[A]Pad_1600x1600_um
+                 (shape (path F.Cu 1600  0 0  0 0))
+                 (shape (path B.Cu 1600  0 0  0 0))
+                 (attach off))
+       (padstack Oval[A]Pad_1700x1700_um
+                 (shape (path F.Cu 1700  0 0  0 0))
+                 (shape (path B.Cu 1700  0 0  0 0))
+                 (attach off))
+       (padstack Rect[A]Pad_1600x1600_um
+                 (shape (rect F.Cu -800 -800 800 800))
+                 (shape (rect B.Cu -800 -800 800 800))
+                 (attach off))
+       (padstack Rect[A]Pad_1700x1700_um
+                 (shape (rect F.Cu -850 -850 850 850))
+                 (shape (rect B.Cu -850 -850 850 850))
+                 (attach off))
+       (padstack "Via[0-1]_800:400_um"
+                 (shape (circle F.Cu 800))
+                 (shape (circle B.Cu 800))
+                 (attach off)))
+     (network
+      (net "Net-(D1-Pad1)"
+           (pins D1-1 S1-2))
+      (net "Net-(D2-Pad1)"
+           (pins S2-2 D2-1))
+      ...
+      (net "Net-(D68-Pad1)"
+           (pins D68-1 S68-2))
+      (net /KeyscanMatrix/ROW4
+           (pins J2-4 S43-1 S44-1 S45-1 S46-1 S47-1 S48-1 S49-1 S50-1 S51-1 S52-1 S53-1
+                 S54-1 S55-1 S56-1))
+      (net /KeyscanMatrix/ROW3
+           (pins J2-3 S29-1 S30-1 S31-1 S32-1 S33-1 S34-1 S35-1 S36-1 S37-1 S38-1 S39-1
+                 S40-1 S41-1 S42-1))
+      ...
+      (net /COL1
+           (pins U1-15 D1-2 D15-2 D29-2 D43-2 J1-1)
+           )
+      (net /COL2
+           (pins U1-1 D2-2 D16-2 D30-2 D44-2 J1-2)
+           )
+      (net /SRCLK
+           (pins J3-4 U3-11 U1-11))
+      (net /SRCLR
+           (pins J3-5 U3-10 U1-10))
+      (net +5V
+           (pins J3-7 U3-16 U1-16))
+      (net GND
+           (pins J3-6 U3-8 U1-8))
+      (net "Net-(U1-Pad7)"
+           (pins U1-7))
+      (net "Net-(U1-Pad9)"
+           (pins U3-14 U1-9))
+      (net /SER
+           (pins J3-1 U1-14))
+      (net /KeyscanMatrix/ROW5
+           (pins J2-5 S57-1 S58-1 S59-1 S66-1 S67-1 S68-1))
+      (class kicad_default "" +5V /COL1 /COL10 /COL11 /COL12 /COL13 /COL14 /COL2
+        /COL3 /COL4 /COL5 /COL6 /COL7 /COL8 /COL9 /KeyscanMatrix/ROW1 /KeyscanMatrix/ROW2
+        /KeyscanMatrix/ROW3 /KeyscanMatrix/ROW4 /KeyscanMatrix/ROW5 /OE /RCLK
+        /SER /SRCLK /SRCLR GND "Net-(D1-Pad1)" "Net-(D10-Pad1)" "Net-(D11-Pad1)"
+        "Net-(D12-Pad1)" "Net-(D13-Pad1)" "Net-(D14-Pad1)" "Net-(D15-Pad1)"
+        ...
+        "Net-(U3-Pad9)"
+        (circuit
+         (use_via Via[0-1]_800:400_um))
+        (rule
+         (width 250)
+         (clearance 200.1))))
+     (wiring))
+#+END_SRC
+
+ses file
+
+#+BEGIN_SRC racket
+(session hbkb.ses
+         (base_design hbkb.dsn)
+         (placement
+          (resolution um 10)
+          (component MountingHole:MountingHole_3.2mm_M3
+                     (place REF** 1739900 -1016000 front 0))
+          (component Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical
+                     (place J3 1729740 -1338580 front 0)
+                     (place J1 1077480 -443380 front 75))
+          (component mx1a:MX1A
+                     (place S43 327660 -1074420 front 345)
+                     (place S58 1013460 -1457960 front 345))
+          (component "Package_DIP:DIP-16_W7.62mm"
+                     (place U3 2766060 -1582420 back 105)
+                     (place U1 421640 -1516380 back 75))
+          (component "Diode_THT:D_DO-35_SOD27_P7.62mm_Horizontal"
+                     (place D1 427990 -609600 front 165)
+                     (place D3 806450 -671830 front 165)
+                     ...
+                     (place D68 2696210 -1497330 front 15)))
+         (was_is)
+         (routes 
+          (resolution um 10)
+          (parser
+           (host_cad "KiCad's Pcbnew")
+           (host_version 5.1.0))
+          (library_out 
+           (padstack "Via[0-1]_800:400_um"
+                     (shape
+                      (circle F.Cu 8000 0 0))
+                     (shape
+                      (circle B.Cu 8000 0 0))
+                     (attach off)))
+          (network_out 
+           (net "Net-(D1-Pad1)"
+                (wire
+                 (path B.Cu 2500
+                       427990 -609600
+                       431683 -595817))
+                (wire
+                 (path B.Cu 2500
+                       512663 -479475
+                       512663 -517236
+                       434082 -595817
+                       431683 -595817)))
+           (net /KeyscanMatrix/ROW4
+                (wire
+                 (path F.Cu 2500
+                       1401062 -1334664
+                       1517796 -1217930
+                       1727200 -1217930))
+                (via "Via[0-1]_800:400_um" 2321277 -1239378)
+                (wire
+                 (path F.Cu 2500
+                       3108764 -1059746
+                       3074212 -1094298
+                       2938322 -1094298
+                       2924614 -1108006)))
+           (net /KeyscanMatrix/ROW3
+                (wire
+                 (path F.Cu 2500
+                       918462 -929534
+                       966833 -929534
+                       1053193 -1015894
+                       1092452 -1015894))
+                (wire
+                 (path B.Cu 2500
+                       2313744 -1035616
+                       2313744 -1026704
+                       2391192 -949256
+                       2487734 -949256))
+                (via "Via[0-1]_800:400_um" 2277803 -1041611)
+                (wire
+                 (path F.Cu 2500
+                       2682044 -937826
+                       2499164 -937826
+                       2487734 -949256))
+                (wire
+                 (path F.Cu 2500
+                       1727200 -1192530
+                       1738953 -1192530)))
+           (net /COL1
+                (wire
+                 (path B.Cu 2500
+                       354386 -589878
+                       366463 -593114))
+                (wire
+                 (path B.Cu 2500
+                       301620 -786104
+                       301621 -786104
+                       301621 -903043
+                       259832 -944832)))
+           (net /SRCLK
+                (wire
+                 (path B.Cu 2500
+                       2908455 -1623154
+                       2905219 -1611076))
+                (via "Via[0-1]_800:400_um" 2602590 -1510112)
+                (wire
+                 (path B.Cu 2500
+                       2905219 -1611076
+                       2703554 -1611076
+                       2602590 -1510112))))))
+
+#+END_SRC
+
+** reference example
+*** Board
+#+BEGIN_SRC racket
+(PCB test_brd
+     (resolution MIL 10)
+     (structure 
+      (boundary (rect pcb 5956.00000 345.90000 11202.00000 3888.00000))
+      (boundary
+       (rect signal 6180 400 11000 3850)))
+     (via VIA)
+     (grid via 1)
+     (grid wire 1)
+     (rule
+      (width 8)
+      (clear 8)
+      (clear 16 (type wire_area))
+      (clear 12 (type via_smd via_pin)))
+     (layer L1 (type signal) (direction vert))
+     (layer L2 (type signal) (direction hori) (rule (width 6)))
+     (layer L3 (type power) (use_net GND))
+     (layer L4 (type power) (use_net VDD VCC))
+     (layer L5 (type signal) (direction vert) (rule (width 6)))
+     (layer L6 (type signal) (direction hori))
+     (keepout (rect signal 6192 942 8011 402))
+     (keepout (rect L1 7980 625 10991 402))
+     (keepout (rect L6 6186 3847 6391 905))
+     (via_keepout (rect signal 8129 2537 9277 2407))
+     (plane VDD
+            (polygon L4 0 6180 400 6180 3850 7100 3850 7100 400))
+     (plane VCC
+            (polygon L4 0 7150 400 7150 3850 11000 3850 11000 400))
+     (plane GND
+            (polygon L3 0 6180 400 6180 3850 11000 3850 11000 400)))
+#+END_SRC
+
+*** Placement
+
+#+BEGIN_SRC racket
+(placement
+ (unit MIL)
+ (component cap.01uf
+            (place c1 9273.0000 1514.0000 front 90)
+            (place c2 8334.0000 1508.0000 front 0)
+            (place c3 8439.0000 729.0000 front 0)
+            (place c4 10443.0000 720.0000 front 0)
+            (place c5 10452.0000 2103.0000 front 0)
+            (place c6 8334.0000 2077.0000 front 0)
+            (place c7 7284.0000 1263.0000 front 0)
+            (place c8 6794.0000 1893.0000 front 0)
+            (place c9 10443.0000 2707.0000 front 0)
+            (place c10 9805.0000 3468.0000 front 0)
+            (place c11 7494.0000 2742.0000 front 0)
+            (place c12 6978.0000 3442.0000 front 0))
+ (component plcc20
+            (place U17 10500.0000 725.0000 front 0)
+            (place U37 9100.0000 725.0000 front 0)
+            (place U42 9800.0000 1325.0000 front 0)
+            (place U89 9800.0000 725.0000 front 0)
+            (place U94 9100.0000 1325.0000 front 0)
+            (place U97 8400.0000 1325.0000 front 0)
+            (place U100 10500.0000 1925.0000 front 0)
+            (place U101 8400.0000 1925.0000 front 0)
+            (place U102 9100.0000 1925.0000 front 0)
+            (place U114 10500.0000 1325.0000 front 0)
+            (place U115 9800.0000 1925.0000 front 0))
+ (component qfp68
+            (place U74 8650.0000 2733.0000 front))
+ (component qfp84
+            (place U75 10733.0000 3086.0000 front)
+            (place U76 7817.0000 3100.0000 front))
+ (component qfp100
+            (place U71 7638.0000 1197.0000 front))
+ (component so24
+            (place U30 8600.0000 1075.0000 front)))
+#+END_SRC
+
+*** library
+#+BEGIN_SRC racket
+(library
+    (image qfp100
+           (pin 868 1 0 0)
+           (pin 868 2 0 31)
+           (pin 868 3 0 63)
+           (pin 868 4 0 94)
+           (pin 868 5 0 126)
+           ...)
+  (image plcc20
+         (pin 763 1 0 0)
+         (pin 763 2 50 0)
+         (pin 763 3 100 0)
+         (pin 784 4 175 75)
+         (pin 784 5 175 175)
+         ...)
+  (image qfp84
+         (pin ...)
+         ...)
+  (image cap.01uf
+         (pin 1030 1 0 0)
+         (pin 1030 2 110 0))
+  (image qfp68
+         (pin ...)
+         ...
+         (via_keepout (rect signal -400 100 400 850)))
+  (image so24
+         (pin 1052 1 0 0)
+         ...)
+  (padstack 402
+            (shape (circ signal 30)))
+  (padstack 868
+            (shape (rect L1 -62 -8 62 8)))
+  (padstack 847
+            (shape (rect L1 -8 -62 8 62)))
+  ...
+  (padstack VIA
+            (shape (circ signal 30))))
+#+END_SRC
+
+*** Network
+
+#+BEGIN_SRC racket
+(network
+ (net GND
+      (pins U75-7 U75-6 U75-5 U75-4 U75-3 U75-2 U115-16
+            U115-15 U115-14 U115-13 U115-12 U37-5 U30-24
+            U30-23 U30-22 U76-71 U76-70 U76-68 U76-67 U76-66
+            U76-63 U30-20 U89-10 U89-9 U89-8 U89-4 U76-84
+            U76-83 U76-82 U76-80 U71-51 U71-50 U71-46 U71-44
+            U71-43 U71-41 U71-40 U71-39 U71-38)
+      (rule (width 16)))
+ (net VDD
+      (pins U101-11 U101-10 U101-8 U101-6 U101-3 U100-20
+            U100-13 U71-95 U71-94 U71-93 U71-92 U71-91 U71-90
+            U71-89 U71-88 U17-19 U17-16 U17-15 U17-14 U17-13
+            U17-11 U17-10 U97-16 U97-14 U97-13 U97-11 U97-10
+            U97-4 U97-3 U42-7 U42-4 U42-1 U37-20 U37-18 U37-15
+            U37-14 U37-13 U42-20 U42-19 U42-18 U42-17 U42-16
+            U42-15 U42-14)
+      (rule (width 16)))
+ (net VCC
+      (pins U71-16 U71-14 U71-13 U71-6 U71-4 U71-2 U71-1
+            U42-13 U42-12 )
+      (rule (width 16)))
+ (net CPU-D/C#
+      (pins U71-11 U89-2 U102-8))
+ (net CPU-M/IO#
+      (pins U71-15 U89-1 U102-7))
+ (net MC-BD2
+      (pins U76-39 U74-18 U30-2 U114-9))
+ (net MC-BD3
+      (pins U76-38 U74-19 U30-1 U97-5))
+ ...
+ (net Q2
+      (pins U102-4 U97-12 U71-76 U114-20)
+      (fromto U102-4 U71-76 (rule (width 5)))
+      (fromto U71-76 U97-12 (rule (width 6)))
+      (fromto U97-12 U114-20 (rule (width 7))))
+ (net Q1
+      (pins U102-18 U101-14 U76-33 U17-9))
+ (net LCLL-S1#
+      (pins U76-69 U42-3 U114-7 U75-58)
+      (source U76-69)
+      (load U75-58 U114-7)
+      (terminator U42-3)
+      (rule (reorder daisy))
+      )
+ (net SD4
+      (order U71-87 U76-48 U114-11 U75-1))
+ (net SD3
+      (pins U71-75 U76-47 U114-15)
+      (rule (reorder daisy)))
+ (net MC-S0#
+      (pins U74-1 U37-2)
+      (layer_rule L1 (rule (width 10)))
+      (layer_rule L6 (rule (width 10))))
+ (net LCL-LEPB#
+      (pins U97-17 U17-8)
+      (layer_rule L1 (rule (width 10)))
+      (layer_rule L6 (rule (width 10))))
+ (net MC-SREG-DCD1
+      (pins U76-24 U74-29 U37-16)
+      (net_number 691))
+ (class C1 SD6 XA13 CAS/RAS# TEMP154
+   SD5 BLITZ-RDY SYS-RESET
+   (rule (width 5) (reorder daisy)))
+ (class C2 LCL-MC-DCD# LCL-SMP-DCD#
+   LCL-MEM-DCD#
+   (layer_rule L2 (rule (width 15)))
+   (layer_rule L5 (rule (width 15)))))
+#+END_SRC
+
+
+*** wiring
+#+BEGIN_SRC racket
+(wiring
+ (resolution MIL 10)
+ (wire (path L1 80 74150 10370 74150 15280 74460 15280
+             74460 18550 73910 18550)
+       (net SD2 )
+       (type protect)
+       (attr fanout))
+ (wire (path L6 80 73910 18550 73910 19730 66510 19730)
+       (net SD2 )
+       (type protect))
+ (wire (path L1 80 66510 19730 65910 19730 65910 30000)
+       (net SD2 )
+       (type protect))
+ (wire (path L1 80 65910 30000 66830 30000)
+       (net SD2 )
+       (type protect)
+       (attr fanout))
+ (wire (path L6 80 65910 30000 106280 30000)
+       (net SD2 )
+       (type protect))
+ (wire (path L1 80 106280 30000 106110 30000 106110
+             34860 107330 34860)
+       (net SD2)
+       (type protect)
+       (attr fanout))
+ (via VIA 73910 18550 (net SD2)
+      (type protect)
+      (attr fanout))
+ (via VIA 66510 19730 (net SD2)
+      (type protect))
+ (via VIA 65910 30000 (net SD2)
+      (type protect)
+      (attr fanout))
+ (via VIA 106280 30000 (net SD2)
+      (type protect)
+      (attr fanout)))
+#+END_SRC
+
+
+* Gerber file format
+
 
 gerber file format
 - website: https://www.ucamco.com/en/gerber
@@ -9,7 +711,7 @@ gerber file format
 
 from computer-aided design (CAD) to computer-aided manufacturing (CAM)
 
-* %% commands
+** %% commands
 All commands must be =%...*%= format.
 
 Declaring commands, can appear only once:
@@ -58,7 +760,7 @@ Attributes (X2: TF, TA, TO, TD):
 - TO :: attribute Object
 - TD :: attribute Delete
 
-* non-%% commands
+** non-%% commands
 All commands must be =...*= format.
 
 - G04: line comment
@@ -98,7 +800,7 @@ Region statement, used for pour. A region is defined by its contour.
 - when a region is ended with G37, all sub regions are filled. I guess
   for a pour fill, it should be performs first.
 
-* Formal grammar
+** Formal grammar
 
 #+BEGIN_EXAMPLE
 <data block> ::= <character>* '*'

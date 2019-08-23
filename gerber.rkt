@@ -173,7 +173,9 @@ vertically."
                                   "\n")]
             [ADD (gen-ADD)]
             [postlude "M02*"])
-        (string-join (list prelude ADD body postlude) "\n")))))
+        (string-join
+         (list prelude ADD body postlude)
+         "\n")))))
 
 (define (IC-size ic)
   "Get the size of IC. If this is simple IC, this will be the size of
