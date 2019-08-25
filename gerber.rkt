@@ -16,7 +16,9 @@
          IC->gerber
          IC-size
          assign-footprint!
-         assign-layout!)
+         assign-layout!
+
+         IC->airwires)
 
 (define (gerber-format-xy x y)
   (format "X~aY~a"
@@ -209,6 +211,43 @@ naively (i.e. vertically), than calculate the size."
     [(comp-IC? ic) (string-join
                     (for/list ([child (map cdr (comp-IC-children ic))])
                       (IC->gerber-internal child select-ap-func))
+                    ;; TODO add connections
+                    #;
+                    (for ([conn (comp-IC-connections ic)])
+                      ;; conn is a list of connected PINs
+                      ;; I need to find the location of the corresponding pads in the children
+                      "")
                     "\n")]))
 
+
+
+(define (IC->airwires ic)
+  (cond
+    [(IC? ic) '()]
+    ;; FIXME currently only support one level of comp-IC
+    [(comp-IC? ic) (let ([children (comp-IC-children ic)])
+                     (for/list ([conn (comp-IC-connections ic)])
+                       (for/list ([pad conn])
+                         (let ([sym (first pad)]
+                               [pin (second pad)])
+                           ;; find sym in children
+                           ;; get the pin loc
+                           (let*-values ([(target-ic) (cdr (assoc sym children))]
+                                         [(fp) (attribute-footprint (IC-attrs target-ic))]
+                                         [(loc) (attribute-loc (IC-attrs target-ic))]
+                                         [(dx) (or (and loc (first loc)) 0)]
+                                         [(dy) (or (and loc (second loc)) 0)]
+                                         [(xmin ymin) (footprint->offset fp)])
+                             ;; first convert the pin to number
+                             (let ([pin (if (number? pin) pin
+                                            ;; this first get the pin number
+                                            (first
+                                             ;; this first get the filter result
+                                             ;; FIXME assert length
+                                             (first
+                                              (filter (λ (x)
+                                                        (equal? (second x) pin))
+                                                      (IC-pins target-ic)))))])
+                               (let-values ([(x y) (footprint-get-pad-loc fp pin)])
+                                 (list (- (+ x dx) xmin) (- (+ y dy) ymin)))))))))]))
 

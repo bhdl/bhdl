@@ -123,4 +123,6 @@
 
   (IC-size g)
   (assign-layout! g)
-  (IC->pict g))
+  (IC->pict g)
+  ;; (comp-IC-connections g)
+  (IC->airwires g))

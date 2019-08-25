@@ -10,7 +10,8 @@
 (provide (struct-out footprint)
          (struct-out line-spec)
          (struct-out pad-spec)
-         read-kicad-mod)
+         read-kicad-mod
+         footprint-get-pad-loc)
 
 (struct footprint
   ;; line will have start (x,y), end (x,y), width
@@ -21,6 +22,13 @@
   (x1 y1 x2 y2 width))
 (struct pad-spec
   (x y num mounting-type shape shape-attr))
+
+(define (footprint-get-pad-loc fp num)
+  (let ([pad (first (filter (λ (x)
+                              (= (pad-spec-num x) num))
+                            (footprint-pads fp)))])
+    (values (pad-spec-x pad)
+            (pad-spec-y pad))))
 
 (define (read-kicad-mod fname)
   "Read a kicad mod file, parse it, and return a footprint object."
