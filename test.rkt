@@ -16,7 +16,7 @@
 
 (module+ test-fp
   (define fp
-    (let ([fname (~a "/home/hebi/github/reading/kicad-footprints/"
+    (let ([fname (~a "/home/hebi/git/reading/kicad-footprints/"
                      "Package_QFP.pretty/TQFP-144_20x20mm_P0.5mm.kicad_mod")])
       (read-kicad-mod fname)))
 

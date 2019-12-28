@@ -19,7 +19,7 @@
          (all-defined-out))
 
 
-(define kicad-footprint-path "/home/hebi/github/reading/kicad-footprints/")
+(define kicad-footprint-path "/home/hebi/git/reading/kicad-footprints/")
 
 (define-syntax (kicad-helper stx)
   (syntax-parse stx
