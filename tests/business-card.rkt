@@ -153,9 +153,6 @@
                      (rename PF5 JTAG_TCK)
                      )))))
 
-(define/component usb
-  VBUS D+ D- GND)
-
 (define/component AT25SF081
   (SO IO1)
   (SI IO0)
