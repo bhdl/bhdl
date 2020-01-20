@@ -13,32 +13,39 @@
 (define GND 'GND)
 
 
-
-;; fuse
-
-;; custom component
 (define/component JW5211
   VIN EN SW FB GND)
 
-(define (λ-FUSE-PWR r-FB-G r-FB-V (use-cap #f))
+;; Upon calling this function, a new circuit (the "group") is returned, with 1
+;; external pin
+(define (λ-fuse-part
+         ;; parameterize value of R1 and R4
+         r1 r4 (use-cap #f))
+  ;; variable binding to a new instance of JW5211
   (let ((j (JW5211)))
-    (group (connect (j.VIN - j.EN)
-                    (when use-cap
-                      (j.VIN - ((C 2u2)
-                                (C 2u2))))
-                    (j.GND - GND)
-                    (j.SW - (L 2u2) VCC)
-                    (j.FB - (R r-FB-G) GND)
-                    (j.FB - (R r-FB-V) VCC)
-                    (VCC - (C 22u) GND))
+    ;; group the connections, design the external pins
+    (group (- j.VIN j.EN)
+           ;; conditional includion of C5 and C6
+           (when use-cap
+             ;; create new instance of capacitors with value, in place
+             (- j.VIN (< (C 2u2)
+                         (C 2u2))))
+           (- j.GND GND)
+           (- j.SW (L 2u2) VCC)
+           ;; create new instance of resistors with values r1 and r4
+           (- j.FB (R r1) GND)
+           (- j.FB (R r4) VCC)
+           (- VCC (< C 22u) GND)
            #:pins j.VIN)))
 
-(define (λ-fuse-circuit)
+;; this function, upon calling, creates three copy of (λ-fuse-part), connecting
+;; their pins (the FUSE_PWR signal)
+(define (λ-fuse)
   (let ((f (fuse)))
-    (group (connect (- (λ-FUSE-PWR 11k 49k9)
-                       (λ-FUSE-PWR 11k 36k)
-                       (λ-FUSE-PWR 10k 8k2)
-                       f.1))
+    (group (- (λ-fuse-part 11k 49k9 #t)
+              (λ-fuse-part 11k 36k)
+              (λ-fuse-part 10k 8k2)
+              f.1)
            #:pins (rename f.2 FUSE_OUT))))
 
 
