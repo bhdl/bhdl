@@ -1,5 +1,19 @@
 #+TITLE: Rackematic: a framework for Schematic/PCB design
 
+* Setup
+Clone kicad footprints into =~/git/reading/kicad-footprints= (configurable in
+=footprint-library.rkt=):
+
+#+begin_example
+cd ~/git/reading/
+git clone https://github.com/KiCad/kicad-footprints
+#+end_example
+
+Then run some test in =test.rkt=. For example, run the =test-555= module:
+
+#+begin_example
+raco test -s test-555 test.rkt
+#+end_example
 
 * References
 ** KiCAD

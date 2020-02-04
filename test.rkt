@@ -13,13 +13,8 @@
          "library.rkt"
          racket/draw)
 
-
 (module+ test-fp
-  (define fp
-    (let ([fname (~a "/home/hebi/git/reading/kicad-footprints/"
-                     "Package_QFP.pretty/TQFP-144_20x20mm_P0.5mm.kicad_mod")])
-      (read-kicad-mod fname)))
-
+  (define fp (kicad-TQFP 144))
   (void
    ;; This will return the length of the file
    (call-with-output-file "out.gbr"
@@ -27,13 +22,14 @@
      (λ (out)
        (write-string (footprint->gerber fp)
                      out))))
+
+  (gerber-file->pict "out.gbr")
   (call-with-output-file "out.gbr"
     #:exists 'replace
     (λ (out)
       (write-string (footprint->gerber (kicad-mounting-hole 2))
                     out)))
   (gerber-file->pict "out.gbr"))
-
 
 (module+ test-IC
   (define/IC a (PA0 PA1 PA2))
@@ -42,7 +38,7 @@
   (define/IC d (PD0 PD1 PD2 PD3))
   (define g (make-group
              ;; input ICs
-             ;; These symbols are significant, they are used to mark the 
+             ;; These symbols are significant, they are used to mark the
              #:in (a b c d)
              ;; Output pins mapped to input IC pins.  This mapping is only useful
              ;; for connecting outer and inner circuit.
@@ -104,7 +100,7 @@
 
   (assign-footprint! vcc (kicad-pin-header 1))
   (assign-footprint! gnd (kicad-pin-header 1))
-  
+
   ;; will throw error if conflicting or short
   ;; error if #-degree is wrong
   ;; will print out warning if same connection defined multiple times
@@ -113,7 +109,7 @@
              #:in (lm555 Rl2 C1 C2 Ra vcc gnd)
              #:out ()
              #:conn ((- lm555.GND gnd)
-                     (- lm555.OUTPUT Rl2 gnd) 
+                     (- lm555.OUTPUT Rl2 gnd)
                      (- lm555.CONTROL C1 gnd)
                      (- (< lm555.THRESHOLD lm555.DISCHARGE)
                         (< (- C2 gnd)

@@ -19,13 +19,14 @@
          (all-defined-out))
 
 
-(define kicad-footprint-path "/home/hebi/git/reading/kicad-footprints/")
+;; configuration
+(define kicad-footprint-path (make-parameter (expand-user-path "~/git/reading/kicad-footprints/")))
 
 (define-syntax (kicad-helper stx)
   (syntax-parse stx
     [(_ s ...)
      #'(read-kicad-mod
-        (string-append kicad-footprint-path s ...))]))
+        (build-path (kicad-footprint-path) s ...))]))
 
 (define kicad-resistor-0603
   (kicad-helper "Resistor_SMD.pretty/"
@@ -369,3 +370,5 @@
   (for*/list ([spacing '(1 1.25 1.5 1.75 2 2.25 2.75 6.25)]
               [pcb-or-plate '(pcb plate)])
     (footprint->pict (kicad-switch-keyboard spacing pcb-or-plate))))
+
+
