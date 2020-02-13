@@ -15,98 +15,20 @@ Then run some test in =test.rkt=. For example, run the =test-555= module:
 raco test -s test-555 test.rkt
 #+end_example
 
-* References
-** KiCAD
-- file formats: http://www.kicad-pcb.org/help/file-formats/
-** footprint
-https://eesemi.com/ic-package-types.htm
+** Running racket code
+The framework is implemented in [[https://racket-lang.org/][racket]]. Running racket code via command line is
+not very common. You can run racket code via Emacs. If you are not comfortable
+with Emacs, you can use [[https://docs.racket-lang.org/drracket/index.html][DrRacket]] which should come with your racket
+installation.
 
-*** QFN (Quad Flat No Leads)
+* code structure
 
-| Part Number | No. of Pads | Body Size     | Body Thickness | Pad Pitch |
-|-------------+-------------+---------------+----------------+-----------|
-| QFN-16      |          16 | 3 mm x 3 mm   | 0.9 mm         | 0.5 mm    |
-| QFN-24      |          24 | 4 mm x 4 mm   | 0.9 mm         | 0.5 mm    |
-| QFN-32      |          32 | 5 mm x 5 mm   | 0.9 mm         | 0.5 mm    |
-| QFN-44      |          32 | 5 mm x 5 mm   | 0.9 mm         | 0.5 mm    |
-| QFN-50      |          50 | 5 mm x 10 mm  | 1.0 mm         | 0.5 mm    |
-| QFN-72      |          72 | 10 mm x 10 mm | 0.9 mm         | 0.5 mm    |
-
-** DIP
-
-
-SSOP-10_3.9x4.9mm_P1.00mm.kicad_mod
-SSOP-14_5.3x6.2mm_P0.65mm.kicad_mod
-SSOP-16_3.9x4.9mm_P0.635mm.kicad_mod
-SSOP-16_4.4x5.2mm_P0.65mm.kicad_mod
-SSOP-16_5.3x6.2mm_P0.65mm.kicad_mod
-SSOP-18_4.4x6.5mm_P0.65mm.kicad_mod
-SSOP-20_3.9x8.7mm_P0.635mm.kicad_mod
-SSOP-20_4.4x6.5mm_P0.65mm.kicad_mod
-SSOP-20_5.3x7.2mm_P0.65mm.kicad_mod
-SSOP-24_3.9x8.7mm_P0.635mm.kicad_mod
-SSOP-24_5.3x8.2mm_P0.65mm.kicad_mod
-SSOP-28_3.9x9.9mm_P0.635mm.kicad_mod
-SSOP-28_5.3x10.2mm_P0.65mm.kicad_mod
-SSOP-32_11.305x20.495mm_P1.27mm.kicad_mod
-SSOP-44_5.3x12.8mm_P0.5mm.kicad_mod
-SSOP-48_7.5x15.9mm_P0.635mm.kicad_mod
-SSOP-56_7.5x18.5mm_P0.635mm.kicad_mod
-SSOP-8_2.95x2.8mm_P0.65mm.kicad_mod
-SSOP-8_3.95x5.21x3.27mm_P1.27mm.kicad_mod
-SSOP-8_3.9x5.05mm_P1.27mm.kicad_mod
-SSOP-8_5.25x5.24mm_P1.27mm.kicad_mod
-
-* GTD
-
-** IC->gerber add connections
-
-Export a airwire connections onto the gerber file
-
-** Libraries
-- define all popular libraries
-- compose them together
-- write visualization and gerber generation for comp-IC
-- assign footprint
-
-** Implement popular boards
-*** 555 timer
-
-*** Arduino Uno
-- bootloader auto-reset
-- USB socket
-- ICSP (SPI, i.e. MISO, MOSI, SCK, RESET) header for programming the
-  Arduino bootloader
-- serial to USB chip (e.g. FTDI)
-
-Custom Arduino Design Series, Schematic, PCB, Test
-https://www.youtube.com/playlist?list=PLRIGIzu0Z7KllhKqPsNDwitjpK45SHoKg
-
-**** sections of schematic
-***** power section
-  - decoupling capacitors
-  - voltage divider resistors, selected by op-amps (e.g. LMV358) to
-    select 3.3v or 5v
-***** (power) LED section
-  - LED
-  - current limiting resistors
-
-***** voltage regulator (e.g. 7805)
-  - decoupling capacitors on both input and output of the voltage regulator
-  - 3v3 volt regulator (e.g. LP2985, NCP1117)
-  - barrel jack for power input
-
-  Some tips:
-  - for linear regulator, the output capacitor should be smaller than
-    the input capacitor
-  - the output capacitor is a filter capacitor
-  - the input capacitor is a decoupling capacitor, since it decouples it
-    from the input power
-
-***** reset button
-  - button
-  - pull-up resistors
-
-
-*** Novena laptop
+- [[file:footprint.rkt][footprint.rkt]]: library for reading kicad footprint library
+- [[file:footprint-library.rkt][footprint-library.rkt]]: wrapper for different footprint packaging (DIP, SOIC, etc)
+- [[file:gerber.rkt][gerber.rkt]]: library for generating gerber file
+- [[file:gerber-viewer.rkt][gerber-viewer.rkt]]: library for draw visualization for gerber files
+- [[file:library.rkt][library.rkt]]: component library
+- [[file:schematic.rkt][schematic.rkt]]: syntax for schematic connection
+- [[file:back/footprint.rkt][back/footprint.rkt]]: define footprint library natively (instead of reading kicad libraries)
+- [[file:back/symbol.rkt][back/symbol.rkt]]: define schematic symbol library natively
 

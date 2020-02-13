@@ -6,3 +6,44 @@ wires connections:
 - not connected (draw a curve or just leave it there but no dot)
 - dot connected
 
+* References
+** KiCAD
+- file formats: http://www.kicad-pcb.org/help/file-formats/
+** footprint
+https://eesemi.com/ic-package-types.htm
+
+*** QFN (Quad Flat No Leads)
+
+| Part Number | No. of Pads | Body Size     | Body Thickness | Pad Pitch |
+|-------------+-------------+---------------+----------------+-----------|
+| QFN-16      |          16 | 3 mm x 3 mm   | 0.9 mm         | 0.5 mm    |
+| QFN-24      |          24 | 4 mm x 4 mm   | 0.9 mm         | 0.5 mm    |
+| QFN-32      |          32 | 5 mm x 5 mm   | 0.9 mm         | 0.5 mm    |
+| QFN-44      |          32 | 5 mm x 5 mm   | 0.9 mm         | 0.5 mm    |
+| QFN-50      |          50 | 5 mm x 10 mm  | 1.0 mm         | 0.5 mm    |
+| QFN-72      |          72 | 10 mm x 10 mm | 0.9 mm         | 0.5 mm    |
+
+** DIP
+
+
+SSOP-10_3.9x4.9mm_P1.00mm.kicad_mod
+SSOP-14_5.3x6.2mm_P0.65mm.kicad_mod
+SSOP-16_3.9x4.9mm_P0.635mm.kicad_mod
+SSOP-16_4.4x5.2mm_P0.65mm.kicad_mod
+SSOP-16_5.3x6.2mm_P0.65mm.kicad_mod
+SSOP-18_4.4x6.5mm_P0.65mm.kicad_mod
+SSOP-20_3.9x8.7mm_P0.635mm.kicad_mod
+SSOP-20_4.4x6.5mm_P0.65mm.kicad_mod
+SSOP-20_5.3x7.2mm_P0.65mm.kicad_mod
+SSOP-24_3.9x8.7mm_P0.635mm.kicad_mod
+SSOP-24_5.3x8.2mm_P0.65mm.kicad_mod
+SSOP-28_3.9x9.9mm_P0.635mm.kicad_mod
+SSOP-28_5.3x10.2mm_P0.65mm.kicad_mod
+SSOP-32_11.305x20.495mm_P1.27mm.kicad_mod
+SSOP-44_5.3x12.8mm_P0.5mm.kicad_mod
+SSOP-48_7.5x15.9mm_P0.635mm.kicad_mod
+SSOP-56_7.5x18.5mm_P0.635mm.kicad_mod
+SSOP-8_2.95x2.8mm_P0.65mm.kicad_mod
+SSOP-8_3.95x5.21x3.27mm_P1.27mm.kicad_mod
+SSOP-8_3.9x5.05mm_P1.27mm.kicad_mod
+SSOP-8_5.25x5.24mm_P1.27mm.kicad_mod

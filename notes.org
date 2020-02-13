@@ -1,0 +1,55 @@
+#+TITLE: Implementation Notes
+
+* GTD
+
+** IC->gerber add connections
+
+Export a airwire connections onto the gerber file
+
+** Libraries
+- define all popular libraries
+- compose them together
+- write visualization and gerber generation for comp-IC
+- assign footprint
+
+** Implement popular boards
+*** 555 timer
+
+*** Arduino Uno
+- bootloader auto-reset
+- USB socket
+- ICSP (SPI, i.e. MISO, MOSI, SCK, RESET) header for programming the
+  Arduino bootloader
+- serial to USB chip (e.g. FTDI)
+
+Custom Arduino Design Series, Schematic, PCB, Test
+https://www.youtube.com/playlist?list=PLRIGIzu0Z7KllhKqPsNDwitjpK45SHoKg
+
+**** sections of schematic
+***** power section
+  - decoupling capacitors
+  - voltage divider resistors, selected by op-amps (e.g. LMV358) to
+    select 3.3v or 5v
+***** (power) LED section
+  - LED
+  - current limiting resistors
+
+***** voltage regulator (e.g. 7805)
+  - decoupling capacitors on both input and output of the voltage regulator
+  - 3v3 volt regulator (e.g. LP2985, NCP1117)
+  - barrel jack for power input
+
+  Some tips:
+  - for linear regulator, the output capacitor should be smaller than
+    the input capacitor
+  - the output capacitor is a filter capacitor
+  - the input capacitor is a decoupling capacitor, since it decouples it
+    from the input power
+
+***** reset button
+  - button
+  - pull-up resistors
+
+
+*** Novena laptop
+
