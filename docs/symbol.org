@@ -1,0 +1,25 @@
+#+TITLE: Schematic Symbol Library
+
+* different kinds of symbols
+
+rectangular:
+
+#+BEGIN_SRC racket
+(define/rect-symbol sym 
+  ;; top
+;; right
+;; bottom
+;; left
+  (pin1/pin2/pin3 
+))
+#+END_SRC
+
+#+BEGIN_SRC racket
+(define/symbol resistor)
+#+END_SRC
+
+
+
+
+
+

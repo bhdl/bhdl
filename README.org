@@ -9,7 +9,7 @@ cd ~/git/reading/
 git clone https://github.com/KiCad/kicad-footprints
 #+end_example
 
-Then run some test in =test.rkt=. For example, run the =test-555= module:
+Then run some test in [[file:test.rkt][test.rkt]]. For example, run the =test-555= module:
 
 #+begin_example
 raco test -s test-555 test.rkt
@@ -30,5 +30,5 @@ installation.
 - [[file:library.rkt][library.rkt]]: component library
 - [[file:schematic.rkt][schematic.rkt]]: syntax for schematic connection
 - [[file:back/footprint.rkt][back/footprint.rkt]]: define footprint library natively (instead of reading kicad libraries)
-- [[file:back/symbol.rkt][back/symbol.rkt]]: define schematic symbol library natively
+- [[file:symbol.rkt][symbol.rkt]]: define schematic symbol library natively
 

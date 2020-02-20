@@ -191,3 +191,29 @@ the kicad footprint format and generate gerber."
         "\n")])
     "M02*")
    "\n"))
+
+(define-syntax (make-simple-symbol stx)
+  (syntax-parse stx
+    [(_ pin ...)
+     #'(rect-symbol '(pin ...) '() '() '())]))
+
+;; (make-simple-symbol PA0 PA1)
+
+(define-syntax (make-rect-symbol stx)
+  (syntax-parse stx
+    [(_ (left l ...)
+        (right r ...)
+        (top t ...)
+        (bottom d ...))
+     #'(rect-symbol->sch-symbol
+        (rect-symbol '(l ...)
+                     '(r ...)
+                     '(t ...)
+                     '(d ...)))]))
+
+(struct sch-symbol
+  (pict locs))
+
+(define (rect-symbol->sch-symbol rect)
+  (let-values ([(pict locs) (rect-symbol->pict rect)])
+    (sch-symbol pict locs)))

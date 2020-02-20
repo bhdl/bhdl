@@ -1,6 +1,42 @@
 #+TITLE: Implementation Notes
+* random
+- https://github.com/racket/pict
 
-* GTD
+* China TODO-list
+** Libraries
+- https://github.com/Digi-Key/digikey-kicad-library
+
+*** DONE schematic symbol library
+CLOSED: [2020-02-20 四 14:27]
+- kicad official library should be enough
+
+*** TODO PCB footprint library
+
+** TODO find benchmark schematics
+
+- a lot of projects, not necessarilly kicad https://kitspace.org/
+
+Individual projects:
+- https://github.com/im-tomu/tomu-hardware
+
+
+** TODO schematic hook syntax
+** TODO schematic hook semantics
+** TODO schematic visualization
+*** TODO placement
+*** routing
+
+** PCB footprint assignment
+** PCB placement & routing
+*** placement
+*** routing
+*** programatic placement
+** gerber generation
+*** design rules
+
+
+
+* TODO-list
 
 ** IC->gerber add connections
 
