@@ -4,6 +4,8 @@
                      racket/string
                      racket/list)
          syntax/parse/define
+         racket/list
+         racket/set
          rackunit
          "footprint.rkt"
          pict
@@ -16,6 +18,20 @@
          define/IC
          make-group
          connect)
+
+;; (struct IC (pins))
+;; (struct R (value))
+;; (struct C (value))
+;; (struct D (anode cathode))
+;; (struct JW5211 ())
+
+;; (define/part R 1 2)
+;; (define/part C 1 2)
+;; (define/part D anode cathode)
+;; (define/part JW5211 VIN EN SW FB GND)
+
+
+(define r (R))
 
 (struct attribute
   (loc footprint value)
@@ -50,9 +66,9 @@
          (IC 'name (gen-indexed-IC-pins pin ...)
              (attribute #f #f #f)))]))
 
-(module+ test
-  (check-equal? (gen-indexed-IC-pins PA0 PA1 PA2)
-                '((1 PA0) (2 PA1) (3 PA2))))
+(myvoid
+ (check-equal? (gen-indexed-IC-pins PA0 PA1 PA2)
+               '((1 PA0) (2 PA1) (3 PA2))))
 
 
 (define-syntax (connect stx)
@@ -131,6 +147,7 @@
                           #:when #t
                           [li l])
                  (list li i))])
+    (println table)
     (let ([dup (remove-duplicates
                 (filter (λ (x)
                           (> (length x) 1))
@@ -138,6 +155,7 @@
                           (map second (filter (λ (x)
                                                 (equal? (first x) (first l)))
                                               table)))))])
+      (pretty-print dup)
       (let ([res-table (remove-duplicates
                         (foldr (λ (v acc)
                                  (for/list ([l acc])
@@ -145,11 +163,15 @@
                                        (list (first l) (first v))
                                        l)))
                                table dup))])
+        (pretty-print res-table)
         ;; convert result table to pairs
         (for/list ([v (remove-duplicates (map second res-table))])
           (map first (filter (λ (l)
                                (= (second l) v))
                              res-table)))))))
+
+(myvoid (connect-merge
+         (connect-assign-pin (connect-rewrite (- a b (< (- x z) y) c d)))))
 
 (define-syntax (make-group stx)
   "Make a new IC by connecting sub ICs."
@@ -164,63 +186,63 @@
                 (list (cons 'in in) ...)
                 (connect conn ...))]))
 
-(module+ test2
-  (connect (a b c d)
-           (x y z))
+(myvoid
+ (connect (a b c d)
+          (x y z))
 
-  (connect (- a b (< (- x z) y) c d)
-           (- a b (< o.i p.3) e f)
-           (- a (+ m.3 m.1) y))
+ (connect (- a b (< (- x z) y) c d)
+          (- a b (< o.i p.3) e f)
+          (- a (+ m.3 m.1) y))
 
-  
-  (check-equal? (connect-rewrite a)
-                '(a))
-  (check-equal? (connect-rewrite (- a b c d))
-                '((a b c d)))
-  (check-equal? (connect-assign-pin (connect-rewrite (- a b c d)))
-                '(((a 2) (b 1)) ((b 2) (c 1)) ((c 2) (d 1))))
-  (check-equal? (connect-rewrite (- a b.out c.3 d))
-                '((a b.out c.3 d)))
-  (check-equal? (connect-assign-pin (connect-rewrite (- a b.out c.3 d)))
-                '(((a 2) (b out)) ((b out) (c 3)) ((c 3) (d 1))))
+ 
+ (check-equal? (connect-rewrite a)
+               '(a))
+ (check-equal? (connect-rewrite (- a b c d))
+               '((a b c d)))
+ (check-equal? (connect-assign-pin (connect-rewrite (- a b c d)))
+               '(((a 2) (b 1)) ((b 2) (c 1)) ((c 2) (d 1))))
+ (check-equal? (connect-rewrite (- a b.out c.3 d))
+               '((a b.out c.3 d)))
+ (check-equal? (connect-assign-pin (connect-rewrite (- a b.out c.3 d)))
+               '(((a 2) (b out)) ((b out) (c 3)) ((c 3) (d 1))))
 
-  
-  
-  (check-equal? (connect-rewrite (< a b))
-                '(a b))
-  (check-equal? (connect-rewrite (< (- x z) y))
-                '((x z) y))
+ 
+ 
+ (check-equal? (connect-rewrite (< a b))
+               '(a b))
+ (check-equal? (connect-rewrite (< (- x z) y))
+               '((x z) y))
 
-  (check-equal? (connect (- a b (< (- x z) y) c d))
-                '(((a 2) (b 1))
-                  ((b 2) (x 1) (y 1))
-                  ((x 2) (z 1))
-                  ((z 2) (c 1) (y 2))
-                  ((c 2) (d 1))))
-  
-  (check-equal? (connect-rewrite (- a b (< (- x z) y) c d))
-                '((a b (x z) c d) (a b y c d)))
-  (check-equal? (connect-assign-pin (connect-rewrite (- a b (< (- x z) y) c d)))
-                '(((a 2) (b 1))
-                  ((b 2) (x 1))
-                  ((x 2) (z 1))
-                  ((z 2) (c 1))
-                  ((c 2) (d 1))
-                  ((b 2) (y 1))
-                  ((y 2) (c 1))))
-  (check-equal? (connect-merge
-                 (connect-assign-pin (connect-rewrite (- a b (< (- x z) y) c d))))
-                '(((a 2) (b 1))
-                  ((b 2) (x 1) (y 1))
-                  ((x 2) (z 1))
-                  ((z 2) (c 1) (y 2))
-                  ((c 2) (d 1))))
-  (check-equal? (connect (- a b (< x (- o p) y) c d))
-                '(((a 2) (b 1))
-                  ((b 2) (x 1) (o 1) (y 1))
-                  ((x 2) (c 1) (p 2) (y 2))
-                  ((c 2) (d 1))
-                  ((o 2) (p 1)))))
+ (check-equal? (connect (- a b (< (- x z) y) c d))
+               '(((a 2) (b 1))
+                 ((b 2) (x 1) (y 1))
+                 ((x 2) (z 1))
+                 ((z 2) (c 1) (y 2))
+                 ((c 2) (d 1))))
+ 
+ (check-equal? (connect-rewrite (- a b (< (- x z) y) c d))
+               '((a b (x z) c d) (a b y c d)))
+ (check-equal? (connect-assign-pin (connect-rewrite (- a b (< (- x z) y) c d)))
+               '(((a 2) (b 1))
+                 ((b 2) (x 1))
+                 ((x 2) (z 1))
+                 ((z 2) (c 1))
+                 ((c 2) (d 1))
+                 ((b 2) (y 1))
+                 ((y 2) (c 1))))
+ (check-equal? (connect-merge
+                (connect-assign-pin (connect-rewrite (- a b (< (- x z) y) c d))))
+               '(((a 2) (b 1))
+                 ((b 2) (x 1) (y 1))
+                 ((x 2) (z 1))
+                 ((z 2) (c 1) (y 2))
+                 ((c 2) (d 1))))
+ (check-equal? (connect (- a b (< x (- o p) y) c d))
+               '(((a 2) (b 1))
+                 ((b 2) (x 1) (o 1) (y 1))
+                 ((x 2) (c 1) (p 2) (y 2))
+                 ((c 2) (d 1))
+                 ((o 2) (p 1)))))
 
 
 #;
@@ -254,42 +276,42 @@
   ;; but what is a footprint? I'm going to have a struct to represent it
   )
 
-(module+ test
-  (IC 'a-name '((0 PA0)
-                (1 PA1)
-                (2 PA2)) #f)
+(myvoid
+ (IC 'a-name '((0 PA0)
+               (1 PA1)
+               (2 PA2)) #f)
 
-  ;; (define a (make-simple-IC PA0 PA1 PA2))
-  ;; (define b (make-simple-IC PB0 PB1 PB2))
-  ;; (define c (make-simple-IC PC0 PC1 PC2))
-  ;; (define d (make-simple-IC PD0 PD1 PD2 PD3))
+ ;; (define a (make-simple-IC PA0 PA1 PA2))
+ ;; (define b (make-simple-IC PB0 PB1 PB2))
+ ;; (define c (make-simple-IC PC0 PC1 PC2))
+ ;; (define d (make-simple-IC PD0 PD1 PD2 PD3))
 
-  (define/IC a (PA0 PA1 PA2))
+ (define/IC a (PA0 PA1 PA2))
 
-  (set-IC-attrs! a '(loc footprint))
-  
-  (define/IC b (PB0 PB1 PB2))
-  (define/IC c (PC0 PC1 PC2))
-  (define/IC d (PD0 PD1 PD2 PD3))
+ (set-IC-attrs! a '(loc footprint))
+ 
+ (define/IC b (PB0 PB1 PB2))
+ (define/IC c (PC0 PC1 PC2))
+ (define/IC d (PD0 PD1 PD2 PD3))
 
-  ;; (set-IC-attrs! (cdr (assoc 'a (comp-IC-children g))) 'hello)
+ ;; (set-IC-attrs! (cdr (assoc 'a (comp-IC-children g))) 'hello)
 
-  (define x a)
-  (define y b)
+ (define x a)
+ (define y b)
 
-  (IC-pins a)
+ (IC-pins a)
 
-  (define g (make-group
-             ;; input ICs
-             ;; These symbols are significant, they are used to mark the 
-             #:in (a b c d)
-             ;; Output pins mapped to input IC pins.  This mapping is only useful
-             ;; for connecting outer and inner circuit.
-             #:out (x y)
-             ;; pair connections
-             #:conn ([x (a PA0) (b PB1) (d PD2)]
-                     [y (a PA2) (c PC0)])))
+ (define g (make-group
+            ;; input ICs
+            ;; These symbols are significant, they are used to mark the 
+            #:in (a b c d)
+            ;; Output pins mapped to input IC pins.  This mapping is only useful
+            ;; for connecting outer and inner circuit.
+            #:out (x y)
+            ;; pair connections
+            #:conn ([x (a PA0) (b PB1) (d PD2)]
+                    [y (a PA2) (c PC0)])))
 
-  )
+ )
 
 

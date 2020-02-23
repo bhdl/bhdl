@@ -217,3 +217,20 @@ the kicad footprint format and generate gerber."
 (define (rect-symbol->sch-symbol rect)
   (let-values ([(pict locs) (rect-symbol->pict rect)])
     (sch-symbol pict locs)))
+
+
+(define (R)
+  (let* ([p1 (box 1)]
+         [p2 (box 1)]
+         [res (R-impl p1 p2)])
+    (set-box! p1 res)
+    (set-box! p2 res)
+    res))
+
+(define (C)
+  (let* ([p1 (box 1)]
+         [p2 (box 1)]
+         [res (C-impl p1 p2)])
+    (set-box! p1 res)
+    (set-box! p2 res)
+    res))
