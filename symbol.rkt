@@ -8,7 +8,9 @@
          racket/draw)
 
 (provide visualize
+         visualize-loc
          make-rect-symbol
+         symbol->pict+locs
          (struct-out rect-symbol)
          (struct-out R-symbol)
          (struct-out L-symbol)
@@ -68,16 +70,16 @@
                           #:bottom [bottom '()])
   (rect-symbol left right top bottom))
 
-(define C-symbol-pict
-  (vc-append (filled-rounded-rectangle 5 100 -0.5 #:color "brown")
-             (vc-append 20 (filled-rounded-rectangle 100 15 -0.5 #:color "brown")
-                        (filled-rounded-rectangle 100 15 -0.5 #:color "brown"))
-             (filled-rounded-rectangle 5 100 -0.5 #:color "brown")))
-
 (struct C-symbol ())
 (struct D-symbol ())
 (struct R-symbol ())
 (struct L-symbol ())
+
+(define C-symbol-pict
+  (hc-append (filled-rounded-rectangle 100 5 -0.5 #:color "brown")
+             (hc-append 20 (filled-rounded-rectangle 15 100 -0.5 #:color "brown")
+                        (filled-rounded-rectangle 15 100 -0.5 #:color "brown"))
+             (filled-rounded-rectangle 100 5 -0.5 #:color "brown")))
 
 (define D-symbol-pict
   (colorize (cc-superimpose
@@ -87,20 +89,20 @@
             "brown"))
 
 (define R-symbol-pict
-  (colorize (vc-append
-             (filled-rectangle 3 20)
-             (rectangle 20 80 #:border-width 5)
-             (filled-rectangle 3 20))
+  (colorize (hc-append
+             (filled-rectangle 20 3)
+             (rectangle 80 20 #:border-width 5)
+             (filled-rectangle 20 3))
             "brown"))
 
 (define L-symbol-pict
-  (let ([hc (inset/clip (circle 30) -15 0 0 0)])
-    (vc-append (filled-rectangle 3 20)
-               (hc-append (ghost hc) hc)
-               (hc-append (ghost hc) hc)
-               (hc-append (ghost hc) hc)
-               (hc-append (ghost hc) hc)
-               (filled-rectangle 3 20))))
+  (let ([hc (inset/clip (circle 30) 0 0 0 -15)])
+    (hc-append (filled-rectangle 20 3)
+               (vc-append hc (ghost hc))
+               (vc-append hc (ghost hc))
+               (vc-append hc (ghost hc))
+               (vc-append hc (ghost hc))
+               (filled-rectangle 20 3))))
 
 (define (symbol-section pict-lsts combine-func)
   (apply combine-func 10
@@ -117,6 +119,10 @@
                 "darkgreen"))))
 
 (define (rect-symbol->pict sym)
+  (let-values ([(p l) (rect-symbol->pict+locs sym)])
+    p))
+
+(define (rect-symbol->pict+locs sym)
   "Return (pict, ((name x y) ...)"
   (unless (rect-symbol? sym)
     (error "sym is not rect-symbol"))
@@ -128,8 +134,7 @@
           [right-picts (symbol-texts pinr)]
           [top-picts (symbol-texts pint)]
           [bottom-picts (symbol-texts pinb)])
-      
-      (let ([left (symbol-section left-picts vl-append)]
+      (let ([left  (symbol-section left-picts vl-append)]
             [right (symbol-section right-picts vr-append)]
             [top (rotate
                   (symbol-section top-picts vl-append)
@@ -137,29 +142,31 @@
             [bottom (rotate
                      (symbol-section bottom-picts vl-append)
                      (/ pi 2))])
-        (define mid (vl-append (max (- (max (pict-height left)
+        (let* ([mid (vl-append (max (- (max (pict-height left)
                                             (pict-height right))
                                        (pict-height top)
                                        (pict-height bottom))
                                     10)
-                               top bottom))
-        (define whole (hc-append 20 left mid right))
-        (define frame (filled-rectangle (+ (pict-width whole) 25)
+                               top bottom)]
+               [whole (hc-append 20 left mid right)]
+               [frame (filled-rectangle (+ (pict-width whole) 25)
                                         (+ (pict-height whole) 25)
                                         #:color "Khaki"
                                         #:border-color "Brown"
-                                        #:border-width 10))
-        (let ([res (cc-superimpose frame whole)])
-          (values
-           ;; the whole pict
-           res
-           ;; the position information for all the pins
-           (for/list ([p (flatten (list left-picts right-picts top-picts bottom-picts))]
-                      [id (flatten (list pinl pinr pint pinb))])
-             (let-values ([(x y) (cc-find res p)])
-               (list id x y))))
-          ;; FIXME I'm not using the position for now
-          res)))))
+                                        #:border-width 10)])
+          (let ([res (cc-superimpose frame whole)])
+            (values
+             ;; the whole pict
+             res
+             ;; the position information for all the pins
+             (for/list ([p (flatten (list left-picts right-picts top-picts bottom-picts))]
+                        [find-fn (append (map (const lc-find) (flatten left-picts))
+                                         (map (const rc-find) (flatten right-picts))
+                                         (map (const rc-find) (flatten top-picts))
+                                         (map (const lc-find) (flatten bottom-picts)))]
+                        [id (flatten (list pinl pinr pint pinb))])
+               (let-values ([(x y) (find-fn res p)])
+                 (list id x y))))))))))
 
 (define (visualize item)
   (cond
@@ -168,3 +175,67 @@
     [(C-symbol? item) C-symbol-pict]
     [(L-symbol? item) L-symbol-pict]
     [(D-symbol? item) D-symbol-pict]))
+
+(define (mark-locs pict locs)
+  (let ([w (pict-width pict)]
+        [h (pict-height pict)])
+    (cc-superimpose
+     pict
+     (dc (λ (dc dx dy)
+           (define old-brush (send dc get-brush))
+           (define old-pen   (send dc get-pen))
+
+           (send dc set-pen "red" 20 'solid)
+           (for ([loc locs])
+             (send dc draw-point (second loc) (third loc)))
+           
+           (send dc set-brush old-brush)
+           (send dc set-pen   old-pen))
+         w h))))
+
+(define (visualize-loc sym)
+  ;; TODO visualize pin locations
+  (let-values ([(pic locs) (symbol->pict+locs sym)])
+    ;; mark locs onto pict
+    (mark-locs pic locs)))
+
+(module+ test
+  (define z80-sym
+    (make-rect-symbol #:left '((~RESET)
+                               (~CLK)
+                               (~NMI ~INT)
+                               (~M1 ~RFSH ~WAIT ~HALT)
+                               (~RD ~WR ~MREQ ~IORQ)
+                               (~BUSRQ ~BUSACK))
+                      #:right '((A0 A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 A12 A13 A14 A15)
+                                (D0 D1 D2 D3 D4 D5 D6 D7))
+                      #:top '((VCC))
+                      #:bottom '((GND))))
+  (mark-locs C-symbol-pict '((pin1 1 2) (pin2 20 20)))
+  (symbol->pict+locs z80-sym)
+  (visualize-loc z80-sym)
+
+  (visualize-loc (C-symbol))
+  (symbol->pict+locs (C-symbol)))
+
+(define (binary-locs pict)
+  (let ([l (blank)]
+        [r (blank)])
+    (let ([whole (hc-append l pict r)])
+      (let-values ([(x1 y1) (cc-find whole l)]
+                   [(x2 y2) (cc-find whole r)])
+        `((1 ,x1 ,y1)
+          (2 ,x2 ,y2))))))
+
+(define (symbol->pict+locs sym)
+  (cond
+    [(C-symbol? sym) (values C-symbol-pict
+                             (binary-locs C-symbol-pict))]
+    [(R-symbol? sym) (values R-symbol-pict
+                             (binary-locs R-symbol-pict))]
+    [(D-symbol? sym) (values D-symbol-pict
+                             (binary-locs D-symbol-pict))]
+    [(L-symbol? sym) (values L-symbol-pict
+                             (binary-locs L-symbol-pict))]
+    [(rect-symbol? sym) (rect-symbol->pict+locs sym)]))
+

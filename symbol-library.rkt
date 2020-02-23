@@ -2,6 +2,10 @@
 
 (require "symbol.rkt")
 
+(struct Symbol
+  (pic w h pins))
+
+
 (define z80-sym
   (make-rect-symbol #:left '((~RESET)
                              (~CLK)
@@ -33,12 +37,16 @@
 
 (module+ test
   ;; trying another way: automatically compute the symbols
-  (visualize z80-sym)
-  (visualize (λ-conn-sym 5))
-  (visualize (λ-conn-sym 20))
-  (visualize 74469-sym)
-  (visualize (R-symbol))
-  (visualize (C-symbol))
-  (visualize (L-symbol))
-  (visualize (D-symbol))
-  (visualize LM555-sym))
+  ;; (rect-symbol->pict z80-sym)
+  (visualize-loc z80-sym)
+  (visualize-loc (λ-conn-sym 5))
+  (visualize-loc (λ-conn-sym 20))
+  (visualize-loc 74469-sym)
+  (visualize-loc (R-symbol))
+  (visualize-loc (C-symbol))
+  (visualize-loc (L-symbol))
+  (visualize-loc (D-symbol))
+  (visualize-loc LM555-sym)
+
+  (visualize-loc z80-sym))
+
