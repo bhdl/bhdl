@@ -258,20 +258,14 @@ res: already in this set."
                   (Atom->decl atom (hash-ref annotations atom) (hash-ref symbols atom))))
   ;; 4. output netlist declaration
   (define nets
-    (apply append
-           (for/list ([net netlist])
-             ;; I need to output pairwise netlist
-             (let ([net (set->list net)])
-               (for*/list ([i (range (length net))]
-                           [j (range (add1 i) (length net))])
-                 (let ([pin1 (list-ref net i)]
-                       [pin2 (list-ref net j)])
-                   (list (list (string->symbol
-                                (~a "X" (hash-ref annotations (Pin-parent pin1))))
-                               (Pin-index pin1))
-                         (list (string->symbol
-                                (~a "X" (hash-ref annotations (Pin-parent pin2))))
-                               (Pin-index pin2)))))))))
+    (for/list ([net netlist])
+      ;; I need to output pairwise netlist
+      (let ([net (set->list net)])
+        ;; I actually want to have multi-point nets
+        (for/list ([pin net])
+          (list (string->symbol
+                 (~a "X" (hash-ref annotations (Pin-parent pin))))
+                (Pin-index pin))))))
   (list (append '(Atoms) decls)
         (append '(Nets) nets)))
 
