@@ -1,6 +1,7 @@
 #+TITLE: Implementation Notes
 * random
 - https://github.com/racket/pict
+- sweet-exp! https://github.com/takikawa/sweet-racket
 
 * China TODO-list
 ** Libraries
@@ -20,10 +21,80 @@ Individual projects:
 - https://github.com/im-tomu/tomu-hardware
 
 
-** TODO schematic hook syntax
-** TODO schematic hook semantics
+** DONE schematic hook syntax
+CLOSED: [2020-02-24 一 17:33]
+** DONE schematic hook semantics
+CLOSED: [2020-02-23 日 18:02]
 ** TODO schematic visualization
 *** TODO placement
+[[https://www.youtube.com/playlist?list=PLai-xIlqf4Jl3BDIADGhPHMX1srl5TTRI][Coursera course on VLSI CAD on youtube]].
+
+So we have the following requirements:
+- no overlap
+- min distance between indivisual Atoms (this actually covers no-overlapping)
+  - min distance between pins is not that good
+- possibly fixed-position Atoms
+
+Now we have netlists, containing
+- atom declarations
+- multi-point nets
+
+The objective is an approximation of wire length. The typical one is
+Half-Perimeter Wire-Length (HPWL). It is easy to calculate for multi-point nets.
+
+Several search algorithms:
+1. First, a naive randomized placer with iterative improvement. 
+   - The iteration is to random select two parts and swap them.
+   - One trick: when calculating the new HPWL, just calculate the delta of the
+     nets influenced by swapped points
+2. hill-climbing (simulated annealing):
+   - keep a decreasing temperature T
+   - find a random swap, evaluate delta(HPWL)
+   - if delta<0, evaluate P(delta, T), the probability of accepting the worse solution
+     - P(delta, T) = e^(-delta/T)
+3. quadratic programming
+   - separately optimize x and y
+   - the wires do not necessarily have same weights. That's the paremter to
+     control which wire gets longer
+   1. write the quadratic length
+   2. calculate partial direvatives, set to 0, get linear equations Ax=b
+      - we can actually compute this: C is connectivity matrix, symmetric,
+        if i,j connects, C[i,j]=weight, otherwise 0
+      - From C, get A = -C + diag(sum(C,dims=2)) + diag(Pad)
+        - Pad is the weight of points to fixed pads
+      - A is actually the same for both X and Y. For b, it is different.
+        - bx = w*Padx, where Padx is padx if i is connected to a padx
+        - by = w*Pady
+   3. solve the linear equations
+      - we don't use Gaussian elimination. Instead, we the matrix has the
+        following properties:
+        - A is sparse, symmetric, diagonally dominant, positive semi-definite
+        We thus use iterative approximate solvers
+
+We then need to spread the placement out, so that they does not stick
+together. This is recursive partitioning, and call quadratic programming for
+each subproblem. Quite clever.
+
+**** Julia solvers
+For matrix divide, you can actually use [[https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/#Base.:\\-Tuple{AbstractArray{T,2}%20where%20T,Union{AbstractArray{T,1},%20AbstractArray{T,2}}%20where%20T}][Base.\]]
+
+The symmetric positive semi-definite A can have faster iterative methods, and
+seems to be very old technique. See:
+- Iterative Methods for Linear Equations with Symmetric Positive Definite Matrix, 1961
+- An Iterative Method for Symmetric Positive Semidefinite Linear System of Equations, 2014
+
+The Juila solvers:
+- [[https://github.com/JuliaNLSolvers/NLsolve.jl][JuliaNLSolvers/NLsolve.jl]]
+- [[https://github.com/JuliaNLSolvers/Optim.jl][JuliaNLSolvers/Optim.jl]]
+- [[https://github.com/JuliaNLSolvers/LsqFit.jl][JuliaNLSolvers/LsqFit.jl]]
+
+
+- [[https://github.com/JuliaOpt/Convex.jl][JuliaOpt/Convex.jl]]
+- [[https://github.com/JuliaOpt/JuMP.jl][JuliaOpt/JuMP.jl]]
+- [[https://github.com/JuliaOpt/NLopt.jl][JuliaOpt/NLopt.jl]]: interface to [[https://github.com/stevengj/nlopt][stevengj/nlopt]]
+- other from JuliaOpt and some other alternatives: http://www.juliaopt.org/packages/
+
+
 *** routing
 
 ** PCB footprint assignment
