@@ -2,7 +2,8 @@
 
 (require (for-syntax syntax/parse
                      racket/string
-                     racket/list)
+                     racket/list
+                     racket/match)
          syntax/parse/define
          racket/list
          racket/set
@@ -53,10 +54,12 @@
   (pinhash connections)
   #:mutable)
 
-(define (pin-ref composite ref)
+;; well, this is a generic method for either Atom or Composite TODO stable
+;; interface
+(define (pin-ref part ref)
   (cond
-    [(Composite? composite) (hash-ref (Composite-pinhash composite) ref)]
-    [(Atom? composite) (hash-ref (Atom-pinhash composite) ref)]))
+    [(Composite? part) (hash-ref (Composite-pinhash part) ref)]
+    [(Atom? part) (hash-ref (Atom-pinhash part) ref)]))
 
 (define (R value)
   (let ([comp (Resistor (make-hash) value)])
@@ -70,8 +73,63 @@
     (hash-set! (Atom-pinhash comp) 2 (Pin comp 2))
     comp))
 
-(module+ test
- ;; creating a circuit composite
+
+(begin-for-syntax
+  (define (parse-dot stx)
+    (match-let ([(list l r) (string-split (symbol->string (syntax-e stx)) ".")])
+      (let ([l (string->symbol l)]
+            [r (or (string->number r) (string->symbol r))])
+        (list l r))))
+  ;; 'a 'b
+  (parse-dot #'a.b)
+  ;; 'a 1
+  (parse-dot #'a.1))
+
+(define-syntax (replace-self stx)
+  (syntax-parse stx
+    [(_ x rep)
+     (if (eq? (syntax-e #'x) 'self)
+         #'rep
+         #'x)]))
+
+(define-syntax (hook stx)
+  (define-syntax-class dot
+    #:description "dot"
+    (pattern x
+             #:with (lhs rhs)
+             (datum->syntax
+              stx (parse-dot #'x))))
+  (syntax-parse stx
+    ;; #:datum-literals (comp)
+    [(_ #:pins (pin ...) (net:dot ...) ...)
+     #`(let ([comp (Composite (make-hash) '())])
+         ;; create pins that refer to comp itself
+         (hash-set! (Composite-pinhash comp) 'pin (Pin comp 'pin)) ...
+         ;; create connections
+         (set-Composite-connections!
+          comp (list
+                (list (pin-ref
+                       ;; this is a trick to bring the newly bound variable
+                       ;; "comp" into the scope for replacing 'self
+                       (replace-self net.lhs comp) 'net.rhs) ...) ...))
+         comp)]))
+
+(myvoid
+ (define mycomp
+   (let ([r1 (R 11)]
+         [r2 (R 22)]
+         [c1 (C 1)])
+     (hook #:pins (OUT1 OUT2)
+           (self.OUT1 r1.1)
+           (r1.2 r2.1)
+           (r2.2 c1.1)
+           (c1.2 self.OUT2))))
+
+ ;; see inside the composite
+ (Composite-pinhash mycomp)
+ (Composite-connections mycomp)
+
+ ;; will expand to the following code
  (define mycomp
    (let ([r1 (R 11)]
          [r2 (R 22)]
@@ -156,21 +214,19 @@ res: already in this set."
               (filter (λ (pin) (Atom? (Pin-parent pin))) l)))))
 
 
-
 (myvoid
+ ;; test netlist generation
  (collect-all-composites mycomp)
  (hash-ref (Composite-pinhash mycomp) 'OUT1)
- (equal? (first (second (Composite-connections mycomp)))
-         (second (second (Composite-connections mycomp))))
  (Composite->netlist mycomp))
 
 
-(define (Atom->netlist atom annot symbol)
+(define (Atom->decl atom annot symbol)
   (let-values ([(pict locs) (symbol->pict+locs symbol)])
     (let ([h (pict-height pict)]
           [w (pict-width pict)])
       ;; get the location of pins
-      (list (~a "X" annot) w h locs))))
+      (list (string->symbol (~a "X" annot)) w h locs))))
 
 
 (define (netlist-export netlist)
@@ -199,7 +255,7 @@ res: already in this set."
   ;; 3. output Atom declarations
   (define decls (for/list ([atom all-atoms])
                   ;; TODO gen-composite-declaration
-                  (Atom->netlist atom (hash-ref annotations atom) (hash-ref symbols atom))))
+                  (Atom->decl atom (hash-ref annotations atom) (hash-ref symbols atom))))
   ;; 4. output netlist declaration
   (define nets
     (apply append
@@ -210,10 +266,14 @@ res: already in this set."
                            [j (range (add1 i) (length net))])
                  (let ([pin1 (list-ref net i)]
                        [pin2 (list-ref net j)])
-                   ;; FIXME this parent might be Composite, which should have been filtered out
-                   (list (list (~a "X" (hash-ref annotations (Pin-parent pin1))) (Pin-index pin1))
-                         (list (~a "X" (hash-ref annotations (Pin-parent pin2))) (Pin-index pin2)))))))))
-  (values decls nets))
+                   (list (list (string->symbol
+                                (~a "X" (hash-ref annotations (Pin-parent pin1))))
+                               (Pin-index pin1))
+                         (list (string->symbol
+                                (~a "X" (hash-ref annotations (Pin-parent pin2))))
+                               (Pin-index pin2)))))))))
+  (list (append '(Atoms) decls)
+        (append '(Nets) nets)))
 
 (module+ test)
 (myvoid

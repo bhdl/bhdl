@@ -234,3 +234,76 @@ the kicad footprint format and generate gerber."
     (set-box! p1 res)
     (set-box! p2 res)
     res))
+
+(define-syntax (test-dot stx)
+  (syntax-parse stx
+    [(_ s)
+     #`#,(reverse (map string->symbol (string-split (symbol->string (syntax-e #'s)) ".")))]))
+
+(test-dot a.foo)
+
+
+(define-syntax (test-hook stx)
+  (syntax-parse stx
+    [(_ net ...)
+     (with-syntax ([(x ...)
+                    (map (map syntax-e (syntax->list #'(net ...))))
+                    #;
+                    #'((match-let ([(list l r)
+                                    (map string->symbol
+                                         (string-split
+                                          (symbol->string (syntax-e net))))])
+                         (datum->syntax stx (list l r))) ...)])
+       #`(list x ...))]))
+
+(define-syntax (test-dot stx)
+  (syntax-parse stx
+    [(_ x) (with-syntax ([nx (match-let
+                                 ([(list l r)
+                                   (map string->symbol
+                                        (string-split (symbol->string (syntax-e #'x)) "."))])
+                               (datum->syntax stx `(pin-ref ,l ,r)))])
+             #'nx)]))
+
+(define-syntax (test-dots stx)
+  (syntax-parse stx
+    [(_ x ...)
+     #'(list (test-dot x) ...)]))
+
+(eval (datum->syntax #f '(list 'l 2)))
+(test-dot a.b)
+(test-dots a.b c.d)
+
+;; ,(symbol->string (syntax-e #'net ...))
+
+(test-hook (r1.x2 r2.x1)
+           #;(r1.x2 r2.x1)
+           )
+
+(define-for-syntax (test-for-syntax s)
+  (symbol->string (syntax-e s)))
+
+(define-syntax (hook stx)
+  ;; 1. add out-pin definition
+  ;; 2. rewrite dot-syntax (and take care of variable binding and "self" notation)
+  (syntax-parse stx
+    [(_ #:pins (pin ...) (net ...) ...)
+     (with-syntax ([(new-net ...) (symbol->string (syntax-e #'net))]))
+     (let ([rewrite-dot-syntax (λ (s)
+                                 (match-let ([(list l r)
+                                              (string-split
+                                               (symbol->string (syntax-e s)) ".")])
+                                   `(pin-ref l ,r)))]
+           [test (λ ()
+                   (symbol->string (syntax-e s)))])
+       #`(let ([comp (Composite (make-hash) '())])
+           ;; create pins that refer to comp itself
+           (hash-set! (Composite-pinhash comp) ',pin (Pin comp ',pin)) ...
+           ;; create connections
+           (set-Composite-connections!
+            comp (list
+                  ;; (list (pin-ref #,(rewrite-dot-syntax net) ...))
+                  (list (pin-ref #,(symbol->string (syntax-e #'net))) ...)
+                  ;; (list (pin-ref #,(test #'net)) ...)
+                  ...))
+           comp))]))
