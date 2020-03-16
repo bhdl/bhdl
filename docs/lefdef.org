@@ -1,0 +1,338 @@
+#+TITLE: Lef/def format
+
+- Library Exchange Format (LEF)
+- Design Exechange Format (DEF)
+
+DEF orientation:
+
+| symbol             | rotation |
+|--------------------+----------|
+| N (north)          | 0        |
+| S (south)          | 180      |
+| W (west)           | 90       |
+| E (east)           | 270      |
+| FN (flipped north) | MY       |
+| FS (flipped south) | MX       |
+| FW                 | MX90     |
+| FE                 | MY90     |
+
+* TODOs
+** visualization tool?
+* ISPD 05/06 global placement benchmark
+adaptec1.aux
+#+begin_example
+RowBasedPlacement :  adaptec1.nodes  adaptec1.nets  adaptec1.wts  adaptec1.pl  adaptec1.scl
+#+end_example
+
+adaptec1.nodes:
+- what are the numbers?
+- terminal should mean fixed pads
+
+#+begin_example
+NumNodes : 		211447
+NumTerminals : 		543
+	o0	8	12
+	o1	13	12
+	o2	13	12
+	o3	13	12
+	o4	13	12
+	o5	13	12
+	o6	13	12
+	o7	13	12
+	o8	13	12
+	o9	13	12
+	o10	13	12
+	o210904	500	2136	terminal
+	o210905	500	2136	terminal
+	o210906	500	2136	terminal
+	o210907	500	2136	terminal
+	o210908	500	2136	terminal
+#+end_example
+
+adaptec1.nets
+- what are the numbers? coordinates?
+- I/O?
+
+#+begin_example
+NumNets : 221142
+NumPins : 944053
+
+NetDegree : 4   n0
+	o197239	I : -0.500000	-6.000000
+	o197110	O : -1.500000	-3.000000
+	o85644	I : -6.000000	-2.000000
+	o0	I : -3.000000	-5.000000
+NetDegree : 2   n1
+	o203752	O : -6.500000	2.000000
+	o0	I : -4.000000	-5.000000
+NetDegree : 2   n2
+	o23	I : -14.500000	0.000000
+	o0	O : 0.000000	-1.000000
+NetDegree : 3   n3
+	o203277	O : -6.500000	-3.000000
+	o2	I : -5.500000	-1.000000
+	o1	I : -5.500000	-1.000000
+#+end_example
+
+
+adaptec1.pl: results
+
+#+begin_example
+o0	0	0	: N
+o1	0	0	: N
+o2	0	0	: N
+o3	0	0	: N
+o210904	3064	8619	: N /FIXED
+o210905	3738	8619	: N /FIXED
+o210906	9951	8907	: N /FIXED
+o210907	10555	8355	: N /FIXED
+o210908	527	5715	: N /FIXED
+o210909	527	7995	: N /FIXED
+o210910	5244	5595	: N /FIXED
+#+end_example
+
+adaptec1.scl: seems to be row definitinos, and I do not see how they are useful.
+
+#+begin_example
+NumRows : 890
+
+CoreRow Horizontal
+  Coordinate    :   459
+  Height        :   12
+  Sitewidth     :    1
+  Sitespacing   :    1
+  Siteorient    :    1
+  Sitesymmetry  :    1
+  SubrowOrigin  :    459	NumSites  :  10692
+End
+#+end_example
+
+* LEF: library
+
+#+begin_example
+VERSION 5.8 ;
+BUSBITCHARS "[]" ;
+DIVIDERCHAR "/" ;
+
+UNITS
+  CAPACITANCE PICOFARADS 1 ;
+  DATABASE MICRONS 2000 ;
+END UNITS
+
+MANUFACTURINGGRID 0.0005 ;
+LAYER Metal1
+  TYPE ROUTING ;
+  DIRECTION HORIZONTAL ;
+  PITCH 0.19 0.19 ;
+  WIDTH 0.06 ;
+  AREA 0.02 ;
+  SPACINGTABLE
+    PARALLELRUNLENGTH 0 
+    WIDTH 0    0.06 
+    WIDTH 0.1  0.1 
+    WIDTH 0.75 0.25 
+    WIDTH 1.5  0.45 ;
+  SPACING 0.09 ENDOFLINE 0.09 WITHIN 0.025 ;
+END Metal1
+
+LAYER Via1
+  TYPE CUT ;
+  SPACING 0.07 ;
+  WIDTH 0.07 ;
+END Via1
+VIA VIA12_1C DEFAULT 
+    LAYER Metal1 ;
+        RECT -0.065000 -0.035000 0.065000 0.035000 ;
+    LAYER Via1 ;
+        RECT -0.035000 -0.035000 0.035000 0.035000 ;
+    LAYER Metal2 ;
+        RECT -0.035000 -0.065000 0.035000 0.065000 ;
+END VIA12_1C
+SITE CoreSite
+  CLASS CORE ;
+  SIZE 0.2 BY 1.71 ;
+END CoreSite
+#+end_example
+
+But more importantly, macro definitions:
+
+#+begin_example
+MACRO OAI2BB1X4
+  CLASS CORE ;
+  ORIGIN 0 0 ;
+  FOREIGN OAI2BB1X4 0 0 ;
+  SIZE 2.6 BY 1.71 ;
+  SYMMETRY X Y ;
+  SITE CoreSite ;
+  PIN Y
+    DIRECTION OUTPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER Metal1 ;
+        RECT 0.115 0.59 0.175 1.22 ;
+        RECT 0.06 0.98 0.175 1.22 ;
+        RECT 0.335 1.16 0.395 1.44 ;
+        RECT 0.51 0.57 0.63 0.65 ;
+        RECT 0.745 1.16 0.805 1.44 ;
+        RECT 0.115 0.59 1.145 0.65 ;
+        RECT 1.165 1.16 1.225 1.44 ;
+        RECT 1.095 0.57 1.36 0.63 ;
+        RECT 0.06 1.16 1.635 1.22 ;
+        RECT 1.575 1.16 1.635 1.44 ;
+    END
+  END Y
+  PIN A0N
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER Metal1 ;
+        RECT 1.795 0.625 1.965 0.705 ;
+        RECT 1.885 0.625 1.965 0.9 ;
+        RECT 1.885 0.82 2.1 0.9 ;
+    END
+  END A0N
+  PIN A1N
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER Metal1 ;
+        RECT 2.36 0.76 2.44 1.06 ;
+        RECT 2.36 0.98 2.54 1.06 ;
+        RECT 2.46 0.98 2.54 1.16 ;
+    END
+  END A1N
+  PIN B0
+    DIRECTION INPUT ;
+    USE SIGNAL ;
+    PORT
+      LAYER Metal1 ;
+        RECT 0.46 0.75 0.54 0.92 ;
+        RECT 0.275 0.75 1.695 0.81 ;
+    END
+  END B0
+  PIN VDD
+    DIRECTION INOUT ;
+    USE POWER ;
+    SHAPE ABUTMENT ;
+    NETEXPR "VDD VDD!" ;
+    PORT
+      LAYER Metal1 ;
+        RECT 0.00 1.65 2.6 1.71 ;
+    END
+  END VDD
+  PIN VSS
+    DIRECTION INOUT ;
+    USE GROUND ;
+    SHAPE ABUTMENT ;
+    NETEXPR "VSS VSS!" ;
+    PORT
+      LAYER Metal1 ;
+        RECT 0.00 0.00 2.6 0.06 ;
+    END
+  END VSS
+END OAI2BB1X4
+#+end_example
+
+* DEF: the description of the circuit
+
+#+begin_example
+VERSION 5.8 ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN ispd18_test1 ;
+UNITS DISTANCE MICRONS 2000 ;
+
+DIEAREA ( 0 0 ) ( 390800 383040 ) ;
+
+ROW ROW_0 CoreSite 0 0 FS DO 977 BY 1 STEP 400 0
+ ;
+ROW ROW_1 CoreSite 0 3420 N DO 977 BY 1 STEP 400 0
+ ;
+TRACKS X 200 DO 977 STEP 400 LAYER Metal9 ;
+TRACKS Y 950 DO 503 STEP 760 LAYER Metal9 ;
+TRACKS Y 760 DO 671 STEP 570 LAYER Metal8 ;
+TRACKS X 200 DO 977 STEP 400 LAYER Metal8 ;
+#+end_example
+
+
+Importantly, the components:
+
+#+begin_example
+COMPONENTS 8879 ;
+- inst8879 NOR4X4 + PLACED ( 360400 379620 ) N ;
+- inst8878 BUFX6 + PLACED ( 7600 0 ) FS ;
+- inst8877 NOR4X4 + PLACED ( 342400 0 ) FS ;
+- inst8876 NAND4BX2 + PLACED ( 360000 6840 ) FS ;
+- inst8875 NAND3X2 + PLACED ( 372400 6840 ) FS ;
+- inst8874 NAND4BX1 + PLACED ( 384800 355680 ) FS ;
+- inst8873 SDFFQX1 + PLACED ( 373200 116280 ) FS ;
+- inst8872 SDFFQX1 + PLACED ( 382000 140220 ) N ;
+- inst8871 SDFFQX1 + PLACED ( 382000 99180 ) N ;
+- inst8870 SDFFQX1 + PLACED ( 361200 102600 ) FS ;
+- inst8869 SDFFQX1 + PLACED ( 327600 369360 ) FS ;
+- inst8868 SDFFQX1 + PLACED ( 338000 338580 ) N ;
+- inst8867 SDFFQX1 + PLACED ( 315600 359100 ) N ;
+- inst8866 SDFFQX1 + PLACED ( 319200 352260 ) N ;
+- inst8865 NOR4X1 + PLACED ( 4800 20520 ) FS ;
+- inst8864 BUFX8 + PLACED ( 346400 3420 ) N ;
+- inst8863 NAND4X1 + PLACED ( 352800 3420 ) N ;
+- inst8862 OR4X4 + PLACED ( 357600 376200 ) FS ;
+#+end_example
+
+and netlists
+
+#+begin_example
+NETS 3153 ;
+- net3153
+  ( inst5747 SI )
+ ;
+- net3152
+  ( inst3044 Y ) ( inst3045 A )
+ ;
+- net3151
+  ( inst3855 Y ) ( inst3856 A )
+ ;
+- net908
+  ( inst4591 SI ) ( inst4592 Q ) ( inst4669 B0 ) ( inst4670 A )
+ ;
+- net907
+  ( inst4518 Q ) ( inst4592 SI ) ( inst4596 B0 )
+ ;
+- net906
+  ( inst4308 Q ) ( inst4450 A ) ( inst4518 SI ) ( inst4964 A0 )
+ ;
+#+end_example
+
+* Replace
+
+#+begin_example tcl
+set design ispd18_test1.input 
+
+replace_external rep
+
+# Import LEF/DEF files
+rep import_lef ispd18_test1.input.lef
+rep import_def ispd18_test1.input.def
+
+rep set_verbose_level 0
+
+# Initialize RePlAce
+rep init_replace
+
+# place_cell with BiCGSTAB 
+rep place_cell_init_place
+
+
+# print out instances' x/y coordinates
+#rep print_instances
+
+# place_cell with Nesterov method
+rep place_cell_nesterov_place
+
+# print out instances' x/y coordinates
+#rep print_instances
+
+# Export DEF file
+rep export_def ./${design}_nontd.def
+puts "Final HPWL: [rep get_hpwl]"
+#+end_example

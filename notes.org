@@ -3,6 +3,36 @@
 - https://github.com/racket/pict
 - sweet-exp! https://github.com/takikawa/sweet-racket
 
+* Stack
+** TODO use VLSI placement benchmarks
+*** DONE figure out the format of ISPD benchmarks
+CLOSED: [2020-03-16 一 21:05]
+*** DONE run existing placers
+CLOSED: [2020-03-16 一 21:05]
+- [[https://github.com/limbo018/DREAMPlace][limbo018/DREAMPlace]]
+- RePIAce code: [[https://github.com/The-OpenROAD-Project/RePlAce][The-OpenROAD-Project/RePlAce]]
+- [[https://github.com/The-OpenROAD-Project/OpenROAD][The-OpenROAD-Project/OpenROAD]]: an umbrella project contains placers and
+  routers as submodules
+
+*** visualization
+
+*** Implement other placers
+- KraftWerk
+- Capo
+- mPL
+- APlace
+- FastPlace
+- NTUplace3
+- SimPL
+- Eplace
+
+** TODO constraint optimization
+*** whether this is mixed-size placement?
+*** figure out PCB input format
+*** generate a simple PCB input file
+*** implement some placement algorithm
+*** import back
+
 * China TODO-list
 ** Libraries
 - https://github.com/Digi-Key/digikey-kicad-library
