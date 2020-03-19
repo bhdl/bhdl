@@ -48,7 +48,8 @@ function read_nets(fname)
                 push!(cur, name)
             else
                 # match
-                m = match(r"(o\d+)\s*([IO]) : (-?\d+\.\d+)\s+(-?\d+\.\d+)", line)
+                # FIXME what is B? see n112279
+                m = match(r"(o\d+)\s*([IOB]) : (-?\d+\.\d+)\s+(-?\d+\.\d+)", line)
                 if m != nothing
                     id = m.captures[1]
                     io = m.captures[2]
@@ -97,4 +98,45 @@ function test()
     pos = read_pos("/home/hebi/data/VLSI-benchmarks/ispd-2005/adaptec1/adaptec1.pl")
     ans_pos = read_pos("/home/hebi/data/VLSI-benchmarks/ispd-2005/adaptec1/adaptec1.ntup.pl")
     length(pos)
+
+end
+
+function test()
+    x,y,w,h,E,solx,soly,mask,mask_offx,mask_offy = read_bench("/home/hebi/data/VLSI-benchmarks/ispd-2005/adaptec1/", "adaptec1")
+    visualize(x, y, w, h)
+    visualize(solx, soly, w, h)
+end
+
+function read_bench(folder, name)
+    # http://www.ispd.cc/contests/05/ispd05-contest/announcement-jan-12.pdf
+    # find
+    nodes = read_nodes(joinpath(folder, "$name.nodes"))
+    nets = read_nets(joinpath(folder, "$name.nets"))
+    pos = read_pos(joinpath(folder, "$name.pl"))
+    # FIXME there may not be solution
+    sol_pos = read_pos(joinpath(folder, "$name.ntup.pl"))
+    # change to x,y,w,h
+
+    # FIXME sort?
+    # FIXME assert names are in order
+    name = [n[1] for n in nodes]
+    name1 = [p[1] for p in pos]
+    name == name1 || error("name order mismatch")
+    # FIXME name starts from "0", but that doesn't really matter
+    name_dict = Dict(Pair.(name, 1:length(name)))
+    x = [p[2] for p in pos]
+    y = [p[3] for p in pos]
+    # fixed macros
+    mask = [if isnothing(p[4]) 1 else 0 end for p in pos]
+    mask_offx = [if isnothing(p[4]) 0 else p[2] end for p in pos]
+    mask_offy = [if isnothing(p[4]) 0 else p[3] end for p in pos]
+    # solution
+    solx = [p[2] for p in sol_pos]
+    soly = [p[3] for p in sol_pos]
+    # w, h
+    w = [n[2] for n in nodes]
+    h = [n[3] for n in nodes]
+    # nets
+    E = [[name_dict[n[1]] for n in net[2:end]] for net in nets]
+    return x,y,w,h,E,solx,soly,mask,mask_offx,mask_offy
 end

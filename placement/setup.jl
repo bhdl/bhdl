@@ -1,3 +1,5 @@
 Pkg.add("Cairo")
 Pkg.add("Luxor")
 Pkg.add("ProgressMeter")
+Pkg.add("ForwardDiff")
+Pkg.add("FFTW")

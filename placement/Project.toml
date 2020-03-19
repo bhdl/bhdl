@@ -1,4 +1,6 @@
 [deps]
 Cairo = "159f3aea-2a34-519c-b102-8c37f9878175"
+FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 Luxor = "ae8d54c2-7ccd-5906-9d76-62fc9837b5bc"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"

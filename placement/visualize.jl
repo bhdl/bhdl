@@ -2,11 +2,9 @@ using Luxor
 import Dates
 using ProgressMeter
 
-macro luxoremacs(body, width=600, height=600,
-                 fname="luxor-drawing-$(Dates.format(Dates.now(), "HHMMSS_s")).png")
+macro luxoremacs(body, width=600, height=600)
     quote
         path, io = Base.Filesystem.mktemp()
-        # FIXME cannot leave it there?
         close(io)
 
         path * ".png"
@@ -19,7 +17,7 @@ macro luxoremacs(body, width=600, height=600,
         $(esc(body))
         finish()
         # instead of preview, I'm printing out something
-        # @show lfname
+        println("$lfname")
         println("#<Image: $lfname>")
         # preview()
     end
@@ -27,7 +25,7 @@ end
 
 function test_Luxor()
     @luxoremacs begin
-        text("Hello world")
+        text("Hello world ...")
         circle(Point(0, 0), 200, :stroke)
     end
     @luxoremacs begin
@@ -84,13 +82,9 @@ function visualize(nodes, nets, pos)
 
     # do the drawing
     @luxoremacs begin
-        # FIXME performance
-        # setdash("dot")
-        # sethue("gray30")
-        # rect(Point(xmin, ymin), xmax-xmin, ymax-ymin, :stroke)
         @showprogress 0.1 "drawing .." for node in node_dict
             name = node[1]
-            # DEBUG scale down
+            # scale down
             w, h = node[2] .* scale
             x, y = pos_dict[name]
             x = (x - xmin - xshift) * scale
@@ -99,8 +93,25 @@ function visualize(nodes, nets, pos)
             box(Point(x,y), w, h, :stroke)
         end
     end
-    # @luxoremacs begin
-    #     box(Point(700, 700), 3000, 4000, :stroke)
-    #     box(O, 800, 800, :stroke)
-    # end 7000 7000
+end
+
+function visualize(x, y, w, h)
+    # get min, max
+    xmin = minimum(x-w/2)
+    xmax = maximum(x+w/2)
+    ymin = minimum(y-h/2)
+    ymax = maximum(y+h/2)
+    xshift = (xmax - xmin) / 2
+    yshift = (ymax - ymin) / 2
+    scale = 500 / max(xmax - xmin, ymax - ymin)
+    # apply scale
+    x = (x .- xmin .- xshift) * scale
+    y = (y .- ymin .- yshift) * scale
+    w = w * scale
+    h = h * scale
+    @luxoremacs begin
+        @showprogress 0.1 "drawing .." for i in 1:length(x)
+            box(Point(x[i],y[i]), w[i], h[i], :stroke)
+        end
+    end
 end
