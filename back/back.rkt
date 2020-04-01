@@ -307,3 +307,7 @@ the kicad footprint format and generate gerber."
                   ;; (list (pin-ref #,(test #'net)) ...)
                   ...))
            comp))]))
+
+(define-simple-macro (assert e)
+  (or e (error (~a "Assertion error: " (syntax->datum #'e)))))
+

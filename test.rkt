@@ -122,3 +122,132 @@
   (IC->pict g)
   ;; (comp-IC-connections g)
   (IC->airwires g))
+
+
+
+(myvoid (println "hello"))
+(myvoid
+ (equal? (unbox (R-impl-pin-1 r)) r)
+ (R-impl-pin-1 (R-impl-pin-1 r)))
+
+;; this returns a Part containing connections. Upon reference
+(myvoid
+ (let ([jw (JW5211)]
+       [r1 (R 11)]
+       [r2 (R 3.3)]
+       [vcc (VCC)]
+       [gnd (GND)])
+   (hook (#:out-pins GND Vout FUSE_PWR)
+         (jw.VIN vcc)
+         (self.Vout l.2 r2.2 c3.1)
+         (j.SW l.1)
+         (j.FB r1.1 r2.1)
+         (r1.2 c3.2)
+         (self.FUSE_PWR j.EN j.VIN)
+         (jw.))))
+
+
+
+(myvoid
+ (untrace get-all-connected)
+ (untrace my-merge-helper)
+
+ (get-all-connected all-conns (seteq (first (first all-conns))) (seteq))
+
+ (seteq (first (first all-conns))
+        (last (last all-conns)))
+
+ (my-merge all-conns)
+ )
+
+
+
+
+
+(myvoid
+ (Part-pinhash myc)
+ (Part-connections myc))
+
+(myvoid
+ (let ([j (JW5211)]
+       [r1 (R 11)]
+       [r2 (R 3.3)]
+       [l (L)]
+       [vcc (VCC)]
+       [gnd (GND)])
+   (Part ('GND (box 1) 'Vout (box 1) 'FUSE_PWR (box 1))
+         (list (.VIN j) vcc)
+         (list (.Vout self) (.2 l) (.2 r2) (.1 c3))
+         (list (.SW j) (.1 l))
+         (list (.FB j) (.1 r1) (.1 r2))
+         (list (.2 r1) (.2 c3))
+         (list (.FUSE_PWR self) (.EN j) (.VIN j)))
+   (hook (#:out-pins GND Vout FUSE_PWR)
+         (jw.VIN vcc)
+         (self.Vout l.2 r2.2 c3.1)
+         (j.SW l.1)
+         (j.FB r1.1 r2.1)
+         (r1.2 c3.2)
+         (self.FUSE_PWR j.EN j.VIN))))
+
+
+(myvoid
+ (let ([r1 (R 11k)]
+       [r2 (R 22k)]
+       [c1 (C 1u)]
+       [c2 (C 2u)]
+       [lm555 (LM555)]
+       [gnd (GND)]
+       [vcc (VCC)])
+   (hook (lm555 gnd)
+         ())))
+
+
+(module+ test
+  ;; get the fileIO lexer
+  (define my-lexer (let ([in (open-input-file "tests/lefdef/ispd18_test1.input.lef")])
+                    (port-count-lines! in)
+                    (λ ()
+                      (get-lexer in))))
+  ;; inspect 10 tokens
+  (for/list ([i (in-range 10)])
+    (my-lexer))
+
+  ;; loop through and filter token-var
+  (define all-tokens (for*/list ([i (in-naturals)]
+                                 [tok (list (my-lexer))]
+                                 #:break (eq? tok 'eof))
+                       tok))
+
+  ;; inspect what's left to parse (mostly captured in token-var)
+  (remove-duplicates all-tokens)
+  ((compose
+    ;; 3. remove var whose last is number
+    (filter-f (λ (x) (not (member (string (last (string->list (token-value x))))
+                                  (map number->string (range 10))))))
+    ;; 2. remove dup
+    remove-duplicates
+    ;; 1. filter all token-var
+    (filter-f (λ (x) (eq? (token-name x) 'var))))
+   all-tokens)
+
+  )
+
+(module+ test2
+  ;; (trace lex-until)
+  ;; (trace parse-MACRO-PIN-PORT)
+  (define my-lexer (let ([in (open-input-file "tests/lefdef/ispd18_test1.input.lef")])
+                     (port-count-lines! in)
+                     (λ ()
+                       (get-lexer in))))
+  (parse-lef my-lexer)
+
+  
+  
+  (case 'hello
+    [(hello) 1]
+    [else 2])
+  (case 1
+    [(1) 2]
+    [(2) 3])
+  )
