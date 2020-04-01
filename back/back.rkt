@@ -308,6 +308,4 @@ the kicad footprint format and generate gerber."
                   ...))
            comp))]))
 
-(define-simple-macro (assert e)
-  (or e (error (~a "Assertion error: " (syntax->datum #'e)))))
 

@@ -1,11 +1,13 @@
 #lang racket
 
-
 ;; reading lef/def files, and do visualization
 (require parser-tools/lex
          syntax/parse/define
          racket/trace
          (prefix-in : parser-tools/lex-sre))
+
+(define-simple-macro (assert e)
+  (or e (error (~a "Assertion error: " (syntax->datum #'e)))))
 
 (define-tokens
   t (f-constant i-constant string-literal var))
@@ -80,6 +82,17 @@
          ["ANTENNADIFFAREA" 'ANTENNADIFFAREA]
          ["SE" 'SE]
          ["E" 'E]
+         ;; def
+         ["ROW" 'ROW]
+         ["TRACKS" 'TRACKS]
+         ["DESIGN" 'DESIGN]
+         ["DIEAREA" 'DIEAREA]
+         ["COMPONENTS" 'COMPONENTS]
+         ["PINS" 'PINS]
+         ["SPECIALNETS" 'SPECIALNETS]
+         ["NETS" 'NETS]
+         ["(" 'l-paren]
+         [")" 'r-paren]
          ;; numbers
          [(:: (:? "-") (:+ D)) (token-i-constant (string->number lexeme))]
          [(:: (:? "-") (:+ D) "." (:+ D)) (token-f-constant (string->number lexeme))]
@@ -87,6 +100,8 @@
          ;; variable name
          [(:+ A) (token-var lexeme)]
          [(eof) 'eof]
+         ["-" '-]
+         ["+" '+]
          ;; [any-string (error lexeme)]
          ))
 
@@ -117,11 +132,19 @@
   #:prefab)
 
 (define (parse-lef fname)
-  (let ([lex (let ([in (open-input-file "tests/lefdef/ispd18_test1.input.lef")])
+  (let ([lex (let ([in (open-input-file fname)])
                (port-count-lines! in)
                (λ ()
                  (get-lexer in)))])
     (parse-lef-lex lex)))
+
+(define (parse-def fname)
+  (let ([lex (let ([in (open-input-file fname)])
+               (port-count-lines! in)
+               (λ ()
+                 (get-lexer in)))])
+    (parse-def-lex lex)))
+
 
 (define (parse-lef-lex lex)
   ;; basically I'm going to peek the current token, and decide which function to
@@ -203,10 +226,104 @@
             (token-value d)))))
 
 (define (expect-consume lex tok-name)
-  (or (eq? (token-name (lex)) tok-name)
-      (error "Expected " tok-name " but " token-name)))
+  (let ([t (lex)])
+    (or (eq? (token-name t) tok-name)
+        (error "Expected " tok-name " but " t))))
+
+(struct cell
+  (name macro x y orient)
+  #:prefab)
+(struct net
+  (name insts)
+  #:prefab)
+
+(define (parse-CELL lex)
+  (let ([name (token-value (lex))]
+        [macro (token-value (lex))])
+    ;; skip until l-paren
+    (lex-until lex 'l-paren)
+    (let ([x (token-value (lex))]
+          [y (token-value (lex))]
+          [_ (expect-consume lex 'r-paren)]
+          [orient (token-value (lex))])
+      (expect-consume lex 'SEMICOLON)
+      (cell name macro x y orient))))
+
+(define (parse-NET lex)
+  (let ([netname (token-value (lex))])
+    (let ([insts (for*/list ([i (in-naturals)]
+                             [tok (list (lex))]
+                             #:break (eq? tok 'SEMICOLON))
+                   (assert (eq? tok 'l-paren))
+                   (let ([instname (token-value (lex))]
+                         [pinname (token-value (lex))])
+                     (expect-consume lex 'r-paren)
+                     (list instname pinname)))])
+      (net netname insts))))
+
+(define (parse-def-lex lex)
+  ;; I'm looking for COMPONENTS (name, pos, orient)
+  ;; and NETS (name, (component, pin))
+  (let ([cells (void)]
+        [nets (void)])
+    (for* ([i (in-naturals)]
+           [tok (list (lex))]
+           #:break (eq? tok 'eof))
+      (case (token-name tok)
+        [(VERSION) (lex) (lex)]
+        [(BUSBITCHARS DIVIDERCHAR DESIGN UNITS ROW TRACKS) (lex-until lex 'SEMICOLON)]
+        [(DIEAREA) (expect-consume lex 'l-paren)
+                   (token-value (lex))
+                   (token-value (lex))
+                   (expect-consume lex 'r-paren)
+                   (expect-consume lex 'l-paren)
+                   (token-value (lex))
+                   (token-value (lex))
+                   (expect-consume lex 'r-paren)
+                   (expect-consume lex 'SEMICOLON)]
+        [(COMPONENTS)
+         (set! cells
+               (let ([num (token-value (lex))])
+                 (expect-consume lex 'SEMICOLON)
+                 (for*/list ([i (in-naturals)]
+                             [tok (list (lex))]
+                             #:break (and (eq? tok 'END)
+                                          (let ([t (lex)])
+                                            (or (eq? t 'COMPONENTS)
+                                                (error "Do not match: " t)))))
+                   (or (eq? tok '-)
+                       (error (~a "expected - but " tok)))
+                   (parse-CELL lex))))]
+        [(PINS) (lex-until-seq2 lex 'END 'PINS)]
+        [(SPECIALNETS) (lex-until-seq2 lex 'END 'SPECIALNETS)]
+        [(NETS)
+         (set! nets
+               (let ([num (token-value (lex))])
+                 (expect-consume lex 'SEMICOLON)
+                 (for*/list ([i (in-naturals)]
+                             [tok (list (lex))]
+                             #:break (and (eq? tok 'END)
+                                          (let ([t (lex)])
+                                            (or (eq? t 'NETS)
+                                                (error (~a "Do not match: " t))))))
+                   (or (eq? tok '-)
+                       (error (~a "expected - but " tok)))
+                   (parse-NET lex))))]
+        [(END) (or (equal? (lex) 'DESIGN)
+                   (equal? (lex) 'eof)
+                   (error "Invalid 'END")) (void)]
+        [else
+         (error (~a "Unrecognized token " tok ", skipping to ;"))]))
+    (values cells nets)))
 
 (module+ test
   (define macros (parse-lef "tests/lefdef/ispd18_test1.input.lef"))
-  (take macros 10))
+  (length macros)
+  (take macros 10)
+  (define-values (cells nets)
+    (parse-def "tests/lefdef/ispd18_test1.input.def"))
+  (length cells)
+  (length nets)
+  (take cells 10)
+  (take nets 10))
 
