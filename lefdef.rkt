@@ -1,9 +1,11 @@
 #lang racket
 
 ;; reading lef/def files, and do visualization
-(require parser-tools/lex
+(require (except-in parser-tools/lex blank)
          syntax/parse/define
          racket/trace
+         racket/draw
+         pict
          (prefix-in : parser-tools/lex-sre))
 
 (define-simple-macro (assert e)
@@ -80,8 +82,9 @@
          ["LIBRARY" 'LIBRARY]
          ["NETEXPR" 'NETEXPR]
          ["ANTENNADIFFAREA" 'ANTENNADIFFAREA]
-         ["SE" 'SE]
-         ["E" 'E]
+         ["NAMESCASESENSITIVE" 'NAMESCASESENSITIVE]
+         ;; ["SE" 'SE]
+         ;; ["E" 'E]
          ;; def
          ["ROW" 'ROW]
          ["TRACKS" 'TRACKS]
@@ -236,6 +239,8 @@
 (struct net
   (name insts)
   #:prefab)
+(struct inst
+  (name pin))
 
 (define (parse-CELL lex)
   (let ([name (token-value (lex))]
@@ -253,34 +258,39 @@
   (let ([netname (token-value (lex))])
     (let ([insts (for*/list ([i (in-naturals)]
                              [tok (list (lex))]
-                             #:break (eq? tok 'SEMICOLON))
+                             #:break (or (eq? tok 'SEMICOLON)
+                                         (and (eq? tok '+)
+                                              (lex-until lex 'SEMICOLON))))
                    (assert (eq? tok 'l-paren))
                    (let ([instname (token-value (lex))]
                          [pinname (token-value (lex))])
                      (expect-consume lex 'r-paren)
-                     (list instname pinname)))])
+                     (inst instname pinname)))])
       (net netname insts))))
 
 (define (parse-def-lex lex)
   ;; I'm looking for COMPONENTS (name, pos, orient)
   ;; and NETS (name, (component, pin))
   (let ([cells (void)]
-        [nets (void)])
+        [nets (void)]
+        [diearea '()])
     (for* ([i (in-naturals)]
            [tok (list (lex))]
            #:break (eq? tok 'eof))
       (case (token-name tok)
         [(VERSION) (lex) (lex)]
-        [(BUSBITCHARS DIVIDERCHAR DESIGN UNITS ROW TRACKS) (lex-until lex 'SEMICOLON)]
-        [(DIEAREA) (expect-consume lex 'l-paren)
-                   (token-value (lex))
-                   (token-value (lex))
-                   (expect-consume lex 'r-paren)
-                   (expect-consume lex 'l-paren)
-                   (token-value (lex))
-                   (token-value (lex))
-                   (expect-consume lex 'r-paren)
-                   (expect-consume lex 'SEMICOLON)]
+        [(BUSBITCHARS DIVIDERCHAR DESIGN UNITS ROW TRACKS NAMESCASESENSITIVE)
+         (lex-until lex 'SEMICOLON)]
+        [(DIEAREA) (let ([_a (expect-consume lex 'l-paren)]
+                         [x1 (token-value (lex))]
+                         [y1 (token-value (lex))]
+                         [_b (expect-consume lex 'r-paren)]
+                         [_c (expect-consume lex 'l-paren)]
+                         [x2 (token-value (lex))]
+                         [y2 (token-value (lex))]
+                         [_d (expect-consume lex 'r-paren)]
+                         [_e (expect-consume lex 'SEMICOLON)])
+                     (set! diearea (list x1 y1 x2 y2)))]
         [(COMPONENTS)
          (set! cells
                (let ([num (token-value (lex))])
@@ -314,16 +324,111 @@
                    (error "Invalid 'END")) (void)]
         [else
          (error (~a "Unrecognized token " tok ", skipping to ;"))]))
-    (values cells nets)))
+    (values cells nets diearea)))
+
+
+(define (visualize diearea macros cells nets)
+  ;; 1. create hash map for macros
+  ;; 2. create hash map for cells
+  (define Hmacros (for/hash ([m macros])
+                    (values (macro-name m) m)))
+  (hash-keys Hmacros)
+  (define Hcells (for/hash ([c cells])
+                   (values (cell-name c) c)))
+  (hash-keys Hcells)
+  ;; 1. loop through all cells, and see if its macro is defined in macros
+  (for ([c cells])
+    (assert (hash-has-key? Hmacros (cell-macro c))))
+  (for ([n nets])
+    (for ([inst (net-insts n)])
+      (assert (hash-has-key? Hcells (inst-name inst)))))
+  ;; 1. loop through all macros, and draw pict for it. UDPATE: no need because
+  ;; the macro size is tiny compared to die area. Using a fixed rectangle instead.
+  (first macros)
+  #;
+  (define HmacroP (for/hash ([m macros])
+                    (values (macro-name m) (draw-macro m))))
+  ;; 2. loop through all cells, and get the total area. UPDATE: use diearea
+  ;; 3. create a total area
+  (define die
+    (match diearea
+      [(list x1 y1 x2 y2) (rectangle (/ (- x2 x1) 100) (/ (- y2 y1) 100))]))
+  (rectangle 390800 383040)
+
+  ;; 12.8, so there is no large macro
+  (apply max (for/list ([m macros])
+               (macro-w m)))
+  ;;
+  ;; 4. put all cells onto the correct locations. Looks like I cannot draw a
+  ;; pict back to dc, but I can pin-over
+  (first cells)
+  (define tmp (for/fold ([die die])
+                        ([c cells])
+                (let* ([x (/ (cell-x c) 100)]
+                       [y (/ (cell-y c) 100)]
+                       [m (hash-ref Hmacros (cell-macro c))]
+                       ;; 2.6 x 1.71
+                       [w (* (macro-w m) 10)]
+                       [h (* (macro-h m) 10)])
+                  (pin-over die x y (rectangle w h)))))
+  ;; the nets are not important here
+  tmp)
+
+(define (draw-macro-on-dc m dc)
+  (send dc draw-rectangle 10 10 30 10)
+  #;
+  (send dc set-font (make-font #:size 10 #:family 'roman
+                               #:weight 'bold))
+  (for ([p (macro-pins m)])
+    (for ([r (pin-rects p)])
+      (match r
+        [(list a b c d) (let ([name (pin-name p)]
+                              [x (* a 100)]
+                              [y (* b 100)]
+                              [w (* (- c a) 100)]
+                              [h (* (- d b) 100)])
+                          ;; (println (~a x " " y " " w " " h))
+                          (send dc draw-rectangle
+                                x y w h)
+                          (send dc draw-text name x y))]))))
+
+(define (draw-macro m)
+  ;; (define target (make-bitmap (inexact->exact (* (macro-w m) 1000))
+  ;;                             (inexact->exact (* (macro-h m) 1000))))
+  ;; (define dc (new bitmap-dc% [bitmap target]))
+  ;; (send target save-file "a.png" 'png)
+  (dc (λ (dc dx dy)
+        (define old-brush (send dc get-brush))
+        (define old-pen (send dc get-pen))
+        (define old-font (send dc get-font))
+        (draw-macro-on-dc m dc)
+        (send dc set-brush old-brush)
+        (send dc set-pen old-pen)
+        (send dc set-font old-font))
+      ;; FIXME this is 2.6 x 1.71, in m probably, I'm converting it
+      (inexact->exact (* (macro-w m) 100))
+      (inexact->exact (* (macro-h m) 100))))
 
 (module+ test
   (define macros (parse-lef "tests/lefdef/ispd18_test1.input.lef"))
   (length macros)
   (take macros 10)
-  (define-values (cells nets)
+  (define-values (cells nets diearea)
     (parse-def "tests/lefdef/ispd18_test1.input.def"))
+  (define-values (outcells outnets outdiearea)
+    (parse-def "tests/lefdef/out.def"))
+  (visualize diearea macros cells nets)
+  (visualize outdiearea macros outcells outnets)
   (length cells)
   (length nets)
   (take cells 10)
   (take nets 10))
 
+(module+ test
+  (define m (first macros))
+  (pict? (scale (rectangle 30 30) 0.3))
+
+  (define target (make-bitmap 3000 3000))
+  
+  ;; (hash-ref Hmacros "SDFFRX4")
+  (define p (draw-macro m)))
