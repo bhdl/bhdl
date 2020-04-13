@@ -1,9 +1,66 @@
 #+TITLE: Implementation Notes
-* random
-- https://github.com/racket/pict
-- sweet-exp! https://github.com/takikawa/sweet-racket
 
-* Stack
+* TODO-list
+** TODO detailed placement and legalization
+** TODO fixed positions
+** TODO Routing
+** Libraries
+- https://github.com/Digi-Key/digikey-kicad-library
+
+*** DONE schematic symbol library
+CLOSED: [2020-02-20 四 14:27]
+- kicad official library should be enough
+*** TODO PCB footprint library
+** TODO write some boards
+
+** Gerbers
+*** gerber generation
+**** design rules
+*** IC->gerber add connections
+
+Export a airwire connections onto the gerber file
+
+* DONE-list
+
+** DONE Julia and Racket interop
+CLOSED: [2020-04-13 Mon 19:05]
+*** build juila code into a static binary
+Although the startup overhead will be reduced, I don't feel this is the best
+option compared to client-server architecture.
+*** DONE run Julia code as server
+CLOSED: [2020-04-13 Mon 19:04]
+What kind of server architecture? Raw socket? Or Http server?
+
+- [[https://github.com/JuliaWeb/HTTP.jl][JuliaWeb/HTTP.jl]]: seems to be more mature, try this first.
+- [[https://github.com/JuliaWeb/JuliaWebAPI.jl][JuliaWeb/JuliaWebAPI.jl]]: this is interesting, it wraps a julia function as a
+  remote callable API.
+
+And I should probably write local files and send filename via POST HTTP request
+instead of sending all data via HTTP payload. The result should probably also be
+a local filename.  *But* for a remote server, I still need to send the whole
+file, so just do a whole file as payload.
+
+In a word, use *HTTP.jl* to start a remote server that handles HTTP POST
+request, and response the result file. Hopefully doing this async.
+
+** lef/def and RePlAce
+*** DONE connect lef with def
+CLOSED: [2020-04-02 四 18:31]
+*** DONE visualize lef/def
+CLOSED: [2020-04-02 四 18:31]
+*** CANCELED read academic benchmark ISPD05 and convert to lef/def
+CLOSED: [2020-04-02 四 19:33]
+*** DONE generate lef/def for my PCB
+CLOSED: [2020-04-03 五 17:18]
+*** DONE verify RePlAce performance on my PCB
+CLOSED: [2020-04-03 五 18:15]
+
+It crashed. How then? It is pretty much impossible to debug RePlAce code. Maybe
+restart my own placement code?
+
+*** DONE place.jl use lef/def and debug on my small scale
+CLOSED: [2020-04-13 Mon 19:05]
+
 ** TODO use VLSI placement benchmarks
 *** DONE figure out the format of ISPD benchmarks
 CLOSED: [2020-03-16 一 21:05]
@@ -16,7 +73,8 @@ CLOSED: [2020-03-16 一 21:05]
 
 *** DONE read ISPD 05/06 benchmarks
 CLOSED: [2020-03-16 一 22:03]
-*** visualization
+*** DONE visualization
+CLOSED: [2020-03-17 二 00:39]
 
 *** Implement other placers
 - KraftWerk
@@ -28,167 +86,17 @@ CLOSED: [2020-03-16 一 22:03]
 - SimPL
 - Eplace
 
-** TODO constraint optimization
+** DONE constraint optimization
+CLOSED: [2020-04-13 Mon 19:07]
 *** whether this is mixed-size placement?
 *** figure out PCB input format
 *** generate a simple PCB input file
 *** implement some placement algorithm
 *** import back
 
-* China TODO-list
-** Libraries
-- https://github.com/Digi-Key/digikey-kicad-library
-
-*** DONE schematic symbol library
-CLOSED: [2020-02-20 四 14:27]
-- kicad official library should be enough
-
-*** TODO PCB footprint library
-
-** TODO find benchmark schematics
-
-- a lot of projects, not necessarilly kicad https://kitspace.org/
-
-Individual projects:
-- https://github.com/im-tomu/tomu-hardware
-
-
-** DONE schematic hook syntax
-CLOSED: [2020-02-24 一 17:33]
-** DONE schematic hook semantics
-CLOSED: [2020-02-23 日 18:02]
-** TODO schematic visualization
-*** TODO placement
-[[https://www.youtube.com/playlist?list=PLai-xIlqf4Jl3BDIADGhPHMX1srl5TTRI][Coursera course on VLSI CAD on youtube]].
-
-So we have the following requirements:
-- no overlap
-- min distance between indivisual Atoms (this actually covers no-overlapping)
-  - min distance between pins is not that good
-- possibly fixed-position Atoms
-
-Now we have netlists, containing
-- atom declarations
-- multi-point nets
-
-The objective is an approximation of wire length. The typical one is
-Half-Perimeter Wire-Length (HPWL). It is easy to calculate for multi-point nets.
-
-Several search algorithms:
-1. First, a naive randomized placer with iterative improvement. 
-   - The iteration is to random select two parts and swap them.
-   - One trick: when calculating the new HPWL, just calculate the delta of the
-     nets influenced by swapped points
-2. hill-climbing (simulated annealing):
-   - keep a decreasing temperature T
-   - find a random swap, evaluate delta(HPWL)
-   - if delta<0, evaluate P(delta, T), the probability of accepting the worse solution
-     - P(delta, T) = e^(-delta/T)
-3. quadratic programming
-   - separately optimize x and y
-   - the wires do not necessarily have same weights. That's the paremter to
-     control which wire gets longer
-   1. write the quadratic length
-   2. calculate partial direvatives, set to 0, get linear equations Ax=b
-      - we can actually compute this: C is connectivity matrix, symmetric,
-        if i,j connects, C[i,j]=weight, otherwise 0
-      - From C, get A = -C + diag(sum(C,dims=2)) + diag(Pad)
-        - Pad is the weight of points to fixed pads
-      - A is actually the same for both X and Y. For b, it is different.
-        - bx = w*Padx, where Padx is padx if i is connected to a padx
-        - by = w*Pady
-   3. solve the linear equations
-      - we don't use Gaussian elimination. Instead, we the matrix has the
-        following properties:
-        - A is sparse, symmetric, diagonally dominant, positive semi-definite
-        We thus use iterative approximate solvers
-
-We then need to spread the placement out, so that they does not stick
-together. This is recursive partitioning, and call quadratic programming for
-each subproblem. Quite clever.
-
-**** Julia solvers
-For matrix divide, you can actually use [[https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/#Base.:\\-Tuple{AbstractArray{T,2}%20where%20T,Union{AbstractArray{T,1},%20AbstractArray{T,2}}%20where%20T}][Base.\]]
-
-The symmetric positive semi-definite A can have faster iterative methods, and
-seems to be very old technique. See:
-- Iterative Methods for Linear Equations with Symmetric Positive Definite Matrix, 1961
-- An Iterative Method for Symmetric Positive Semidefinite Linear System of Equations, 2014
-
-The Juila solvers:
-- [[https://github.com/JuliaNLSolvers/NLsolve.jl][JuliaNLSolvers/NLsolve.jl]]
-- [[https://github.com/JuliaNLSolvers/Optim.jl][JuliaNLSolvers/Optim.jl]]
-- [[https://github.com/JuliaNLSolvers/LsqFit.jl][JuliaNLSolvers/LsqFit.jl]]
-
-
-- [[https://github.com/JuliaOpt/Convex.jl][JuliaOpt/Convex.jl]]
-- [[https://github.com/JuliaOpt/JuMP.jl][JuliaOpt/JuMP.jl]]
-- [[https://github.com/JuliaOpt/NLopt.jl][JuliaOpt/NLopt.jl]]: interface to [[https://github.com/stevengj/nlopt][stevengj/nlopt]]
-- other from JuliaOpt and some other alternatives: http://www.juliaopt.org/packages/
-
-
-*** routing
-
-** PCB footprint assignment
-** PCB placement & routing
-*** placement
-*** routing
-*** programatic placement
-** gerber generation
-*** design rules
-
-
-
-* TODO-list
-
-** IC->gerber add connections
-
-Export a airwire connections onto the gerber file
-
-** Libraries
+** CANCELED Libraries
+CLOSED: [2020-04-13 Mon 19:19]
 - define all popular libraries
 - compose them together
 - write visualization and gerber generation for comp-IC
 - assign footprint
-
-** Implement popular boards
-*** 555 timer
-
-*** Arduino Uno
-- bootloader auto-reset
-- USB socket
-- ICSP (SPI, i.e. MISO, MOSI, SCK, RESET) header for programming the
-  Arduino bootloader
-- serial to USB chip (e.g. FTDI)
-
-Custom Arduino Design Series, Schematic, PCB, Test
-https://www.youtube.com/playlist?list=PLRIGIzu0Z7KllhKqPsNDwitjpK45SHoKg
-
-**** sections of schematic
-***** power section
-  - decoupling capacitors
-  - voltage divider resistors, selected by op-amps (e.g. LMV358) to
-    select 3.3v or 5v
-***** (power) LED section
-  - LED
-  - current limiting resistors
-
-***** voltage regulator (e.g. 7805)
-  - decoupling capacitors on both input and output of the voltage regulator
-  - 3v3 volt regulator (e.g. LP2985, NCP1117)
-  - barrel jack for power input
-
-  Some tips:
-  - for linear regulator, the output capacitor should be smaller than
-    the input capacitor
-  - the output capacitor is a filter capacitor
-  - the input capacitor is a decoupling capacitor, since it decouples it
-    from the input power
-
-***** reset button
-  - button
-  - pull-up resistors
-
-
-*** Novena laptop
-

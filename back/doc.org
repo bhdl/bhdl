@@ -47,3 +47,41 @@ SSOP-8_2.95x2.8mm_P0.65mm.kicad_mod
 SSOP-8_3.95x5.21x3.27mm_P1.27mm.kicad_mod
 SSOP-8_3.9x5.05mm_P1.27mm.kicad_mod
 SSOP-8_5.25x5.24mm_P1.27mm.kicad_mod
+
+* Email
+This is a question rather than an issue. I'm trying to implement the global
+placer. In your paper in section 3.2, you mentioned:
+
+> The computation consists of four steps: 1) density map computation; 2) a u,v ;
+3) ψ in forward or ξ in backward; 4) D in forward ∂D in backwrad. Steps 2 and 3
+are the bulk computation parts.
+
+I actually find it particularly costly for computing density maps. If I
+understand correctly, the density is computed by calculating overlapped area of
+all cells with all bins. I'm computing it using the following Julia code
+(simplified). I'm also doing the computation on GPU using
+[CuArrays.jl](https://github.com/JuliaGPU/CuArrays.jl)
+
+```julia
+function rho(xs, ys, ws, hs, binxs1, binys1, binxs2, binys2)
+    x1 = max.((xs .- ws) / 2, binxs1)
+    y1 = max.((ys .- hs) / 2, binys1)
+    x2 = min.((xs .+ ws) / 2, binxs2)
+    y2 = min.((ys .+ hs) / 2, binys2)
+    sum(max.(x2 - x1, 0) .* max.(y2 - y1, 0), dims=3)
+end
+```
+
+For the relatively small ISPD 2005 adaptec1 benchmark, there are about 210k
+cells and 220k nets. I'm using 300x300 bins. It takes about 10 seconds to
+compute density map. If using CPU it takes 10 minutes. Other computations (WA
+wirelength forward/backward, 2D FFT) seem to take about 1 second (which is still
+much higher than yours).
+
+I noticed your implementation seems to take less than 1ms for each iteration,
+which is so impressive. But I could not follow your code very easily. Could you
+point me your implementation of density map computation? Is there any trick to
+compute this efficiently?
+
+One trick I can think of is that each cell usually only overlaps with 1 bin. But
+I'm not sure if this is the problem.
