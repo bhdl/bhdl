@@ -1,9 +1,9 @@
 #lang racket
 
-(require "../place.rkt"
-         "../schematic.rkt"
-         "../sch-lib.rkt"
-         "../utils.rkt"
+(require "../src/place.rkt"
+         "../src/schematic.rkt"
+         "../src/sch-lib.rkt"
+         "../src/utils.rkt"
          json)
 
 (module+ test
