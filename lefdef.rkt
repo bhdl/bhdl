@@ -432,3 +432,146 @@
   
   ;; (hash-ref Hmacros "SDFFRX4")
   (define p (draw-macro m)))
+
+;; I'm still going to define a lexer for it
+
+(define get-aca-lexer
+  (lexer [whitespace (get-aca-lexer input-port)]
+         [Comment (get-aca-lexer input-port)]
+         ;; non-important I guess
+         [":" 'COLON]
+         [";" 'SEMICOLON]
+         ["UCLA" 'UCLA]
+         ["VERSION" 'VERSION]
+         ["NumNodes" 'NumNodes]
+         ["NumTerminals" 'NumTerminals]
+         ["NumNets" 'NumNets]
+         ["NumPins" 'NumPins]
+         ["NetDegree" 'NetDegree]
+         ["terminal" 'terminal]
+         ["/FIXED" 'FIXED]
+         ;; numbers
+         [(:: (:? "-") (:+ D)) (token-i-constant (string->number lexeme))]
+         [(:: (:? "-") (:+ D) "." (:+ D)) (token-f-constant (string->number lexeme))]
+         ;; variable name
+         [(:+ A) (token-var lexeme)]
+         [(eof) 'eof]
+         ;; [any-string (error lexeme)]
+         ))
+
+
+(struct aca-cell
+  (name w h)
+  #:prefab)
+(struct aca-pos
+  (name x y)
+  #:prefab)
+(struct aca-net
+  (name insts)
+  #:prefab)
+
+(define (read-cells p)
+  (let ([lex (let ([in (open-input-file p)])
+               (port-count-lines! in)
+               (λ ()
+                 (get-aca-lexer in)))]
+        [res (void)])
+    (for* ([i (in-naturals)]
+           [tok (list (lex))]
+           #:break (eq? tok 'eof))
+      (case (token-name tok)
+        [(UCLA) (lex) (lex)]
+        [(NumNodes) (lex) (lex)]
+        [(NumTerminals) (lex) (lex)
+                        (set! res (filter-not
+                                   void?
+                                   (for*/list ([i (in-naturals)]
+                                               [tok (list (lex))]
+                                               #:break (eq? tok 'eof))
+                                     (case (token-name tok)
+                                       ;; FIXME ignoring terminal for now
+                                       [(terminal) (void)]
+                                       [(var) (let ([name (token-value tok)]
+                                                    [w (token-value (lex))]
+                                                    [h (token-value (lex))])
+                                                (aca-cell name w h))]))))]))
+    res))
+
+(define (read-nets p)
+  (let ([lex (let ([in (open-input-file p)])
+               (port-count-lines! in)
+               (λ ()
+                 (get-aca-lexer in)))]
+        [res (void)])
+    (for* ([i (in-naturals)]
+           [tok (list (lex))]
+           #:break (eq? tok 'eof))
+      (case (token-name tok)
+        [(UCLA) (lex) (lex) (void)]
+        [(NumNets) (lex) (lex) (void)]
+        [(NumPins) (lex) (lex) (void)]
+        [(NetDegree) (set! res
+                           (for*/list ([i (in-naturals)]
+                                       [tok (list (lex))]
+                                       #:break (eq? tok 'eof))
+                             ;; HACK actually 3 unused tokens, but one is in the
+                             ;; loop var
+                             (lex) (lex)
+                             (for*/list ([i (in-naturals)]
+                                         [tok (list (lex))]
+                                         #:break (or (eq? tok 'eof)
+                                                     (eq? tok 'NetDegree)))
+                               (let  ([name (token-value tok)]
+                                      [dir (token-value (lex))]
+                                      [_ (lex)]
+                                      [offx (token-value (lex))]
+                                      [offy (token-value (lex))])
+                                 (list name dir offx offy)))))]))
+    res))
+
+(define (read-pos p)
+  (let ([lex (let ([in (open-input-file p)])
+               (port-count-lines! in)
+               (λ ()
+                 (get-aca-lexer in)))])
+    (for*/list ([i (in-naturals)]
+                [tok (list (lex))]
+                #:break (eq? tok 'eof))
+      (case (token-name tok)
+        [(UCLA) (lex) (lex)]
+        ;; FIXME this cannot be ignored
+        [('FIXED) (void)]
+        [(var) (let ([name (token-value tok)]
+                     [x (token-value (lex))]
+                     [y (token-value (lex))])
+                 (lex) (lex)
+                 (aca-pos name x y))]))))
+
+(module+ test
+  (define aca-dir "/home/hebi/data/VLSI-benchmarks/ispd-2005/adaptec1")
+  (define aca-name "adaptec1")
+
+  ;; 1. read nodes (cells)
+  (define aca-cells
+    (read-cells (path-add-extension (build-path aca-dir aca-name) ".nodes")))
+  (length aca-cells)
+  (take aca-cells 10)
+  ;; 2. read nets
+  ;; FIXME this is very slow, about 10 seconds
+  (define aca-nets
+    (read-nets (path-add-extension (build-path aca-dir aca-name) ".nets")))
+  (length aca-nets)
+  (take aca-nets 10)
+  ;; 3. read pos
+  (define aca-poses
+    (read-pos (path-add-extension (build-path aca-dir aca-name) ".pl")))
+  (length aca-poses)
+  (take aca-poses 10)
+  ;; convert them into lef/def
+  ;; 1. each cell has a width and height. Turn this into macros?
+  ;; 2. each net has pin offset. Turn this into pins in macro?
+  ;; 3. the pos is relatively easy, but I need the FIXED to be handled properly
+  ;;
+  ;; Thus the main difficulty is how to generate proper amount of macros. I'm
+  ;; suspending this, and directly generate lef/def for PCB design.
+  )

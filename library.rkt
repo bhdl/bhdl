@@ -12,14 +12,10 @@
          capacitor resistor diode crystal LM555)
 
 ;; power
-(define/IC GND (a))
-(define/IC VCC (a))
+;; (define GND '())
+;; (define VCC '())
 
 ;; basic components
-(define/IC capacitor (a b))
-(define/IC resistor (a b))
-(define/IC diode (a b))
-(define/IC crystal (a b))
 
 ;; http://www.ti.com/lit/ds/symlink/lm555.pdf
 (define/IC LM555
