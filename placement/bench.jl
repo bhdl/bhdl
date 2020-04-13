@@ -1,3 +1,5 @@
+import JSON
+
 function read_nodes(fname)
     res = []
     open(fname, "r") do io
@@ -11,12 +13,14 @@ function read_nodes(fname)
                 # TODO record
             else
                 # match
-                m = match(r"(o\d+)\t(\d+)\t(\d+)(\tterminal)?", line)
+                # m = match(r"(o\d+)\t(\d+)\t(\d+)(\tterminal)?", line)
+                m = match(r"(X\d+)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)(\s+terminal)?", line)
+                
                 if m != nothing
                     id = m.captures[1]
                     # seems unimportant
-                    width = parse(Int, m.captures[2])
-                    height = parse(Int, m.captures[3])
+                    width = parse(Float32, m.captures[2])
+                    height = parse(Float32, m.captures[3])
                     # seems duplicate with .pl
                     terminal = m.captures[4]
                     # @show id, x, y, terminal
@@ -41,7 +45,7 @@ function read_nets(fname)
             elseif startswith(line, "NumTerminals")
                 # TODO record
             elseif startswith(line, "NetDegree")
-                m = match(r".*:\s*(\d+)\s*(n\d+)", line)
+                m = match(r".*:\s*(\d+)\s*(\w+)", line)
                 name = m.captures[2]
                 push!(res, cur)
                 cur = []
@@ -49,7 +53,8 @@ function read_nets(fname)
             else
                 # match
                 # FIXME what is B? see n112279
-                m = match(r"(o\d+)\s*([IOB]) : (-?\d+\.\d+)\s+(-?\d+\.\d+)", line)
+                # m = match(r"(o\d+)\s*([IOB]) : (-?\d+\.\d+)\s+(-?\d+\.\d+)", line)
+                m = match(r"(X\d+)\s*([IOB]) : (-?(?:\d+\.)?\d+)\s+(-?(?:\d+\.)?\d+)", line)
                 if m != nothing
                     id = m.captures[1]
                     io = m.captures[2]
@@ -65,12 +70,19 @@ function read_nets(fname)
     return res[2:end]
 end
 
+function test()
+    read_nets("../out/a.nets")
+    read_nodes("../out/a.nodes")
+    read_pos("../out/a.pl")
+end
+
 function read_pos(fname)
     res = []
     open(fname, "r") do io
         for line in eachline(io)
             line = strip(line)
-            m = match(r"(o\d+)\s+(\d+)\s+(\d+).*: \w+( /FIXED)?", line)
+            # m = match(r"(o\d+)\s+(\d+)\s+(\d+).*: \w+( /FIXED)?", line)
+            m = match(r"(X\d+)\s+(\d+)\s+(\d+).*: \w+( /FIXED)?", line)
             if m != nothing
                 id = m.captures[1]
                 x = parse(Int, m.captures[2])
@@ -110,18 +122,23 @@ end
 function read_bench(folder, name)
     # http://www.ispd.cc/contests/05/ispd05-contest/announcement-jan-12.pdf
     # find
+    @info "reading nodes .."
     nodes = read_nodes(joinpath(folder, "$name.nodes"))
+    @info "reading nets .."
     nets = read_nets(joinpath(folder, "$name.nets"))
+    @info "reading pos .."
     pos = read_pos(joinpath(folder, "$name.pl"))
-    # FIXME there may not be solution
-    sol_pos = read_pos(joinpath(folder, "$name.ntup.pl"))
-    # change to x,y,w,h
+    # # FIXME there may not be solution
+    # sol_pos = read_pos(joinpath(folder, "$name.ntup.pl"))
+    # # change to x,y,w,h
+    # dream_pos = read_pos("/home/hebi/data/VLSI-benchmarks/DREAMPlace/install/results/adaptec1/adaptec1.gp.pl")
 
     # FIXME sort?
     # FIXME assert names are in order
+    @info "manipulating .."
     name = [n[1] for n in nodes]
     name1 = [p[1] for p in pos]
-    name == name1 || error("name order mismatch")
+    name == name1 || error("name order mismatch: $name vs. $name1")
     # FIXME name starts from "0", but that doesn't really matter
     name_dict = Dict(Pair.(name, 1:length(name)))
     x = [p[2] for p in pos]
@@ -131,12 +148,76 @@ function read_bench(folder, name)
     mask_offx = [if isnothing(p[4]) 0 else p[2] end for p in pos]
     mask_offy = [if isnothing(p[4]) 0 else p[3] end for p in pos]
     # solution
-    solx = [p[2] for p in sol_pos]
-    soly = [p[3] for p in sol_pos]
+    # solx = [p[2] for p in sol_pos]
+    # soly = [p[3] for p in sol_pos]
+    # dream_solx = [p[2] for p in dream_pos]
+    # dream_soly = [p[3] for p in dream_pos]
+    
     # w, h
     w = [n[2] for n in nodes]
     h = [n[3] for n in nodes]
     # nets
     E = [[name_dict[n[1]] for n in net[2:end]] for net in nets]
-    return x,y,w,h,E,solx,soly,mask,mask_offx,mask_offy
+    # return x,y,w,h,E,solx,soly,mask,mask_offx,mask_offy, dream_solx, dream_soly
+    return x,y,w,h,E,mask
 end
+
+
+function parse_jobj(jobj)
+    jobj["nets"][1]
+    jobj["macros"][1]
+    jobj["cells"][1]
+    # TODO save this to a file
+    # TODO call placement algorithm and return placement results
+    # get xs, ys, ws, hs
+    # 1. get macro hash table
+    hmacros = map(jobj["macros"]) do m
+        Pair(m["name"], m)
+    end |> Dict
+
+    # cell index
+    cell_indices = map(enumerate(jobj["cells"])) do (i,c)
+        Pair(c["name"], i)
+    end |> Dict
+
+    data = map(jobj["cells"]) do c
+        x = c["x"]
+        y = c["y"]
+        w = hmacros[c["macro"]]["w"]
+        h = hmacros[c["macro"]]["h"]
+        x, y, w, h
+    end
+    xs = [d[1] for d in data]
+    ys = [d[2] for d in data]
+    ws = [d[3] for d in data]
+    hs = [d[4] for d in data]
+
+    jobj["nets"][1]["insts"]
+    Es = map(jobj["nets"]) do net
+        map(net["insts"]) do inst
+            # Es FIXME Pin index, Pin offset
+            cell_indices[inst["name"]]
+        end
+    end
+    # FIXME use true and false directly here
+    mask = [true for x in xs]
+    xs, ys, ws, hs, Es, mask
+end
+
+
+function encode(jobj, xs, ys)
+    map(enumerate(jobj["cells"])) do (i,c)
+        Pair(c["name"], (xs[i], ys[i]))
+    end |> Dict |> JSON.json
+end
+
+function test()
+    # read json directly for debugging
+    str = open("../out/a.json") do io
+        read(io, String)
+    end
+    jobj = JSON.parse(str)
+    xs, ys, ws, hs, Es, mask = parse_jobj(jobj)
+    place(xs, ys, ws, hs, Es, mask)
+end
+

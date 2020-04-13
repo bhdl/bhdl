@@ -95,12 +95,18 @@ function visualize(nodes, nets, pos)
     end
 end
 
-function visualize(x, y, w, h)
+function visualize(x, y, w, h, R)
     # get min, max
     xmin = minimum(x-w/2)
     xmax = maximum(x+w/2)
     ymin = minimum(y-h/2)
     ymax = maximum(y+h/2)
+
+    xmin = 0
+    ymin = 0
+    xmax = R.xmax
+    ymax = R.ymax
+
     xshift = (xmax - xmin) / 2
     yshift = (ymax - ymin) / 2
     scale = 500 / max(xmax - xmin, ymax - ymin)
@@ -110,6 +116,9 @@ function visualize(x, y, w, h)
     w = w * scale
     h = h * scale
     @luxoremacs begin
+        setdash("dash")
+        box(Point(0,0), R.xmax * scale, R.ymax * scale, :stroke)
+        setdash("solid")
         @showprogress 0.1 "drawing .." for i in 1:length(x)
             box(Point(x[i],y[i]), w[i], h[i], :stroke)
         end

@@ -1,16 +1,22 @@
 import FFTW
 using SparseArrays: sparse, spzeros
+import ForwardDiff
+import Zygote
+using Statistics: mean
+import Plots
+import CuArrays: cu, allowscalar
+allowscalar(false)
+using Flux: gpu, cpu
+
+γ = 0.5
 
 function sumexp(x, γ)
     aP = exp.((x .- maximum(x)) / γ)
     aN = exp.(- (x .- minimum(x)) / γ)
-    # This is not stable with large x
-    # wex = sum(x .* exp.(x / γ)) / sum(exp.(x / γ)) - sum(x .* exp.(- x / γ)) / sum(exp.(- x / γ))
     sum(x .* aP) / sum(aP) - sum(x .* aN) / sum(aN)
 end
 
 function We(net, xs, ys)
-    γ = 1.5
     x = [xs[n] for n in net]
     y = [ys[n] for n in net]
     wex = sumexp(x, γ)
@@ -23,8 +29,7 @@ function W(nets, xs, ys)
     sum(f.(nets))
 end
 
-function We_grad_x_impl(net, x)
-    γ = 1.5
+function We_grad_x_impl(x)
     aP = exp.((x .- maximum(x)) / γ)
     aN = exp.(- (x .- minimum(x)) / γ)
     bP = sum(aP)
@@ -38,9 +43,10 @@ end
 
 function We_grad_x(net, x)
     res = spzeros(length(x))
-    x = [x[n] for n in net]
-    grad = We_grad_x_impl(net, x)
-    # FIXME map back to whole x
+    # all the x values of net
+    netx = [x[n] for n in net]
+    grad = We_grad_x_impl(netx)
+    # map back to whole x
     for (i,n) in enumerate(net)
         res[n] = grad[i]
     end
@@ -52,89 +58,122 @@ function W_grad_x(nets, x)
     batch_size = 10000
     ct = Int(ceil(length(nets) / batch_size))
     f = e->We_grad_x(e,x)
-    res = spzeros(length(x))
-    @showprogress 0.1 "batching .." for i in 1:ct
-        start = (i-1) * batch_size + 1
-        stop = min(i * batch_size, length(nets))
-        # @show i start stop
-        res .+= sum(f.(nets[start:stop]))
+    # res = spzeros(length(x))
+    tmp = Array{Any}(nothing, length(nets))
+    Threads.@threads for i in 1:length(nets)
+        tmp[i] = f(nets[i])
     end
-    res
+    sum(tmp)
 end
 
-function rho_b(b, vs, R)
-    # x,y should be the bin coordinate
-    # this should return N,N for bins
-    bx, by = b
+function test()
+    # export JULIA_NUM_THREADS=4
+    Threads.nthreads()
+    @time W_grad_x(Es, xs)
+end
+
+function rho_v_many(pxs, pys, pws, phs, bx1s, by1s, bx2s, by2s)
+    x1 = max.(pxs .- pws / 2, bx1s)
+    y1 = max.(pys .- phs / 2, by1s)
+    x2 = min.(pxs .+ pws / 2, bx2s)
+    y2 = min.(pys .+ phs / 2, by2s)
+    # max.(x2 - x1, 0) .* max.(y2 - y1, 0)
+    sum(max.(x2 - x1, 0) .* max.(y2 - y1, 0), dims=3)
+end
+
+function rho_cells(vs, R)
     xs, ys, ws, hs = vs
-    xmin = bx * R.bw
-    xmax = (bx+1) * R.bw
-    ymin = by * R.bh
-    ymax = (by+1) * R.bh
 
-    all = map(1:length(xs)) do i
-        # FIXME overwrite outer variable
-        x = xs[i]
-        y = ys[i]
-        w = ws[i]
-        h = hs[i]
-        x1 = max(x - w / 2, xmin)
-        y1 = max(y - h / 2, ymin)
-        x2 = min(x + w / 2, xmax)
-        y2 = min(y + h / 2, ymax)
-        max(x2 - x1, 0) * max(y2 - y1, 0)
-    end
-    return sum(all) / (R.bw * R.bh)
+    # bx1s = reshape([R.xmin + R.bw * (i-1) for i in 1:R.M for j in 1:R.M], R.M, R.M)
+    # bx2s = reshape([R.xmin + R.bw * i for i in 1:R.M for j in 1:R.M], R.M, R.M)
+    # by1s = reshape([R.ymin + R.bh * (j-1) for i in 1:R.M for j in 1:R.M], R.M, R.M)
+    # by2s = reshape([R.ymin + R.bh * j for i in 1:R.M for j in 1:R.M], R.M, R.M)
+    
+    pxs = reshape(xs, 1, 1, length(xs))
+    pys = reshape(ys, 1, 1, length(ys))
+    pws = reshape(ws, 1, 1, length(ws))
+    phs = reshape(hs, 1, 1, length(hs))
+
+    # FIXME moving data between cpu and gpu
+    x1 = max.(pxs .- pws / 2, cpu(R.bx1s))
+    y1 = max.(pys .- phs / 2, cpu(R.by1s))
+    x2 = min.(pxs .+ pws / 2, cpu(R.bx2s))
+    y2 = min.(pys .+ phs / 2, cpu(R.by2s))
+
+    max.(x2 - x1, 0) .* max.(y2 - y1, 0)
 end
 
-function rho_all(vs, R)
-    # FIXME row and column
-    rhos = [rho_b((bx,by), vs, R) for by in 1:R.M for bx in 1:R.M]
-    reshape(rhos, R.M, R.M)
+function rho_fast(vs, R)
+    xs, ys, ws, hs = vs
+    # OK, I need to use batch
+    pxs = reshape(xs, 1, 1, length(xs))
+    pys = reshape(ys, 1, 1, length(ys))
+    pws = reshape(ws, 1, 1, length(ws))
+    phs = reshape(hs, 1, 1, length(hs))
+    # FIXME whether to use GPU or not for small scale
+    pxs, pys, pws, phs = (pxs, pys, pws, phs) .|> gpu
+    res = rho_v_many(pxs, pys, pws, phs,
+                     R.bx1s, R.by1s, R.bx2s, R.by2s)
+    dropdims(res, dims=3) |> cpu
 end
 
-function phi_b(vs, R)
-    rho = rho_all(vs, R)
-    auv = FFTW.dct(rho)
-
-    wuv_f(uv) = 2 * pi * uv / R.M
-    wuv2 = reshape([wuv_f(u)^2 + wuv_f(v)^2 for u in 1:R.M for v in 1:R.M], R.M, R.M)
-    wu = reshape([wuv_f(u) for u in 1:R.M for v in 1:R.M], R.M, R.M)
-    wv = reshape([wuv_f(v) for u in 1:R.M for v in 1:R.M], R.M, R.M)
+function phi_b(rho, R)
+    # auv = FFTW.dct(rho)
+    auv = real.(FFTW.fft(rho))
 
     # R.M,R.M matrix
-    phi = FFTW.idct(auv ./ wuv2)
-    Ephix = FFTW.idct(auv .* wv ./ wuv2)
-    Ephiy = FFTW.idct(auv .* wu ./ wuv2)
+    phi = FFTW.idct(auv ./ R.wuv2)
+
+    Ephix = imag.(FFTW.ifft(real.(FFTW.ifft(auv .* R.wv ./ R.wuv2, 1)), 2))
+    Ephiy = real.(FFTW.ifft(imag.(FFTW.ifft(auv .* R.wu ./ R.wuv2, 1)), 2))
+
     phi, Ephix, Ephiy
 end
 
 function density(vs, R)
+    # vs = xs, ys, ws, hs
     xs, ys, ws, hs = vs
-    # gradient
-    phi, Ephix, Ephiy = phi_b(vs, R)
+    # 1. calculate rho
+    @info "calculating rho .."
+    # rho = rho_all(vs, R)
+    # rho = rho_fast(vs, R)
+    @time rho = rho_fast((xs, ys, ws, hs), R);
+    # 2. calculate potential and field using FFT
+    @info "calculating potential and field .."
+    @time phi, Ephix, Ephiy = phi_b(rho, R);
     # calculate for each v
 
-    # map x,y into bin
-    bxs = Int.(floor.((xs .- R.xmin) ./ R.bw)) .+ 1
-    bys = Int.(floor.((ys .- R.ymin) ./ R.bh)) .+ 1
-    # calculate phi
-    phis = ((bx,by)->phi[bx,by]).(bxs, bys)
-    Ephixs = ((bx,by)->Ephix[bx,by]).(bxs, bys)
-    Ephiys = ((bx,by)->Ephiy[bx,by]).(bxs, bys)
-    # qi * phis
-    qis = ws .* hs
-    return qis .* phis, qis .* Ephixs, qis .* Ephiys
+    # M,M,N
+    @time rrr = rho_cells(vs, R);
+    size(rrr)
+    size(phi)
+    one = dropdims(sum(rrr .* phi, dims=(1,2)), dims=(1,2))
+    two = dropdims(sum(rrr .* Ephix, dims=(1,2)), dims=(1,2))
+    three = dropdims(sum(rrr .* Ephiy, dims=(1,2)), dims=(1,2))
+    return one, two, three
 end
 
 struct Region
+    # number of bins
     M
+    # bin width and height
     bw
     bh
+    # overall diearea
     xmin
     xmax
     ymin
     ymax
+    # bounding box for bins (to compute only once)
+    # TODO when printing out, omit these arrays
+    bx1s
+    by1s
+    bx2s
+    by2s
+    # for FFT
+    wu
+    wv
+    wuv2
 end
 
 function Region(xs, ys, ws, hs, M)
@@ -143,11 +182,36 @@ function Region(xs, ys, ws, hs, M)
     ymin = minimum(ys-hs/2)
     ymax = maximum(ys+hs/2)
 
+    # actually the width and height should be calculated based on ws and hs
+    xmin = 0
+    # FIXME 2 times
+    xmax = sqrt(sum(ws .* hs)) * 2
+    ymin = 0
+    ymax = sqrt(sum(ws .* hs)) * 2
+
+    # Or I'm using a fixed number
+    xmax = 10
+    ymax = 10
+
     # M = 10
     bw = (xmax-xmin) / M + 1e-8
     bh = (ymax-ymin) / M + 1e-8
 
-    Region(M, bw, bh, xmin, xmax, ymin, ymax)
+    bx1s = reshape([xmin + bw * (i-1) for i in 1:M for j in 1:M], M, M)
+    bx2s = reshape([xmin + bw * i for i in 1:M for j in 1:M], M, M)
+    by1s = reshape([ymin + bh * (j-1) for i in 1:M for j in 1:M], M, M)
+    by2s = reshape([ymin + bh * j for i in 1:M for j in 1:M], M, M)
+    bx1s, by1s, bx2s, by2s = (bx1s, by1s, bx2s, by2s) .|> gpu
+
+    # this is slow, but only compute once
+    wuv_f(uv) = 2 * pi * uv / M
+    wu = reshape([wuv_f(u) for u in 1:M for v in 1:M], M, M);
+    wv = reshape([wuv_f(v) for u in 1:M for v in 1:M], M, M);
+    wuv2 = reshape([wuv_f(u)^2 + wuv_f(v)^2 for u in 1:M for v in 1:M], M, M);
+
+    Region(M, bw, bh, xmin, xmax, ymin, ymax,
+           bx1s, by1s, bx2s, by2s,
+           wu, wv, wuv2)
 end
 
 function hpwl(xs, ys, Es)
@@ -159,32 +223,65 @@ function hpwl(xs, ys, Es)
     sum(res)
 end
 
+function display_plot(p)
+    path = tempname() * ".png"
+    Plots.savefig(p, path)
+    println("$(path)")
+    println("#<Image: $(path)>")
+end
+
 # return a new pos
-function place(xs, ys, ws, hs, Es, mask)
-    xs = Float64.(xs)
-    ys = Float64.(ys)
+function place(xs, ys, ws, hs, Es, mask; vis=false)
+    xs = Float32.(xs)
+    ys = Float32.(ys)
 
     # first, devide into bins
     # FIXME use a more formal way of deciding the bouding box
     # FIXME more bins
-    R = Region(xs, ys, ws, hs, 10)
+    R = Region(xs, ys, ws, hs, 300)
 
     # loss: HPWL and density penalty
     hpwl(xs, ys, Es)
     mask
 
+    # move all to the middle
+    midx = (R.xmin + R.xmax) / 2
+    midy = (R.ymin + R.ymax) / 2
+    xs[mask.==1] .= midx
+    ys[mask.==1] .= midy
+
     # iteratively solve the loss
+    # 800 * 10 / 3600 = 2.2 hour
+    # FIXME stop criteria: when the update is small enough for several epochs
     for step in 1:50
         @info "step: $step"
+        @info "calculating W .."
         w = W(Es, xs, ys)
+        @info "calculating W gradient .."
         wgradx = W_grad_x(Es, xs)
         wgrady = W_grad_x(Es, ys)
+        wgradx[mask .== 0] .= 0
+        wgrady[mask .== 0] .= 0
         # remove the grad for fixed values
 
         # FIXME this density impl seems to be wrong
-        d, dx, dy = density((xs, ys, ws, hs), R)
-        deltax = wgradx .+ 0.1 * dx
-        deltay = wgrady .+ 0.1 * dy
+        @info "Calculating fft density .."
+        d, dx, dy = density((xs, ys, ws, hs), R);
+        dx[mask .== 0] .= 0
+        dy[mask .== 0] .= 0
+        # weights HP here
+        dx .*= 1000
+        dy .*= 1000
+        wgradx .*= 0.01
+        wgrady .*= 0.01
+
+        deltax = wgradx .- dx
+        deltay = wgrady .- dy
+        # do a cap
+        deltax[deltax .> 0.1] .= 0.1
+        deltax[deltax .< -0.1] .= -0.1
+        deltay[deltay .> 0.1] .= 0.1
+        deltay[deltay .< -0.1] .= -0.1
         loss = w + sum(d)
 
         # DEBUG use only grad
@@ -192,20 +289,33 @@ function place(xs, ys, ws, hs, Es, mask)
         # deltay = wgrady
         # loss = w
 
-        @info "data" step loss sum(d) hpwl(xs, ys, Es)
+        @info "data" step loss mean(abs.(wgradx)) mean(abs.(dx)) hpwl(xs, ys, Es)
 
         # apply mask for fixed macros
-        # FIXME this learning rate is huge
-        xs .-= 100 * deltax .* mask
-        ys .-= 100 * deltay .* mask
-        
+        xs .-= deltax .* mask
+        ys .-= deltay .* mask
+
         # map back to valid region
         # FIXME consider w and h
         xs[xs .< R.xmin] .= R.xmin
         xs[xs .> R.xmax] .= R.xmax
         ys[ys .< R.ymin] .= R.ymin
         ys[ys .> R.ymax] .= R.ymax
-        visualize(xs, ys, ws, hs)
+        if vis visualize(xs, ys, ws, hs, R) end
     end
+    if vis visualize_density((xs, ys, ws, hs), R) end
     xs, ys
 end
+
+function visualize_density(vs, R)
+    visualize(xs, ys, ws, hs, R)
+    rho = rho_fast(vs, R)
+    phi, Ephix, Ephiy = phi_b(rho, R)
+    # display_plot(Plots.heatmap(rho))
+    display_plot(Plots.heatmap(reverse(rho, dims=1)))
+    # display_plot(Plots.heatmap(permutedims(rho)))
+    display_plot(Plots.heatmap(reverse(Ephix, dims=1)))
+    display_plot(Plots.heatmap(reverse(Ephiy, dims=1)))
+    # display_plot(Plots.bar(sort(bxs)))
+end
+
