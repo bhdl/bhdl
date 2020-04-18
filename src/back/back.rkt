@@ -309,3 +309,342 @@ the kicad footprint format and generate gerber."
            comp))]))
 
 
+
+(define (atoms->symbols atoms)
+  (make-hasheq (map cons atoms
+                    (map (λ (atom)
+                           ;; for the atom
+                           (cond
+                             [(Resistor? atom) (R-symbol)]
+                             [(Capacitor? atom) (C-symbol)]
+                             [else (error "Atom not supported")]))
+                         atoms))))
+
+
+(define (netlist->nets netlist annotations)
+  (for/list ([net netlist]
+             ;; annotate net as well for a unique name
+             [index (in-range (length netlist))])
+    ;; (println (~a "net" index))
+    ;; I need to output pairwise netlist
+    (let ([net (set->list net)])
+      ;; I actually want to have multi-point nets
+      (Net (~a "net" index)
+           (for/list ([pin net])
+             (Pinref (~a "X" (hash-ref annotations (Pin-parent pin)))
+                     (Pin-index pin)))))))
+
+(define (atoms->cells atoms annotations)
+  (for/list ([atom atoms])
+    ;; TODO gen-composite-declaration
+    (let ([annot (hash-ref annotations atom)])
+      (let ([macro (Macro (~a "X" annot "M")
+                          w h
+                          (for/list ([loc locs])
+                            (match loc
+                              [(list index offx offy) (Pin (~a "P" index)
+                                                           offx
+                                                           offy)])))])
+        (Cell (~a "X" annot)
+              macro
+              ;; FIXME use #f for unplaced?
+              0 0)))))
+
+;; TODO deserialize
+(define (serialize-macros macros)
+  ;; convert it to json
+  (for/hash ([m macros])
+    (values (Macro-name m)
+            (hash 'w (exact->inexact (Macro-w m))
+                  'h (exact->inexact (Macro-h m))
+                  'pins (for/list ([p (Macro-pins m)])
+                          (hash 'name (Pin-name p)
+                                'offx (exact->inexact (Pin-offx p))
+                                'offy (exact->inexact (Pin-offy p))))))))
+
+(define (serialize-cells cells)
+  (for/hash ([c cells])
+    (values (Cell-name c)
+            (hash 'macro (Cell-macro c)
+                  'x (Cell-x c)
+                  'y) (Cell-y c))))
+
+(define (serialize-nets nets)
+  (for/list ([net nets])
+    (hash 'name (Net-name net)
+          'insts (for/list ([i (Net-pinrefs net)])
+                   (hash 'name (Pinref-name i)
+                         'index (Pinref-index i))))))
+
+(define (serialize-all macros cells nets diearea)
+  ;; I probably don't want to serialize all, but process the data, get
+  ;; xs,ys,ws,hs,Es,mask, then send for placement
+  ;;
+  ;; But this would be hard to extend, e.g. add pin index and pin offset in nets
+  (hash 'macros (serialize-macros macros)
+        'cells (serialize-cells cells)
+        'nets (serialize-nets nets)
+        'diearea diearea))
+
+
+(define (save-for-placement macros cells nets diearea fname)
+  (let ([tmp (make-temporary-file)])
+    (call-with-output-file tmp
+      (λ (out)
+        (write-bytes
+         (jsexpr->bytes (serialize-all macros cells nets diearea))
+         out))
+      ;; make-temporary-file creates the file
+      #:exists 'replace)
+    ;; pretty print by python -m json.tool
+    (let ([formatted (with-output-to-string
+                       (λ ()
+                         (system (~a "python -m json.tool " tmp))))])
+      (call-with-output-file fname
+        (λ (out)
+          ;; FIXME text output port?
+          (write-string formatted out))
+        #:exists 'replace))))
+
+(define (send-for-placement macros cells nets diearea)
+  (let ([in (post-pure-port
+             (string->url "http://localhost:8081")
+             (jsexpr->bytes (serialize-all macros cells nets diearea)))])
+    (begin0
+        ;; TODO parse the placement results
+        ;;
+        ;; well, this has header. I need to remote the header, so maybe just use
+        ;; pure port
+        (string->jsexpr (port->string in))
+      (close-input-port in))))
+
+(define (atoms->macros atoms syms annotations)
+  (for/list ([atom atoms])
+    (let ([sym (hash-ref syms atom)])
+      (let-values ([(pict locs) (symbol->pict+locs sym)])
+        ;; CAUTION use the pict-height/width as macro size
+        ;; FIXME this is exact, e.g. 6/5
+        (let ([h (pict-height pict)]
+              [w (pict-width pict)]
+              [annot (hash-ref annotations atom)])
+          ;; get the location of pins
+          (Macro (~a "X" annot "M")
+                 w h
+                 (for/list ([loc locs])
+                   (match loc
+                     [(list index offx offy) (Pin (~a "P" index)
+                                                  offx
+                                                  offy)]))))))))
+
+
+;; FIXME a better name
+(define (netlist->three netlist)
+  "three means macros, cells, nets"
+  ;; 1. get all atoms. I do not need the composite Composites at this stage.
+  (define atoms (netlist->atoms netlist))
+  ;; 2. annotate composite number to them. But how should I record this piece of
+  ;; information? Maybe an external data structure.
+  (define annotations (atoms->annotations atoms))
+  ;; 2.1 assign symbol (and TODO footprint)
+  (define syms (map atom->symbol atoms))
+  ;; 3. output Atom declarations
+  ;;
+  ;; UPDATE: I actually want to output the macros used (one for each atom (or
+  ;; more specifically, footprint))
+  (define macros (atoms->macros atoms syms annotations))
+  ;;
+  (define cells (atoms->cells atoms annotations))
+  ;; 4. output netlist declaration
+  (define nets (netlist->nets netlist annotations))
+  (values macros cells nets))
+
+;; parse result and visualize
+(define (visualize-placement macros cells nets diearea place-result)
+  ;; result is a object
+  (define placed-cells (for/list ([c cells])
+                         (match (hash-ref place-result (string->symbol (Cell-name c)))
+                           [(list x y) (struct-copy Cell c
+                                                    [x x]
+                                                    [y y])])))
+  (visualize-three macros placed-cells nets diearea))
+
+;; (macro->pict (first macros))
+
+(define (macro->pict m)
+  (for/fold ([res (rectangle (Macro-w m)
+                             (Macro-h m))])
+            ([pin (Macro-pins m)])
+    (pin-over res (Pin-offx pin) (Pin-offy pin) (text (Pin-name pin)))))
+
+
+(define (visualize-three macros cells nets diearea)
+  ;; FIXME omiting nets for now
+  ;;
+  ;; loop through each cell, and draw on canvas
+  (define Hmacros (for/hash ([m macros])
+                    (values (Macro-name m) m)))
+  ;; 3. create a total area
+  (define die
+    (match diearea
+      [(list w h) (rectangle w h)]))
+  ;; 4. put all cells onto the correct locations.
+  (for/fold ([die die])
+            ([c cells])
+    (let* ([x (Cell-x c)]
+           [y (Cell-y c)]
+           [m (hash-ref Hmacros (Cell-macro c))]
+           ;; 2.6 x 1.71
+           [w (Macro-w m)]
+           [h (Macro-h m)])
+      (println (~a w h x y #:separator " "))
+      (pin-over die x y (cc-superimpose
+                         (rectangle w h)
+                         (text (Cell-name c)))))))
+
+(myvoid
+ (Pin-parent (first (first (Composite->netlist mycomp))))
+ (first (netlist->atoms (Composite->netlist mycomp)))
+ (nets->atoms (netlist->nets (Composite->netlist mycomp)))
+ 
+ (map atom->cell atoms)
+ (atom->macro (first atoms))
+
+ ;; make sure they are jsexpr
+ (jsexpr? (serialize-macros macros))
+ (jsexpr? (serialize-cells cells))
+ (jsexpr? (serialize-nets nets))
+ (jsexpr? (serialize-all macros cells nets))
+ ;; convert to string/bytes
+ (jsexpr->string (serialize-macros macros))
+ (jsexpr->bytes (serialize-all macros cells nets)))
+
+
+(define (nets->place-spec nets)
+  "generate directly xs, ys, ws, hs, mask, Es, diearea"
+  ;; (define nets (netlist->nets (Composite->netlist mycomp)))
+  ;;
+  ;; Es has ((i,ioffx,ioffy), (j,joffx,joffy))
+  ;; diearea is (w, h)
+  ;; mask is for fixed position
+  ;;
+  ;; 1. generate atoms
+  (define atoms (nets->atoms nets))
+  ;; 2. annotate atoms
+  (define Hatoms (annotate-atoms atoms))
+  ;; 3. get fixed positions
+  ;; 4. generate xs, ys
+  (define xs (for/list ([atom atoms]) 0))
+  (define ys (for/list ([atom atoms]) 0))
+  (define mask (for/list ([atom atoms]) 1))
+  ;; 5. generate ws, hs
+  (define ws (for/list ([atom atoms])
+               (Macro-w (atom->macro atom))))
+  (define hs (for/list ([atom atoms])
+               (Macro-h (atom->macro atom))))
+  ;; 6. generate Es
+  (define Es (for/list ([net nets])
+               (for/list ([v (Net-vertices net)])
+                 (let* ([atom (car v)]
+                        [pin-index (cdr v)]
+                        [macro (atom->macro atom)]
+                        [pin (list-ref (Macro-pins macro) (sub1 pin-index))])
+                   (list (hash-ref Hatoms atom) (Pin-offx pin) (Pin-offy pin))))))
+  (define diearea '(1000 1000))
+  (hash 'xs xs
+        'ys ys
+        'ws ws
+        'hs hs
+        'Es Es
+        'diearea diearea
+        'mask mask))
+(define (atoms->Hannotations atoms)
+  (for/hash ([atom atoms]
+             [i (in-naturals)])
+    (values atom (add1 i))))
+
+(define (atoms->Hsymbols atoms)
+  (for/hash ([atom atoms])
+    (values atom (atom->symbol atoms))))
+
+(define (visualize nets diearea xs ys)
+  ;; 1. draw the macro of each atoms on the right location
+  (define atoms (nets->atoms nets))
+  (define cells (atoms->cells atoms))
+  (define die
+    (match diearea
+      [(list w h) (rectangle w h)]))
+  (define Hatom=>xy (for/hash ([atom atoms]
+                              [x xs]
+                              [y ys])
+                      (values atom (list x y))))
+  (define H)
+  (for/fold ([die die])
+            ([c cells]
+             [x xs]
+             [y ys])
+    (let* ([m (Cell-macro c)]
+           ;; 2.6 x 1.71
+           [w (Macro-w m)]
+           [h (Macro-h m)])
+      (pin-over die x y
+                ;; (rectangle w h)
+                (draw-macro m))))
+  ;; 2. annotate each atom on pict
+  ;; 3. draw pins of net connections
+  (first (Net-vertices (first nets)))
+  ;; construct a weighted racket's graph
+  (for ([net nets])
+    (for ([v (Net-vertices net)])
+      (let ([atom (car v)]
+            [pin-index (cdr v)])
+        (let ([pin (list-ref (Macro-pins (atom->macro atom)) pi-index)])
+          (match (hash-ref Hatom=>xy atom)
+            [(list x y) (list (- x (Pin-offx pin))
+                              (- y (Pin-offy pin)))])))))
+  ;; calculate the positions of each net
+  ;; find the minimum spanning tree for the clique
+  ;; connect those points in the figure
+  (line)
+  (void))
+
+
+(define (atom->cell atom)
+  (Cell (atom->macro atom) 0 0))
+
+#;
+(define (nets->atoms nets)
+  (remove-duplicates
+   (apply append (for/list ([net nets])
+                   (for/list ([vertex (Net-vertices net)])
+                     (car vertex))))))
+(define (netlist->nets netlist)
+  (for/list ([net netlist])
+    (let ([net (set->list net)])
+      ;; I actually want to have multi-point nets
+      (Net (for/list ([pin net])
+             (let ([atom (Pin-parent pin)]
+                   [index (Pin-index pin)])
+               (cons atom index)))))))
+
+(struct Cell
+  (macro x y)
+  #:prefab)
+
+(struct Net
+  ;; insts are a list of ((cell pin-index) ...)
+  (vertices)
+  #:prefab)
+
+(module+ test
+  (define-values (macros cells nets)
+    (netlist->three (Composite->netlist comp)))
+  (define nets (netlist->nets (Composite->netlist comp)))
+  (define atoms (nets->atoms nets)))
+
+
+(define (cc-pin-over base dx dy pict)
+  "like pin over, but put the CENTER of pict at dx,dy"
+  (let ([h (pict-height pict)]
+        [w (pict-width pict)])
+    (pin-over base (- dx (/ w 2)) (- dy (/ h 2)) pict)))
+

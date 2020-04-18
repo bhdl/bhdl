@@ -12,7 +12,11 @@
          pict
          racket/draw)
 
-(provide hook Composite->netlist
+(provide hook
+         collect-all-composites
+         collect-all-atoms
+         collect-all-pins
+         Composite->netlist
          (struct-out Pin)
          (struct-out Atom)
          (struct-out Composite))
@@ -34,7 +38,8 @@
                    port))])
 
 (struct Atom
-  (pinhash))
+  (pinhash)
+  #:prefab)
 
 (struct Composite
   (pinhash connections)
@@ -147,6 +152,20 @@ res: already in this set."
     (filter (λ (x) (> (length x) 1))
             (for/list ([l merged])
               (filter (λ (pin) (Atom? (Pin-parent pin))) l)))))
+
+(define (collect-all-atoms comp)
+  ;; remove dupilcate and FIXME fix order
+  (set->list
+   (list->set
+    (apply append (for/list ([net (Composite->netlist comp)])
+                    (for/list ([pin net])
+                      (Pin-parent pin)))))))
+
+(define (collect-all-pins comp)
+  (remove-duplicates
+   (apply append (for/list ([net (Composite->netlist comp)])
+                   (for/list ([pin net])
+                     pin)))))
 
 
 (module+ test

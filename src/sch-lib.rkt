@@ -4,7 +4,7 @@
          "symbol.rkt"
          "footprint.rkt")
 
-(provide atoms->symbols
+(provide atom->symbol
          R C
          (struct-out Resistor)
          (struct-out Capacitor))
@@ -36,12 +36,8 @@
     (hash-set! (Atom-pinhash comp) 2 (Pin comp 2))
     comp))
 
-(define (atoms->symbols atoms)
-  (make-hasheq (map cons atoms
-                    (map (λ (atom)
-                           ;; for the atom
-                           (cond
-                             [(Resistor? atom) (R-symbol)]
-                             [(Capacitor? atom) (C-symbol)]
-                             [else (error "Atom not supported")]))
-                         atoms))))
+(define (atom->symbol atom)
+  (cond
+    [(Resistor? atom) (R-symbol)]
+    [(Capacitor? atom) (C-symbol)]
+    [else (error "Atom not supported")]))

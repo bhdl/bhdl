@@ -11,6 +11,7 @@
          visualize-loc
          make-rect-symbol
          symbol->pict+locs
+         symbol->pict
          (struct-out rect-symbol)
          (struct-out R-symbol)
          (struct-out L-symbol)
@@ -75,34 +76,44 @@
 (struct R-symbol ())
 (struct L-symbol ())
 
+(define (scale-width-to pict width)
+  (scale pict (/ width (pict-width pict))))
+
 (define C-symbol-pict
-  (hc-append (filled-rounded-rectangle 100 5 -0.5 #:color "brown")
-             (hc-append 20 (filled-rounded-rectangle 15 100 -0.5 #:color "brown")
-                        (filled-rounded-rectangle 15 100 -0.5 #:color "brown"))
-             (filled-rounded-rectangle 100 5 -0.5 #:color "brown")))
+  (let ([res
+         (hc-append
+          (filled-rounded-rectangle 100 5 -0.5 #:color "brown")
+          (hc-append 20 (filled-rounded-rectangle 15 100 -0.5 #:color "brown")
+                     (filled-rounded-rectangle 15 100 -0.5 #:color "brown"))
+          (filled-rounded-rectangle 100 5 -0.5 #:color "brown"))])
+    (scale-width-to res 100)))
 
 (define D-symbol-pict
-  (colorize (cc-superimpose
-             (hc-append (rotate (filled-rounded-rectangle 50 5 -0.25) (/ pi 2))
-                        (rotate (triangular 25 #:color "white" #:border-width 5) (- (/ pi 2))))
-             (filled-rounded-rectangle 100 5 -0.25))
-            "brown"))
+  (let ([res (colorize
+              (cc-superimpose
+               (hc-append (rotate (filled-rounded-rectangle 50 5 -0.25) (/ pi 2))
+                          (rotate (triangular 25 #:color "white" #:border-width 5) (- (/ pi 2))))
+               (filled-rounded-rectangle 100 5 -0.25))
+              "brown")])
+    (scale-width-to res 100)))
 
 (define R-symbol-pict
-  (colorize (hc-append
-             (filled-rectangle 20 3)
-             (rectangle 80 20 #:border-width 5)
-             (filled-rectangle 20 3))
-            "brown"))
+  (let ([res (colorize (hc-append
+                        (filled-rectangle 20 3)
+                        (rectangle 80 20 #:border-width 5)
+                        (filled-rectangle 20 3))
+                       "brown")])
+    (scale-width-to res 100)))
 
 (define L-symbol-pict
-  (let ([hc (inset/clip (circle 30) 0 0 0 -15)])
-    (hc-append (filled-rectangle 20 3)
-               (vc-append hc (ghost hc))
-               (vc-append hc (ghost hc))
-               (vc-append hc (ghost hc))
-               (vc-append hc (ghost hc))
-               (filled-rectangle 20 3))))
+  (let ([res (let ([hc (inset/clip (circle 30) 0 0 0 -15)])
+               (hc-append (filled-rectangle 20 3)
+                          (vc-append hc (ghost hc))
+                          (vc-append hc (ghost hc))
+                          (vc-append hc (ghost hc))
+                          (vc-append hc (ghost hc))
+                          (filled-rectangle 20 3)))])
+    (scale-width-to res 100)))
 
 (define (symbol-section pict-lsts combine-func)
   (apply combine-func 10
@@ -238,4 +249,8 @@
     [(L-symbol? sym) (values L-symbol-pict
                              (binary-locs L-symbol-pict))]
     [(rect-symbol? sym) (rect-symbol->pict+locs sym)]))
+
+(define (symbol->pict sym)
+  (let-values ([(p locs) (symbol->pict+locs sym)])
+    p))
 

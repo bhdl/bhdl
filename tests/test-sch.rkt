@@ -4,10 +4,11 @@
          "../src/schematic.rkt"
          "../src/sch-lib.rkt"
          "../src/utils.rkt"
+         (submod "../src/place.rkt" vis)
          json)
 
 (module+ test
-  (define mycomp
+  (define comp
     (let ([r1 (R 11)]
           [r2 (R 22)]
           [c1 (C 1)])
@@ -19,11 +20,11 @@
 
 (myvoid
  ;; will expand to the following code
- (define mycomp
+ (define comp
    (let ([r1 (R 11)]
          [r2 (R 22)]
          [c1 (C 1)])
-     (let ([comp (Composite (make-hash) '())])
+     (let ([res (Composite (make-hash) '())])
        ;; create pins that refer to comp itself
        (hash-set! (Composite-pinhash comp) 'OUT1 (Pin comp 'OUT1))
        (hash-set! (Composite-pinhash comp) 'OUT2 (Pin comp 'OUT2))
@@ -37,36 +38,40 @@
 
 (myvoid
  ;; see inside the composite
- (Composite-pinhash mycomp)
- (Composite-connections mycomp)
+ (Composite-pinhash comp)
+ (Composite-connections comp)
  ;; test netlist generation
- (collect-all-composites mycomp)
- (hash-ref (Composite-pinhash mycomp) 'OUT1)
- (Composite->netlist mycomp))
-
-(module+ test
-  (define-values (macros cells nets)
-    (netlist->three (Composite->netlist mycomp))))
-
-(myvoid
- ;; make sure they are jsexpr
- (jsexpr? (serialize-macros macros))
- (jsexpr? (serialize-cells cells))
- (jsexpr? (serialize-nets nets))
- (jsexpr? (serialize-all macros cells nets))
- ;; convert to string/bytes
- (jsexpr->string (serialize-macros macros))
- (jsexpr->bytes (serialize-all macros cells nets)))
+ (collect-all-composites comp)
+ (hash-ref (Composite-pinhash comp) 'OUT1)
+ (Composite->netlist comp))
 
 (myvoid
  ;; TODO parse results
- (send-for-placement macros cells nets)
- (save-for-placement macros cells nets "out/a.json"))
+ ;;
+ ;; TODO I actually want to save this so that I can process the results without
+ ;; another placement
+ ;;
+ ;; for local placement debug purpose
+ (make-directory* "/tmp/rackematic/out/")
+ (save-for-placement (Composite->place-spec comp) "/tmp/rackematic/out/a.json")
+ ;; send for replacement
+ (define place-result (send-for-placement (Composite->place-spec comp)))
 
-(module+ test
-  ;; this is hash table from "cell name" to '(x y)
-  (define result (string->jsexpr
-                  (port->string
-                   (open-input-file "out/a-sol.json"))))
-  (visualize-placement macros cells nets result))
+ ;; DEPRECATED save locally
+ (call-with-output-file "/tmp/rackematic/out/a-sol.json"
+   (λ (out)
+     (write-string (jsexpr->string place-result) out))
+   #:exists 'replace)
+ ;; read it back
+ (define place-result (call-with-input-file "/tmp/rackematic/out/a-sol.json"
+                        (λ (in)
+                          (string->jsexpr (port->string in))))))
+
+
+
+(myvoid
+ (Composite->pict comp
+                  '(1000 1000)
+                  (hash-ref place-result 'xs)
+                  (hash-ref place-result 'ys)))
 
