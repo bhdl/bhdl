@@ -162,53 +162,15 @@ function read_bench(folder, name)
     return x,y,w,h,E,mask
 end
 
-
-function parse_jobj(jobj)
-    jobj["nets"][1]
-    jobj["macros"][1]
-    jobj["cells"][1]
-    # TODO save this to a file
-    # TODO call placement algorithm and return placement results
-    # get xs, ys, ws, hs
-    # 1. get macro hash table
-    hmacros = map(jobj["macros"]) do m
-        Pair(m["name"], m)
-    end |> Dict
-
-    # cell index
-    cell_indices = map(enumerate(jobj["cells"])) do (i,c)
-        Pair(c["name"], i)
-    end |> Dict
-
-    data = map(jobj["cells"]) do c
-        x = c["x"]
-        y = c["y"]
-        w = hmacros[c["macro"]]["w"]
-        h = hmacros[c["macro"]]["h"]
-        x, y, w, h
-    end
-    xs = [d[1] for d in data]
-    ys = [d[2] for d in data]
-    ws = [d[3] for d in data]
-    hs = [d[4] for d in data]
-
-    jobj["nets"][1]["insts"]
-    Es = map(jobj["nets"]) do net
-        map(net["insts"]) do inst
-            # Es FIXME Pin index, Pin offset
-            cell_indices[inst["name"]]
-        end
-    end
-    # FIXME use true and false directly here
-    mask = [true for x in xs]
-    xs, ys, ws, hs, Es, mask
-end
-
-
-function encode(jobj, xs, ys)
-    map(enumerate(jobj["cells"])) do (i,c)
-        Pair(c["name"], (xs[i], ys[i]))
-    end |> Dict |> JSON.json
+function decode_place_spec(jobj)
+    xs = jobj["xs"]
+    ys = jobj["ys"]
+    ws = jobj["ws"]
+    hs = jobj["hs"]
+    Es = jobj["Es"]
+    mask = jobj["mask"]
+    diearea = jobj["diearea"]
+    xs, ys, ws, hs, Es, mask, diearea
 end
 
 function test()

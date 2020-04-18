@@ -16,6 +16,8 @@ Pkg.add("JSON")
 
 Pkg.rm("CuArrays")
 
+Pkg.update()
+
 
 import Profile
 function test_profile()

@@ -834,3 +834,63 @@ function test()
     rho1 .- rho2
 end
 
+
+
+function parse_jobj(jobj)
+    jobj["nets"][1]
+    jobj["macros"][1]
+    jobj["cells"][1]
+    # TODO save this to a file
+    # TODO call placement algorithm and return placement results
+    # get xs, ys, ws, hs
+    # 1. get macro hash table
+    hmacros = map(jobj["macros"]) do m
+        Pair(m["name"], m)
+    end |> Dict
+
+    hcells = map(jobj["cells"]) do c
+        Pair(c["name"], c)
+    end |> Dict
+
+    # cell index
+    cell_indices = map(enumerate(jobj["cells"])) do (i,c)
+        Pair(c["name"], i)
+    end |> Dict
+
+    data = map(jobj["cells"]) do c
+        x = c["x"]
+        y = c["y"]
+        # FIXME support offset
+        w = hmacros[c["macro"]]["w"]
+        h = hmacros[c["macro"]]["h"]
+        x, y, w, h
+    end
+    xs = [d[1] for d in data]
+    ys = [d[2] for d in data]
+    ws = [d[3] for d in data]
+    hs = [d[4] for d in data]
+
+    jobj["nets"][1]["insts"]
+    Es = map(jobj["nets"]) do net
+        map(net["insts"]) do inst
+            # Es FIXME Pin index, Pin offset
+            name = inst["name"]
+            idx = inst["index"]
+            # which
+            cell_indices[name]
+            # offsets
+            hmacros[hcells[name]["macro"]]["pins"]["P$index"]
+        end
+    end
+    # FIXME use true and false directly here
+    mask = [true for x in xs]
+    diearea = jobj["diearea"]
+    xs, ys, ws, hs, Es, mask, diearea
+end
+
+
+function encode(jobj, xs, ys)
+    map(enumerate(jobj["cells"])) do (i,c)
+        Pair(c["name"], (xs[i], ys[i]))
+    end |> Dict |> JSON.json
+end

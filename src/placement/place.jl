@@ -17,8 +17,9 @@ function sumexp(x, γ)
 end
 
 function We(net, xs, ys)
-    x = [xs[n] for n in net]
-    y = [ys[n] for n in net]
+    # DEBUG using offx and offy
+    x = [xs[n] - offx for (n, offx, offy) in net]
+    y = [ys[n] - offy for (n, offx, offy) in net]
     wex = sumexp(x, γ)
     wey = sumexp(y, γ)
     return wex + wey
@@ -41,23 +42,27 @@ function We_grad_x_impl(x)
     return res / (bP ^ 2) .* aP .- res2 / (bN .^ 2) .* aN
 end
 
-function We_grad_x(net, x)
+function We_grad_x(net, x, xory)
     res = spzeros(length(x))
     # all the x values of net
-    netx = [x[n] for n in net]
+
+    if xory == :x
+        netx = [x[n] - offx for (n, offx, offy) in net]
+    else
+        netx = [x[n] - offy for (n, offx, offy) in net]
+    end
+
     grad = We_grad_x_impl(netx)
     # map back to whole x
-    for (i,n) in enumerate(net)
+    for (i,(n,offx,offy)) in enumerate(net)
         res[n] = grad[i]
     end
     res
 end
 
-function W_grad_x(nets, x)
+function W_grad_x(nets, x, xory)
     # batched by default
-    batch_size = 10000
-    ct = Int(ceil(length(nets) / batch_size))
-    f = e->We_grad_x(e,x)
+    f = e->We_grad_x(e,x,xory)
     # res = spzeros(length(x))
     tmp = Array{Any}(nothing, length(nets))
     Threads.@threads for i in 1:length(nets)
@@ -65,6 +70,12 @@ function W_grad_x(nets, x)
     end
     sum(tmp)
 end
+
+# function W_grad(Es, xs, ys)
+#     wx = W_grad_x(Es, xs, :x)
+#     wy = W_grad_x(Es, ys, :y)
+#     wx, wy
+# end
 
 function test()
     # export JULIA_NUM_THREADS=4
@@ -176,22 +187,11 @@ struct Region
     wuv2
 end
 
-function Region(xs, ys, ws, hs, M)
-    xmin = minimum(xs-ws/2)
-    xmax = maximum(xs+ws/2)
-    ymin = minimum(ys-hs/2)
-    ymax = maximum(ys+hs/2)
-
-    # actually the width and height should be calculated based on ws and hs
+function Region(xs, ys, ws, hs, diearea, M)
     xmin = 0
-    # FIXME 2 times
-    xmax = sqrt(sum(ws .* hs)) * 2
     ymin = 0
-    ymax = sqrt(sum(ws .* hs)) * 2
-
-    # Or I'm using a fixed number
-    xmax = 10
-    ymax = 10
+    xmax = diearea[1]
+    ymax = diearea[2]
 
     # M = 10
     bw = (xmax-xmin) / M + 1e-8
@@ -216,9 +216,10 @@ end
 
 function hpwl(xs, ys, Es)
     res = map(Es) do e
+        ns = [ei for (ei,offx,offy) in e]
         # max delta x
-        abs(maximum((i->xs[i]).(e)) - minimum((i->xs[i]).(e))) +
-            abs(maximum((i->ys[i]).(e)) - minimum((i->ys[i]).(e)))
+        abs(maximum((i->xs[i]).(ns)) - minimum((i->xs[i]).(ns))) +
+            abs(maximum((i->ys[i]).(ns)) - minimum((i->ys[i]).(ns)))
     end
     sum(res)
 end
@@ -231,14 +232,16 @@ function display_plot(p)
 end
 
 # return a new pos
-function place(xs, ys, ws, hs, Es, mask; vis=false)
+function place(xs, ys, ws, hs, Es, mask, diearea; vis=false)
     xs = Float32.(xs)
     ys = Float32.(ys)
+    ws = Float32.(ws)
+    hs = Float32.(hs)
 
     # first, devide into bins
     # FIXME use a more formal way of deciding the bouding box
     # FIXME more bins
-    R = Region(xs, ys, ws, hs, 300)
+    R = Region(xs, ys, ws, hs, diearea, 300)
 
     # loss: HPWL and density penalty
     hpwl(xs, ys, Es)
@@ -258,8 +261,8 @@ function place(xs, ys, ws, hs, Es, mask; vis=false)
         @info "calculating W .."
         w = W(Es, xs, ys)
         @info "calculating W gradient .."
-        wgradx = W_grad_x(Es, xs)
-        wgrady = W_grad_x(Es, ys)
+        wgradx = W_grad_x(Es, xs, :x)
+        wgrady = W_grad_x(Es, ys, :y)
         wgradx[mask .== 0] .= 0
         wgrady[mask .== 0] .= 0
         # remove the grad for fixed values
@@ -270,21 +273,21 @@ function place(xs, ys, ws, hs, Es, mask; vis=false)
         dx[mask .== 0] .= 0
         dy[mask .== 0] .= 0
         # weights HP here
-        dx .*= 1000
-        dy .*= 1000
+        dx .*= 0.001
+        dy .*= 0.001
         wgradx .*= 0.01
         wgrady .*= 0.01
 
         deltax = wgradx .- dx
         deltay = wgrady .- dy
         # do a cap
-        deltax[deltax .> 0.1] .= 0.1
-        deltax[deltax .< -0.1] .= -0.1
-        deltay[deltay .> 0.1] .= 0.1
-        deltay[deltay .< -0.1] .= -0.1
+        # deltax[deltax .> 10] .= 10
+        # deltax[deltax .< -10] .= -10
+        # deltay[deltay .> 10] .= 10
+        # deltay[deltay .< -10] .= -10
         loss = w + sum(d)
 
-        # DEBUG use only grad
+        # DEBUG use only wgrad
         # deltax = wgradx
         # deltay = wgrady
         # loss = w
@@ -308,6 +311,7 @@ function place(xs, ys, ws, hs, Es, mask; vis=false)
 end
 
 function visualize_density(vs, R)
+    xs, ys, ws, hs = vs
     visualize(xs, ys, ws, hs, R)
     rho = rho_fast(vs, R)
     phi, Ephix, Ephiy = phi_b(rho, R)

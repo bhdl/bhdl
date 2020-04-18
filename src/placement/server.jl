@@ -10,42 +10,38 @@ using HTTP
 # test this: accept a file, append hello to the file, and respond back
 
 function web_server()
-    # payload = nothing
-    # myreq = nothing
-    # HTTP.target(myreq)
     HTTP.serve(HTTP.Sockets.localhost, 8081) do request::HTTP.Request
-        # global myreq
-        # myreq = request
         @show request
         @show request.method
-        # @show HTTP.header(request, "Content-Type")
-        # @show HTTP.payload(request)
-        # @show typeof(HTTP.payload(request))
 
-        # global payload
         payload = HTTP.payload(request)
-        # @show payload
-        # typeof(payload)
-        # FIXME the String constructor method will clear the payload!
+        # CAUTION the String constructor method will clear the payload!
         # String(payload)
 
         @info "parsing payload .."
         jstr = String(payload)
         jobj = JSON.parse(jstr)
-        xs, ys, ws, hs, Es, mask = parse_jobj(jobj)
+        xs, ys, ws, hs, Es, mask, diearea = decode_place_spec(jobj)
         @info "running placement .."
-        solxs, solys = place(xs, ys, ws, hs, Es, mask, vis=true)
-        # FIXME region, die area
-        # FIXME performance
+        solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false)
         # FIXME run iterations
-        @info "visualizing .."
-        R = Region(xs, ys, ws, hs, 300)
+
+        # @info "visualizing .."
+        # R = Region(xs, ys, ws, hs, 300)
         # TODO for each incoming request, plot the process and save as log
-        visualize(xs, ys, ws, hs, R)
-        visualize(solxs, solys, ws, hs, R)
+        # visualize(xs, ys, ws, hs, R)
+        # visualize(solxs, solys, ws, hs, R)
+
         @info "sending results back .."
         # I'll only send back cells, or cell locations
-        res_payload = encode(jobj, solxs, solys)
+        # res_payload = encode(jobj, solxs, solys)
+        #
+        # the new payload just encode the xs and ys
+        #
+        # transform the result to corner based, because racket pict system convention
+        solxs = solxs .- ws ./ 2
+        solys = solys .- hs ./ 2
+        res_payload = Dict("xs"=>solxs, "ys"=>solys) |> JSON.json
 
         # parse this directly as json, and save data to internal data structure
         # and start placement and routing.
@@ -55,31 +51,30 @@ function web_server()
         catch e
             return HTTP.Response(404, "Error: $e")
         end
-        @info "Done. Ready to accept next request."
     end
 end
 
 function test()
     # read json directly for debugging
-    str = open("../out/a.json") do io
+    str = open("/tmp/rackematic/out/a.json") do io
         read(io, String)
     end
     jobj = JSON.parse(str)
 
-    xs, ys, ws, hs, Es, mask = parse_jobj(jobj)
-    Profile.@profile
-    @time solx,soly = place(xs, ys, ws, hs, Es, mask, vis=false)
+    xs, ys, ws, hs, Es, mask, diearea = decode_place_spec(jobj)
 
-    visualize(xs, ys, ws, hs, R)
-    visualize(solxs, solys, ws, hs, R)
+    # place(xs, ys, ws, hs, Es, mask, diearea, vis=true)
 
-    # this is json output
-    res = encode(jobj, solxs, solys)
+    @time solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false)
+
+    # visualize(xs, ys, ws, hs, R)
+    # visualize(solxs, solys, ws, hs, R)
 end
 
 function main()
     @info "starting a test run to warm the model up .."
     test()
+    @info "starting server .."
     web_server()
 end
 

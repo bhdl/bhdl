@@ -35,14 +35,14 @@ end
 
 function test()
     # read json directly for debugging
-    str = open("../out/a.json") do io
+    str = open("/tmp/rackematic/out/a.json") do io
         read(io, String)
     end
     jobj = JSON.parse(str)
 
-    xs, ys, ws, hs, Es, mask = parse_jobj(jobj)
-    Profile.@profile
-    @time solxs, solys = place(xs, ys, ws, hs, Es, mask, vis=false)
+    xs, ys, ws, hs, Es, mask, diearea = parse_jobj(jobj)
+    # Profile.@profile
+    solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=true)
 
     visualize(xs, ys, ws, hs, R)
     visualize(solxs, solys, ws, hs, R)
