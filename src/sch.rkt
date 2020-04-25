@@ -32,9 +32,10 @@
   ;; index: it is the #index pin of the parent
   (parent index)
   #:methods gen:custom-write
-  [(define (write-proc pin port mode)
-     (write-string (~a "#<Pin-" (Pin-parent pin)
-                       "-" (Pin-index pin) ">")
+  [(define (write-proc pin port mode) eq?
+     (write-string (~a "#<Pin-"
+                       (eq-hash-code (Pin-parent pin)) "-"
+                       (Pin-index pin) ">")
                    port))])
 
 (struct Atom
@@ -50,7 +51,11 @@
 (define (pin-ref part ref)
   (cond
     [(Composite? part) (hash-ref (Composite-pinhash part) ref)]
-    [(Atom? part) (hash-ref (Atom-pinhash part) ref)]))
+    [(Atom? part) (hash-ref (Atom-pinhash part) ref)]
+    ;; FIXME better error message
+    [else (error (~a "pin-ref error: " part
+                     ", must be an Atom or Composite."
+                     " Probably the variable is undefined."))]))
 
 (begin-for-syntax
   (define (parse-dot stx)
@@ -89,7 +94,9 @@
                 (list (pin-ref
                        ;; this is a trick to bring the newly bound variable
                        ;; "comp" into the scope for replacing 'self
-                       (replace-self net.lhs comp) 'net.rhs) ...) ...))
+                       (replace-self net.lhs comp)
+                       'net.rhs)
+                      ...) ...))
          comp)]))
 
 (define (get-neighbors lsts item)

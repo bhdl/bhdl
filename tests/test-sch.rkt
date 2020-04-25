@@ -16,7 +16,11 @@
             (self.OUT1 r1.1)
             (r1.2 r2.1)
             (r2.2 c1.1)
-            (c1.2 self.OUT2)))))
+            (c1.2 self.OUT2))))
+  (Composite-pinhash comp)
+  (collect-all-atoms comp)
+  (collect-all-pins comp))
+
 
 (myvoid
  ;; will expand to the following code

@@ -39,16 +39,6 @@
                                                    offx
                                                    offy)]))))))
 
-(define (netlist->atoms netlist)
-  (remove-duplicates
-   (filter-not
-    void? (for*/list ([net netlist]
-                      [pin net])
-            (let ([parent (Pin-parent pin)])
-              (when (Atom? parent)
-                parent))))
-   eq?))
-
 (define (annotate-atoms atoms)
   "Return hash table from (atom . 1-based-index)"
   ;; annotate cells and macros
@@ -73,6 +63,7 @@
           [Es (for/list ([net netlist])
                 (for/list ([pin net])
                   (let* ([atom (Pin-parent pin)]
+                         ;; FIXME pin index might be symbol
                          [pin-index (Pin-index pin)]
                          [macro (atom->macro atom)]
                          [pin (list-ref (Macro-pins macro) (sub1 pin-index))])

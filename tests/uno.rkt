@@ -2,7 +2,7 @@
 
 ;; schematic from https://www.arduino.cc/en/uploads/Main/arduino-uno-schematic.pdf
 
-(define/componnet ATMEGA8U2
+(define/component ATMEGA8U2
   ;; power
   VCC GND AVCC
   ;; usb
@@ -35,6 +35,7 @@
   (PD5 XCK AIN4 PCINT12)
   (PD6 RTS AIN5 INT6)
   (PD7 CTS HWB AIN6 TO INT7))
+
 
 (define (λ-mcu-usb)
   (let ((ic (ATMEGA8U2)))

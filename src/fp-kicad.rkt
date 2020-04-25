@@ -10,17 +10,72 @@
          racket/trace
          racket/draw)
 
-(provide (struct-out footprint)
-         (struct-out line-spec)
-         (struct-out pad-spec)
-         read-kicad-mod
+(provide fp-mounting-hole
 
-         kicad-mounting-hole
-         (all-defined-out))
+         fp-resistor
+         fp-capacitor
+         fp-crystal
+         fp-diode
+         fp-sw-spst
+         fp-sw-push
+         fp-jack-audio
+         fp-jack-barrel
+         fp-pin-header
+         fp-usb
+
+         fp-QFN
+         fp-PQFP
+         fp-TQFP
+         fp-DIP
+         fp-SOIC
+         fp-TSSOP
+
+         fp-switch-keyboard
+
+         fp-1602)
 
 
 ;; configuration
-(define kicad-footprint-path (make-parameter (expand-user-path "~/git/reading/kicad-footprints/")))
+(define kicad-footprint-path
+  (make-parameter (expand-user-path "~/git/reading/kicad-footprints/")))
+
+(define (read-kicad-mod fname)
+  "Read a kicad mod file, parse it, and return a footprint object."
+  (let ([kicad-mod (let ([in (open-input-file fname)])
+                     (begin0
+                         (read in)
+                       (close-input-port in)))])
+    (let ([specs
+           (match kicad-mod
+             [(list 'module name layer body ...)
+              (filter
+               identity
+               (for/list [(e body)]
+                 (match e
+                   ;; TODO
+                   ;; FIXME optional z
+                   [`(fp_text ,_ ,text (at ,x ,y ,z ...) (layer ,l) ,other ...)
+                    #f]
+                   [`(fp_arc (start ,sx ,sy) (end ,ex ,ey)
+                             (angle ,ag) (layer ,l) (width ,w))
+                    #f]
+                   [`(fp_line (start ,sx ,sy) (end ,ex ,ey) (layer ,l) (width ,w))
+                    (line-spec sx sy ex ey w)]
+                   ;; FIXME optional z
+                   [`(pad ,num ,mounting-type ,shape (at ,x ,y ,z ...)
+                          (size ,s1 ,s2) ,other-attrs ...)
+                    (pad-spec x y num mounting-type shape `((size ,s1 ,s2)))]
+                   ;; TODO
+                   [`(fp_circle ,other ...)
+                    #f]
+                   [`(tedit ,other ...) #f]
+                   [`(descr ,other ...) #f]
+                   [`(tags ,other ...) #f]
+                   [`(model ,other ...) #f]
+                   [`(attr ,other ...) #f])))])])
+      (let ([line-specs (filter line-spec? specs)]
+            [pad-specs (filter pad-spec? specs)])
+        (footprint line-specs pad-specs)))))
 
 (define-syntax (kicad-helper stx)
   (syntax-parse stx
@@ -28,35 +83,42 @@
      #'(read-kicad-mod
         (build-path (kicad-footprint-path) s ...))]))
 
-(define kicad-resistor-0603
+(define fp-resistor-0603
   (kicad-helper "Resistor_SMD.pretty/"
                 "R_0603_1608Metric.kicad_mod"))
-(define kicad-resistor-0805
+(define fp-resistor-0805
   (kicad-helper "Resistor_SMD.pretty/"
                 "R_0805_2012Metric.kicad_mod"))
 ;; this is one of vertical mounting. I'm only using SMD for now
-(define kicad-resistor-tht
+(define fp-resistor-THT
   (kicad-helper "Resistor_THT.pretty/"
                 "R_Axial_DIN0204_L3.6mm_D1.6mm_P2.54mm_Vertical.kicad_mod"))
 
+(define (fp-resistor type)
+  (case type
+    [("0603") fp-resistor-0603]
+    [("0805") fp-resistor-0805]
+    [("THT") fp-resistor-THT]
+    [else (error (~a "Unsupported resistor type: " type))]))
+
+(define (fp-capacitor type)
+  (case type
+    [("0603") fp-capacitor-0603]
+    [("0805") fp-capacitor-0805]
+    [else (error (~a "Unsupported capacitor type: " type))]))
+
 ;; FIXME This seems to be the same as resistor's. Then I'll define
 ;; only one.
-(define kicad-capacitor-0603
+(define fp-capacitor-0603
   (kicad-helper "Capacitor_SMD.pretty/"
                 "C_0603_1608Metric.kicad_mod"))
-(define kicad-capacitor-0805
+(define fp-capacitor-0805
   (kicad-helper "Capacitor_SMD.pretty/"
                 "C_0805_2012Metric.kicad_mod"))
 
-(module+ test
-  (footprint->pict kicad-resistor-0603)
-  (footprint->pict kicad-resistor-0805)
-  (footprint->pict kicad-resistor-tht)
-  (footprint->pict kicad-capacitor-0603)
-  (footprint->pict kicad-capacitor-0805))
 
 ;; only THT, SPST, slide switches
-(define (kicad-sw-spst ct)
+(define (fp-sw-spst ct)
   (let ([height (case ct
                   [(1) 4.72]
                   [(2) 7.26]
@@ -71,93 +133,74 @@
                       height
                       "mm_W7.62mm_P2.54mm.kicad_mod"))))
 
-(module+ test
-  (for/list ([ct '(1 2 3 4 6 8)])
-    (footprint->pict (kicad-sw-spst ct))))
-
-(define kicad-sw-push (kicad-helper "Button_Switch_THT.pretty/"
+(define fp-sw-push (kicad-helper "Button_Switch_THT.pretty/"
                                     "SW_PUSH_6mm.kicad_mod"))
 
-(define kicad-jack-audio (kicad-helper "Connector_Audio.pretty/"
+(define fp-jack-audio (kicad-helper "Connector_Audio.pretty/"
                                        "Jack_3.5mm_PJ311_Horizontal.kicad_mod"))
-(define kicad-jack-barrel (kicad-helper "Connector_BarrelJack.pretty/"
+(define fp-jack-barrel (kicad-helper "Connector_BarrelJack.pretty/"
                                         "BarrelJack_Horizontal.kicad_mod"))
 
-(module+ test
-  (footprint->pict kicad-sw-push)
-  (footprint->pict kicad-sw-push)
-  (footprint->pict kicad-jack-audio)
-  (footprint->pict kicad-jack-barrel))
-
-(define (kicad-pin-header ct)
+(define (fp-pin-header ct)
   ;; available ct: 1,2,3,4,5,6,7,8
   (kicad-helper "Connector_PinHeader_2.54mm.pretty/"
                 (~a "PinHeader_1x"
                     (~r ct #:min-width 2 #:pad-string "0")
                     "_P2.54mm_Vertical.kicad_mod")))
 
-(module+ test
-  (for/list ([ct '(1 2 3 4 5 6 7 8)])
-    (footprint->pict (kicad-pin-header ct))))
+(define (fp-usb type)
+  (case type
+    [(c-male) fp-usb-c-male]
+    [(c-female) fp-usb-c-female]
+    [(a-male) fp-usb-a-male]
+    [(a-female) fp-usb-a-female]
+    [(micro-male) fp-usb-micro-male]
+    [(micro-female) fp-usb-micro-female]
+    [(mini-male) fp-usb-mini-male]
+    [(mini-female) fp-usb-mini-female]
+    [else (error (~a "Unsupported usb type: " type))]))
 
-
-(define kicad-usb-c-male
+(define fp-usb-c-male
   (kicad-helper "Connector_USB.pretty/"
                 "USB_C_Plug_Molex_105444.kicad_mod"))
-(define kicad-usb-c-female
+(define fp-usb-c-female
   (kicad-helper "Connector_USB.pretty/"
                 "USB_C_Receptacle_Palconn_UTC16-G.kicad_mod"))
 ;; FIXME usb3 different?
-(define kicad-usb-a-male
+(define fp-usb-a-male
   (kicad-helper "Connector_USB.pretty/"
                 "USB_A_CNCTech_1001-011-01101_Horizontal.kicad_mod"))
-(define kicad-usb-a-female
+(define fp-usb-a-female
   (kicad-helper "Connector_USB.pretty/"
                 "USB_A_Molex_105057_Vertical.kicad_mod"))
 ;; FIXME male or female, type and manufacture
-(define kicad-usb-micro-male
+(define fp-usb-micro-male
   (kicad-helper "Connector_USB.pretty/"
                 "USB_Micro-B_Wuerth_629105150521.kicad_mod"))
-(define kicad-usb-micro-female
+(define fp-usb-micro-female
   (kicad-helper "Connector_USB.pretty/"
                 "USB_Micro-B_Molex-105133-0001.kicad_mod"))
-(define kicad-usb-mini-male
+(define fp-usb-mini-male
   (kicad-helper "Connector_USB.pretty/"
                 "USB_Mini-B_Tensility_54-00023_Vertical.kicad_mod"))
-(define kicad-usb-mini-female
+(define fp-usb-mini-female
   (kicad-helper "Connector_USB.pretty/"
                 "USB_Mini-B_Lumberg_2486_01_Horizontal.kicad_mod"))
 
-(module+ test
-  (footprint->pict kicad-usb-c-male)
-  (footprint->pict kicad-usb-c-female)
-  (footprint->pict kicad-usb-a-male)
-  (footprint->pict kicad-usb-a-female)
-  (footprint->pict kicad-usb-micro-male)
-  (footprint->pict kicad-usb-micro-female)
-  (footprint->pict kicad-usb-mini-male)
-  (footprint->pict kicad-usb-mini-female))
-
 ;; (footprint->pict (kicad-pin-header 4))
-(define kicad-crystal
+(define fp-crystal
   (kicad-helper "Crystal.pretty/"
                 "Resonator-2Pin_W10.0mm_H5.0mm.kicad_mod"))
 
-(define kicad-diode
+(define fp-diode
   (kicad-helper "Diode_THT.pretty/"
                 "D_DO-35_SOD27_P7.62mm_Horizontal.kicad_mod"))
 
-(define kicad-1602
+(define fp-1602
   (kicad-helper "Display.pretty/"
                 "LCD-016N002L.kicad_mod"))
 
-(module+ test
-  (footprint->pict kicad-crystal)
-  (footprint->pict kicad-diode)
-  ;; this is huge
-  (scale (footprint->pict kicad-1602) 0.2))
-
-(define (kicad-mounting-hole m)
+(define (fp-mounting-hole m)
   ;; MountingHole_2.2mm_M2.kicad_mod
   ;; MountingHole_2.7mm_M2.5.kicad_mod
   ;; MountingHole_3.2mm_M3.kicad_mod
@@ -179,14 +222,8 @@
                     m
                     ".kicad_mod")))
 
-(module+ test
-  ;; (footprint->pict (kicad-mounting-hole 2))
-  ;; (displayln (footprint->gerber (kicad-mounting-hole 2)))
-  (for/list ([m '(2 2.5 3 4 5 6 8)])
-    (footprint->pict (kicad-mounting-hole m))))
-
 ;; FIXME many variations
-(define (kicad-QFN ct)
+(define (fp-QFN ct)
   ;; QFN-12-1EP_3x3mm_P0.5mm_EP1.65x1.65mm.kicad_mod
   ;; QFN-16-1EP_3x3mm_P0.5mm_EP1.45x1.45mm.kicad_mod
   ;; QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm.kicad_mod
@@ -211,12 +248,7 @@
                       (second data) "x" (second data)
                       "mm.kicad_mod"))))
 
-(module+ test
-  (kicad-QFN 12)
-  (for/list ([ct '(12 16 20 24 28 32 44 72)])
-    (footprint->pict (kicad-QFN ct))))
-
-(define (kicad-PQFP ct)
+(define (fp-PQFP ct)
   ;; PQFP-44_10x10mm_P0.8mm.kicad_mod
   ;; PQFP-80_14x20mm_P0.8mm.kicad_mod
   ;; PQFP-100_14x20mm_P0.65mm.kicad_mod
@@ -235,11 +267,7 @@
                       (first data) "x" (second data)
                       "mm_P" (third data) "mm.kicad_mod"))))
 
-(module+ test
-  (for/list ([ct '(44 80 100 112 144 256)])
-    (footprint->pict (kicad-PQFP ct))))
-
-(define (kicad-TQFP ct)
+(define (fp-TQFP ct)
   ;;TQFP-32_7x7mm_P0.8mm.kicad_mod
   ;;TQFP-44_10x10mm_P0.8mm.kicad_mod
   ;;TQFP-48_7x7mm_P0.5mm.kicad_mod
@@ -272,12 +300,7 @@
                       (first data) "x" (first data)
                       "mm_P" (second data) "mm.kicad_mod"))))
 
-(module+ test
-  (footprint->pict (kicad-TQFP 176))
-  (for/list ([ct '(32 44 48 64 80 100 120 128 144 176)])
-    (footprint->pict (kicad-TQFP ct))))
-
-(define (kicad-DIP ct)
+(define (fp-DIP ct)
   ;; DIP-4_W7.62mm.kicad_mod
   ;; DIP-6_W7.62mm.kicad_mod
   ;; DIP-8_W7.62mm.kicad_mod
@@ -293,13 +316,8 @@
     (kicad-helper "Package_DIP.pretty/"
                   (~a "DIP-" ct "_W" width "mm.kicad_mod"))))
 
-(module+ test
-  (for/list ([ct '(4 6 8 10 12 14 16 18 20 22 24 28 32
-                     40 42 48 64)])
-    (footprint->pict (kicad-DIP ct))))
 
-
-(define (kicad-SOIC ct)
+(define (fp-SOIC ct)
   ;; SOIC-8_3.9x4.9mm_P1.27mm.kicad_mod
   ;; SOIC-14_3.9x8.7mm_P1.27mm.kicad_mod
   ;; SOIC-16W_7.5x10.3mm_P1.27mm.kicad_mod
@@ -317,15 +335,8 @@
                       [(28) 17.9])
                     "mm_P1.27mm.kicad_mod")))
 
-(module+ test
-  (for/list ([ct '(16 18 20 24 28)])
-    (footprint->pict (kicad-SOIC ct))))
-
-(define (kicad-TSSOP ct)
-  
-
+(define (fp-TSSOP ct)
   ;; TSSOP-56_6.1x14mm_P0.5mm.kicad_mod
-  
   (let ([data (case ct
                 [(8) '(4.4 3 0.65)]
                 [(14) '(4.4 5 0.65)]
@@ -344,11 +355,7 @@
                       (first data) "x" (second data)
                       "mm_P" (third data) "mm.kicad_mod"))))
 
-(module+ test
-  (for/list ([ct '(8 14 16 20 24 28 30 32 38 48 56)])
-    (footprint->pict (kicad-TSSOP ct))))
-
-(define (kicad-switch-keyboard spacing pcb-or-plate)
+(define (fp-switch-keyboard spacing pcb-or-plate)
   ;; SW_Cherry_MX_1.00u_PCB.kicad_mod
   ;; SW_Cherry_MX_1.00u_Plate.kicad_mod
   ;; SW_Cherry_MX_1.25u_PCB.kicad_mod
@@ -364,11 +371,4 @@
                       [(plate) "Plate"]
                       [else (error "Unknown pcb-or-place.")])
                     ".kicad_mod")))
-
-
-(module+ test
-  (for*/list ([spacing '(1 1.25 1.5 1.75 2 2.25 2.75 6.25)]
-              [pcb-or-plate '(pcb plate)])
-    (footprint->pict (kicad-switch-keyboard spacing pcb-or-plate))))
-
 

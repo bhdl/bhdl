@@ -648,3 +648,53 @@ the kicad footprint format and generate gerber."
         [w (pict-width pict)])
     (pin-over base (- dx (/ w 2)) (- dy (/ h 2)) pict)))
 
+(define (netlist->atoms netlist)
+  (remove-duplicates
+   (filter-not
+    void? (for*/list ([net netlist]
+                      [pin net])
+            (let ([parent (Pin-parent pin)])
+              (when (Atom? parent)
+                parent))))
+   eq?))
+
+
+;; I actually want a lexer than remove whitespace, but keeps newline
+(define-tokens simple [IDENTIFIER NUMBER STRING])
+(define-empty-tokens simple* [NEWLINE])
+
+(define-lex-abbrevs
+  (Comment (:: "#" (:* (:~ (:or #\return #\linefeed)))))
+  ;; digit
+  (Digit (:or (:/ #\0 #\9)))
+  (Letter (:or (:/ #\A #\Z)
+          (:/ #\a #\z)))
+  (SChar (:or (:~ #\"))))
+
+(define simple-lexer
+  (lexer-src-pos
+   [Comment (void)]
+   [(:: #\newline) (token-NEWLINE)]
+   [(:or blank) (void)]
+   ;; FIXME only integer
+   [(:: (:? #\-) (:+ Digit)) (token-NUMBER (string->number lexeme))]
+   [(:+ (:or #\$ #\* #\_ #\- #\. Letter Digit)) (token-IDENTIFIER lexeme)]
+   [(:: #\" (:* SChar) #\") (token-STRING lexeme)]
+   [(eof) eof]))
+
+(define (lex-simple str)
+  (let ([in (open-input-string str)])
+    (port-count-lines! in)
+    (let loop ([v (simple-lexer in)])
+      (cond [(void? (position-token-token v)) (loop (simple-lexer in))]
+            [(eof-object? (position-token-token v)) '()]
+            [else (cons v (loop (simple-lexer in)))]))))
+
+(module+ test
+  (char-whitespace? #\newline)
+  (char-blank? #\newline)
+  (char-blank? #\space)
+  (char-blank? #\tab)
+  (lex-simple "hello world 123
+
+  ok"))
