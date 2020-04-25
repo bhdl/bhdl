@@ -1,17 +1,30 @@
 #+TITLE: Implementation Notes
 
 * TODO-list
+** DONE visualize of placement result on racket side
+CLOSED: [2020-04-18 Sat 18:30]
+** STARTED write some boards
+
+- arduino uno
+- lichee nano
+- gh60: https://github.com/komar007/gh60
+- pyboard
+- linux business card
+
+*** other
+- ergonomic (hebi) keyboard
+
 ** TODO detailed placement and legalization
 ** TODO fixed positions
-** TODO Routing
-** Libraries
+** TODO Auto-Routing
+
+** TODO Libraries
 - https://github.com/Digi-Key/digikey-kicad-library
 
 *** DONE schematic symbol library
 CLOSED: [2020-02-20 四 14:27]
 - kicad official library should be enough
 *** TODO PCB footprint library
-** TODO write some boards
 
 ** Gerbers
 *** gerber generation
