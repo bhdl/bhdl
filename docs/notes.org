@@ -1,8 +1,16 @@
 #+TITLE: Implementation Notes
 
+
 * TODO-list
-** DONE visualize of placement result on racket side
-CLOSED: [2020-04-18 Sat 18:30]
+
+** STARTED Unified Libraries
+- https://github.com/Digi-Key/digikey-kicad-library
+
+*** TODO schematic symbol library
+- kicad official library should be enough (UPDATE: no)
+
+*** TODO PCB footprint library
+
 ** STARTED write some boards
 
 - arduino uno
@@ -18,20 +26,47 @@ CLOSED: [2020-04-18 Sat 18:30]
 ** TODO fixed positions
 ** TODO Auto-Routing
 
-** TODO Libraries
-- https://github.com/Digi-Key/digikey-kicad-library
-
-*** DONE schematic symbol library
-CLOSED: [2020-02-20 四 14:27]
-- kicad official library should be enough
-*** TODO PCB footprint library
-
 ** Gerbers
 *** gerber generation
 **** design rules
 *** IC->gerber add connections
 
 Export a airwire connections onto the gerber file
+
+* Library Design
+
+A variant of a component should have a symbol and one or more footprints. The
+pin name should be the same, and the indexes of pins shall be consistent. For
+footprint, it is fairly standard, just choose from one of the packagings. For
+symbols, we should also specify the orientation and grouping of pins.
+
+Of course, we can use the footprint directly as the symbol. However, there are
+problems:
+1. there may be many footprints for one symbol, which one to use?
+2. the pin order in the footprint is not necessary optimal from symbol point of
+   view, e.g. A0-A7 may not be located together.
+3. the schematic view should better be kept consistent with kicad
+
+And reading directly the Kicad library is not ideal:
+1. there is overhead to filter the important ones from kicad library
+2. kicad library is hard to maintain, and reply on external python script to
+   generate. It is the right way to integrate that script into our system. Well,
+   tons of scripts:
+   - https://github.com/pointhi/kicad-footprint-generator
+   - https://github.com/kicad/kicad-library-utils
+
+** Reference
+Some Kicad library documentations are very useful:
+- https://kicad-pcb.org/libraries/klc/: KiCad Library Convention
+
+And the real schematic and footprint libraries:
+- https://github.com/kicad/kicad-symbols
+- https://github.com/KiCad/kicad-footprints
+
+Of course, the library editor is inside Kicad source code:
+- https://github.com/KiCad/kicad-source-mirror
+
+
 
 * DONE-list
 
@@ -113,3 +148,17 @@ CLOSED: [2020-04-13 Mon 19:19]
 - compose them together
 - write visualization and gerber generation for comp-IC
 - assign footprint
+** CANCELED kicad symbol library
+CLOSED: [2020-04-29 Wed 19:22]
+- visualization
+- API
+
+For kicad symbol library, the only thing I care about is actually the "pinname
+to index" mapping, which is consistent with kicad footprint pin index for
+different packagings.
+
+However, different packaging should have different pin index, but one symbol can
+have many footprints. How is that possible?
+
+** DONE visualize of placement result on racket side
+CLOSED: [2020-04-18 Sat 18:30]

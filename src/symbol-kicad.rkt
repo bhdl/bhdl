@@ -17,7 +17,8 @@
 
          syntax/parse/define
          rackunit
-         (except-in pict blank))
+         (except-in pict blank)
+         (prefix-in p: pict))
 
 ;; configuration
 (define kicad-symbol-path
@@ -134,6 +135,9 @@
 (define (string-not/p c) (satisfy/p (λ (s) (not (equal? s c)))))
 (define number/p (satisfy/p (λ (s) (number? s))))
 
+(define any/p (or/p string-any/p
+                    number/p))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; parser combinators
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -167,19 +171,60 @@
 $ENDFPLIST
 "))
 
+
+;; TODO I actually need the arcs
+;;
+;; TODO I probably need to decide what is the bouding box draw, and what is
+;; unimportant
 (struct kicad-symbol
   (name fplist
         ;; FIXME how many rects are possible?
-        rect
+        draws
         pins)
   #:prefab)
 (struct draw-rect
   (x1 y1 x2 y2)
   #:prefab)
+(struct draw-polygon
+  (vertices)
+  #:prefab)
+(struct draw-circle
+  (x y radius)
+  #:prefab)
+(struct draw-arc
+  (x y radius start-degree end-degree
+     x-start y-start x-end y-end)
+  #:prefab)
 (struct draw-pin
-  (name index xoff yoff)
+  (name index xoff yoff len orient)
   #:prefab)
 
+
+(module+ test
+  ((compose panorama
+            (λ (x) (pin-over x -100 0 (rectangle 10 10)))
+            (λ (x) (pin-over x 100 0 (circle 10))))
+   (p:blank))
+
+  )
+
+(define (pin-line-xy base x1 y1 x2 y2)
+  (let ([p1 (p:blank)]
+        [p2 (p:blank)])
+    (let ([combined ((compose (λ (x) (pin-over x x1 y1 p1))
+                              (λ (x) (pin-over x x2 y2 p2)))
+                     base)])
+      (panorama (pin-line combined
+                          p1 cc-find
+                          p2 cc-find
+                          #:start-angle 10
+                          #:end-angle 10)))))
+
+(module+ test
+  (pin-line-xy (rectangle 30 30) -10 -10 20 20))
+
+
+;; rectangle
 (define S-line/p (do (string/p "S")
                      [x1 <- number/p]
                    [y1 <- number/p]
@@ -187,21 +232,65 @@ $ENDFPLIST
                    [y2 <- number/p]
                    skip-to-newline/p
                    (pure (draw-rect x1 y1 x2 y2))))
+
+;; pin: X name pin X Y length orientation - ...
 (define X-line/p (do (string/p "X")
                      [name <- string-any/p]
                    [index <- number/p]
                    [xoff <- number/p]
                    [yoff <- number/p]
+                   [len <- number/p]
+                   ;; U D L R
+                   [orient <- string-any/p]
                    skip-to-newline/p
-                   (pure (draw-pin name index xoff yoff))))
+                   (pure (draw-pin name index xoff yoff len orient))))
+;; arc, format:
+;; TODO A X Y radius start-degree end-degree - - - - Xstart (can be calculated FIXME verify) Ystart Xend Yend
 (define A-line/p (do (string/p "A")
-                     skip-to-newline/p))
+                     [x <- number/p]
+                   [y <- number/p]
+                   [radius <- number/p]
+                   ;; in 0.1 degrees
+                   [start-degree <- number/p]
+                   [end-degree <- number/p]
+                   any/p
+                   any/p
+                   any/p
+                   any/p
+                   [x-start <- number/p]
+                   [y-start <- number/p]
+                   [x-end <- number/p]
+                   [y-end <- number/p]
+                   skip-to-newline/p
+                   (pure (draw-arc x y radius start-degree end-degree
+                                   ;; FIXME I probably don't need these, but
+                                   ;; need to verify them
+                                   x-start y-start x-end y-end))))
+;; circle, format:
+;; C X Y radius - - - -
 (define C-line/p (do (string/p "C")
-                     skip-to-newline/p))
+                     [x <- number/p]
+                   [y <- number/p]
+                   [radius <- number/p]
+                   skip-to-newline/p
+                   (pure (draw-circle x y radius))))
+;; this is polygon, format:
+;; P - - - - X Y ... -
 (define P-line/p (do (string/p "P")
-                     skip-to-newline/p))
+                     any/p
+                   any/p
+                   any/p
+                   any/p
+                   [vertices <- (many/p (do [x <- number/p]
+                                            [y <- number/p]
+                                          (pure (cons x y))))]
+                   skip-to-newline/p
+                   (pure (draw-polygon vertices))))
+;; text, skip for now
 (define T-line/p (do (string/p "T")
                      skip-to-newline/p))
+
+;; "Bezier curve, skip for now
 (define B-line/p (do (string/p "B")
                      skip-to-newline/p))
 
@@ -264,7 +353,11 @@ $ENDFPLIST
                 [draw <- DRAW/p]
                 (string/p "ENDDEF")
                 (pure (kicad-symbol name fplist
-                                    (filter draw-rect? draw)
+                                    (filter (λ (x) (or (draw-rect? x)
+                                                       (draw-circle? x)
+                                                       (draw-polygon? x)
+                                                       (draw-arc? x)))
+                                            draw)
                                     (filter draw-pin? draw)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -286,13 +379,94 @@ $ENDFPLIST
                         ;; #:sep newline/p
                         )]
         eof/p
-      (pure res))
+      (pure
+       (filter-not
+        ;; and I need to remove the newline parsed by the above or/p
+        (λ (x) (equal? x 'newline))
+        res)))
     (call-with-input-file fname
       (λ (in) (port->string in))))))
 
+;; visualization
+
+(define (draw-kicad-symbol sym)
+  ;; I should call panorama in the end, so that the coordinate system is consistent
+  (cc-superimpose
+   (panorama
+    (draw-kicad-symbol-pins sym
+                            (draw-kicad-symbol-shape sym)))
+   ;; the name of the symbol
+   (scale (text (kicad-symbol-name sym)) 2)))
+
+(define (draw-kicad-symbol-shape sym)
+  ((apply
+    compose
+    (for/list ([draw (kicad-symbol-draws sym)])
+      (match draw
+        [(draw-rect x1 y1 x2 y2) (λ (p)
+                                   (pin-over p
+                                             (min x1 x2)
+                                             (min y1 y2)
+                                             ;; this should be transparent
+                                             ;; to be pinned over
+                                             (cellophane
+                                              (rectangle (abs (- x2 x1))
+                                                         (abs (- y2 y1)))
+                                              ;; FIXME should be 0, but
+                                              ;; that would make the lines
+                                              ;; transparent too
+                                              0.5)))]
+        [(draw-polygon vertices) (λ (p)
+                                   (for/fold ([prev
+                                               ;; FIXME prev should be last vertices
+                                               ;; if closed, and none if not closed
+                                               (cons 0 0)]
+                                              [res p])
+                                             ([v vertices])
+                                     (values v
+                                             (pin-line-xy res
+                                                          (car prev) (cdr prev)
+                                                          (car v) (cdr v)))))]
+        [(draw-circle x y radius) (λ (p)
+                                    (pin-over p x y (circle radius)))]
+        ;; this is difficult
+        [(draw-arc x y radius start-degree end-degree
+                   x-start y-start x-end y-end)
+         ;; FIXME degree and pull
+         (λ (p) (pin-line-xy p x-start y-start x-end y-end))])))
+   (p:blank)))
+
+(define (draw-kicad-symbol-pins sym base)
+  ((apply compose (for/list ([pin (kicad-symbol-pins sym)])
+                    (match pin
+                      [(draw-pin name index xoff yoff len orient)
+                       (let*-values ([(p2) (text (draw-pin-name pin))]
+                                     [(pw ph) (values (pict-width p2)
+                                                      (pict-height p2))]
+                                     [(xoff yoff)
+                                      ;; 1. adjust for pin length, 2. move all
+                                      ;; text into the border
+                                      (case orient
+                                        [("L") (values (- xoff len pw) yoff)]
+                                        [("R") (values (+ xoff len) yoff)]
+                                        [("U") (values xoff (+ yoff len))]
+                                        [("D") (values xoff (- yoff len ph))])])
+                         (λ (p) (pin-over p
+                                          xoff
+                                          yoff
+                                          p2)))])))
+   base))
 
 (module+ test
-  (parse-kicad-lib "/home/hebi/git/reading/kicad-symbols/4xxx.lib"))
-
-
+  ;; read as many .lib files as I'm interested
+  (define symbols (parse-kicad-lib "/home/hebi/git/reading/kicad-symbols/4xxx.lib"))
+  ;; build a hash table from symbol name to symbol object
+  (define Hname=>symbol (for/hash ([sym symbols])
+                          (values (kicad-symbol-name sym)
+                                  sym)))
+  (hash-keys Hname=>symbol)
+  ;; draw it
+  (draw-kicad-symbol (hash-ref Hname=>symbol "4543"))
+  ;; TODO debug drawing other shapes
+  )
 
