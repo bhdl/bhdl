@@ -1,7 +1,6 @@
 #lang racket
 
 (require "symbol.rkt"
-         ;; "library-raw.rkt"
          "library-syntax.rkt"
          "library.rkt")
 
