@@ -65,6 +65,11 @@ different pin number
 
 *** TODO negative signal (e.g. ~RESET)
 
+** footprints
+Well, actually footprint is another story. I need to get the exact position of
+pads, and borders. That's hard to maintain afterall. Kicad footprint library is
+pretty good, and I'm using it.
+
 ** Reference
 Some Kicad library documentations are very useful:
 - https://kicad-pcb.org/libraries/klc/: KiCad Library Convention

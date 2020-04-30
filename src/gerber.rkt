@@ -5,9 +5,8 @@
          syntax/parse/define
          rackunit
          pict
-         "footprint.rkt"
+         "fp.rkt"
          "gerber-viewer.rkt"
-         "schematic.rkt"
          racket/draw)
 
 (provide footprint->gerber

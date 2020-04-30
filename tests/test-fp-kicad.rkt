@@ -2,7 +2,7 @@
 
 (require "../src/fp-kicad.rkt"
          "../src/gerber.rkt"
-         "../src/footprint.rkt"
+         "../src/fp.rkt"
          pict)
 
 (module+ test

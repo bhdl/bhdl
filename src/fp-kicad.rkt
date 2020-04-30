@@ -4,7 +4,7 @@
                      racket/string)
          syntax/parse/define
          rackunit
-         "footprint.rkt"
+         "fp.rkt"
          "gerber.rkt"
          pict
          racket/trace
