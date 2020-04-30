@@ -23,7 +23,7 @@
   ;; FIXME actually there is one more pin, the bottom pad, connected to GND
   ;;
   ;; CAUTION DNC means Do-Not-Connect
-  #:RECT 20 (pb5 pb3 dnc dnc pb4
+  #:QFN 20 (pb5 pb3 dnc dnc pb4
                  dnc dnc gnd dnc dnc
                  pb0 pb1 dnc pb2 vcc
                  dnc dnc dnc dnc dnc))
@@ -33,9 +33,8 @@
   ;; FIXME I'm assuming the alias is consistent across variants
   ;;
   ;; And I'm using this for schematic? Yes!
-  #:top ([(VCC) (AVCC) (AREF) (RESET)]
-         [(GND) (XTAL2) (XTAL1)])
-  #:bottom ()
+  #:top ([(VCC) (AVCC) (AREF) (RESET)])
+  #:bottom ([(GND) (XTAL2) (XTAL1)])
   #:left ([(PA0 ADC0) (PA1 ADC1) (PA2 ADC2) (PA3 ADC3) (PA4 ADC4)
                       (PA5 ADC5) (PA6 ADC6) (PA7 ADC7)]
           [(PB0 XCK T0) (PB1 T1) (PB2 INT2 AIN0) (PB3 OC0 AIN1)
@@ -55,7 +54,7 @@
                 avcc gnd aref
                 pa7 pa6 pa5 pa4 pa3 pa2 pa1 pa0)
   ;; FIXME this suits TQFP/QFN/MLF
-  #:RECT 44 (PB5 pb6 pb7 reset vcc gnd xtal2 xtal1 pd0 pd1 pd2
+  #:QFN 44 (PB5 pb6 pb7 reset vcc gnd xtal2 xtal1 pd0 pd1 pd2
                  pd3 pd4 pd5 pd6 pd7 vcc gnd pc0 pc1 pc2 pc3
                  pc4 pc5 pc6 pc7 avcc gnd aref pa7 pa6 pa5 pa4
                  pa3 pa2 pa1 pa0 vcc gnd pb0 pb1 pb2 pb3 pb4))
@@ -78,7 +77,7 @@
                        (pf5 adc5 tms) (pf6 adc6 tdo) (pf7 adc7 tdi)]
            [(pg0 wr) (pg1 rd) (pg2 ale) (pg3 tosc2) (pg4 tosc1)])
   ;; TQFP
-  #:RECT 64 (pen pe0 pe1 pe2 pe3 pe4 pe5 pe6 pe7 pb0 pb1 pb2 pb3 pb4 pb5 pb6
+  #:QFN 64 (pen pe0 pe1 pe2 pe3 pe4 pe5 pe6 pe7 pb0 pb1 pb2 pb3 pb4 pb5 pb6
                  pb7 pg3 pg4 reset vcc gnd xtal1 xtal1 pd0 pd1 pd2 pd3 pd4 pd5 pd6 pd7
                  pg0 pg1 pc0 pc1 pc2 pc3 pc4 pc5 pc6 pc7 pg2 pa7 pa6 pa5 pa4 pa3
                  pa2 pa1 pa0 vcc gnd pf7 pf6 pf5 pf4 pf3 pf2 pf1 pf0 aref gnd avcc))
@@ -112,11 +111,11 @@
             (pd7 pcint23 ain1)])
   #:DIP 28 (PC6 PD0 pd1 pd2 pd3 pd4 vcc gnd pb6 pb7 pd5 pd6 pd7 pb0
                 pb1 pb2 pb3 pb4 pb5 avcc aref gnd pc0 pc1 pc2 pc3 pc4 pc5)
-  #:RECT 28 (pd3 pd4 vcc gnd pb6 pb7 pd5
+  #:QFN 28 (pd3 pd4 vcc gnd pb6 pb7 pd5
                  pd6 pd7 pb0 pb1 pb2 pb3 pb4
                  pb5 avcc aref gnd pc0 pc1 pc2
                  pc3 pc4 pc5 pc6 pd0 pd1 pd2)
-  #:RECT 32 (pd3 pd4 gnd vcc gnd vcc pb6 pb7
+  #:QFN 32 (pd3 pd4 gnd vcc gnd vcc pb6 pb7
                  pd5 pd6 pd7 pb0 pb1 pb2 pb3 pb4
                  pb5 avcc adc6 aref gnd adc7 pc0 pc1
                  pc2 pc3 pc4 pc5 pc6 pd0 pd1 pd2))
