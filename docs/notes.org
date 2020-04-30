@@ -55,6 +55,16 @@ And reading directly the Kicad library is not ideal:
    - https://github.com/pointhi/kicad-footprint-generator
    - https://github.com/kicad/kicad-library-utils
 
+** schematic symbol
+
+I'm not going to read kicad library file, because I need heuristics to
+determine groups, and that's not maintainable
+
+Different varaints have different number of pins, different packaging, and
+different pin number
+
+*** TODO negative signal (e.g. ~RESET)
+
 ** Reference
 Some Kicad library documentations are very useful:
 - https://kicad-pcb.org/libraries/klc/: KiCad Library Convention

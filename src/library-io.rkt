@@ -1,7 +1,9 @@
 #lang racket
 
 (require "symbol.rkt"
-         "library-raw.rkt")
+         ;; "library-raw.rkt"
+         "library-syntax.rkt"
+         "library.rkt")
 
 (define (IC->symbol-pict ic)
   ;; TODO

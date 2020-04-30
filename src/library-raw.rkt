@@ -1,35 +1,19 @@
 #lang racket
 
 (require (for-syntax syntax/parse)
-         rackunit
-         syntax/parse)
+         syntax/parse
+         "utils.rkt"
+         "library.rkt")
 
-(provide (struct-out IC)
-
-         ATtiny25 ATtiny45 ATtiny85
+(provide ATtiny25 ATtiny45 ATtiny85
          ATmega128
          ATmega16
          ATmega48 ATmega88 ATmega168 ATmega328
          ATMEGA8U2 ATMEGA16U2 ATMEGA32U2)
 
-(struct IC
-  (datasheet alts orients fps))
-
-(define-syntax (define-alias stx)
-  (syntax-parse stx
-    [(_ (name ...) body ...)
-     #`(match-define (list name ...)
-         (make-list (length (list #'name ...)) (begin body ...)))]))
-
-(module+ test
-  (define-alias (a b c) '(1 2))
-  (check-true (eq? a b))
-  (check-false (eq? a '(1 2))))
-
-
 ;; I really don't need custom syntax for now. I just need this structure
 (define-alias (ATtiny25 ATtiny45 ATtiny85)
-  (IC "https://example.pdf"
+  (IC "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf"
       '([vcc]
         [gnd]
         [pb0 mosi di sda ain0 oc0a oc1a aref pcint0]
@@ -42,6 +26,9 @@
             'left '((pb0 pb1 pb2 pb3 pb4 pb5))
             'right '())
       (hash 'DIP-8 '(pb5 pb3 pb4 gnd pb0 pb1 pb2 vcc)
+            ;; FIXME actually there is one more pin, the bottom pad, connected to GND
+            ;;
+            ;; CAUTION DNC means Do-Not-Connect
             'QFN-20 '(pb5 pb3 dnc dnc pb4
                           dnc dnc gnd dnc dnc
                           pb0 pb1 dnc pb2 vcc
@@ -50,6 +37,7 @@
 
 (define-alias (ATmega16)
   (IC "http://ww1.microchip.com/downloads/en/DeviceDoc/doc2466.pdf"
+      ;; FIXME I'm assuming the alias is consistent across variants
       '((VCC) (AVCC) (AREF) (RESET)
               (GND) (XTAL2) (XTAL1)
               (PA0 ADC0) (PA1 ADC1) (PA2 ADC2) (PA3 ADC3) (PA4 ADC4)
@@ -65,8 +53,10 @@
             'left '([pa0 pa1 pa2 pa3 pa4 pa5 pa6 pa7]
                     [pb0 pb1 pb2 pb3 pb4 pb5 pb6 pb7])
             'right '([pc0 pc1 pc2 pc3 pc4 pc5 pc6 pc7]
-                     [pd0 pd1 pd2 pd3 pd4 pd5 pd6 pd7])
-            )
+                     [pd0 pd1 pd2 pd3 pd4 pd5 pd6 pd7]))
+      ;; And these are the packagings, for assigning correct pin numbers.  As a
+      ;; result, the rendered schematic symbols may not have pin number, if
+      ;; footprint not assigned.
       (hash 'DIP-40 '(PB0 PB1 PB2 PB3 PB4 PB5 pb6 pb7
                           reset vcc gnd xtal2 xtal1
                           pd0 pd1 pd2 pd3 pd4 pd5 pd6
@@ -74,6 +64,7 @@
                           pd7 pc0 pc1 pc2 pc3 pc4 pc5 pc6 pc7
                           avcc gnd aref
                           pa7 pa6 pa5 pa4 pa3 pa2 pa1 pa0)
+            ;; FIXME this suits TQFP/QFN/MLF
             'QFN-44 '(PB5 pb6 pb7 reset vcc gnd xtal2 xtal1 pd0 pd1 pd2
                           pd3 pd4 pd5 pd6 pd7 vcc gnd pc0 pc1 pc2 pc3
                           pc4 pc5 pc6 pc7 avcc gnd aref pa7 pa6 pa5 pa4
@@ -176,6 +167,9 @@
             'left '([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
                     [PC0 PC1 PC2 PC4 PC5 PC6 PC7])
             'right '([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7]))
+      ;; FIXME the datasheet has two seemingly exactly the same pinouts: QFN/TQFP
+      ;;
+      ;; FIXME no other packaging?
       (hash 'QFN-32 '(xtal1 xtal2 gnd vcc pc2 pd0 pd1 pd2
                             pd3 pd4 pd5 pd6 pd7 pb0 pb1 pb2
                             pb3 pb4 pb5 pb6 pb7 pc7 pc6 reset
