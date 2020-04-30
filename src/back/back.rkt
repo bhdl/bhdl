@@ -731,3 +731,6 @@ the kicad footprint format and generate gerber."
   ;; however, there is no packaging section of Z80. It seems to have its own footprint
   #:datasheet "http://www.zilog.com/force_download.php?filepath=YUhSMGNEb3ZMM2QzZHk1NmFXeHZaeTVqYjIwdlpHOWpjeTk2T0RBdlZVMHdNRGd3TG5Ca1pnPT0=")
 
+
+(define (λ-conn-sym num)
+  (make-rect-symbol #:left (list (map add1 (range num)))))

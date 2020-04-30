@@ -206,3 +206,13 @@
             pd3 pd4 pd5 pd6 pd7 pb0 pb1 pb2
             pb3 pb4 pb5 pb6 pb7 pc7 pc6 reset
             pc5 pc4 ucap ugnd d+ d- uvcc avcc))
+
+(define/IC (LM555-sym)
+  #:datasheet ""
+  ;; FIXME when there're no alts, I should be able to just leave it blank
+  #:alts ()
+  #:top ((VCC))
+  #:bottom ((GND))
+  #:left ((TR output reset))
+  #:right ((DIS THR CV))
+  #:DIP (8 GND TR output reset CV THR DIS VCC))

@@ -12,10 +12,3 @@
          pict
          racket/draw)
 
-;; (provide (all-defined-out))
-
-
-
-;; (sch-visualize g)
-
-;; (IC-children g)
