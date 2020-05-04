@@ -4,6 +4,8 @@
          "library-syntax.rkt"
          "library.rkt")
 
+;; I want not only output a pict, but also the location of the pads, and the
+;; width and height
 (define (IC->symbol-pict ic)
   ;; TODO
   (visualize-loc

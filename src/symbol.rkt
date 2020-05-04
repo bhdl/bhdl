@@ -5,7 +5,8 @@
          syntax/parse/define
          rackunit
          pict
-         racket/draw)
+         racket/draw
+         "utils.rkt")
 
 (provide visualize
          visualize-loc
@@ -115,20 +116,6 @@
                           (filled-rectangle 20 3)))])
     (scale-width-to res 100)))
 
-(define (symbol-section pict-lsts combine-func)
-  (apply combine-func 10
-         (for/list ([lst pict-lsts])
-           (apply combine-func lst))))
-
-(define (symbol-texts lsts)
-  (for/list ([lst lsts])
-    (for/list ([t lst])
-      (colorize (text (cond
-                        [(symbol? t) (symbol->string t)]
-                        [(string? t) t]
-                        [(number? t) (number->string t)]) 'default 15)
-                "darkgreen"))))
-
 (define (rect-symbol->pict sym)
   (let-values ([(p l) (rect-symbol->pict+locs sym)])
     p))
@@ -137,22 +124,50 @@
   "Return (pict, ((name x y) ...)"
   (unless (rect-symbol? sym)
     (error "sym is not rect-symbol"))
-  (let ([pinl (rect-symbol-left sym)]
-        [pinr (rect-symbol-right sym)]
-        [pint (rect-symbol-top sym)]
-        [pinb (rect-symbol-bottom sym)])
-    (let ([left-picts (symbol-texts pinl)]
-          [right-picts (symbol-texts pinr)]
-          [top-picts (symbol-texts pint)]
-          [bottom-picts (symbol-texts pinb)])
-      (let ([left  (symbol-section left-picts vl-append)]
-            [right (symbol-section right-picts vr-append)]
-            [top (rotate
-                  (symbol-section top-picts vl-append)
-                  (/ pi 2))]
-            [bottom (rotate
-                     (symbol-section bottom-picts vl-append)
-                     (/ pi 2))])
+  (let* ([pinl (rect-symbol-left sym)]
+         [pinr (rect-symbol-right sym)]
+         [pint (rect-symbol-top sym)]
+         [pinb (rect-symbol-bottom sym)]
+         [pin-lrtb (list pinl pinr pint pinb)]
+         [any->string
+          (λ (x)
+            (cond
+              [(symbol? x) (symbol->string x)]
+              [(string? x) x]
+              [(number? x) (number->string x)]
+              [else (error (~a "any->string: " x))]))])
+    ;; 1. create points
+    (let* ([points-lrtb (compose-pipe
+                         pin-lrtb
+                         #:...> (λ (x) (blank)))]
+           [texts-lrtb (compose-pipe
+                        pin-lrtb
+                        #:...> any->string
+                        #:...> (λ (s) (text s 'default 15))
+                        #:...> (λ (x) (colorize x "darkgreen")))]
+           ;; 2. create texted picture
+           [picts-lrtb (compose-pipe
+                        points-lrtb texts-lrtb
+                        ;; FIXME the rank does not match
+                        (list vl-append vr-append ht-append hb-append)
+                        #:...> (λ (point text func)
+                                 (func point text)))])
+      (match-let
+          ([(list left right top bottom)
+            ;; 3. combine the picts
+            ;; should be the connecting the point (using appropriate
+            ;; combinator) with the text
+            (compose-pipe picts-lrtb
+                          (list vl-append vr-append vl-append vr-append)
+                          #:..> (λ (lst func)
+                                  (apply func lst))
+                          ;; FIXME I need to have this again
+                          (list vl-append vr-append vl-append vr-append)
+                          (list identity identity
+                                (λ (x) (rotate x (/ pi 2)))
+                                (λ (x) (rotate x (/ pi 2))))
+                          #:.> (λ (lst func post)
+                                 (post (apply func lst))))])
         (let* ([mid (vl-append (max (- (max (pict-height left)
                                             (pict-height right))
                                        (pict-height top)
@@ -170,14 +185,14 @@
              ;; the whole pict
              res
              ;; the position information for all the pins
-             (for/list ([p (flatten (list left-picts right-picts top-picts bottom-picts))]
-                        [find-fn (append (map (const lc-find) (flatten left-picts))
-                                         (map (const rc-find) (flatten right-picts))
-                                         (map (const rc-find) (flatten top-picts))
-                                         (map (const lc-find) (flatten bottom-picts)))]
-                        [id (flatten (list pinl pinr pint pinb))])
-               (let-values ([(x y) (find-fn res p)])
-                 (list id x y))))))))))
+             (compose-pipe
+              points-lrtb
+              (list lc-find rc-find rc-find lc-find)
+              #:...> (λ (p find)
+                       (let-values ([(x y) (find res p)])
+                         (list x y)))))))))))
+
+
 
 (define (visualize item)
   (cond

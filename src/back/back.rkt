@@ -734,3 +734,68 @@ the kicad footprint format and generate gerber."
 
 (define (λ-conn-sym num)
   (make-rect-symbol #:left (list (map add1 (range num)))))
+
+(define (symbol-section pict-lsts combine-func)
+  (apply combine-func 10
+         (for/list ([lst pict-lsts])
+           (apply combine-func lst))))
+
+(define (symbol-texts lsts)
+  (for/list ([lst lsts])
+    (for/list ([t lst])
+      (colorize (text (cond
+                        [(symbol? t) (symbol->string t)]
+                        [(string? t) t]
+                        [(number? t) (number->string t)]) 'default 15)
+                "darkgreen"))))
+
+(define (rect-symbol->pict+locs sym)
+  "Return (pict, ((name x y) ...)"
+  (unless (rect-symbol? sym)
+    (error "sym is not rect-symbol"))
+  (let ([pinl (rect-symbol-left sym)]
+        [pinr (rect-symbol-right sym)]
+        [pint (rect-symbol-top sym)]
+        [pinb (rect-symbol-bottom sym)])
+    ;; FIXME I should create pin position first. Text should be affliated info
+    ;;
+    ;; However, the pin does not have width and height. To make up the correct
+    ;; space, I still need to have text at the very beginning.
+    (let ([left-picts (symbol-texts pinl)]
+          [right-picts (symbol-texts pinr)]
+          [top-picts (symbol-texts pint)]
+          [bottom-picts (symbol-texts pinb)])
+      (let ([left  (symbol-section left-picts vl-append)]
+            [right (symbol-section right-picts vr-append)]
+            [top (rotate
+                  (symbol-section top-picts vl-append)
+                  (/ pi 2))]
+            [bottom (rotate
+                     (symbol-section bottom-picts vl-append)
+                     (/ pi 2))])
+        (let* ([mid (vl-append (max (- (max (pict-height left)
+                                            (pict-height right))
+                                       (pict-height top)
+                                       (pict-height bottom))
+                                    10)
+                               top bottom)]
+               [whole (hc-append 20 left mid right)]
+               [frame (filled-rectangle (+ (pict-width whole) 25)
+                                        (+ (pict-height whole) 25)
+                                        #:color "Khaki"
+                                        #:border-color "Brown"
+                                        #:border-width 10)])
+          (let ([res (cc-superimpose frame whole)])
+            (values
+             ;; the whole pict
+             res
+             ;; the position information for all the pins
+             (for/list ([p (flatten (list left-picts right-picts top-picts bottom-picts))]
+                        [find-fn (append (map (const lc-find) (flatten left-picts))
+                                         (map (const rc-find) (flatten right-picts))
+                                         (map (const rc-find) (flatten top-picts))
+                                         (map (const lc-find) (flatten bottom-picts)))]
+                        [id (flatten (list pinl pinr pint pinb))])
+               (let-values ([(x y) (find-fn res p)])
+                 (list id x y))))))))))
+
