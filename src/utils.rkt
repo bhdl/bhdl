@@ -91,6 +91,41 @@
              #:with func1 #'func.func1)))
 
 (define-syntax (compose-pipe stx)
+  "compose-pipe is a syntax sugar for writing piping style code. It solves 2
+problems.
+
+1. In lisp, when you write maps or apply functions, the sequence of functions
+are written from inside out. This is counter-intuitive.
+
+2. When using map or for loops, when you have list of lists, you have to write
+nested maps.
+
+The syntax of compose-pipe:
+
+(compose-pipe '(1 2 3) '(4 5 6)
+              #:.> (λ (x y) (+ x y))
+              #:.> (λ (x) (add1 x)))
+
+where the
+  #:> means directly take as argument
+  #:.> means map the function with the arguments as list
+  #:..> means maps into list of lists
+  #:.*> means agressively maps until ALL the arguments are not lists.
+
+There are still some detailed designs that is subject to change.
+
+1. when the arguments are not the same rank, it MIGHT choose to extend them to the
+same rank
+
+2. it is possible to supply additional data in between the functions
+
+(compose-pipe '(1 2 3)
+                '(4 5 6)
+                #:.> (λ (x y) (+ x y))
+                '(7 8 9)
+                #:.> (λ (x y) (+ x y)))
+
+"
   (syntax-parse stx
     [(_ e0:expr e:expr-until-pipe ...)
      #`((apply compose (reverse (list (λ (prev) (e.func1 prev e.e ...)) ...)))
