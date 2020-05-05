@@ -3,13 +3,22 @@
 
 * TODO-list
 
-** STARTED Unified Libraries
+** DONE Unified Libraries
+CLOSED: [2020-05-05 Tue 17:32]
 - https://github.com/Digi-Key/digikey-kicad-library
 
-*** TODO schematic symbol library
+*** DONE schematic symbol library
+CLOSED: [2020-05-05 Tue 17:32]
 - kicad official library should be enough (UPDATE: no)
 
-*** TODO PCB footprint library
+*** DONE PCB footprint library
+CLOSED: [2020-05-05 Tue 17:32]
+
+** auto placement
+*** DONE for footprint
+CLOSED: [2020-05-05 Tue 21:07]
+*** DONE for symbols
+CLOSED: [2020-05-05 Tue 21:07]
 
 ** STARTED write some boards
 

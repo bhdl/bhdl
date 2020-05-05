@@ -61,6 +61,6 @@
   (collect-all-pins comp))
 
 (myvoid
- (Composite->place-spec comp)
+ (Composite->place-spec comp 'symbol)
  (Composite->netlist comp))
 

@@ -4,7 +4,6 @@
          "../src/sch.rkt"
          "../src/library.rkt"
          "../src/utils.rkt"
-         (submod "../src/place.rkt" vis)
          json)
 
 (module+ test
@@ -20,7 +19,6 @@
   (Composite-pinhash comp)
   (collect-all-atoms comp)
   (collect-all-pins comp))
-
 
 (myvoid
  ;; will expand to the following code
@@ -57,9 +55,13 @@
  ;;
  ;; for local placement debug purpose
  (make-directory* "/tmp/rackematic/out/")
- (save-for-placement (Composite->place-spec comp) "/tmp/rackematic/out/a.json")
+ (save-for-placement (Composite->place-spec comp 'symbol)
+                     "/tmp/rackematic/out/symbol.json")
+ (save-for-placement (Composite->place-spec comp 'fp)
+                     "/tmp/rackematic/out/fp.json")
  ;; send for replacement
- (define place-result (send-for-placement (Composite->place-spec comp)))
+ (define place-result (send-for-placement (Composite->place-spec comp 'symbol)))
+ (define place-result (send-for-placement (Composite->place-spec comp 'fp)))
 
  ;; DEPRECATED save locally
  (call-with-output-file "/tmp/rackematic/out/a-sol.json"
@@ -77,5 +79,6 @@
  (Composite->pict comp
                   '(1000 1000)
                   (hash-ref place-result 'xs)
-                  (hash-ref place-result 'ys)))
+                  (hash-ref place-result 'ys)
+                  'fp))
 
