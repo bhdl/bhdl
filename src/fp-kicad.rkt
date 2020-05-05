@@ -8,31 +8,40 @@
          "gerber.rkt"
          pict
          racket/trace
+         racket/contract
          racket/draw)
 
-(provide fp-mounting-hole
+(provide (contract-out
+          ;; constructors
+          [fp-resistor ((or/c "0603" "0805" "THT") . -> . footprint?)]
+          [fp-capacitor ((or/c "0603" "0805") . -> . footprint?)]
+          [fp-sw-spst (-> (or/c 1 2 3 4 6 8) footprint?)]
+          [fp-pin-header (-> (or/c 1 2 3 4 5 6 7 8) footprint?)]
+          [fp-usb (-> (or/c 'a-male 'a-female
+                            'c-male 'c-female
+                            'micro-male 'micro-female
+                            'mini-male 'mini-female)
+                      footprint?)]
+          [fp-mounting-hole (-> (or/c 2 2.5 3 4 5 6 8) footprint?)]
+          [fp-QFN (-> (or/c 12 16 20 24 28 32 44 72) footprint?)]
+          [fp-PQFP (-> (or/c 44 80 100 112 144 256) footprint?)]
+          [fp-TQFP (-> (or/c 32 44 48 64 80 100 120 128 144 176) footprint?)]
+          [fp-DIP (-> (or/c 4 6 8 10 12 14 16 18 20 22 24 28 32
+                            40 42 48 64) footprint?)]
+          [fp-SOIC (-> (or/c 16 18 20 24 28) footprint?)]
+          [fp-TSSOP (-> (or/c 8 14 16 20 24 28
+                              30 32 38 48 56) footprint?)]
+          [fp-switch-keyboard (-> (or/c 1 1.25 1.5 1.75 2 2.25 2.75 6.25)
+                                  (or/c 'pcb 'plate)
+                                  footprint?)]
 
-         fp-resistor
-         fp-capacitor
-         fp-crystal
-         fp-diode
-         fp-sw-spst
-         fp-sw-push
-         fp-jack-audio
-         fp-jack-barrel
-         fp-pin-header
-         fp-usb
-
-         fp-QFN
-         fp-PQFP
-         fp-TQFP
-         fp-DIP
-         fp-SOIC
-         fp-TSSOP
-
-         fp-switch-keyboard
-
-         fp-1602)
+          ;; direct footprints
+          [fp-crystal footprint?]
+          [fp-diode footprint?]
+          [fp-sw-push footprint?]
+          [fp-jack-audio footprint?]
+          [fp-jack-barrel footprint?]
+          [fp-1602 footprint?]))
 
 
 ;; configuration
@@ -83,6 +92,10 @@
      #'(read-kicad-mod
         (build-path (kicad-footprint-path) s ...))]))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; small items: resistors, capacitors, switches
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (define fp-resistor-0603
   (kicad-helper "Resistor_SMD.pretty/"
                 "R_0603_1608Metric.kicad_mod"))
@@ -98,14 +111,7 @@
   (case type
     [("0603") fp-resistor-0603]
     [("0805") fp-resistor-0805]
-    [("THT") fp-resistor-THT]
-    [else (error (~a "Unsupported resistor type: " type))]))
-
-(define (fp-capacitor type)
-  (case type
-    [("0603") fp-capacitor-0603]
-    [("0805") fp-capacitor-0805]
-    [else (error (~a "Unsupported capacitor type: " type))]))
+    [("THT") fp-resistor-THT]))
 
 ;; FIXME This seems to be the same as resistor's. Then I'll define
 ;; only one.
@@ -116,6 +122,19 @@
   (kicad-helper "Capacitor_SMD.pretty/"
                 "C_0805_2012Metric.kicad_mod"))
 
+(define (fp-capacitor type)
+  (case type
+    [("0603") fp-capacitor-0603]
+    [("0805") fp-capacitor-0805]))
+
+;; (footprint->pict (kicad-pin-header 4))
+(define fp-crystal
+  (kicad-helper "Crystal.pretty/"
+                "Resonator-2Pin_W10.0mm_H5.0mm.kicad_mod"))
+
+(define fp-diode
+  (kicad-helper "Diode_THT.pretty/"
+                "D_DO-35_SOD27_P7.62mm_Horizontal.kicad_mod"))
 
 ;; only THT, SPST, slide switches
 (define (fp-sw-spst ct)
@@ -135,6 +154,10 @@
 
 (define fp-sw-push (kicad-helper "Button_Switch_THT.pretty/"
                                     "SW_PUSH_6mm.kicad_mod"))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; connectors
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 (define fp-jack-audio (kicad-helper "Connector_Audio.pretty/"
                                        "Jack_3.5mm_PJ311_Horizontal.kicad_mod"))
@@ -187,18 +210,14 @@
   (kicad-helper "Connector_USB.pretty/"
                 "USB_Mini-B_Lumberg_2486_01_Horizontal.kicad_mod"))
 
-;; (footprint->pict (kicad-pin-header 4))
-(define fp-crystal
-  (kicad-helper "Crystal.pretty/"
-                "Resonator-2Pin_W10.0mm_H5.0mm.kicad_mod"))
-
-(define fp-diode
-  (kicad-helper "Diode_THT.pretty/"
-                "D_DO-35_SOD27_P7.62mm_Horizontal.kicad_mod"))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; other single items
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define fp-1602
   (kicad-helper "Display.pretty/"
                 "LCD-016N002L.kicad_mod"))
+
 
 (define (fp-mounting-hole m)
   ;; MountingHole_2.2mm_M2.kicad_mod
@@ -221,6 +240,25 @@
                     "mm_M"
                     m
                     ".kicad_mod")))
+
+(define (fp-switch-keyboard spacing pcb-or-plate)
+  ;; SW_Cherry_MX_1.00u_PCB.kicad_mod
+  ;; SW_Cherry_MX_1.00u_Plate.kicad_mod
+  ;; SW_Cherry_MX_1.25u_PCB.kicad_mod
+  ;; SW_Cherry_MX_1.25u_Plate.kicad_mod
+  (kicad-helper "Button_Switch_Keyboard.pretty/"
+                (~a "SW_Cherry_MX_"
+                    (~r spacing #:precision '(= 2))
+                    "u_"
+                    (case pcb-or-plate
+                      [(pcb) "PCB"]
+                      [(plate) "Plate"]
+                      [else (error "Unknown pcb-or-place.")])
+                    ".kicad_mod")))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; IC footprints
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; FIXME many variations
 (define (fp-QFN ct)
@@ -354,21 +392,4 @@
                   (~a "TSSOP-" ct "_"
                       (first data) "x" (second data)
                       "mm_P" (third data) "mm.kicad_mod"))))
-
-(define (fp-switch-keyboard spacing pcb-or-plate)
-  ;; SW_Cherry_MX_1.00u_PCB.kicad_mod
-  ;; SW_Cherry_MX_1.00u_Plate.kicad_mod
-  ;; SW_Cherry_MX_1.25u_PCB.kicad_mod
-  ;; SW_Cherry_MX_1.25u_Plate.kicad_mod
-  (unless (member spacing '(1 1.25 1.5 1.75 2 2.25 2.75 6.25))
-    (error "Error: uknown spacing" spacing))
-  (kicad-helper "Button_Switch_Keyboard.pretty/"
-                (~a "SW_Cherry_MX_"
-                    (~r spacing #:precision '(= 2))
-                    "u_"
-                    (case pcb-or-plate
-                      [(pcb) "PCB"]
-                      [(plate) "Plate"]
-                      [else (error "Unknown pcb-or-place.")])
-                    ".kicad_mod")))
 

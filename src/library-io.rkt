@@ -52,10 +52,6 @@
 (define (DIP-fp-pict pin-count pins)
   ;; TODO I'm loading kicad footprints because that's more reasonable than
   ;; symbol library.
-  ;;
-  ;; However, I cannot get the location of the pins easily. Thus I'm still
-  ;; generating myself.
-
   (void))
 
 (define (QFN-fp-pict pin-count pins)
