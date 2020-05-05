@@ -203,3 +203,7 @@ same rank
                                      (list expr ...))])
          body ...)]))
 
+(define-syntax (begin-where stx)
+  (syntax-parse stx
+    [(_ TODO ...) #'(void)]))
+

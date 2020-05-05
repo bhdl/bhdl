@@ -6,13 +6,22 @@
 
 ;; I want not only output a pict, but also the location of the pads, and the
 ;; width and height
-(define (IC->symbol-pict ic)
+(define (IC->symbol-pict+locs ic)
   ;; TODO
-  (visualize-loc
-   (make-rect-symbol #:top (hash-ref (IC-orients ic) 'top)
+  (symbol->pict+locs
+   ;; the location order of schematic symbol is: lrtb
+   (make-rect-symbol #:left (hash-ref (IC-orients ic) 'left)
                      #:bottom (hash-ref (IC-orients ic) 'bottom)
-                     #:left (hash-ref (IC-orients ic) 'left)
-                     #:right (hash-ref (IC-orients ic) 'right))))
+                     #:right (hash-ref (IC-orients ic) 'right)
+                     #:top (hash-ref (IC-orients ic) 'top))))
+
+(define (IC->symbol-pict ic)
+  (let-values ([(p locs) (symbol->pict+locs
+                          (make-rect-symbol #:left (hash-ref (IC-orients ic) 'left)
+                                            #:bottom (hash-ref (IC-orients ic) 'bottom)
+                                            #:right (hash-ref (IC-orients ic) 'right)
+                                            #:top (hash-ref (IC-orients ic) 'top)))])
+    p))
 
 (module+ test
   (IC->symbol-pict ATtiny25)
