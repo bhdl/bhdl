@@ -1,9 +1,11 @@
 #lang racket
 
-(require "schematic.rkt"
-         "symbol.rkt"
-         "sch-lib.rkt"
+(require "sch.rkt"
+         "common.rkt"
+         "library-symbol.rkt"
+         "library-io.rkt"
          "utils.rkt"
+         "library-io.rkt"
          ;; https://docs.racket-lang.org/json/index.html
          json
          ;; https://docs.racket-lang.org/net/url.html
@@ -23,21 +25,20 @@
   #:prefab)
 
 (define (atom->macro atom)
-  (symbol->macro (atom->symbol atom)))
-
-(define (symbol->macro sym)
-  (let-values ([(pict locs) (symbol->pict+locs sym)])
+  (let-values ([(pict locs) (atom->symbol-pict+locs atom)])
     ;; CAUTION use the pict-height/width as macro size
     ;; FIXME this is exact, e.g. 6/5
     (let ([h (pict-height pict)]
           [w (pict-width pict)])
       ;; get the location of pins
       (Macro w h
-             (for/list ([loc locs])
+             (for/list ([loc locs]
+                        [index (in-naturals 1)])
                (match loc
-                 [(list index offx offy) (MacroPin (~a "P" index)
-                                                   offx
-                                                   offy)]))))))
+                 [(Point offx offy)
+                  (MacroPin (~a "P" index)
+                            offx
+                            offy)]))))))
 
 (define (annotate-atoms atoms)
   "Return hash table from (atom . 1-based-index)"
@@ -183,7 +184,7 @@
                      (pin-over die x y
                                ;; (rectangle w h)
                                ;; I actually should draw the symbol for schematic
-                               (symbol->pict (atom->symbol atom))
+                               (atom->symbol-pict atom)
                                ;; (draw-macro m)
                                )))])
         ;; Draw airwires.  Construct graph using racket's graph library, and find

@@ -1,8 +1,8 @@
 #lang racket
 
 (require "../src/place.rkt"
-         "../src/schematic.rkt"
-         "../src/sch-lib.rkt"
+         "../src/sch.rkt"
+         "../src/library.rkt"
          "../src/utils.rkt"
          (submod "../src/place.rkt" vis)
          json)

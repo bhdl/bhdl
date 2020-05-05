@@ -6,7 +6,7 @@
                      racket/list)
          syntax/parse/define
          rackunit
-         "symbol.rkt"
+         "library-symbol.rkt"
          "schematic.rkt"
          "footprint.rkt"
          pict

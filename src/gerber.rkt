@@ -9,8 +9,7 @@
          "gerber-viewer.rkt"
          racket/draw)
 
-(provide footprint->gerber
-         footprint->pict)
+(provide footprint->gerber)
 
 (define (gerber-format-xy x y)
   (format "X~aY~a"
@@ -90,24 +89,4 @@ the kicad footprint format and generate gerber."
             [postlude "M02*"])
         (string-join (list prelude ADD body postlude) "\n")))))
 
-
-(define (footprint->pict fp)
-  (let ([fname (make-temporary-file)])
-    (println (~a "DEBUG: " fname))
-    (call-with-output-file fname
-       #:exists 'replace
-       (λ (out)
-         (write-string (footprint->gerber fp)
-                       out)))
-    (gerber-file->pict fname)))
-
-(define (footprint->offset fp)
-  (let ([fname (make-temporary-file)])
-    (println (~a "DEBUG: " fname))
-    (call-with-output-file fname
-       #:exists 'replace
-       (λ (out)
-         (write-string (footprint->gerber fp)
-                       out)))
-    (gerber-file->offset fname)))
 

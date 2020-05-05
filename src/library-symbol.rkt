@@ -9,30 +9,14 @@
          "common.rkt"
          "pict-utils.rkt")
 
-(provide make-rect-symbol
-         symbol->pict+locs
-         symbol->pict
-         (struct-out rect-symbol)
-         (struct-out R-symbol)
-         (struct-out L-symbol)
-         (struct-out C-symbol)
-         (struct-out D-symbol))
+(provide R-symbol-pict
+         L-symbol-pict
+         C-symbol-pict
+         D-symbol-pict
 
+         rect-symbol->pict+locs
+         rect-symbol->pict)
 
-(struct rect-symbol
-  (left bottom right top)
-  #:prefab)
-
-(define (make-rect-symbol #:left [left '()]
-                          #:right [right '()]
-                          #:top [top '()]
-                          #:bottom [bottom '()])
-  (rect-symbol left bottom right top))
-
-(struct C-symbol ())
-(struct D-symbol ())
-(struct R-symbol ())
-(struct L-symbol ())
 
 (define (scale-width-to pict width)
   (scale pict (/ width (pict-width pict))))
@@ -73,19 +57,12 @@
                           (filled-rectangle 20 3)))])
     (scale-width-to res 100)))
 
-(define (rect-symbol->pict sym)
-  (let-values ([(p l) (rect-symbol->pict+locs sym)])
-    p))
-
-(define (rect-symbol->pict+locs sym)
+(define (rect-symbol->pict+locs #:left [left '()]
+                                #:right [right '()]
+                                #:top [top '()]
+                                #:bottom [bottom '()])
   "Return (pict, ((name x y) ...)"
-  (unless (rect-symbol? sym)
-    (error "sym is not rect-symbol"))
-  (let* ([pinl (rect-symbol-left sym)]
-         [pinb (rect-symbol-bottom sym)]
-         [pinr (rect-symbol-right sym)]
-         [pint (rect-symbol-top sym)]
-         [pin-lbrt (list pinl pinb pinr pint)]
+  (let* ([pin-lbrt (list left bottom right top)]
          [any->string
           (λ (x)
             (cond
@@ -110,7 +87,7 @@
                         #:...> (λ (point text func)
                                  (func point text)))])
       (match-let
-          ([(list left bottom right top)
+          ([(list pict-l pict-b pict-r pict-t)
             ;; 3. combine the picts
             ;; should be the connecting the point (using appropriate
             ;; combinator) with the text
@@ -124,13 +101,13 @@
                                 identity (λ (x) (rotate x (/ pi 2))))
                           #:.> (λ (lst func post)
                                  (post (apply func lst))))])
-        (let* ([mid (vl-append (max (- (max (pict-height left)
-                                            (pict-height right))
-                                       (pict-height top)
-                                       (pict-height bottom))
+        (let* ([mid (vl-append (max (- (max (pict-height pict-l)
+                                            (pict-height pict-r))
+                                       (pict-height pict-t)
+                                       (pict-height pict-b))
                                     10)
-                               top bottom)]
-               [whole (hc-append 20 left mid right)]
+                               pict-t pict-b)]
+               [whole (hc-append 20 pict-l mid pict-r)]
                [frame (filled-rectangle (+ (pict-width whole) 25)
                                         (+ (pict-height whole) 25)
                                         #:color "Khaki"
@@ -148,45 +125,27 @@
                        (let-values ([(x y) (find res p)])
                          (Point x y)))))))))))
 
+(define (rect-symbol->pict #:left [left '()]
+                           #:right [right '()]
+                           #:top [top '()]
+                           #:bottom [bottom '()])
+  (let-values ([(p l) (rect-symbol->pict+locs #:left left
+                                              #:right right
+                                              #:top top
+                                              #:bottom bottom)])
+    p))
 
 
 (module+ test
   (define z80-sym
-    (make-rect-symbol #:left '((~RESET)
-                               (~CLK)
-                               (~NMI ~INT)
-                               (~M1 ~RFSH ~WAIT ~HALT)
-                               (~RD ~WR ~MREQ ~IORQ)
-                               (~BUSRQ ~BUSACK))
-                      #:right '((A0 A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 A12 A13 A14 A15)
-                                (D0 D1 D2 D3 D4 D5 D6 D7))
-                      #:top '((VCC))
-                      #:bottom '((GND))))
-  (symbol->pict z80-sym)
-  (symbol->pict (C-symbol)))
-
-(define (binary-locs pict)
-  (let ([l (blank)]
-        [r (blank)])
-    (let ([whole (hc-append l pict r)])
-      (let-values ([(x1 y1) (cc-find whole l)]
-                   [(x2 y2) (cc-find whole r)])
-        (list (Point x1 y1)
-              (Point x2 y2))))))
-
-(define (symbol->pict+locs sym)
-  (cond
-    [(C-symbol? sym) (values C-symbol-pict
-                             (binary-locs C-symbol-pict))]
-    [(R-symbol? sym) (values R-symbol-pict
-                             (binary-locs R-symbol-pict))]
-    [(D-symbol? sym) (values D-symbol-pict
-                             (binary-locs D-symbol-pict))]
-    [(L-symbol? sym) (values L-symbol-pict
-                             (binary-locs L-symbol-pict))]
-    [(rect-symbol? sym) (rect-symbol->pict+locs sym)]))
-
-(define (symbol->pict sym)
-  (let-values ([(p locs) (symbol->pict+locs sym)])
-    p))
+    (rect-symbol->pict #:left '((~RESET)
+                                (~CLK)
+                                (~NMI ~INT)
+                                (~M1 ~RFSH ~WAIT ~HALT)
+                                (~RD ~WR ~MREQ ~IORQ)
+                                (~BUSRQ ~BUSACK))
+                       #:right '((A0 A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 A12 A13 A14 A15)
+                                 (D0 D1 D2 D3 D4 D5 D6 D7))
+                       #:top '((VCC))
+                       #:bottom '((GND)))))
 
