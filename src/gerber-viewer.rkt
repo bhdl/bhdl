@@ -178,7 +178,7 @@
 (define (gerber-file->pict gbr-file)
   "Return a pict for the gerber file."
   (let-values ([(p _) (execute-gbr-instructions (gbr->instructions gbr-file))])
-    (scale p 30)))
+    p))
 
 (define (gerber-file->offset gbr-file)
   (let-values ([(_ box)
@@ -186,7 +186,6 @@
     (let ([xmin (second box)]
           [ymin (last box)])
       (values xmin ymin))))
-
 
 ;; (pict-path? p)
 

@@ -45,14 +45,10 @@
      #`(define-alias (name ...)
          (IC url
              '((alt ...) ...)
-             (make-hash
-              (list (cons 'orient.which
-                          '((orient.group ...) ...))
-                    ...))
-             (make-hash
-              (list (cons 'footprint.package
-                          '(footprint.num footprint.pin ...))
-                    ...))))]))
+             (list (OrientSpec 'orient.which '((orient.group ...) ...))
+                   ...)
+             (list (FpSpec 'footprint.package footprint.num '(footprint.pin ...))
+                   ...)))]))
 
 
 (define/IC (ATtiny25 ATtiny45 ATtiny85)

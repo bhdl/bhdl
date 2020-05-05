@@ -799,3 +799,43 @@ the kicad footprint format and generate gerber."
                (let-values ([(x y) (find-fn res p)])
                  (list id x y))))))))))
 
+
+(define (footprint-get-pad-loc fp num)
+  (let ([pad (first (filter (λ (x)
+                              (= (pad-spec-num x) num))
+                            (footprint-pads fp)))])
+    (values (pad-spec-x pad)
+            (pad-spec-y pad))))
+
+
+(define (mark-locs pict locs)
+  (let ([w (pict-width pict)]
+        [h (pict-height pict)])
+    (cc-superimpose
+     pict
+     (dc (λ (dc dx dy)
+           (define old-brush (send dc get-brush))
+           (define old-pen   (send dc get-pen))
+
+           (send dc set-pen "red" 20 'solid)
+           (for ([loc locs])
+             (send dc draw-point (second loc) (third loc)))
+           
+           (send dc set-brush old-brush)
+           (send dc set-pen   old-pen))
+         w h))))
+
+(define (visualize item)
+  (cond
+    [(rect-symbol? item) (rect-symbol->pict item)]
+    [(R-symbol? item) R-symbol-pict]
+    [(C-symbol? item) C-symbol-pict]
+    [(L-symbol? item) L-symbol-pict]
+    [(D-symbol? item) D-symbol-pict]))
+
+(define (visualize-loc sym)
+  ;; TODO visualize pin locations
+  (let-values ([(pic locs) (symbol->pict+locs sym)])
+    ;; mark locs onto pict
+    (mark-locs pic locs)))
+

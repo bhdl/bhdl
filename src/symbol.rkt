@@ -6,11 +6,10 @@
          rackunit
          pict
          "utils.rkt"
+         "common.rkt"
          "pict-utils.rkt")
 
-(provide visualize
-         visualize-loc
-         make-rect-symbol
+(provide make-rect-symbol
          symbol->pict+locs
          symbol->pict
          (struct-out rect-symbol)
@@ -147,40 +146,9 @@
               (list lc-find lc-find rc-find rc-find)
               #:...> (λ (p find)
                        (let-values ([(x y) (find res p)])
-                         (list x y)))))))))))
+                         (Point x y)))))))))))
 
 
-
-(define (visualize item)
-  (cond
-    [(rect-symbol? item) (rect-symbol->pict item)]
-    [(R-symbol? item) R-symbol-pict]
-    [(C-symbol? item) C-symbol-pict]
-    [(L-symbol? item) L-symbol-pict]
-    [(D-symbol? item) D-symbol-pict]))
-
-(define (mark-locs pict locs)
-  (let ([w (pict-width pict)]
-        [h (pict-height pict)])
-    (cc-superimpose
-     pict
-     (dc (λ (dc dx dy)
-           (define old-brush (send dc get-brush))
-           (define old-pen   (send dc get-pen))
-
-           (send dc set-pen "red" 20 'solid)
-           (for ([loc locs])
-             (send dc draw-point (second loc) (third loc)))
-           
-           (send dc set-brush old-brush)
-           (send dc set-pen   old-pen))
-         w h))))
-
-(define (visualize-loc sym)
-  ;; TODO visualize pin locations
-  (let-values ([(pic locs) (symbol->pict+locs sym)])
-    ;; mark locs onto pict
-    (mark-locs pic locs)))
 
 (module+ test
   (define z80-sym
@@ -194,12 +162,8 @@
                                 (D0 D1 D2 D3 D4 D5 D6 D7))
                       #:top '((VCC))
                       #:bottom '((GND))))
-  (mark-locs C-symbol-pict '((pin1 1 2) (pin2 20 20)))
-  (symbol->pict+locs z80-sym)
-  (visualize-loc z80-sym)
-
-  (visualize-loc (C-symbol))
-  (symbol->pict+locs (C-symbol)))
+  (symbol->pict z80-sym)
+  (symbol->pict (C-symbol)))
 
 (define (binary-locs pict)
   (let ([l (blank)]
@@ -207,8 +171,8 @@
     (let ([whole (hc-append l pict r)])
       (let-values ([(x1 y1) (cc-find whole l)]
                    [(x2 y2) (cc-find whole r)])
-        `((1 ,x1 ,y1)
-          (2 ,x2 ,y2))))))
+        (list (Point x1 y1)
+              (Point x2 y2))))))
 
 (define (symbol->pict+locs sym)
   (cond

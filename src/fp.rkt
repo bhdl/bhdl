@@ -9,8 +9,7 @@
 
 (provide (struct-out footprint)
          (struct-out line-spec)
-         (struct-out pad-spec)
-         footprint-get-pad-loc)
+         (struct-out pad-spec))
 
 (struct footprint
   ;; line will have start (x,y), end (x,y), width
@@ -26,12 +25,4 @@
 (struct pad-spec
   (x y num mounting-type shape shape-attr)
   #:prefab)
-
-(define (footprint-get-pad-loc fp num)
-  (let ([pad (first (filter (λ (x)
-                              (= (pad-spec-num x) num))
-                            (footprint-pads fp)))])
-    (values (pad-spec-x pad)
-            (pad-spec-y pad))))
-
 

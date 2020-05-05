@@ -3,7 +3,8 @@
 (require pict
          racket/draw)
 
-(provide triangular)
+(provide triangular
+         mytext)
 
 (define (draw-shape/border w h draw-fun
                            color [border-color #f] [border-width #f]
@@ -47,3 +48,9 @@
                        (send dc draw-path path dx dy))
                      color border-color border-width))
 
+(define (mytext txt [size 12])
+  ;; allow size to be real number
+  (scale (text txt 'default
+               ;; the maximum size is 1024
+               1024)
+         (/ size 1024)))
