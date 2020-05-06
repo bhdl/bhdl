@@ -3,26 +3,6 @@
 
 * TODO-list
 
-** DONE Unified Libraries
-CLOSED: [2020-05-05 Tue 17:32]
-- https://github.com/Digi-Key/digikey-kicad-library
-
-*** DONE schematic symbol library
-CLOSED: [2020-05-05 Tue 17:32]
-- kicad official library should be enough (UPDATE: no)
-
-*** DONE PCB footprint library
-CLOSED: [2020-05-05 Tue 17:32]
-
-** auto placement
-*** DONE for footprint
-CLOSED: [2020-05-05 Tue 21:07]
-*** DONE for symbols
-CLOSED: [2020-05-05 Tue 21:07]
-
-** Random
-*** footprint coordinates system mismatch
-
 ** STARTED write some boards
 
 - arduino uno
@@ -37,6 +17,12 @@ CLOSED: [2020-05-05 Tue 21:07]
 ** TODO detailed placement and legalization
 ** TODO fixed positions
 ** TODO Auto-Routing
+
+** Tmp
+*** assign footprints
+*** assign fixed locations
+*** In place.rkt, the macro and macro pins should be unified with library as well
+specifically, the pin index of ICAtom might not be numbers, but symbols
 
 ** Gerbers
 *** gerber generation
@@ -189,3 +175,24 @@ have many footprints. How is that possible?
 
 ** DONE visualize of placement result on racket side
 CLOSED: [2020-04-18 Sat 18:30]
+
+** DONE Unified Libraries
+CLOSED: [2020-05-05 Tue 17:32]
+- https://github.com/Digi-Key/digikey-kicad-library
+
+*** DONE schematic symbol library
+CLOSED: [2020-05-05 Tue 17:32]
+- kicad official library should be enough (UPDATE: no)
+
+*** DONE PCB footprint library
+CLOSED: [2020-05-05 Tue 17:32]
+
+** auto placement
+*** DONE for footprint
+CLOSED: [2020-05-05 Tue 21:07]
+*** DONE for symbols
+CLOSED: [2020-05-05 Tue 21:07]
+
+** Random
+*** DONE footprint coordinates system mismatch
+CLOSED: [2020-05-06 Wed 13:46]

@@ -83,7 +83,12 @@
                    [`(model ,other ...) #f]
                    [`(attr ,other ...) #f])))])])
       (let ([line-specs (filter line-spec? specs)]
-            [pad-specs (filter pad-spec? specs)])
+            [pad-specs (filter
+                        ;; FIXME the num maybe a string, most likely empty
+                        ;; string. See QFN-32 for an example.
+                        (λ (p)
+                          (number? (pad-spec-num p)))
+                        (filter pad-spec? specs))])
         (footprint line-specs pad-specs)))))
 
 (define-syntax (kicad-helper stx)

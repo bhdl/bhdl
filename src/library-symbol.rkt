@@ -118,12 +118,14 @@
              ;; the whole pict
              res
              ;; the position information for all the pins
-             (compose-pipe
-              points-lbrt
-              (list lc-find lc-find rc-find rc-find)
-              #:...> (λ (p find)
-                       (let-values ([(x y) (find res p)])
-                         (Point x y)))))))))))
+             ;; DEBUG flattern the locs
+             (flatten
+              (compose-pipe
+               points-lbrt
+               (list lc-find lc-find rc-find rc-find)
+               #:...> (λ (p find)
+                        (let-values ([(x y) (find res p)])
+                          (Point x y))))))))))))
 
 (define (rect-symbol->pict #:left [left '()]
                            #:right [right '()]

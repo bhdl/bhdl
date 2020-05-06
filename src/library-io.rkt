@@ -70,26 +70,29 @@
   ;; boxes
   ;;
   ;; create an IC
-  (IC->fp-pict ATmega16)
+  (IC->fp-pict+locs ATmega16 'DIP)
   (void))
 
 
 (define (IC->fp-pict+locs ic
-                          #:package (package 'DIP)
+                          #:package (package #f)
                           #:pin-count (pin-count #f))
   ;; generate footprint for ic
-  ;; 1. get the real pin-count
+  ;; 1. get the first footprint spec that matches selection
   (let ([spec (findf (λ (spec)
-                       (and (eq? package
-                                 (FpSpec-package spec))
+                       (and (or (not package)
+                                (eq? package
+                                     (FpSpec-package spec)))
                             (or (not pin-count)
-                                (= pin-count FpSpec-num spec))))
+                                (= pin-count (FpSpec-num spec)))))
                      (IC-fps ic))])
-    (let ([fp (case package
+    (or spec (error (~a "No matching footprint packaging for IC.") ))
+    (let ([fp (case (FpSpec-package spec)
                 [(DIP) (fp-DIP (FpSpec-num spec))]
                 ;; FIXME other rectangular footprints have the same pin order,
                 ;; but different size details
                 [(QFN) (fp-QFN (FpSpec-num spec))]
+                ;; TODO other types of IC packaging?
                 [else (error (~a "Unsupported package: " package))])])
       ;; CAUTION p is scaled here
       (let-values ([(p locs) (footprint->pict+locs fp)]
@@ -107,8 +110,13 @@
                          p)])
           (values texted-p locs))))))
 
-(define (IC->fp-pict ic)
-  (let-values ([(p locs) (IC->fp-pict+locs ic)])
+(define (IC->fp-pict ic
+                     ;; FIXME duplication
+                     #:package (package #f)
+                     #:pin-count (pin-count #f))
+  (let-values ([(p locs) (IC->fp-pict+locs ic
+                                           #:package package
+                                           #:pin-count pin-count)])
     p))
 
 ;; FIXME it should be in fp.rkt?
@@ -135,6 +143,9 @@
                              #:key pad-spec-num)])
          (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))
                 (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale))))))))
+
+(module+ test
+  (footprint->pict (fp-QFN 32)))
 
 (define (footprint->pict fp)
   (let-values ([(p _) (footprint->pict+locs fp)]) p))
@@ -175,7 +186,7 @@
     ;; FIXME fixed footprint packaging
     [(Resistor _) (footprint->pict+locs (fp-resistor "0603"))]
     [(Capacitor _) (footprint->pict+locs (fp-capacitor "0603"))]
-    [(ICAtom ic) (IC->symbol-pict+locs ic)]))
+    [(ICAtom ic) (IC->fp-pict+locs ic)]))
 
 (define (atom->fp-pict atom)
   (let-values ([(p locs) (atom->fp-pict+locs atom)]) p))

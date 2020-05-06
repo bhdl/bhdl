@@ -48,6 +48,15 @@
                             offx
                             offy)]))))))
 
+(module+ test
+  (require "library-IC.rkt")
+  (require "library.rkt")
+  (atom->symbol-pict+locs (make-IC-atom ATMEGA8U2))
+  (atom->fp-pict+locs (make-IC-atom ATMEGA8U2))
+  (atom->macro (make-IC-atom ATMEGA8U2) 'symbol)
+  (atom->macro (make-IC-atom ATtiny25) 'symbol)
+  (void))
+
 (define (annotate-atoms atoms)
   "Return hash table from (atom . 1-based-index)"
   ;; annotate cells and macros
