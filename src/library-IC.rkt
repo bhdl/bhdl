@@ -53,22 +53,22 @@
 
 (define/IC (ATtiny25 ATtiny45 ATtiny85)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf"
-  #:alts ([vcc]
-          [gnd]
-          [pb0 mosi di sda ain0 oc0a oc1a aref pcint0]
-          [pb2 sck usck scl adc1 t0 int0 pcint2]
-          [pb3 pcint3 xtal1 clki oc1b adc3]
-          [pb4 pcint4 xtal2 clko oc1b adc2]
-          [pb5 pcint5 reset adc0 dw])
-  #:top ((vcc))
-  #:bottom ((gnd))
-  #:left ((pb0 pb1 pb2 pb3 pb4 pb5))
+  #:alts ([VCC]
+          [GND]
+          [PB0 MOSI DI SDA AIN0 OC0A OC1A AREF PCINT0]
+          [PB2 SCK USCK SCL ADC1 T0 INT0 PCINT2]
+          [PB3 PCINT3 XTAL1 CLKI OC1B ADC3]
+          [PB4 PCINT4 XTAL2 CLKO OC1B ADC2]
+          [PB5 PCINT5 RESET ADC0 DW])
+  #:top ((VCC))
+  #:bottom ((GND))
+  #:left ((PB0 PB1 PB2 PB3 PB4 PB5))
   #:right ()
-  #:DIP (8 pb5 pb3 pb4 gnd pb0 pb1 pb2 vcc)
-  #:QFN (20 pb5 pb3 dnc dnc pb4
-            dnc dnc gnd dnc dnc
-            pb0 pb1 dnc pb2 vcc
-            dnc dnc dnc dnc dnc))
+  #:DIP (8 PB5 PB3 PB4 GND PB0 PB1 PB2 VCC)
+  #:QFN (20 PB5 PB3 DNC DNC PB4
+            DNC DNC GND DNC DNC
+            PB0 PB1 DNC PB2 VCC
+            DNC DNC DNC DNC DNC))
 
 (define/IC (ATmega16)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc2466.pdf"
@@ -85,105 +85,108 @@
           (PD5 OC1A) (PD6 ICP1) (PD7 OC2))
   #:top ((VCC) (AVCC) (AREF) (RESET))
   #:bottom ((GND) (XTAL2) (XTAL1))
-  #:left ([pa0 pa1 pa2 pa3 pa4 pa5 pa6 pa7]
-          [pb0 pb1 pb2 pb3 pb4 pb5 pb6 pb7])
-  #:right ([pc0 pc1 pc2 pc3 pc4 pc5 pc6 pc7]
-           [pd0 pd1 pd2 pd3 pd4 pd5 pd6 pd7])
-  #:DIP (40 PB0 PB1 PB2 PB3 PB4 PB5 pb6 pb7
-            reset vcc gnd xtal2 xtal1
-            pd0 pd1 pd2 pd3 pd4 pd5 pd6
+  #:left ([PA0 PA1 PA2 PA3 PA4 PA5 PA6 PA7]
+          [PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7])
+  #:right ([PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7]
+           [PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
+  #:DIP (40 PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
+            RESET VCC GND XTAL2 XTAL1
+            PD0 PD1 PD2 PD3 PD4 PD5 PD6
 
-            pd7 pc0 pc1 pc2 pc3 pc4 pc5 pc6 pc7
-            avcc gnd aref
-            pa7 pa6 pa5 pa4 pa3 pa2 pa1 pa0)
-  #:QFN (44 PB5 pb6 pb7 reset vcc gnd xtal2 xtal1 pd0 pd1 pd2
-            pd3 pd4 pd5 pd6 pd7 vcc gnd pc0 pc1 pc2 pc3
-            pc4 pc5 pc6 pc7 avcc gnd aref pa7 pa6 pa5 pa4
-            pa3 pa2 pa1 pa0 vcc gnd pb0 pb1 pb2 pb3 pb4))
+            PD7 PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7
+            AVCC GND AREF
+            PA7 PA6 PA5 PA4 PA3 PA2 PA1 PA0)
+  #:QFN (44 PB5 PB6 PB7 RESET VCC GND XTAL2 XTAL1 PD0 PD1 PD2
+            PD3 PD4 PD5 PD6 PD7 VCC GND PC0 PC1 PC2 PC3
+            PC4 PC5 PC6 PC7 AVCC GND AREF PA7 PA6 PA5 PA4
+            PA3 PA2 PA1 PA0 VCC GND PB0 PB1 PB2 PB3 PB4))
 
 (define/IC (ATmega128)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc2467.pdf"
-  #:alts ((vcc)
-          (reset) (avcc)
-          (gnd) (xtal2) (xtal1) (aref)
-          (pa0 ad0) (pa1 ad1) (pa2 ad2) (pa3 ad3)
-          (pa4 ad4) (pa5 ad5) (pa6 ad6) (pa7 ad7)
-          (pb0 ss) (pb1 sck) (pb2 mosi) (pb3 miso)
-          (pb4 oc0) (pb5 oc1a) (pb6 oc1b) (pb7 oc2 oc1c)
-          (pc0 a8) (pc1 a9) (pc2 a10) (pc3 a11)
-          (pc4 a12) (pc5 a13) (pc6 a14) (pc7 a15)
-          (pd0 scl int0) (pd1 sda int1) (pd2 rxd1 int2) (pd3 txd1 int3)
-          (pd4 icp1) (pd5 xck1) (pd6 t1) (pd7 t2)
-          (pen)
-          (pe0 rxd0 pdi) (pe1 txd0 pdo) (pe2 xck0 ain0) (pe3 oc3a ain1)
-          (pe4 oc3b int4) (pe5 oc3c int5) (pe6 t3 int6) (pe7 icp3 int7)
-          (pf0 adc0) (pf1 adc1) (pf2 adc2) (pf3 adc3) (pf4 adc4 tck)
-          (pf5 adc5 tms) (pf6 adc6 tdo) (pf7 adc7 tdi)
-          (pg0 wr) (pg1 rd) (pg2 ale) (pg3 tosc2) (pg4 tosc1))
-  #:top ((reset) (vcc) (avcc))
-  #:bottom ((gnd) (xtal2) (xtal1) (aref))
-  #:left ([pa0 ad1 ad2 ad3 pa4 ad5 ad6 ad7]
-          [pb0 pb1 pb2 pb3 pb4 pb5 pb6 pb7]
-          [pc0 pc1 pc2 pc3 pc4 pc5 pc6 pc7])
-  #:right ([pd0 pd1 pd2 pd3 pd4 pd5 pd6 pd7]
-           [pen pe0 pe1 pe2 pe3 pe4 pe5 pe6 pe7]
-           [pf0 pf1 pf2 pf3 pf4 pf5 pf6 pf7]
-           [pg0 pg1 pg2 pg3 pg4])
-  #:QFN (64 pen pe0 pe1 pe2 pe3 pe4 pe5 pe6 pe7 pb0 pb1 pb2 pb3 pb4 pb5 pb6
-            pb7 pg3 pg4 reset vcc gnd xtal1 xtal1 pd0 pd1 pd2 pd3 pd4 pd5 pd6 pd7
-            pg0 pg1 pc0 pc1 pc2 pc3 pc4 pc5 pc6 pc7 pg2 pa7 pa6 pa5 pa4 pa3
-            pa2 pa1 pa0 vcc gnd pf7 pf6 pf5 pf4 pf3 pf2 pf1 pf0 aref gnd avcc))
+  #:alts ((VCC)
+          (RESET) (AVCC)
+          (GND) (XTAL2) (XTAL1) (AREF)
+          (PA0 AD0) (PA1 AD1) (PA2 AD2) (PA3 AD3)
+          (PA4 AD4) (PA5 AD5) (PA6 AD6) (PA7 AD7)
+          (PB0 SS) (PB1 SCK) (PB2 MOSI) (PB3 MISO)
+          (PB4 OC0) (PB5 OC1A) (PB6 OC1B) (PB7 OC2 OC1C)
+          (PC0 A8) (PC1 A9) (PC2 A10) (PC3 A11)
+          (PC4 A12) (PC5 A13) (PC6 A14) (PC7 A15)
+          (PD0 SCL INT0) (PD1 SDA INT1) (PD2 RXD1 INT2) (PD3 TXD1 INT3)
+          (PD4 ICP1) (PD5 XCK1) (PD6 T1) (PD7 T2)
+          (PEN)
+          (PE0 RXD0 PDI) (PE1 TXD0 PDO) (PE2 XCK0 AIN0) (PE3 OC3A AIN1)
+          (PE4 OC3B INT4) (PE5 OC3C INT5) (PE6 T3 INT6) (PE7 ICP3 INT7)
+          (PF0 ADC0) (PF1 ADC1) (PF2 ADC2) (PF3 ADC3) (PF4 ADC4 TCK)
+          (PF5 ADC5 TMS) (PF6 ADC6 TDO) (PF7 ADC7 TDI)
+          (PG0 WR) (PG1 RD) (PG2 ALE) (PG3 TOSC2) (PG4 TOSC1))
+  #:top ((RESET) (VCC) (AVCC))
+  #:bottom ((GND) (XTAL2) (XTAL1) (AREF))
+  #:left ([PA0 AD1 AD2 AD3 PA4 AD5 AD6 AD7]
+          [PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
+          [PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7])
+  #:right ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7]
+           [PEN PE0 PE1 PE2 PE3 PE4 PE5 PE6 PE7]
+           [PF0 PF1 PF2 PF3 PF4 PF5 PF6 PF7]
+           [PG0 PG1 PG2 PG3 PG4])
+  #:QFN (64 PEN PE0 PE1 PE2 PE3 PE4 PE5 PE6 PE7 PB0 PB1 PB2 PB3 PB4 PB5 PB6
+            PB7 PG3 PG4 RESET VCC GND XTAL1 XTAL1 PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7
+            PG0 PG1 PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7 PG2 PA7 PA6 PA5 PA4 PA3
+            PA2 PA1 PA0 VCC GND PF7 PF6 PF5 PF4 PF3 PF2 PF1 PF0 AREF GND AVCC))
 
 (define/IC (ATmega48 ATmega88 ATmega168 ATmega328)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf"
-  #:alts ((vcc) (avcc)
-                (gnd) (aref)
+  #:alts ((VCC) (AVCC)
+                (GND) (AREF)
 
-                (pb0 pcint0 clko icp1)
-                (pb1 oc1a pcint1)
-                (pb2 ss oc1b pcint2)
-                (pb3 mosi oc2a pcint3)
-                (pb4 miso pcint4)
-                (pb5 sck pcint5)
-                (pb6 pcint6 xtal1 tosc1)
-                (pb7 pcint7 xtal2 tosc2)
+                (PB0 PCINT0 CLKO ICP1)
+                (PB1 OC1A PCINT1)
+                (PB2 SS OC1B PCINT2)
+                (PB3 MOSI OC2A PCINT3)
+                (PB4 MISO PCINT4)
+                (PB5 SCK PCINT5)
+                (PB6 PCINT6 XTAL1 TOSC1)
+                (PB7 PCINT7 XTAL2 TOSC2)
 
-                (pc0 adc0 pcint8)
-                (pc1 adc1 pcint9)
-                (pc2 adc2 pcint10)
-                (pc3 adc3 pcint11)
-                (pc4 adc4 sda pcint12)
-                (pc5 adc5 scl pcint13)
-                (pc6 pcint14 reset)
+                (PC0 ADC0 PCINT8)
+                (PC1 ADC1 PCINT9)
+                (PC2 ADC2 PCINT10)
+                (PC3 ADC3 PCINT11)
+                (PC4 ADC4 SDA PCINT12)
+                (PC5 ADC5 SCL PCINT13)
+                (PC6 PCINT14 RESET)
 
-                (pd0 pcint16 rxd)
-                (pd1 pcint17 txd)
-                (pd2 pcint18 int0)
-                (pd3 pcint19 oc2b int1)
-                (pd4 pcint20 xck t0)
-                (pd5 pcint1 oc0b t1)
-                (pd6 pcint22 oc0a ain0)
-                (pd7 pcint23 ain1))
-  #:top ((vcc) (avcc))
-  #:bottom ((gnd) (aref))
-  #:left ([pb0 pb1 pb2 pb3 pb4 pb5 pb6 pb7]
-          [pc0 pc1 pc2 pc3 pc4 pc5 pc6])
-  #:right ([pd0 pd1 pd2 pd3 pd4 pd5 pd6 pd7])
-  #:DIP (28 PC6 PD0 pd1 pd2 pd3 pd4 vcc gnd pb6 pb7 pd5 pd6 pd7 pb0
-            pb1 pb2 pb3 pb4 pb5 avcc aref gnd pc0 pc1 pc2 pc3 pc4 pc5)
-  #:QFN (28 pd3 pd4 vcc gnd pb6 pb7 pd5
-            pd6 pd7 pb0 pb1 pb2 pb3 pb4
-            pb5 avcc aref gnd pc0 pc1 pc2
-            pc3 pc4 pc5 pc6 pd0 pd1 pd2)
-  #:QFN (32 pd3 pd4 gnd vcc gnd vcc pb6 pb7
-            pd5 pd6 pd7 pb0 pb1 pb2 pb3 pb4
-            pb5 avcc adc6 aref gnd adc7 pc0 pc1
-            pc2 pc3 pc4 pc5 pc6 pd0 pd1 pd2))
+                (PD0 PCINT16 RXD)
+                (PD1 PCINT17 TXD)
+                (PD2 PCINT18 INT0)
+                (PD3 PCINT19 OC2B INT1)
+                (PD4 PCINT20 XCK T0)
+                (PD5 PCINT1 OC0B T1)
+                (PD6 PCINT22 OC0A AIN0)
+                (PD7 PCINT23 AIN1))
+  #:top ((VCC) (AVCC))
+  #:bottom ((GND) (AREF))
+  #:left ([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
+          [PC0 PC1 PC2 PC3 PC4 PC5 PC6])
+  #:right ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
+  #:DIP (28 PC6 PD0 PD1 PD2 PD3 PD4 VCC GND PB6 PB7 PD5 PD6 PD7 PB0
+            PB1 PB2 PB3 PB4 PB5 AVCC AREF GND PC0 PC1 PC2 PC3 PC4 PC5)
+  #:QFN (28 PD3 PD4 VCC GND PB6 PB7 PD5
+            PD6 PD7 PB0 PB1 PB2 PB3 PB4
+            PB5 AVCC AREF GND PC0 PC1 PC2
+            PC3 PC4 PC5 PC6 PD0 PD1 PD2)
+  #:QFN (32 PD3 PD4 GND VCC GND VCC PB6 PB7
+            PD5 PD6 PD7 PB0 PB1 PB2 PB3 PB4
+            PB5 AVCC ADC6 AREF GND ADC7 PC0 PC1
+            PC2 PC3 PC4 PC5 PC6 PD0 PD1 PD2))
 
 (define/IC (ATMEGA8U2 ATMEGA16U2 ATMEGA32U2)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc7799.pdf"
   #:alts ((VCC)
-          (GND) (AVCC) (PAD) (XTAL1)
+          (GND) (AVCC)
+          ;; FIXME PAD
+          ;; (PAD)
+          (XTAL1)
           (UCAP) (UVCC) (UGND) (D-) (D+)
           (PB0 SS PCINT0) (PB1 SCLK PCINT1) (PB2 PD1 MOSI PCINT2)
           (PB3 PD0 MISO PCINT3) (PB4 T1 PCINT4)
@@ -193,15 +196,17 @@
           (PD0 OC0B INT0) (PD1 AIN0 INT1) (PD2 RXD1 AIN1 INT2) (PD3 TXD1 INT3)
           (PD4 INT5 AIN3) (PD5 XCK AIN4 PCINT12)
           (PD6 RTS AIN5 INT6) (PD7 CTS HWB AIN6 TO INT7))
-  #:top ((VCC) (GND) (AVCC) (PAD) (XTAL1))
+  #:top ((VCC) (GND) (AVCC)
+               ;; (PAD)
+               (XTAL1))
   #:bottom ((UCAP) (UVCC) (UGND) (D-) (D+))
   #:left ([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
           [PC0 PC1 PC2 PC4 PC5 PC6 PC7])
   #:right ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
-  #:QFN (32 xtal1 xtal2 gnd vcc pc2 pd0 pd1 pd2
-            pd3 pd4 pd5 pd6 pd7 pb0 pb1 pb2
-            pb3 pb4 pb5 pb6 pb7 pc7 pc6 reset
-            pc5 pc4 ucap ugnd d+ d- uvcc avcc))
+  #:QFN (32 XTAL1 XTAL2 GND VCC PC2 PD0 PD1 PD2
+            PD3 PD4 PD5 PD6 PD7 PB0 PB1 PB2
+            PB3 PB4 PB5 PB6 PB7 PC7 PC6 RESET
+            PC5 PC4 UCAP UGND D+ D- UVCC AVCC))
 
 (define/IC (LM555-sym)
   #:datasheet ""
@@ -209,6 +214,6 @@
   #:alts ()
   #:top ((VCC))
   #:bottom ((GND))
-  #:left ((TR output reset))
+  #:left ((TR OUTPUT RESET))
   #:right ((DIS THR CV))
-  #:DIP (8 GND TR output reset CV THR DIS VCC))
+  #:DIP (8 GND TR OUTPUT RESET CV THR DIS VCC))
