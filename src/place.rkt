@@ -44,7 +44,7 @@
                         [index (in-naturals 1)])
                (match loc
                  [(Point offx offy)
-                  (MacroPin (~a "P" index)
+                  (MacroPin index
                             offx
                             offy)]))))))
 
@@ -79,7 +79,10 @@
                 (exact->inexact (Macro-w (atom->macro atom symbol-or-fp))))]
           [hs (for/list ([atom atoms])
                 (exact->inexact (Macro-h (atom->macro atom symbol-or-fp))))]
-          [Es (for/list ([net netlist])
+          [Es
+           ;; Edge is list of nets. Each net is a list of nodes, a node is
+           ;; (index offx offy)
+           (for/list ([net netlist])
                 (for/list ([pin net])
                   (let* ([atom (Pin-parent pin)]
                          ;; FIXME pin index might be symbol

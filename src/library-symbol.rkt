@@ -62,7 +62,7 @@
                                 #:top [top '()]
                                 #:bottom [bottom '()])
   "Return (pict, ((name x y) ...)"
-  (let* ([pin-lbrt (list left bottom right top)]
+  (let* ([pins-lbrt (list left bottom right top)]
          [any->string
           (λ (x)
             (cond
@@ -72,10 +72,10 @@
               [else (error (~a "any->string: " x))]))])
     ;; 1. create points
     (let* ([points-lbrt (compose-pipe
-                         pin-lbrt
+                         pins-lbrt
                          #:...> (λ (x) (blank)))]
            [texts-lbrt (compose-pipe
-                        pin-lbrt
+                        pins-lbrt
                         #:...> any->string
                         #:...> (λ (s) (text s 'default 15))
                         #:...> (λ (x) (colorize x "darkgreen")))]
@@ -122,10 +122,11 @@
              (flatten
               (compose-pipe
                points-lbrt
+               pins-lbrt
                (list lc-find lc-find rc-find rc-find)
-               #:...> (λ (p find)
+               #:...> (λ (p name find)
                         (let-values ([(x y) (find res p)])
-                          (Point x y))))))))))))
+                          (NamedPoint name x y))))))))))))
 
 (define (rect-symbol->pict #:left [left '()]
                            #:right [right '()]

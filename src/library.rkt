@@ -116,10 +116,17 @@
                         alts)])
       (let ([comp (ICAtom (make-hash) ic)])
         ;; each alt group
-        (for ([alt alts])
-          (let ([p (Pin comp (first alt))])
+        (for ([alt alts]
+              ;; CAUTION the pin index is always number. The random order here
+              ;; is significant. I cannot use footprint order, because that is
+              ;; different across different footprints. TODO I can probably use
+              ;; schematic order.
+              [index (in-naturals 1)])
+          (let ([p (Pin comp index)])
             ;; each pin name in the alt group
             (for ([a alt])
-              (hash-set! (Atom-pinhash comp) a p))))
+              (hash-set! (Atom-pinhash comp) a p))
+            ;; set the index to point to the same pin as well
+            (hash-set! (Atom-pinhash comp) index p)))
         ;; return the created Atom instance
         comp))))

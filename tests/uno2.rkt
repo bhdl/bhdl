@@ -22,11 +22,33 @@
                        ;; FIXME GND
                        ;; FIXME crystal
                        (c1.1 c2.1))))
+  ;; (Composite->place-spec comp 'fp)
+  ;; (Composite->place-spec comp 'symbol)
   (Composite-connections comp)
   (collect-all-atoms comp)
   (collect-all-pins comp))
 
+(module+ test
+  (Atom-pinhash (make-IC-atom ATMEGA8U2))
+  (Atom-pinhash (R 12)))
+
 (myvoid
  (Composite->place-spec comp 'symbol)
- (Composite->netlist comp))
+ (Composite->netlist comp)
+
+ ;; symbol
+ (define place-result-symbol (send-for-placement (Composite->place-spec comp 'symbol)))
+ (Composite->pict comp
+                  '(1000 1000)
+                  (hash-ref place-result-symbol 'xs)
+                  (hash-ref place-result-symbol 'ys)
+                  'symbol)
+ ;; footprint
+ (define place-result-fp (send-for-placement (Composite->place-spec comp 'fp)))
+ (Composite->pict comp
+                  '(1000 1000)
+                  (hash-ref place-result-fp 'xs)
+                  (hash-ref place-result-fp 'ys)
+                  'fp)
+ )
 

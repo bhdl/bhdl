@@ -9,6 +9,8 @@
          "gerber-viewer.rkt"
          "pict-utils.rkt"
          "common.rkt"
+         ;; FIXME dependency
+         "sch.rkt"
          pict)
 
 (provide IC->symbol-pict+locs
@@ -108,7 +110,12 @@
                                                  (Point-y loc)
                                                  (text (symbol->string pin)))))))
                          p)])
-          (values texted-p locs))))))
+          (values texted-p
+                  ;; attach names to the points
+                  (map point->named-point locs pins)))))))
+
+(module+ test
+  (footprint->pict+locs (fp-QFN 32)))
 
 (define (IC->fp-pict ic
                      ;; FIXME duplication
@@ -158,7 +165,8 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Atom -> symbol and footprint
+;; Atom -> symbol and footprint. The locs order is the internal atom's order, as
+;; defined in atom pin's Pin-index
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (binary-locs pict)
@@ -170,13 +178,38 @@
         (list (Point x1 y1)
               (Point x2 y2))))))
 
+(define (atom-sort-locs atom named-locs)
+  "sort locs based on atom's internal pin order (the Pin-index of each pin)"
+  (let* (;; 1. get all the keys
+         [keys (hash-keys (Atom-pinhash atom))]
+         ;; 3. build hash table for named-locs
+         [Hlocs (for/hash ([loc named-locs])
+                  (match loc
+                    [(NamedPoint name x y)
+                     (values name loc)]))]
+         ;; filter only the keys that are in Hlocs
+         [keys (filter (λ (k) (hash-has-key? Hlocs k)) keys)]
+         ;; sort keys based on the pin index
+         [keys (sort keys <
+                     #:key (λ (k) (Pin-index
+                                   (hash-ref (Atom-pinhash atom)
+                                             k))))])
+    (or (= (length keys) (hash-count Hlocs))
+        (error "Hlocs and keys should be equal. Maybe due to some
+case-sensitivity issue in library-IC.rkt"))
+    (for/list ([key keys])
+      (match (hash-ref Hlocs key)
+        ;; and change it back to Point
+        [(NamedPoint _ x y) (Point x y)]))))
+
 (define (atom->symbol-pict+locs atom)
   (match atom
     [(Resistor _) (values R-symbol-pict
                           (binary-locs R-symbol-pict))]
     [(Capacitor _) (values C-symbol-pict
                            (binary-locs C-symbol-pict))]
-    [(ICAtom ic) (IC->symbol-pict+locs ic)]))
+    [(ICAtom ic) (let-values ([(p locs) (IC->symbol-pict+locs ic)])
+                   (values p (atom-sort-locs atom locs)))]))
 
 (define (atom->symbol-pict atom)
   (let-values ([(p locs) (atom->symbol-pict+locs atom)]) p))
@@ -186,7 +219,15 @@
     ;; FIXME fixed footprint packaging
     [(Resistor _) (footprint->pict+locs (fp-resistor "0603"))]
     [(Capacitor _) (footprint->pict+locs (fp-capacitor "0603"))]
-    [(ICAtom ic) (IC->fp-pict+locs ic)]))
+    ;; FIXME only IC needs to sort locs based. Other simple ones should have the
+    ;; correct and consistent order
+    [(ICAtom ic) (let-values ([(p locs) (IC->fp-pict+locs ic)])
+                   (values p (atom-sort-locs atom locs)))]))
 
 (define (atom->fp-pict atom)
   (let-values ([(p locs) (atom->fp-pict+locs atom)]) p))
+
+(module+ test
+  (atom->symbol-pict+locs (make-IC-atom ATMEGA8U2))
+  (atom->fp-pict+locs (make-IC-atom ATMEGA8U2))
+  )

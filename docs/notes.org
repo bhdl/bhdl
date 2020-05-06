@@ -23,6 +23,7 @@
 *** assign fixed locations
 *** In place.rkt, the macro and macro pins should be unified with library as well
 specifically, the pin index of ICAtom might not be numbers, but symbols
+*** fixed diearea?
 
 ** Gerbers
 *** gerber generation
