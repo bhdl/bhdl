@@ -284,12 +284,22 @@
                 [(32) '(5 3.1)]
                 [(44) '(7 5.15)]
                 [(72) '(10 6)])])
-    (kicad-helper "Package_DFN_QFN.pretty/"
-                  (~a "QFN-" ct "-1EP_"
-                      (first data) "x" (first data)
-                      "mm_P0.5mm_EP"
-                      (second data) "x" (second data)
-                      "mm.kicad_mod"))))
+    (let ([fp (kicad-helper "Package_DFN_QFN.pretty/"
+                            (~a "QFN-" ct "-1EP_"
+                                (first data) "x" (first data)
+                                "mm_P0.5mm_EP"
+                                (second data) "x" (second data)
+                                "mm.kicad_mod"))])
+      ;; adjust fp to remove the last pads
+      (or (= (length (footprint-pads fp)) (add1 ct))
+          (error "The QFN's kicad footprint is not CT+1"))
+      (struct-copy footprint fp
+                   [pads (drop-right (footprint-pads fp) 1)]))))
+
+(module+ test
+  (footprint-pads (fp-QFN 16))
+  (for/list ([ct '(12 16 20 24 28 32 44 72)])
+    (length (footprint-pads (fp-QFN ct)))))
 
 (define (fp-PQFP ct)
   ;; PQFP-44_10x10mm_P0.8mm.kicad_mod
