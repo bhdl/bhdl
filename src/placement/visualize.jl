@@ -109,6 +109,7 @@ function visualize(x, y, w, h, R)
 
     @luxoremacs begin
         setdash("dash")
+        # the point is the center of box
         box(Point(0,0), R.xmax * scale, R.ymax * scale, :stroke)
         setdash("solid")
         @showprogress 0.1 "drawing .." for i in 1:length(x)

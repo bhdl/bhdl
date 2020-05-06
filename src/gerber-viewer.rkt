@@ -5,10 +5,11 @@
          syntax/parse/define
          rackunit
          pict
-         racket/draw)
+         racket/draw
+         "common.rkt")
 
 (provide gerber-file->pict
-         gerber-file->offset)
+         gerber-file->pict+offset)
 
 ;; draw a given gerber file onto dc%
 
@@ -171,21 +172,20 @@
   (define-values (xmax xmin ymax ymin) (get-bounding-box))
 
   ;; (println (list xmax xmin ymax ymin))
-  (values (inset res
-                 (- 0 xmin) (- 0 ymin) xmax ymax)
-          (list xmax xmin ymax ymin)))
+  (values
+   (inset res
+          (- 0 xmin) (- 0 ymin) xmax ymax)
+   (list xmin ymin xmax ymax)))
+
+(define (gerber-file->pict+offset gbr-file)
+  "Return a pict for the gerber file."
+  (let-values ([(p box) (execute-gbr-instructions (gbr->instructions gbr-file))])
+    (match box
+      [(list xmin ymin _ _) (values p (Point xmin ymin))])))
 
 (define (gerber-file->pict gbr-file)
-  "Return a pict for the gerber file."
-  (let-values ([(p _) (execute-gbr-instructions (gbr->instructions gbr-file))])
+  (let-values ([(p _) (gerber-file->pict+offset gbr-file)])
     p))
-
-(define (gerber-file->offset gbr-file)
-  (let-values ([(_ box)
-                (execute-gbr-instructions (gbr->instructions gbr-file))])
-    (let ([xmin (second box)]
-          [ymin (last box)])
-      (values xmin ymin))))
 
 ;; (pict-path? p)
 

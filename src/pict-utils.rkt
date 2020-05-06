@@ -4,7 +4,8 @@
          racket/draw)
 
 (provide triangular
-         mytext)
+         mytext
+         pin-over-cc)
 
 (define (draw-shape/border w h draw-fun
                            color [border-color #f] [border-width #f]
@@ -54,3 +55,11 @@
                ;; the maximum size is 1024
                1024)
          (/ size 1024)))
+
+
+(define (pin-over-cc base dx dy pict)
+  ;; like pin-over, but put pict centered at (dx,dy)
+  (pin-over base
+            (- dx (/ (pict-width pict) 2))
+            (- dy (/ (pict-height pict) 2))
+            pict))

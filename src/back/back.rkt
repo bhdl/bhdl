@@ -907,3 +907,11 @@ the kicad footprint format and generate gerber."
   (let-values ([(p locs) (symbol->pict+locs sym)])
     p))
 
+
+(define (gerber-file->offset gbr-file)
+  (let-values ([(_ box)
+                (execute-gbr-instructions (gbr->instructions gbr-file))])
+    (let ([xmin (second box)]
+          [ymin (last box)])
+      (values xmin ymin))))
+

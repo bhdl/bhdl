@@ -56,7 +56,9 @@ end
 
 function test()
     # read json directly for debugging
-    str = open("/tmp/rackematic/out/a.json") do io
+    #
+    # FIXME relative path might not work
+    str = open("../../tests/warmup.json") do io
         read(io, String)
     end
     jobj = JSON.parse(str)

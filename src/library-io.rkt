@@ -60,6 +60,19 @@
 ;; IC -> footprint
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(module+ test-coordinates
+  ;; test whether the coordinates system, i.e. centered.
+  ;;
+  ;; 1. the locations of pads should be the center of the pads
+  ;;    - however, the pict library is by corner
+  ;;
+  ;; 2. In julia placement engine, the Luxor.jl library uses center to draw
+  ;; boxes
+  ;;
+  ;; create an IC
+  (IC->fp-pict ATmega16)
+  (void))
+
 
 (define (IC->fp-pict+locs ic
                           #:package (package 'DIP)
@@ -79,19 +92,18 @@
                 [(QFN) (fp-QFN (FpSpec-num spec))]
                 [else (error (~a "Unsupported package: " package))])])
       ;; CAUTION p is scaled here
-      (let ([p (footprint->pict fp)]
-            [locs (footprint->pad-locs fp)]
-            [pins (FpSpec-pins spec)])
+      (let-values ([(p locs) (footprint->pict+locs fp)]
+                   [(pins) (FpSpec-pins spec)])
         ;; add pin name
         (let ([texted-p ((apply
                           compose
                           (reverse
                            (for/list ([loc locs]
                                       [pin pins])
-                             (λ (p) (pin-over p
-                                              (Point-x loc)
-                                              (Point-y loc)
-                                              (text (symbol->string pin)))))))
+                             (λ (p) (pin-over-cc p
+                                                 (Point-x loc)
+                                                 (Point-y loc)
+                                                 (text (symbol->string pin)))))))
                          p)])
           (values texted-p locs))))))
 
@@ -100,35 +112,37 @@
     p))
 
 ;; FIXME it should be in fp.rkt?
-(define (footprint->pict fp)
+(define (footprint->pict+locs fp)
+  "This functions takes care of two additional things:
+
+1. the offset created by turning gerber into pict
+2. the scale for making pict suitable for display
+"
   (let ([fname (make-temporary-file)])
     (println (~a "DEBUG: " fname))
     (call-with-output-file fname
-       #:exists 'replace
-       (λ (out)
-         (write-string (footprint->gerber fp)
-                       out)))
-    ;; CAUTION scale
-    (scale (gerber-file->pict fname) (fp-scale))))
+      #:exists 'replace
+      (λ (out)
+        (write-string (footprint->gerber fp)
+                      out)))
+    (let-values ([(p offset) (gerber-file->pict+offset fname)])
+      (values
+       ;; 1. scale the picture
+       (scale p (fp-scale))
+       ;; 2. offset and scale the loc
+       (for/list ([pad (sort (footprint-pads fp)
+                             <
+                             #:key pad-spec-num)])
+         (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))
+                (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale))))))))
 
-(define (footprint->pict+locs fp)
-  (let ([p (footprint->pict fp)]
-        [locs (footprint->pad-locs fp)])
-    (values p locs)))
-
-
-(define (footprint->pad-locs fp)
-  (for/list ([pad (sort (footprint-pads fp)
-                        <
-                        #:key pad-spec-num)])
-    (Point (* (pad-spec-x pad) (fp-scale))
-           (* (pad-spec-y pad) (fp-scale)))))
+(define (footprint->pict fp)
+  (let-values ([(p _) (footprint->pict+locs fp)]) p))
 
 
 (module+ test
   (IC->symbol-pict+locs ATtiny25)
   (IC->symbol-pict ATmega16)
-  (footprint->pad-locs (fp-DIP 20))
   (IC->fp-pict+locs ATtiny25))
 
 

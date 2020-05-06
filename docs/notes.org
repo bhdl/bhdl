@@ -20,6 +20,9 @@ CLOSED: [2020-05-05 Tue 21:07]
 *** DONE for symbols
 CLOSED: [2020-05-05 Tue 21:07]
 
+** Random
+*** footprint coordinates system mismatch
+
 ** STARTED write some boards
 
 - arduino uno

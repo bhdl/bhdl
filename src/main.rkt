@@ -7,8 +7,8 @@
          syntax/parse/define
          rackunit
          "library-symbol.rkt"
-         "schematic.rkt"
-         "footprint.rkt"
+         "sch.rkt"
+         "fp.rkt"
          pict
          racket/draw)
 
