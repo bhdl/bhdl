@@ -8,7 +8,7 @@
          ATmega128
          ATmega16
          ATmega48 ATmega88 ATmega168 ATmega328
-         ATMEGA8U2 ATMEGA16U2 ATMEGA32U2)
+         ATmega8U2 ATmega16U2 ATmega32U2)
 
 (begin-for-syntax
   (define-syntax-class symbol-spec
@@ -180,7 +180,7 @@
             PB5 AVCC ADC6 AREF GND ADC7 PC0 PC1
             PC2 PC3 PC4 PC5 PC6 PD0 PD1 PD2))
 
-(define/IC (ATMEGA8U2 ATMEGA16U2 ATMEGA32U2)
+(define/IC (ATmega8U2 ATmega16U2 ATmega32U2)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc7799.pdf"
   #:alts ((VCC)
           (GND) (AVCC)

@@ -228,6 +228,5 @@ case-sensitivity issue in library-IC.rkt"))
   (let-values ([(p locs) (atom->fp-pict+locs atom)]) p))
 
 (module+ test
-  (atom->symbol-pict+locs (make-IC-atom ATMEGA8U2))
-  (atom->fp-pict+locs (make-IC-atom ATMEGA8U2))
-  )
+  (atom->symbol-pict+locs (make-IC-atom ATmega8U2))
+  (atom->fp-pict+locs (make-IC-atom ATmega8U2)))

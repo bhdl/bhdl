@@ -8,7 +8,7 @@
          json)
 
 (module+ test
-  (define comp (let ([ic (make-IC-atom ATMEGA8U2)]
+  (define comp (let ([ic (make-IC-atom ATmega8U2)]
                      [r1 (R 27)]
                      [c1 (C 22)]
                      [c2 (C 22)]
@@ -29,7 +29,7 @@
   (collect-all-pins comp))
 
 (module+ test
-  (Atom-pinhash (make-IC-atom ATMEGA8U2))
+  (Atom-pinhash (make-IC-atom ATmega8U2))
   (Atom-pinhash (R 12)))
 
 (myvoid
