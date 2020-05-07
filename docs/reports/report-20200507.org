@@ -12,7 +12,7 @@ This is the first end-to-end fully working prototype in the sense that:
 
 * Demo
 
-- [[file:~/git/rackematic/tests/uno.rkt][source of Arduino Uno]]
+- [[file:../../tests/uno.rkt][source of Arduino Uno]]
 - The visualized [[file:symbol.pdf][schematic]] and [[file:fp.pdf][PCB]]. The placement engine still has a lot to
   improve.
 
