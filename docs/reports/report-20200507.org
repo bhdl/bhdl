@@ -1,0 +1,82 @@
+#+TITLE: The first fully-working end-to-end BHDL prototype
+
+
+This is the first end-to-end fully working prototype in the sense that:
+1. A full arduino Uno can be specified in BHDL
+2. internal representation of the circuit
+3. generate netlist for placement, in either schematic (symbols) or PCB
+   (footprint) format
+4. auto placement engine, which acts as a server, accepting netlist and sending
+   back placement results for all components
+5. visualize placement of the schematic or PCB
+
+* Demo
+
+- [[file:~/git/rackematic/tests/uno.rkt][source of Arduino Uno]]
+- The visualized [[file:symbol.rkt][schematic]] and [[file:fp.rkt][PCB]]. The placement engine still has a lot to
+  improve.
+
+* COMMENT Quick introduction to the host language
+The host langauge is racket, more fundamentally, lambda calculus. It simply
+means variable binding and function application.
+
+The =let= syntax is used for binding variables, e.g.
+
+#+BEGIN_SRC racket
+(let ([a 1]
+      [b 2])
+  (+ a b))
+#+END_SRC
+
+Here, we create two variables, =a= and =b=, with values =1= and =2=. Those
+variables are available in the "body" of =let= expressino. The value of the
+=let= expression is the value of its body, which evaluates to =3= in this case,
+
+* Description of the BHDL syntax
+
+The internal representation of circuit is
+1. Atom: a simple atomic component, like resistors, capacitors, or an Integrated
+   Circuit (IC).
+2. Composite: a circuit composed of Atoms and connections between them
+
+It is pretty simple to use BHDL:
+1. You create components (Atoms or Composites), and bind them to some variables
+2. You specify the connections of them, using =hook= or =hook!= syntax.
+   - =hook= is purely function, and it returns a new circuit (Composite)
+   - =hook!= is destructive, it modifies an existing circuit
+
+* Next step
+
+*** Short term implementations
+
+**** TODO write more boards
+
+- [X] arduino uno
+- [ ] lichee nano
+- [ ] gh60: https://github.com/komar007/gh60
+- [ ] pyboard
+- [ ] linux business card
+
+**** TODO better placement engine
+
+**** TODO export to kicad schematic and PCB format
+So that it can be viewed and edited in Kicad
+
+**** TODO better schematic and footprint library
+**** TODO assign footprints
+**** TODO assign fixed locations
+
+*** Long term research papers
+**** connect GUI editing with programming
+
+**** library for descriptive circuits
+Like power regulator circuit, ICSP circuit, USB circuit. The general goal is
+that, user only needs to specify the circuit he wants, the library figures out
+the detailed pin-level connections.
+
+**** auto P&R specific issues for PCB
+- power track
+- signal detangling
+
+**** compiler checking
+Check for pin conflicts, filter capacitors, power track

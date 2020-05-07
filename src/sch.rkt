@@ -63,6 +63,7 @@
          res)]))
 
 (define (combine-Composites . rst)
+  "This function effectively merge separated Composite into one."
   ;; 1. add all connections
   ;; 2. TODO external pins?
   (let ([res (create-simple-Composite)])
