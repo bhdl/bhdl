@@ -13,13 +13,16 @@
          racket/draw)
 
 (provide hook
+         hook!
          collect-all-composites
          collect-all-atoms
          collect-all-pins
          Composite->netlist
          (struct-out Pin)
          (struct-out Atom)
-         (struct-out Composite))
+         (struct-out Composite)
+
+         pin-ref)
 
 ;; Antonyms
 ;; Synonyms
@@ -45,6 +48,27 @@
 (struct Composite
   (pinhash connections)
   #:mutable)
+
+;; two-node net
+(struct Conn
+  (p1 p2)
+  #:methods gen:equal+hash
+  ;; (p1,p2) == (p2,p1)
+  [(define (equal-proc a b equal?-recur)
+     (or (and (equal?-recur (Conn-p1 a) (Conn-p1 b))
+              (equal?-recur (Conn-p2 a) (Conn-p2 b)))
+         (and (equal?-recur (Conn-p1 a) (Conn-p2 b))
+              (equal?-recur (Conn-p2 a) (Conn-p1 b)))))
+   ;; FIXME is this useful?
+   (define (hash-proc a hash-recur)
+     (+ (hash-recur (Conn-p1 a))
+        (hash-recur (Conn-p2 a))))
+   ;; FIXME the same as hash1
+   (define (hash2-proc a hash2-recur)
+     (+ (hash2-recur (Conn-p1 a))
+        (hash2-recur (Conn-p2 a))))])
+
+
 
 ;; well, this is a generic method for either Atom or Composite TODO stable
 ;; interface
@@ -75,13 +99,15 @@
          #'rep
          #'x)]))
 
-(define-syntax (hook stx)
+(begin-for-syntax
   (define-syntax-class dot
     #:description "dot"
     (pattern x
              #:with (lhs rhs)
              (datum->syntax
-              stx (parse-dot #'x))))
+              #'x (parse-dot #'x)))))
+
+(define-syntax (hook stx)
   (syntax-parse stx
     ;; #:datum-literals (comp)
     [(_ #:pins (pin ...) (net:dot ...) ...)
@@ -98,6 +124,36 @@
                        'net.rhs)
                       ...) ...))
          comp)]))
+
+(define-syntax (hook! stx)
+  (syntax-parse stx
+    [(_ comp (net:dot ...) ...)
+     #`(set! comp
+             (struct-copy
+              Composite comp
+              [connections
+               (remove-duplicates
+                (append (Composite-connections comp)
+                        (list
+                         (list (pin-ref net.lhs 'net.rhs)
+                               ...) ...)))]))]))
+
+(myvoid
+ (require "library.rkt")
+ (require "library-IC.rkt")
+ (define ic (make-IC-atom ATmega8U2))
+ (define comp (Composite (make-hash) '()))
+ ;; connect crystal
+ (let ([r1 (R 27)]
+       [c1 (C 22)]
+       [c2 (C 22)]
+       [r3 (R 1000)])
+   (hook! comp
+          (ic.XTAL1 r3.2)
+          (ic.XTAL2 r1.1 c1.2)
+          (r1.2 r3.1 c2.2)
+          (c1.1 c2.1)))
+ (collect-all-atoms comp))
 
 (define (get-neighbors lsts item)
   "Get the (direct) neighbors of item inside the lsts."

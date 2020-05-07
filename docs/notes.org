@@ -21,9 +21,13 @@
 ** Tmp
 *** assign footprints
 *** assign fixed locations
-*** In place.rkt, the macro and macro pins should be unified with library as well
-specifically, the pin index of ICAtom might not be numbers, but symbols
 *** fixed diearea?
+*** new hook syntax
+Or maybe I don't need syntax for now.
+
+*** DONE In place.rkt, the macro and macro pins should be unified with library as well
+CLOSED: [2020-05-06 Wed 16:55]
+specifically, the pin index of ICAtom might not be numbers, but symbols
 
 ** Gerbers
 *** gerber generation

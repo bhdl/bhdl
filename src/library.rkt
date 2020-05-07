@@ -6,6 +6,8 @@
 (provide (struct-out IC)
          (struct-out OrientSpec)
          (struct-out FpSpec)
+         (struct-out Connector)
+         
          ;; this is a little ugly
          (contract-out
           [IC-get-orient-pins (-> IC?
@@ -14,12 +16,17 @@
 
          ;; create components to use in sch.rkt
          make-IC-atom
-         R C
+         R C connector
+         LED fuse
+
+         global
 
          ;; FIXME not sure if these needs to be provided
          (struct-out Resistor)
          (struct-out Capacitor)
-         (struct-out ICAtom))
+         (struct-out ICAtom)
+         (struct-out Diode)
+         (struct-out Fuse))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IC definition, for symbol and footprint
@@ -79,6 +86,19 @@
   [(define (write-proc r port mode)
      (write-string (~a "#<C(" (Capacitor-value r) ")>") port))])
 
+(struct Diode
+  (color)
+  #:super struct:Atom
+  #:methods gen:custom-write
+  [(define (write-proc r port mode)
+     (write-string (~a "#<D>") port))])
+
+(struct Fuse
+  (value)
+  #:super struct:Atom
+  #:methods gen:custom-write
+  [(define (write-proc r port mode)
+     (write-string (~a "#<F>") port))])
 
 (define (make-simple-atom proc degree . rst)
   (let ([comp (apply proc (make-hash) rst)])
@@ -93,6 +113,32 @@
 
 (define (C value)
   (make-simple-atom Capacitor 2 value))
+
+(define (fuse value)
+  (make-simple-atom Fuse 2 value))
+
+(define (LED color)
+  (make-simple-atom Diode 2 color))
+
+;; symbol and footprint?
+(define global
+  (let ([comp (Atom (make-hash '()))])
+    (hash-set! (Atom-pinhash comp) 'VCC (Pin comp 1))
+    (hash-set! (Atom-pinhash comp) 'GND (Pin comp 2))
+    comp))
+
+(struct Connector
+  (num)
+  #:super struct:Atom
+  #:methods gen:custom-write
+  [(define (write-proc x port mode)
+     (write-string (~a "#<Conn(" (Connector-num x) ")>") port))])
+
+(define (connector num)
+  (let ([comp (Connector (make-hash) num)])
+    (for ([i (in-range num)])
+      (hash-set! (Atom-pinhash comp) (add1 i) (Pin comp (add1 i))))
+    comp))
 
 (struct ICAtom
   (ic)

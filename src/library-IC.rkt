@@ -15,16 +15,16 @@
     (pattern ((group:id ...) ...)))
 
   (define-splicing-syntax-class orient-spec
-    (pattern (~seq #:top spec:symbol-spec)
+    (pattern (~seq #:TOP spec:symbol-spec)
              #:with which #'top
              #:with ((group ...) ...) #'((spec.group ...) ...))
-    (pattern (~seq #:bottom spec:symbol-spec)
+    (pattern (~seq #:BOTTOM spec:symbol-spec)
              #:with which #'bottom
              #:with ((group ...) ...) #'((spec.group ...) ...))
-    (pattern (~seq #:left spec:symbol-spec)
+    (pattern (~seq #:LEFT spec:symbol-spec)
              #:with which #'left
              #:with ((group ...) ...) #'((spec.group ...) ...))
-    (pattern (~seq #:right spec:symbol-spec)
+    (pattern (~seq #:RIGHT spec:symbol-spec)
              #:with which #'right
              #:with ((group ...) ...) #'((spec.group ...) ...)))
   
@@ -39,7 +39,7 @@
     [(_ (name ...)
         ;; CAUTION currently only fixed order is implemented
         #:datasheet url
-        #:alts ((alt ...) ...)
+        #:ALTS ((alt ...) ...)
         orient:orient-spec ...
         footprint:footprint-spec ...)
      #`(define-alias (name ...)
@@ -53,17 +53,17 @@
 
 (define/IC (ATtiny25 ATtiny45 ATtiny85)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf"
-  #:alts ([VCC]
+  #:ALTS ([VCC]
           [GND]
           [PB0 MOSI DI SDA AIN0 OC0A OC1A AREF PCINT0]
           [PB2 SCK USCK SCL ADC1 T0 INT0 PCINT2]
           [PB3 PCINT3 XTAL1 CLKI OC1B ADC3]
           [PB4 PCINT4 XTAL2 CLKO OC1B ADC2]
           [PB5 PCINT5 RESET ADC0 DW])
-  #:top ((VCC))
-  #:bottom ((GND))
-  #:left ((PB0 PB1 PB2 PB3 PB4 PB5))
-  #:right ()
+  #:TOP ((VCC))
+  #:BOTTOM ((GND))
+  #:LEFT ((PB0 PB1 PB2 PB3 PB4 PB5))
+  #:RIGHT ()
   #:DIP (8 PB5 PB3 PB4 GND PB0 PB1 PB2 VCC)
   #:QFN (20 PB5 PB3 DNC DNC PB4
             DNC DNC GND DNC DNC
@@ -72,7 +72,7 @@
 
 (define/IC (ATmega16)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc2466.pdf"
-  #:alts ((VCC)
+  #:ALTS ((VCC)
           (AVCC) (AREF) (RESET)
           (GND) (XTAL2) (XTAL1)
           (PA0 ADC0) (PA1 ADC1) (PA2 ADC2) (PA3 ADC3) (PA4 ADC4)
@@ -83,11 +83,11 @@
           (PC4 TDO) (PC5 TDI) (PC6 TOSC1) (PC7 TOSC2)
           (PD0 RXD) (PD1 TXD) (PD2 INT0) (PD3 INT1) (PD4 OC1B)
           (PD5 OC1A) (PD6 ICP1) (PD7 OC2))
-  #:top ((VCC) (AVCC) (AREF) (RESET))
-  #:bottom ((GND) (XTAL2) (XTAL1))
-  #:left ([PA0 PA1 PA2 PA3 PA4 PA5 PA6 PA7]
+  #:TOP ((VCC) (AVCC) (AREF) (RESET))
+  #:BOTTOM ((GND) (XTAL2) (XTAL1))
+  #:LEFT ([PA0 PA1 PA2 PA3 PA4 PA5 PA6 PA7]
           [PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7])
-  #:right ([PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7]
+  #:RIGHT ([PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7]
            [PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
   #:DIP (40 PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
             RESET VCC GND XTAL2 XTAL1
@@ -103,7 +103,7 @@
 
 (define/IC (ATmega128)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc2467.pdf"
-  #:alts ((VCC)
+  #:ALTS ((VCC)
           (RESET) (AVCC)
           (GND) (XTAL2) (XTAL1) (AREF)
           (PA0 AD0) (PA1 AD1) (PA2 AD2) (PA3 AD3)
@@ -120,12 +120,12 @@
           (PF0 ADC0) (PF1 ADC1) (PF2 ADC2) (PF3 ADC3) (PF4 ADC4 TCK)
           (PF5 ADC5 TMS) (PF6 ADC6 TDO) (PF7 ADC7 TDI)
           (PG0 WR) (PG1 RD) (PG2 ALE) (PG3 TOSC2) (PG4 TOSC1))
-  #:top ((RESET) (VCC) (AVCC))
-  #:bottom ((GND) (XTAL2) (XTAL1) (AREF))
-  #:left ([PA0 AD1 AD2 AD3 PA4 AD5 AD6 AD7]
+  #:TOP ((RESET) (VCC) (AVCC))
+  #:BOTTOM ((GND) (XTAL2) (XTAL1) (AREF))
+  #:LEFT ([PA0 AD1 AD2 AD3 PA4 AD5 AD6 AD7]
           [PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
           [PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7])
-  #:right ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7]
+  #:RIGHT ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7]
            [PEN PE0 PE1 PE2 PE3 PE4 PE5 PE6 PE7]
            [PF0 PF1 PF2 PF3 PF4 PF5 PF6 PF7]
            [PG0 PG1 PG2 PG3 PG4])
@@ -136,7 +136,7 @@
 
 (define/IC (ATmega48 ATmega88 ATmega168 ATmega328)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf"
-  #:alts ((VCC) (AVCC)
+  #:ALTS ((VCC) (AVCC)
                 (GND) (AREF)
 
                 (PB0 PCINT0 CLKO ICP1)
@@ -164,11 +164,11 @@
                 (PD5 PCINT1 OC0B T1)
                 (PD6 PCINT22 OC0A AIN0)
                 (PD7 PCINT23 AIN1))
-  #:top ((VCC) (AVCC))
-  #:bottom ((GND) (AREF))
-  #:left ([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
+  #:TOP ((VCC) (AVCC))
+  #:BOTTOM ((GND) (AREF))
+  #:LEFT ([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
           [PC0 PC1 PC2 PC3 PC4 PC5 PC6])
-  #:right ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
+  #:RIGHT ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
   #:DIP (28 PC6 PD0 PD1 PD2 PD3 PD4 VCC GND PB6 PB7 PD5 PD6 PD7 PB0
             PB1 PB2 PB3 PB4 PB5 AVCC AREF GND PC0 PC1 PC2 PC3 PC4 PC5)
   #:QFN (28 PD3 PD4 VCC GND PB6 PB7 PD5
@@ -182,7 +182,7 @@
 
 (define/IC (ATmega8U2 ATmega16U2 ATmega32U2)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc7799.pdf"
-  #:alts ((VCC)
+  #:ALTS ((VCC)
           (GND) (AVCC)
           ;; FIXME PAD
           ;; (PAD)
@@ -196,24 +196,63 @@
           (PD0 OC0B INT0) (PD1 AIN0 INT1) (PD2 RXD1 AIN1 INT2) (PD3 TXD1 INT3)
           (PD4 INT5 AIN3) (PD5 XCK AIN4 PCINT12)
           (PD6 RTS AIN5 INT6) (PD7 CTS HWB AIN6 TO INT7))
-  #:top ((VCC) (GND) (AVCC)
+  #:TOP ((VCC) (GND) (AVCC)
                ;; (PAD)
                (XTAL1))
-  #:bottom ((UCAP) (UVCC) (UGND) (D-) (D+))
-  #:left ([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
+  #:BOTTOM ((UCAP) (UVCC) (UGND) (D-) (D+))
+  #:LEFT ([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
           [PC0 PC1 PC2 PC4 PC5 PC6 PC7])
-  #:right ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
+  #:RIGHT ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
   #:QFN (32 XTAL1 XTAL2 GND VCC PC2 PD0 PD1 PD2
             PD3 PD4 PD5 PD6 PD7 PB0 PB1 PB2
             PB3 PB4 PB5 PB6 PB7 PC7 PC6 RESET
             PC5 PC4 UCAP UGND D+ D- UVCC AVCC))
 
+(define/IC (ATmega8)
+  #:datasheet "https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2486-8-bit-AVR-microcontroller-ATmega8_L_datasheet.pdf"
+  #:ALTS ([PD0 RXD]
+          [PD1 TXD]
+          [PD2 INT0]
+          [PD3 INT1]
+          [PD4 XCK T0]
+          [PD5 T1]
+          [PD6 AIN0]
+          [PD7 AIN1]
+
+          [PB0 ICP1]
+          [PB1 OC1A]
+          [PB2 SS OC1B]
+          [PB3 MOSI OC2]
+          [PB4 MISO]
+          [PB5 SCK]
+          [PB6 XTAL1 TOSC1]
+          [PB7 XTAL2 TOSC2]
+
+          [PC0 ADC0]
+          [PC1 ADC1]
+          [PC2 ADC2]
+          [PC3 ADC3]
+          [PC4 ADC4 SDA]
+          [PC5 ADC5 SCL]
+          [PC6 RESET])
+  #:TOP ((VCC))
+  #:BOTTOM ((GND))
+  #:LEFT ([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
+          [PC0 PC1 PC2 PC3 PC4 PC5 PC6])
+  #:RIGHT ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
+  #:DIP (28 PC6 PD0 PD1 PD2 PD3 PD4 VCC GND PB6 PB7 PD5 PD6 PD7 PB0
+            PB1 PB2 PB3 PB4 PB5 AVCC AREF GND PC0 PC1 PC2 PC3 PC4 PC5)
+  #:QFN (32 pd3 pd4 gnd vcc gnd vcc pb6 pb7
+            pd5 pd6 pd7 pb0 pb1 pb2 pb3 pb4
+            pb5 avcc adc6 aref gnd adc7 pc0 pc1
+            pc2 pc3 pc4 pc5 pc6 pd0 pd1 pd2))
+
 (define/IC (LM555-sym)
   #:datasheet ""
   ;; FIXME when there're no alts, I should be able to just leave it blank
-  #:alts ()
-  #:top ((VCC))
-  #:bottom ((GND))
-  #:left ((TR OUTPUT RESET))
-  #:right ((DIS THR CV))
+  #:ALTS ()
+  #:TOP ((VCC))
+  #:BOTTOM ((GND))
+  #:LEFT ((TR OUTPUT RESET))
+  #:RIGHT ((DIS THR CV))
   #:DIP (8 GND TR OUTPUT RESET CV THR DIS VCC))

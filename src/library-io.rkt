@@ -58,6 +58,22 @@
   (let-values ([(p locs) (IC->symbol-pict+locs ic)])
     p))
 
+(define (atom->symbol-pict+locs-fallback atom)
+  ;; this is a fallback, create a pad for each pin
+  (let-values ([(p locs) (rect-symbol->pict+locs
+                          #:bottom (list (hash-keys (Atom-pinhash atom))))])
+    (values p (atom-sort-locs
+               atom locs))))
+
+(define (atom->fp-pict+locs-fallback atom)
+  ;; FIXME using symbol
+  (let-values ([(p locs) (rect-symbol->pict+locs
+                          #:bottom (list (hash-keys (Atom-pinhash atom))))])
+    (values p (atom-sort-locs
+               atom locs))))
+
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IC -> footprint
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -208,8 +224,15 @@ case-sensitivity issue in library-IC.rkt"))
                           (binary-locs R-symbol-pict))]
     [(Capacitor _) (values C-symbol-pict
                            (binary-locs C-symbol-pict))]
+    [(Diode _) (values D-symbol-pict
+                       (binary-locs C-symbol-pict))]
+    ;; FIXME using footprint ..
+    [(Connector num) (footprint->pict+locs (fp-pin-header num))]
     [(ICAtom ic) (let-values ([(p locs) (IC->symbol-pict+locs ic)])
-                   (values p (atom-sort-locs atom locs)))]))
+                   (values p (atom-sort-locs atom locs)))]
+    [(Atom _) (atom->symbol-pict+locs-fallback atom)]))
+
+
 
 (define (atom->symbol-pict atom)
   (let-values ([(p locs) (atom->symbol-pict+locs atom)]) p))
@@ -219,10 +242,14 @@ case-sensitivity issue in library-IC.rkt"))
     ;; FIXME fixed footprint packaging
     [(Resistor _) (footprint->pict+locs (fp-resistor "0603"))]
     [(Capacitor _) (footprint->pict+locs (fp-capacitor "0603"))]
+    [(Diode _) (footprint->pict+locs fp-diode)]
+    ;; FIXME pin header? Double column?
+    [(Connector num) (footprint->pict+locs (fp-pin-header num))]
     ;; FIXME only IC needs to sort locs based. Other simple ones should have the
     ;; correct and consistent order
     [(ICAtom ic) (let-values ([(p locs) (IC->fp-pict+locs ic)])
-                   (values p (atom-sort-locs atom locs)))]))
+                   (values p (atom-sort-locs atom locs)))]
+    [(Atom _) (atom->fp-pict+locs-fallback atom)]))
 
 (define (atom->fp-pict atom)
   (let-values ([(p locs) (atom->fp-pict+locs atom)]) p))
