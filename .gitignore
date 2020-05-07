@@ -5,3 +5,5 @@
 
 *.png
 
+*.tex
+_minted-*
