@@ -22,6 +22,9 @@
          (struct-out Atom)
          (struct-out Composite)
 
+         create-simple-Composite
+         combine-Composites
+
          pin-ref)
 
 ;; Antonyms
@@ -48,6 +51,25 @@
 (struct Composite
   (pinhash connections)
   #:mutable)
+
+(define-syntax (create-simple-Composite stx)
+  (syntax-parse stx
+    [(_ pin ...)
+     #'(let ([res (Composite (make-hash) '())])
+         (hash-set! (Composite-pinhash res) 'pin
+                    ;; FIXME this should be number, how to do that?
+                    (Pin res 'pin))
+         ...
+         res)]))
+
+(define (combine-Composites . rst)
+  ;; 1. add all connections
+  ;; 2. TODO external pins?
+  (let ([res (create-simple-Composite)])
+    (set-Composite-connections!
+     res
+     (apply append (map Composite-connections rst)))
+    res))
 
 ;; two-node net
 (struct Conn

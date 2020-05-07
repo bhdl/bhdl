@@ -17,9 +17,7 @@
          ;; create components to use in sch.rkt
          make-IC-atom
          R C connector
-         LED fuse
-
-         global
+         LED fuse crystal
 
          ;; FIXME not sure if these needs to be provided
          (struct-out Resistor)
@@ -114,18 +112,15 @@
 (define (C value)
   (make-simple-atom Capacitor 2 value))
 
+(define (crystal)
+  (make-simple-atom Atom 2))
+
 (define (fuse value)
   (make-simple-atom Fuse 2 value))
 
 (define (LED color)
   (make-simple-atom Diode 2 color))
 
-;; symbol and footprint?
-(define global
-  (let ([comp (Atom (make-hash '()))])
-    (hash-set! (Atom-pinhash comp) 'VCC (Pin comp 1))
-    (hash-set! (Atom-pinhash comp) 'GND (Pin comp 2))
-    comp))
 
 (struct Connector
   (num)

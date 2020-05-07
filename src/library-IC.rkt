@@ -8,7 +8,9 @@
          ATmega128
          ATmega16
          ATmega48 ATmega88 ATmega168 ATmega328
-         ATmega8U2 ATmega16U2 ATmega32U2)
+         ATmega8U2 ATmega16U2 ATmega32U2
+
+         ATmega8)
 
 (begin-for-syntax
   (define-syntax-class symbol-spec
@@ -235,17 +237,17 @@
           [PC4 ADC4 SDA]
           [PC5 ADC5 SCL]
           [PC6 RESET])
-  #:TOP ((VCC))
+  #:TOP ((VCC AVCC AREF))
   #:BOTTOM ((GND))
   #:LEFT ([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
           [PC0 PC1 PC2 PC3 PC4 PC5 PC6])
   #:RIGHT ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
   #:DIP (28 PC6 PD0 PD1 PD2 PD3 PD4 VCC GND PB6 PB7 PD5 PD6 PD7 PB0
             PB1 PB2 PB3 PB4 PB5 AVCC AREF GND PC0 PC1 PC2 PC3 PC4 PC5)
-  #:QFN (32 pd3 pd4 gnd vcc gnd vcc pb6 pb7
-            pd5 pd6 pd7 pb0 pb1 pb2 pb3 pb4
-            pb5 avcc adc6 aref gnd adc7 pc0 pc1
-            pc2 pc3 pc4 pc5 pc6 pd0 pd1 pd2))
+  #:QFN (32 PD3 PD4 GND VCC GND VCC PB6 PB7
+            PD5 PD6 PD7 PB0 PB1 PB2 PB3 PB4
+            PB5 AVCC ADC6 AREF GND ADC7 PC0 PC1
+            PC2 PC3 PC4 PC5 PC6 PD0 PD1 PD2))
 
 (define/IC (LM555-sym)
   #:datasheet ""
@@ -256,3 +258,15 @@
   #:LEFT ((TR OUTPUT RESET))
   #:RIGHT ((DIS THR CV))
   #:DIP (8 GND TR OUTPUT RESET CV THR DIS VCC))
+
+;; ;; FIXME this is comparator, should have triangular symbol
+;; (define/IC (LM358)
+;;   #:datasheet ""
+;;   #:ALTS ()
+;;   #:TOP ()
+;;   #:BOTTOM ()
+;;   #:LEFT ((2 3))
+;;   #:RIGHT ((1))
+;;   #:DIP )
+;; (define/IC (LP298)
+;;   #:datasheet "")

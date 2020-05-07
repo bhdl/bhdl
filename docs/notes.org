@@ -3,31 +3,52 @@
 
 * TODO-list
 
-** STARTED write some boards
+** TODO write some boards
 
-- arduino uno
-- lichee nano
-- gh60: https://github.com/komar007/gh60
-- pyboard
-- linux business card
+- [X] arduino uno
+- [ ] lichee nano
+- [ ] gh60: https://github.com/komar007/gh60
+- [ ] pyboard
+- [ ] linux business card
 
 *** other
-- ergonomic (hebi) keyboard
+- [ ] ergonomic (hebi) keyboard
 
 ** TODO detailed placement and legalization
 ** TODO fixed positions
 ** TODO Auto-Routing
 
+** research problems
+
+1. connect GUI editing with programming
+2. placement and routing for human reading
+3. abstraction of general components, e.g. crystal, filter capacitors
+4. make module-level connections standing out
+5. more functional way instead of (hook!)
+6. syntax for in-place component creation
+7. in schematic, kicad allows you to annotate text on line. However, it is hard
+   to see where are all those matched texts.
+8. developing Kicad itself can make it more powerful and easier to use. E.g. add
+   abstraction capability, add highlighting of matched annotations. However,
+   developing kicad is challenging, it has too much code and complexity.
+9. vectorrized syntax
+10. compiler checking: pin conflicts, filter capacitors, power track
+    requirements
+11. auto P&R specific issues for PCB:
+   - power track
+   - signal matching
+
+** Why (additional advantages)
+Make it clear the modules. You cannot see clearly from the schematic the
+hierarchy of the components. E.g. the reset circuit, usb module are tangled
+together.
+
+No more number assignment like R5, it is compiler details.
+
 ** Tmp
 *** assign footprints
 *** assign fixed locations
 *** fixed diearea?
-*** new hook syntax
-Or maybe I don't need syntax for now.
-
-*** DONE In place.rkt, the macro and macro pins should be unified with library as well
-CLOSED: [2020-05-06 Wed 16:55]
-specifically, the pin index of ICAtom might not be numbers, but symbols
 
 ** Gerbers
 *** gerber generation
@@ -201,3 +222,19 @@ CLOSED: [2020-05-05 Tue 21:07]
 ** Random
 *** DONE footprint coordinates system mismatch
 CLOSED: [2020-05-06 Wed 13:46]
+
+*** DONE new hook syntax
+CLOSED: [2020-05-07 Thu 16:05]
+Or maybe I don't need syntax for now.
+
+*** DONE how did we get all the connections?
+CLOSED: [2020-05-07 Thu 16:05]
+1. collect all reachable Composite through pins parent
+2. get all connections stored in these Composite
+
+So this already take all connections, as long as that connection is recorded in
+some reachable Composite
+
+*** DONE In place.rkt, the macro and macro pins should be unified with library as well
+CLOSED: [2020-05-06 Wed 16:55]
+specifically, the pin index of ICAtom might not be numbers, but symbols

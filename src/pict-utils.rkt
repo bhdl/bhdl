@@ -1,11 +1,13 @@
 #lang racket
 
 (require pict
+         file/convertible
          racket/draw)
 
 (provide triangular
          mytext
-         pin-over-cc)
+         pin-over-cc
+         save-file)
 
 (define (draw-shape/border w h draw-fun
                            color [border-color #f] [border-width #f]
@@ -63,3 +65,11 @@
             (- dx (/ (pict-width pict) 2))
             (- dy (/ (pict-height pict) 2))
             pict))
+
+(define (save-file p filename)
+  (let ([out (open-output-file filename
+                               #:mode 'binary
+                               #:exists 'replace)])
+    (write-bytes (convert p 'pdf-bytes)
+                 out)
+    (close-output-port out)))
