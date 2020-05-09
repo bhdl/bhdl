@@ -915,3 +915,61 @@ the kicad footprint format and generate gerber."
           [ymin (last box)])
       (values xmin ymin))))
 
+
+
+(define-syntax (*- stx)
+  (syntax-parse stx
+    [(_ node:maybe-dot ...)
+     #:with fst (datum->syntax ((first (syntax->datum #'(node.res ...)))))
+     #:with lst (datum->syntax (last (syntax->datum #'(node.res ...))))
+     #:with prev (datum->syntax (drop-right (syntax->datum #'(node.res ...)) 1))
+     #:with next (datum->syntax (drop (syntax->datum #'(node.res ...)) 1))
+     #'(let ([res (create-simple-Composite 1 2)])
+         (hook! res
+                ;; FIXME . has special meaning in syntax-parse
+                (res\.1 fst\.1)
+                ;; FIXME and this won't pass the current hook, e.g. fst is a
+                ;; list instead of a single variable name
+                (res.2 lst.2)
+                (prev.2 next.1) ...)
+         res)]))
+
+(define-syntax (*< stx)
+  (syntax-parse stx
+    [(_ node ...)
+     #'(let ([res (create-simple-Composite 1 2)])
+         (hook! res
+                (res.1 node.1) ...
+                (res.2 node.2) ...))]))
+
+(define (*- . rst)
+  (let ([fst (first rst)]
+        [lst (last rst)]
+        [mids (drop-right (drop rst 1) 1)]
+        [res (create-simple-Composite 1 2)])
+    (hook! res (res.1 fst.1))
+    (for/fold ([prev (first rst)])
+              ([cur (rest rst)])
+      (hook! res (prev.2 cur.1))
+      cur)
+    (hook! res (lst.2 res.2))
+    res))
+
+(define (*< . rst)
+  (let ([res (create-simple-Composite 1 2)])
+    (for ([cur rst])
+      (hook! res
+             (res.1 cur.1)
+             (res.2 cur.2)))
+    res))
+
+(define (hook-proc! comp . pins)
+  ;; FIXME set! only changes the binding of the variable, but does not change
+  ;; the underline data
+  (set! comp
+        (struct-copy
+         Composite comp
+         [connections
+          (remove-duplicates
+           (append (Composite-connections comp)
+                   pins))])))

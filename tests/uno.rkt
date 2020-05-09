@@ -75,9 +75,9 @@
              (usb.4 ic.UGND)))
 
     ;; serial LED
-    (let ([txled (LED 'yellow)]
+    (let ([txled (led 'yellow)]
           [r1 (R 1000)]
-          [rxled (LED 'yellow)]
+          [rxled (led 'yellow)]
           [r2 (R 1000)])
       (hook! res
              (global.VCC r1.1) (r1.2 txled.1) (txled.2 ic.PD5)
@@ -181,7 +181,7 @@
 
     ;; ICSP
     (let ([conn (connector 6)]
-          [led (LED 'yellow)]
+          [led (led 'yellow)]
           [r1 (R '1k)]
           [r2 (R '1k)])
       (hook! res
@@ -235,7 +235,7 @@
 (define whole-circuit
   (let ([res (Composite (make-hash) '())])
     ;; led
-    (let ([led (LED 'green)]
+    (let ([led (led 'green)]
           [r1 (R '1k)]
           [r2 (R '1k)])
       (hook! res

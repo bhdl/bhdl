@@ -17,13 +17,18 @@
          ;; create components to use in sch.rkt
          make-IC-atom
          R C connector
-         LED fuse crystal
+         led diode fuse crystal
+         switch cherry
+
+         ;; HACK this should not have been exposed
+         make-simple-atom
 
          ;; FIXME not sure if these needs to be provided
          (struct-out Resistor)
          (struct-out Capacitor)
          (struct-out ICAtom)
          (struct-out Diode)
+         (struct-out LED)
          (struct-out Fuse))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -84,8 +89,15 @@
   [(define (write-proc r port mode)
      (write-string (~a "#<C(" (Capacitor-value r) ")>") port))])
 
-(struct Diode
+(struct LED
   (color)
+  #:super struct:Atom
+  #:methods gen:custom-write
+  [(define (write-proc r port mode)
+     (write-string (~a "#<LED>") port))])
+
+(struct Diode
+  ()
   #:super struct:Atom
   #:methods gen:custom-write
   [(define (write-proc r port mode)
@@ -115,12 +127,23 @@
 (define (crystal)
   (make-simple-atom Atom 2))
 
+(define (crystal-4)
+  (make-simple-atom Atom 4))
+
 (define (fuse value)
   (make-simple-atom Fuse 2 value))
 
-(define (LED color)
-  (make-simple-atom Diode 2 color))
+(define (led [color 'red])
+  (make-simple-atom LED 2 color))
 
+(define (diode)
+  (make-simple-atom Diode 2))
+
+(define (switch)
+  (make-simple-atom Atom 2))
+
+(define (cherry)
+  (make-simple-atom Atom 2))
 
 (struct Connector
   (num)
@@ -151,6 +174,9 @@
   ;;
   ;; then record ic into view
   (let ([pins (flatten (map OrientSpec-pins (IC-orients ic)))]
+        ;; FIXME i probably need to combine the footprint pins as well, just to
+        ;; make sure the orients recorded all pins. This is a verification
+        ;; check.
         [alts (IC-alts ic)])
     ;; this is alts extended with all pins not recorded in original alts
     (let ([alts (append (map list (set-subtract pins (flatten alts)))

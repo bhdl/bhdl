@@ -10,6 +10,8 @@
          ATmega48 ATmega88 ATmega168 ATmega328
          ATmega8U2 ATmega16U2 ATmega32U2
 
+         ATmega16U4 ATmega32U4
+
          ATmega8)
 
 (begin-for-syntax
@@ -209,6 +211,55 @@
             PD3 PD4 PD5 PD6 PD7 PB0 PB1 PB2
             PB3 PB4 PB5 PB6 PB7 PC7 PC6 RESET
             PC5 PC4 UCAP UGND D+ D- UVCC AVCC))
+
+(define/IC (ATmega16U4 ATmega32U4)
+  ;; it is very similar to the U2 edition
+  #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7766-8-bit-AVR-ATmega16U4-32U4_Datasheet.pdf"
+  #:ALTS ([PB0 SS PCINT0]
+          [PB1 PCINT1 SCLK]
+          [PB2 PDI PCINT2 MOSI]
+          [PB3 PDO PCINT3 MISO]
+          (PB4 PCINT4 ADC11)
+          ;; FIXME ADC12, ADC13, OC4B  ???
+          (PB5 PCINT5 OC1A OC4A ADC12)
+          (PB6 PCINT6 OC1B OC4B ADC13)
+          [PB7 PCINT7 OC0A OC1C RTS]
+
+          (PC6 OC3A OC4A)
+          (PC7 ICP3 CLK0 OC4A)
+
+          (PD0 OC0B SCL/INT0)
+          (PD1 SDA INT1)
+          (PD2 RXD1 INT2)
+          (PD3 TXD1 INT3)
+          (PD4 ICP1 ADC8)
+          (PD5 XCK1 CTS)
+          (PD6 T1 OC4D ADC9)
+          (PD7 T0 OC4D ADC10)
+
+          (PE2 HWB)
+          [PE6 INT6 AIN0]
+
+          (PF0 ADC0)
+          (PF1 ADC1)
+          (PF4 ADC4 TCK)
+          (PF5 ADC5 TMS)
+          (PF6 ADC6 TDO)
+          (PF7 ADC7 TDI))
+  #:TOP ((VCC AVCC RESET AREF))
+  #:BOTTOM ((GND))
+  #:LEFT ((UVCC D- D+ UGND UCAP)
+          (XTAL2 XTAL1 VBUS)
+          (PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7))
+  #:RIGHT ((PC6 PC7)
+           (PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7)
+           (PE2 PE6)
+           (PF0 PF1 PF4 PF5 PF6 PF7))
+  #:QFN (44 PE6 UVCC D- D+ UGND UCAP VBUS PB0 PB1 PB2 PB3
+            PB7 RESET VCC GND XTAL2 XTAL1 PD0 PD1 PD2 PD3 PD5
+            GND AVCC PD4 PD6 PD7 PB4 PB5 PB6 PC6 PC7 PE2
+            VCC GND PF7 PF6 PF5 PF4 PF1 PF0 AREF GND AVCC))
+
 
 (define/IC (ATmega8)
   #:datasheet "https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2486-8-bit-AVR-microcontroller-ATmega8_L_datasheet.pdf"

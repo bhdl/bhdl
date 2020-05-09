@@ -72,9 +72,13 @@
          [Hatom=>idx (annotate-atoms atoms)])
     ;; FIXME fixed diearea
     (let ([diearea '(1000 1000)]
-          [xs (for/list ([atom atoms]) 0)]
-          [ys (for/list ([atom atoms]) 0)]
-          [mask (for/list ([atom atoms]) 1)]
+          [xs (for/list ([atom atoms]) (if (Atom-loc atom)
+                                           (Point-x (Atom-loc atom))
+                                           0))]
+          [ys (for/list ([atom atoms]) (if (Atom-loc atom)
+                                           (Point-y (Atom-loc atom))
+                                           0))]
+          [mask (for/list ([atom atoms]) (if (Atom-loc atom) 0 1))]
           [ws (for/list ([atom atoms])
                 (exact->inexact (Macro-w (atom->macro atom symbol-or-fp))))]
           [hs (for/list ([atom atoms])

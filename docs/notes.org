@@ -7,7 +7,7 @@
 
 - [X] arduino uno
 - [ ] lichee nano
-- [ ] gh60: https://github.com/komar007/gh60
+- [X] gh60: https://github.com/komar007/gh60
 - [ ] pyboard
 - [ ] linux business card
 
@@ -15,8 +15,9 @@
 - [ ] ergonomic (hebi) keyboard
 
 ** TODO detailed placement and legalization
-** TODO fixed positions
 ** TODO Auto-Routing
+** DONE fixed positions
+CLOSED: [2020-05-09 Sat 20:18]
 
 ** research problems
 
@@ -38,6 +39,8 @@
    - power track
    - signal matching
 
+*** connect hardware programming with software programming
+
 ** Why (additional advantages)
 Make it clear the modules. You cannot see clearly from the schematic the
 hierarchy of the components. E.g. the reset circuit, usb module are tangled
@@ -46,9 +49,23 @@ together.
 No more number assignment like R5, it is compiler details.
 
 ** Tmp
-*** assign footprints
-*** assign fixed locations
-*** fixed diearea?
+
+*** vectorized connections
+
+*** STARTED better schematic and footprint libraries
+*** STARTED assign footprints
+and probably mix the two syntaxes?
+
+*** TODO fixed diearea?
+*** TODO export kicad compatible netlist
+And read back edited results?
+
+*** DONE assign fixed locations
+CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
+*** DONE in-place part creation and corresponding syntax
+CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
+*** DONE gh60
+CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
 
 ** Gerbers
 *** gerber generation

@@ -45,7 +45,7 @@
 
 ;; I want not only output a pict, but also the location of the pads, and the
 ;; width and height
-(define (IC->symbol-pict+locs ic)
+(define (IC->symbol-pict+locs-uncached ic)
   ;; TODO
   (rect-symbol->pict+locs
    ;; the location order of schematic symbol is: lrtb
@@ -53,6 +53,17 @@
    #:bottom (IC-get-orient-pins ic 'bottom)
    #:right (IC-get-orient-pins ic 'right)
    #:top (IC-get-orient-pins ic 'top)))
+
+(define IC->symbol-pict+locs
+  (let ([cache (make-hash)])
+    (λ (ic)
+      (if (hash-has-key? cache ic)
+          ;; CAUTION store in the hash table list
+          (match-let ([(list p locs) (hash-ref cache ic)])
+            (values p locs))
+          (let-values ([(p locs) (IC->symbol-pict+locs-uncached ic)])
+            (hash-set! cache ic (list p locs))
+            (values p locs))))))
 
 (define (IC->symbol-pict ic)
   (let-values ([(p locs) (IC->symbol-pict+locs ic)])
@@ -143,7 +154,7 @@
     p))
 
 ;; FIXME it should be in fp.rkt?
-(define (footprint->pict+locs fp)
+(define (footprint->pict+locs-uncached fp)
   "This functions takes care of two additional things:
 
 1. the offset created by turning gerber into pict
@@ -166,6 +177,17 @@
                              #:key pad-spec-num)])
          (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))
                 (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale))))))))
+
+(define footprint->pict+locs
+  (let ([cache (make-hash)])
+    (λ (fp)
+      ;; FIXME hash the footprint struct?
+      (if (hash-has-key? cache fp)
+          (match-let ([(list p locs) (hash-ref cache fp)])
+            (values p locs))
+          (let-values ([(p locs) (footprint->pict+locs-uncached fp)])
+            (hash-set! cache fp (list p locs))
+            (values p locs))))))
 
 (module+ test
   (footprint->pict (fp-QFN 32)))
@@ -218,19 +240,22 @@ case-sensitivity issue in library-IC.rkt"))
         ;; and change it back to Point
         [(NamedPoint _ x y) (Point x y)]))))
 
+
 (define (atom->symbol-pict+locs atom)
   (match atom
     [(Resistor _) (values R-symbol-pict
                           (binary-locs R-symbol-pict))]
     [(Capacitor _) (values C-symbol-pict
                            (binary-locs C-symbol-pict))]
-    [(Diode _) (values D-symbol-pict
-                       (binary-locs C-symbol-pict))]
+    [(LED _) (values D-symbol-pict
+                     (binary-locs C-symbol-pict))]
+    [(Diode) (values D-symbol-pict
+                     (binary-locs C-symbol-pict))]
     ;; FIXME using footprint ..
     [(Connector num) (footprint->pict+locs (fp-pin-header num))]
     [(ICAtom ic) (let-values ([(p locs) (IC->symbol-pict+locs ic)])
                    (values p (atom-sort-locs atom locs)))]
-    [(Atom _) (atom->symbol-pict+locs-fallback atom)]))
+    [(Atom _ _) (atom->symbol-pict+locs-fallback atom)]))
 
 
 
@@ -242,14 +267,15 @@ case-sensitivity issue in library-IC.rkt"))
     ;; FIXME fixed footprint packaging
     [(Resistor _) (footprint->pict+locs (fp-resistor "0603"))]
     [(Capacitor _) (footprint->pict+locs (fp-capacitor "0603"))]
-    [(Diode _) (footprint->pict+locs fp-diode)]
+    [(Diode) (footprint->pict+locs fp-diode)]
+    [(LED _) (footprint->pict+locs fp-diode)]
     ;; FIXME pin header? Double column?
     [(Connector num) (footprint->pict+locs (fp-pin-header num))]
     ;; FIXME only IC needs to sort locs based. Other simple ones should have the
     ;; correct and consistent order
     [(ICAtom ic) (let-values ([(p locs) (IC->fp-pict+locs ic)])
                    (values p (atom-sort-locs atom locs)))]
-    [(Atom _) (atom->fp-pict+locs-fallback atom)]))
+    [(Atom _ _) (atom->fp-pict+locs-fallback atom)]))
 
 (define (atom->fp-pict atom)
   (let-values ([(p locs) (atom->fp-pict+locs atom)]) p))

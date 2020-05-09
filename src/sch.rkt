@@ -24,6 +24,12 @@
 
          create-simple-Composite
          combine-Composites
+         combine-Composites-1
+
+         loced-atom!
+
+         *-
+         *<
 
          pin-ref)
 
@@ -45,9 +51,37 @@
                    port))])
 
 (struct Atom
-  (pinhash)
-  #:prefab)
+  (pinhash [loc #:auto])
+  #:prefab
+  ;; CAUTION #:mutable only for changing loc
+  #:mutable)
 
+;; CAUTION FIXME there is no functional way to do this, because I do not want to
+;; create extra pins. Also, Atom is marked with #:auto fields, and that is not
+;; copiable in the sense of struct-copy
+(define (loced-atom! atom loc)
+  (set-Atom-loc! atom loc)
+  atom)
+
+
+;; DESIGN each composite should keep a location map of Atoms and (not yet
+;; Composites). These are local to this composite. When this composite is used
+;; to compose more complex Composites, the location does not copy. Finally,
+;; during place-spec export, we'll have many hierarchical groups of semi-fixed
+;; locations.
+;;
+;; UPDATE for now, I would just use one absolute location for each atom. Also,
+;; the Composite->place-spec should recenter the fixed locations (for keyboard
+;; for example).
+;;
+;; TODO of course, we also need to have really fixed positions that cannot be
+;; recentered, for example fixed mounting holes.
+;;
+;; FIXME struct-copy should NOT modify Hlocs
+;;
+;; UPDATE actually I'd better just use absolute locations for each Atom to
+;; simplify the logic. Even better, I can create a one-to-one correspondence of
+;; pict and atoms.
 (struct Composite
   (pinhash connections)
   #:mutable)
@@ -71,6 +105,12 @@
      res
      (apply append (map Composite-connections rst)))
     res))
+
+(define (combine-Composites-1 one . rst)
+  "The first one's external pin is used"
+  (struct-copy Composite one
+               [connections (apply append (Composite-connections one)
+                                   (map Composite-connections rst))]))
 
 ;; two-node net
 (struct Conn
@@ -99,8 +139,11 @@
   (cond
     [(Composite? part) (hash-ref (Composite-pinhash part) ref)]
     [(Atom? part) (hash-ref (Atom-pinhash part) ref)]
+    ;; HACK if it is already a pin, just return it. This enables B- and B<
+    ;; operators to accept both pin and part
+    [(Pin? part) part]
     ;; FIXME better error message
-    [else (error (~a "pin-ref error: " part
+    [else (error (~a "pin-ref error: part: " part " ref: " ref
                      ", must be an Atom or Composite."
                      " Probably the variable is undefined."))]))
 
@@ -110,10 +153,23 @@
       (let ([l (string->symbol l)]
             [r (or (string->number r) (string->symbol r))])
         (list l r))))
+  
   ;; 'a 'b
   (parse-dot #'a.b)
   ;; 'a 1
-  (parse-dot #'a.1))
+  (parse-dot #'a.1)
+  ;; TODO use this 
+  (define (parse-maybe-dot stx)
+    "Return lhs rhs if there is a dot, else, return itself and (void)"
+    (let ([s (symbol->string (syntax-e stx))])
+      (if (string-contains? s ".")
+          (match-let ([(list l r) (string-split s ".")])
+            (let ([l (string->symbol l)]
+                  [r (or (string->number r) (string->symbol r))])
+              (datum->syntax stx (list 'pin-ref l (list 'quote r)))))
+          (datum->syntax stx stx))))
+  (parse-maybe-dot #'ab)
+  (parse-maybe-dot #'ab.cd))
 
 (define-syntax (replace-self stx)
   (syntax-parse stx
@@ -128,38 +184,129 @@
     (pattern x
              #:with (lhs rhs)
              (datum->syntax
-              #'x (parse-dot #'x)))))
+              #'x (parse-dot #'x))))
+  (define-syntax-class maybe-dot
+    #:description "maybe-dot"
+    ;; if it is a list, do nothing
+    (pattern (x ...)
+             #:with res #'(x ...))
+    ;; otherwise, it must be an id. check to see if it has a dot
+    (pattern y:id
+             #:with res
+             (datum->syntax
+              #'y (parse-maybe-dot #'y)))))
+
+(define (hook-proc! comp . pins)
+  (set-Composite-connections!
+   comp
+   (remove-duplicates
+    (append (Composite-connections comp)
+            pins))))
+
+(myvoid
+ (require "library.rkt")
+ (require "library-IC.rkt")
+ (Composite-connections
+  (let ([r1 (R 11)]
+        [r2 (R 22)]
+        [c1 (C 1)])
+    (hook #:pins (OUT1 OUT2)
+          (self.OUT1 r1.1)
+          (r1.2 r2.1)
+          (r2.2 c1.1)
+          (c1.2 self.OUT2))))
+ (define r1 (R 1))
+ (define r2 (R 2))
+ (define c1 (R 1))
+ (define comp (create-simple-Composite OUT1 OUT2))
+ (set! comp (struct-copy Composite comp
+                         [connections "hello"]))
+ (hook-proc! comp (list
+                   (pin-ref comp 'OUT1)
+                   (pin-ref r1 '1)))
+ (Composite-connections comp)
+ 
+ (Composite-connections
+  (let-values (((r1) (#%app R 11)) ((r2) (#%app R 22)) ((c1) (#%app C 1)))
+    (let-values (((comp) (create-simple-Composite OUT1 OUT2)))
+      (hook-proc!
+       comp
+       (list
+        (pin-ref comp 'OUT1)
+        (pin-ref r1 '1))
+       (list
+        (pin-ref r1 '2)
+        (pin-ref r2 '1))
+       (list
+        (pin-ref r2 '2)
+        (pin-ref c1 '1))
+       (list
+        (pin-ref c1 '2)
+        (pin-ref comp 'OUT2)))
+      comp)))
+
+ )
 
 (define-syntax (hook stx)
   (syntax-parse stx
     ;; #:datum-literals (comp)
     [(_ #:pins (pin ...) (net:dot ...) ...)
-     #`(let ([comp (Composite (make-hash) '())])
-         ;; create pins that refer to comp itself
-         (hash-set! (Composite-pinhash comp) 'pin (Pin comp 'pin)) ...
+     #`(let ([comp (create-simple-Composite pin ...)])
          ;; create connections
-         (set-Composite-connections!
-          comp (list
-                (list (pin-ref
-                       ;; this is a trick to bring the newly bound variable
-                       ;; "comp" into the scope for replacing 'self
-                       (replace-self net.lhs comp)
-                       'net.rhs)
-                      ...) ...))
+         (hook-proc! comp
+                     (list (pin-ref
+                            ;; this is a trick to bring the newly bound
+                            ;; variable "comp" into the scope for
+                            ;; replacing 'self
+                            (replace-self net.lhs comp)
+                            'net.rhs)
+                           ...)
+                     ...)
          comp)]))
 
 (define-syntax (hook! stx)
   (syntax-parse stx
     [(_ comp (net:dot ...) ...)
-     #`(set! comp
-             (struct-copy
-              Composite comp
-              [connections
-               (remove-duplicates
-                (append (Composite-connections comp)
-                        (list
-                         (list (pin-ref net.lhs 'net.rhs)
-                               ...) ...)))]))]))
+     #'(hook-proc! comp
+                   (list (pin-ref net.lhs 'net.rhs)
+                         ...) ...)]))
+
+(define (*--proc lst)
+  (let ([item-1 (first lst)]
+        [item-n (last lst)]
+        [res (create-simple-Composite 1 2)])
+    ;; connect res.2 with first.1
+    (hook-proc! res (list (pin-ref res 1)
+                          (pin-ref item-1 1)))
+    (for/fold ([prev (first lst)])
+              ([cur (rest lst)])
+      (hook-proc! res (list (pin-ref prev 2)
+                            (pin-ref cur 1)))
+      cur)
+    ;; end
+    (hook-proc! res (list (pin-ref item-n 2)
+                          (pin-ref res 2)))
+    res))
+
+(define-syntax (*- stx)
+  (syntax-parse stx
+    [(_ node:maybe-dot ...)
+     #'(*--proc (list node.res ...))]))
+
+(define (*<-proc lst)
+  (let ([res (create-simple-Composite 1 2)])
+    (for ([item lst])
+      (hook-proc! res
+                  (list (pin-ref res 1)
+                        (pin-ref item 1))
+                  (list (pin-ref res 2)
+                        (pin-ref item 2))))
+    res))
+
+(define-syntax (*< stx)
+  (syntax-parse stx
+    [(_ node:maybe-dot ...)
+     #'(*<-proc (list node.res ...))]))
 
 (myvoid
  (require "library.rkt")
