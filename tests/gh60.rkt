@@ -7,6 +7,10 @@
          "../src/utils.rkt"
          "../src/pict-utils.rkt"
          "../src/common.rkt"
+
+         ;; DEBUG
+         "../src/fp-kicad.rkt"
+         "../src/library-io.rkt"
          pict
          json)
 
@@ -93,7 +97,9 @@
                      (mod1 mod2 mod3 space mod4 mod5 mod6 mod7))])
     ;; TODO compute the position by pict library
     (let* ([pict-rows (compose-pipe name-rows
-                                    #:..> (λ (x) (rectangle 20 20)))]
+                                    ;; FIXME the cherry switch pict is actually
+                                    ;; 383x383
+                                    #:..> (λ (x) (rectangle 30 30)))]
            ;; combine the pict rows
            [one-pict (compose-pipe pict-rows
                                    #:.> (λ (x) (apply hc-append x))
@@ -253,21 +259,25 @@
 
 (define whole
   (combine-Composites ic-module
-                      power-module))
+                      matrix-module
+                      power-module
+                      io-module))
 
 (module+ test
   (collect-all-atoms whole)
   (Composite->place-spec whole 'fp)
-  (define init-place (Composite->place-spec matrix-module 'fp))
-  (Composite->pict matrix-module
+
+  (footprint->pict (fp-switch-keyboard 1 'pcb))
+  (define init-place (Composite->place-spec whole 'fp))
+  (Composite->pict whole
                    '(1000 1000)
                    (hash-ref init-place 'xs)
                    (hash-ref init-place 'ys)
                    'fp)
 
   ;; there seems to be a little off, i.e. fixed xs and ys changed a little
-  (define place-result (send-for-placement (Composite->place-spec matrix-module 'fp)))
-  (Composite->pict matrix-module
+  (define place-result (send-for-placement (Composite->place-spec whole 'fp)))
+  (Composite->pict whole
                    '(1000 1000)
                    (hash-ref place-result 'xs)
                    (hash-ref place-result 'ys)

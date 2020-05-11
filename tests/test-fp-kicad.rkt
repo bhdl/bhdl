@@ -3,6 +3,7 @@
 (require "../src/fp-kicad.rkt"
          "../src/gerber.rkt"
          "../src/fp.rkt"
+         "../src/library-io.rkt"
          pict)
 
 (module+ test
@@ -79,6 +80,8 @@
 
 
 (module+ test
+  (pict-height (footprint->pict (fp-switch-keyboard 1 'pcb)))
   (for*/list ([spacing '(1 1.25 1.5 1.75 2 2.25 2.75 6.25)]
               [pcb-or-plate '(pcb plate)])
     (footprint->pict (fp-switch-keyboard spacing pcb-or-plate))))
+

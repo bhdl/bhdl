@@ -28,6 +28,7 @@
          (struct-out Capacitor)
          (struct-out ICAtom)
          (struct-out Diode)
+         (struct-out CherrySwitch)
          (struct-out LED)
          (struct-out Fuse))
 
@@ -142,8 +143,15 @@
 (define (switch)
   (make-simple-atom Atom 2))
 
+(struct CherrySwitch
+  ()
+  #:super struct:Atom
+  #:methods gen:custom-write
+  [(define (write-proc x port mode)
+     (write-string (~a "#<cherry>") port))])
+
 (define (cherry)
-  (make-simple-atom Atom 2))
+  (make-simple-atom CherrySwitch 2))
 
 (struct Connector
   (num)

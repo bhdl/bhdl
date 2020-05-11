@@ -20,8 +20,8 @@
          IC->fp-pict+locs
 
          ;; not sure if needed
-         ;; footprint->pict
-         ;; footprint->pict+locs
+         footprint->pict
+         footprint->pict+locs
          ;; footprint->pad-locs
 
          atom->symbol-pict+locs
@@ -32,6 +32,9 @@
 ;; the FP size is typically in MM, and the number is typically in the range of
 ;; [1,10]. When this scale is applied, the result picture looks normal in size.
 (define fp-scale (make-parameter 20))
+
+;; DEBUG scale factor
+;; (define fp-scale (make-parameter 2))
 
 ;; The text font size 12 is easy to read. But when drawing the text, we
 ;; typically need to use (/ (fp-font-size) (fp-scale)) because the picture is
@@ -269,6 +272,7 @@ case-sensitivity issue in library-IC.rkt"))
     [(Capacitor _) (footprint->pict+locs (fp-capacitor "0603"))]
     [(Diode) (footprint->pict+locs fp-diode)]
     [(LED _) (footprint->pict+locs fp-diode)]
+    [(CherrySwitch) (footprint->pict+locs (fp-switch-keyboard 1.25 'pcb))]
     ;; FIXME pin header? Double column?
     [(Connector num) (footprint->pict+locs (fp-pin-header num))]
     ;; FIXME only IC needs to sort locs based. Other simple ones should have the
