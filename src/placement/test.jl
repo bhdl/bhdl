@@ -1,3 +1,6 @@
+include("bench.jl")
+include("visualize.jl")
+include("place.jl")
 import Profile
 
 function test_profile()
@@ -16,4 +19,23 @@ function test_profile()
     # ProfileView.view()
 end
 
+
+
+function test()
+    str = open("/tmp/rackematic/out/gh60.json") do io
+        read(io, String)
+    end
+    jobj = JSON.parse(str)
+
+    xs, ys, ws, hs, Es, mask, diearea = decode_place_spec(jobj);
+
+    # place(xs, ys, ws, hs, Es, mask, diearea, vis=true)
+
+    @time solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=true, iter=200)
+    # save to json file
+    res_payload = Dict("xs"=>solxs, "ys"=>solys) |> JSON.json
+    open("/tmp/rackematic/out/gh60-sol.json", "w") do io
+        write(io, res_payload)
+    end
+end
 

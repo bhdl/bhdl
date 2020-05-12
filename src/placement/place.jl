@@ -232,7 +232,7 @@ function display_plot(p)
 end
 
 # return a new pos
-function place(xs, ys, ws, hs, Es, mask, diearea; vis=false)
+function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, iter=50)
     xs = Float32.(xs)
     ys = Float32.(ys)
     ws = Float32.(ws)
@@ -256,7 +256,7 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false)
     # iteratively solve the loss
     # 800 * 10 / 3600 = 2.2 hour
     # FIXME stop criteria: when the update is small enough for several epochs
-    for step in 1:50
+    for step in 1:iter
         @info "step: $step"
         @info "calculating W .."
         w = W(Es, xs, ys)
@@ -275,8 +275,8 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false)
         # weights HP here
         dx .*= 0.001
         dy .*= 0.001
-        wgradx .*= 0.01
-        wgrady .*= 0.01
+        wgradx .*= 10
+        wgrady .*= 10
 
         deltax = wgradx .- dx
         deltay = wgrady .- dy
@@ -292,7 +292,9 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false)
         # deltay = wgrady
         # loss = w
 
-        @info "data" step loss mean(abs.(wgradx)) mean(abs.(dx)) hpwl(xs, ys, Es)
+        @info("data", step, loss,
+              mean(abs.(d)), mean(abs.(wgradx)),
+              mean(abs.(dx)), hpwl(xs, ys, Es))
 
         # apply mask for fixed macros
         xs .-= deltax .* mask
@@ -300,10 +302,10 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false)
 
         # map back to valid region
         # FIXME consider w and h
-        xs[xs .< R.xmin] .= R.xmin
-        xs[xs .> R.xmax] .= R.xmax
-        ys[ys .< R.ymin] .= R.ymin
-        ys[ys .> R.ymax] .= R.ymax
+        xs[xs .- ws ./ 2 .< R.xmin] .= (ws ./ 2 .+ R.xmin)[xs .- ws ./ 2 .< R.xmin]
+        xs[xs .+ ws ./ 2 .> R.xmax] .= (ws ./ 2 .- R.xmax)[xs .+ ws ./ 2 .> R.xmax]
+        ys[ys .- hs ./ 2 .< R.ymin] .= (hs ./ 2 .+ R.ymin)[ys .- hs ./ 2 .< R.ymin]
+        ys[ys .+ hs ./ 2 .> R.ymax] .= (hs ./ 2 .- R.ymax)[ys .+ hs ./ 2 .> R.ymax]
         if vis visualize(xs, ys, ws, hs, R) end
     end
     if vis visualize_density((xs, ys, ws, hs), R) end

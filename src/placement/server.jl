@@ -23,7 +23,7 @@ function web_server()
         jobj = JSON.parse(jstr)
         xs, ys, ws, hs, Es, mask, diearea = decode_place_spec(jobj)
         @info "running placement .."
-        solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false)
+        solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false, iter=100)
         # FIXME run iterations
 
         # @info "visualizing .."
@@ -39,8 +39,10 @@ function web_server()
         # the new payload just encode the xs and ys
         #
         # transform the result to corner based, because racket pict system convention
-        solxs = solxs .- ws ./ 2
-        solys = solys .- hs ./ 2
+        #
+        # UPDATE I'm using center at every locations, to be consistent for fixed locations
+        # solxs = solxs .- ws ./ 2
+        # solys = solys .- hs ./ 2
         res_payload = Dict("xs"=>solxs, "ys"=>solys) |> JSON.json
 
         # parse this directly as json, and save data to internal data structure
