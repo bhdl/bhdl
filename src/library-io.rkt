@@ -31,7 +31,16 @@
 
 ;; the FP size is typically in MM, and the number is typically in the range of
 ;; [1,10]. When this scale is applied, the result picture looks normal in size.
-(define fp-scale (make-parameter 20))
+(define fp-scale (make-parameter
+                  ;; 20
+                  ;;
+                  ;; my monitor is 27 inch, 16:9, 2K 2560x1440
+                  ;;
+                  ;; pixel / mm
+                  (/ (sqrt (+ (expt 2560 2) (expt 1440 2)))
+                     ;; mm in diagnal
+                     (* 27 25.4))))
+
 
 ;; DEBUG scale factor
 ;; (define fp-scale (make-parameter 2))

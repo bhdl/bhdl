@@ -5,6 +5,7 @@
          "library-symbol.rkt"
          "library-io.rkt"
          "utils.rkt"
+         "pict-utils.rkt"
          "library-io.rkt"
          ;; https://docs.racket-lang.org/json/index.html
          json
@@ -14,7 +15,7 @@
          pict)
 
 (provide (contract-out
-          [Composite->place-spec (any/c (or/c 'symbol 'fp) . -> . any)]
+          [Composite->place-spec (any/c (or/c 'symbol 'fp) any/c . -> . any)]
           ;; (Composite->pict comp diearea xs ys symbol-or-fp)
           [Composite->pict       (any/c any/c any/c any/c
                                         (or/c 'symbol 'fp) . -> . any)])
@@ -65,14 +66,12 @@
              [i (in-naturals)])
     (values atom (add1 i))))
 
-(define (Composite->place-spec comp symbol-or-fp)
+(define (Composite->place-spec comp symbol-or-fp diearea)
   "generate directly xs, ys, ws, hs, mask, Es, diearea"
   (let* ([netlist (Composite->netlist comp)]
          [atoms (collect-all-atoms comp)]
          [Hatom=>idx (annotate-atoms atoms)])
-    ;; FIXME fixed diearea
-    (let ([diearea '(1000 1000)]
-          [xs (for/list ([atom atoms]) (if (Atom-loc atom)
+    (let ([xs (for/list ([atom atoms]) (if (Atom-loc atom)
                                            (Point-x (Atom-loc atom))
                                            0))]
           [ys (for/list ([atom atoms]) (if (Atom-loc atom)
@@ -197,9 +196,13 @@
                          [(list x y)
                           (values pin
                                   (list
-                                   ;; FIXME + offset or - offset
-                                   (+ x (MacroPin-offx macropin))
-                                   (+ y (MacroPin-offy macropin))))])))])
+                                   ;; CAUTION this macro pin offset is not
+                                   ;; centered, to keep consistent with gerber
+                                   ;; file convention.
+                                   (+ (- x (/ (Macro-w macro) 2))
+                                      (MacroPin-offx macropin))
+                                   (+ (- y (/ (Macro-h macro) 2))
+                                      (MacroPin-offy macropin))))])))])
     (let ([res (for/fold ([die die])
                          ([atom atoms]
                           [x xs]
@@ -207,32 +210,34 @@
                  (let* ([m (atom->macro atom symbol-or-fp)]
                         [w (Macro-w m)]
                         [h (Macro-h m)])
-                   (pin-over die x y
-                             ;; (rectangle w h)
-                             ;; I actually should draw the symbol for schematic
-                             (case symbol-or-fp
-                               [(symbol) (atom->symbol-pict atom)]
-                               [(fp)     (atom->fp-pict atom)])
-                             
-                             ;; (draw-macro m)
-                             )))])
+                   (pin-over-cc die x y
+                                ;; (rectangle w h)
+                                ;; I actually should draw the symbol for schematic
+                                (case symbol-or-fp
+                                  [(symbol) (atom->symbol-pict atom)]
+                                  [(fp)     (atom->fp-pict atom)]))))])
       ;; Draw airwires.  Construct graph using racket's graph library, and find
       ;; MST with distance as weights
       (let* ([g (Composite->graph comp Hpin=>xy)]
              [edges (min-st-kruskal g)])
-        (for/fold ([res res])
-                  ([edge edges])
-          (let ([src (first edge)]
-                [dst (second edge)])
-            (match-let ([(list x1 y1) (hash-ref Hpin=>xy src)]
-                        [(list x2 y2) (hash-ref Hpin=>xy dst)])
-              ;; however, pip-line does not support styling
-              ;; (pin-over res x1 y1 (pip-line (- x2 x1) (- y2 y1) 0))
-              (let ([src-p (circle 0)]
-                    [dst-p (circle 0)])
-                (pin-line (pin-over
-                           (pin-over res x1 y1 src-p)
-                           x2 y2 dst-p)
-                          src-p cc-find
-                          dst-p cc-find
-                          #:style 'long-dash)))))))))
+        (let ([final-res (for/fold ([res res])
+                                   ([edge edges])
+                           (let ([src (first edge)]
+                                 [dst (second edge)])
+                             (match-let ([(list x1 y1) (hash-ref Hpin=>xy src)]
+                                         [(list x2 y2) (hash-ref Hpin=>xy dst)])
+                               ;; however, pip-line does not support styling
+                               ;; (pin-over res x1 y1 (pip-line (- x2 x1) (- y2 y1) 0))
+                               (let ([src-p (circle 0)]
+                                     [dst-p (circle 0)])
+                                 (pin-line (pin-over-cc
+                                            (pin-over-cc res x1 y1 src-p)
+                                            x2 y2 dst-p)
+                                           src-p cc-find
+                                           dst-p cc-find
+                                           #:style 'long-dash)))))])
+          ;; scale it down
+          (let* ([w (pict-width final-res)]
+                 [h (pict-height final-res)]
+                 [factor (min 1 (/ 640 w) (/ 480 h))])
+            (scale final-res factor)))))))

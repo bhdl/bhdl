@@ -88,42 +88,6 @@
                        (*- (led) res.ROW4)
                        (*- (led) res.ROW5))))))
 
-(module+ test
-  (let ([name-rows '((ESC 1 2 3 4 5 6 7 8 9 0 - = backspace)
-                     (Tab Q W E R T y u i o p #\[ #\] #\\)
-                     (caps a s d f g h j k l #\; #\' enter)
-                     (lshift z x c v b n m #\, #\. #\/ rshift)
-                     ;; FIXME some positions do not have keys
-                     (mod1 mod2 mod3 space mod4 mod5 mod6 mod7))])
-    ;; TODO compute the position by pict library
-    (let* ([pict-rows (compose-pipe name-rows
-                                    ;; FIXME the cherry switch pict is actually
-                                    ;; 383x383
-                                    #:..> (λ (x) (rectangle 30 30)))]
-           ;; combine the pict rows
-           [one-pict (compose-pipe pict-rows
-                                   #:.> (λ (x) (apply hc-append x))
-                                   #:> (λ (x) (apply vc-append x)))]
-           ;; find
-           [locs (compose-pipe pict-rows
-                               #:.*> (λ (x) (let-values ([(x y) (cc-find one-pict x)])
-                                              (list ))))])
-      (void)
-      one-pict
-      (cc-find one-pict (first (first pict-rows)))))
-  (let ([name-rows '((ESC 1 2 3 4 5 6 7 8 9 0 - = backspace)
-                     (Tab Q W E R T y u i o p #\[ #\] #\\)
-                     (caps a s d f g h j k l #\; #\' enter)
-                     (lshift z x c v b n m #\, #\. #\/ rshift)
-                     ;; FIXME some positions do not have keys
-                     (mod1 mod2 mod3 space mod4 mod5 mod6 mod7))])
-    (let* ([pict-rows (compose-pipe name-rows
-                                    #:..> (λ (x) (rectangle 20 20)))]
-           [one-pict (compose-pipe pict-rows
-                                   #:.> (λ (x) (apply hc-append x))
-                                   #:> (λ (x) (apply vc-append x)))])
-      (void))))
-
 (define matrix-module
   (let ([name-rows '((ESC 1 2 3 4 5 6 7 8 9 0 - = backspace)
                      (Tab Q W E R T y u i o p #\[ #\] #\\)
@@ -135,11 +99,14 @@
     (let* ([pict-rows (compose-pipe name-rows
                                     ;; FIXME use real footprint pict?
                                     ;; DESIGN or use larger separation
-                                    #:..> (λ (x) (rectangle 50 50)))]
+                                    #:..> (λ (x)
+                                            ;; use real switch pict
+                                            (ghost (footprint->pict
+                                                    (fp-switch-keyboard 1 'pcb)))))]
            ;; combine the pict rows
            [one-pict (compose-pipe pict-rows
-                                   #:.> (λ (x) (apply hc-append x))
-                                   #:> (λ (x) (apply vc-append x)))]
+                                   #:.> (λ (x) (apply hc-append 30 x))
+                                   #:> (λ (x) (apply vc-append 30 x)))]
            ;; find
            [locs (compose-pipe pict-rows
                                #:.*> (λ (x) (let-values ([(x y) (cc-find one-pict x)])
@@ -265,23 +232,32 @@
 
 (module+ test
   (collect-all-atoms whole)
-  (Composite->place-spec whole 'fp)
-
-  (footprint->pict (fp-switch-keyboard 1 'pcb))
-  (define init-place (Composite->place-spec whole 'fp))
+  (pict-height (footprint->pict (fp-switch-keyboard 1 'pcb)))
+  (define init-place (Composite->place-spec whole 'fp '(2000 1000)))
   (Composite->pict whole
-                   '(1000 1000)
+                   '(2000 1000)
                    (hash-ref init-place 'xs)
                    (hash-ref init-place 'ys)
                    'fp)
 
   ;; there seems to be a little off, i.e. fixed xs and ys changed a little
-  (define place-result (send-for-placement (Composite->place-spec whole 'fp)))
-  (Composite->pict whole
-                   '(1000 1000)
-                   (hash-ref place-result 'xs)
-                   (hash-ref place-result 'ys)
-                   'fp)
+  (make-directory* "/tmp/rackematic/out/")
+  (save-for-placement (Composite->place-spec whole 'fp '(2000 1000))
+                      "/tmp/rackematic/out/gh60.json")
+  (define place-result
+    (send-for-placement
+     (Composite->place-spec whole 'fp '(2000 1000))))
+  
+  (define place-result
+    (call-with-input-file "/tmp/rackematic/out/gh60-sol.json"
+      (λ (in) (string->jsexpr (port->string in)))))
+  (save-file (Composite->pict whole
+                              '(2000 1000)
+                              (hash-ref place-result 'xs)
+                              (hash-ref place-result 'ys)
+                              'fp)
+             "a.pdf")
+
   (collect-all-atoms ic-module)
   (collect-all-atoms matrix-module)
   (Composite-pinhash power-module)

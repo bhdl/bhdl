@@ -50,15 +50,16 @@ No more number assignment like R5, it is compiler details.
 
 ** Tmp
 
-*** vectorized connections
+*** TODO vectorized connections
 
 *** STARTED better schematic and footprint libraries
 *** STARTED assign footprints
 and probably mix the two syntaxes?
 
-*** TODO fixed diearea?
 *** TODO export kicad compatible netlist
 And read back edited results?
+
+But this would require compatibility with kicad symbol and footprint library.
 
 *** DONE assign fixed locations
 CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
@@ -66,6 +67,17 @@ CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
 CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
 *** DONE gh60
 CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
+*** DONE a little mismatch of placed fixed positions
+CLOSED: [2020-05-12 Tue 14:35]
+*** DONE auto-visualization scale
+CLOSED: [2020-05-12 Tue 15:11]
+And use the real footprint size
+
+*** DONE placement engine wirelength
+CLOSED: [2020-05-12 Tue 15:11]
+
+*** DONE fixed diearea?
+CLOSED: [2020-05-12 Tue 15:11]
 
 ** Gerbers
 *** gerber generation
