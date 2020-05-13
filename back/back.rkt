@@ -973,3 +973,65 @@ the kicad footprint format and generate gerber."
           (remove-duplicates
            (append (Composite-connections comp)
                    pins))])))
+
+(myvoid
+ (require "library.rkt")
+ (require "library-IC.rkt")
+ (Composite-connections
+  (let ([r1 (R 11)]
+        [r2 (R 22)]
+        [c1 (C 1)])
+    (hook #:pins (OUT1 OUT2)
+          (self.OUT1 r1.1)
+          (r1.2 r2.1)
+          (r2.2 c1.1)
+          (c1.2 self.OUT2))))
+ (define r1 (R 1))
+ (define r2 (R 2))
+ (define c1 (R 1))
+ (define comp (create-simple-Composite OUT1 OUT2))
+ (set! comp (struct-copy Composite comp
+                         [connections "hello"]))
+ (hook-proc! comp (list
+                   (pin-ref comp 'OUT1)
+                   (pin-ref r1 '1)))
+ (Composite-connections comp)
+ 
+ (Composite-connections
+  (let-values (((r1) (#%app R 11)) ((r2) (#%app R 22)) ((c1) (#%app C 1)))
+    (let-values (((comp) (create-simple-Composite OUT1 OUT2)))
+      (hook-proc!
+       comp
+       (list
+        (pin-ref comp 'OUT1)
+        (pin-ref r1 '1))
+       (list
+        (pin-ref r1 '2)
+        (pin-ref r2 '1))
+       (list
+        (pin-ref r2 '2)
+        (pin-ref c1 '1))
+       (list
+        (pin-ref c1 '2)
+        (pin-ref comp 'OUT2)))
+      comp)))
+
+ )
+
+(myvoid
+ (require "library.rkt")
+ (require "library-IC.rkt")
+ (define ic (make-IC-atom ATmega8U2))
+ (define comp (Composite (make-hash) '()))
+ ;; connect crystal
+ (let ([r1 (R 27)]
+       [c1 (C 22)]
+       [c2 (C 22)]
+       [r3 (R 1000)])
+   (hook! comp
+          (ic.XTAL1 r3.2)
+          (ic.XTAL2 r1.1 c1.2)
+          (r1.2 r3.1 c2.2)
+          (c1.1 c2.1)))
+ (collect-all-atoms comp))
+
