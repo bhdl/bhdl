@@ -24,7 +24,7 @@ end
 function test()
     str = open("/tmp/rackematic/out/gh60.json") do io
         read(io, String)
-    end
+    end;
     jobj = JSON.parse(str)
 
     xs, ys, ws, hs, Es, mask, diearea = decode_place_spec(jobj);

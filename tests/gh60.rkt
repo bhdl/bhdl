@@ -138,7 +138,8 @@
                          (*-
                           ;; col
                           (pin-ref res j)
-                          (diode) atom
+                          ;; TODO I actually want to assign larger weight to this link
+                          (diode) #:weight 2 atom
                           ;; row
                           (pin-ref res i))))))))))
 
@@ -232,6 +233,7 @@
 
 (module+ test
   (collect-all-atoms whole)
+  (Composite-nets whole)
   (pict-height (footprint->pict (fp-switch-keyboard 1 'pcb)))
   (define init-place (Composite->place-spec whole 'fp '(2000 1000)))
   (Composite->pict whole
@@ -248,7 +250,7 @@
     (send-for-placement
      (Composite->place-spec whole 'fp '(2000 1000))))
   
-  (define place-result
+  (define place-result-2
     (call-with-input-file "/tmp/rackematic/out/gh60-sol.json"
       (λ (in) (string->jsexpr (port->string in)))))
   (save-file (Composite->pict whole

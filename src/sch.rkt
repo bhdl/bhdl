@@ -21,6 +21,9 @@
          (struct-out Pin)
          (struct-out Atom)
          (struct-out Composite)
+         ;; FIXME naming conflicts. This shall only be used in place.rkt for
+         ;; genereting place spec
+         (struct-out Net)
 
          create-simple-Composite
          combine-Composites
@@ -83,7 +86,7 @@
 ;; simplify the logic. Even better, I can create a one-to-one correspondence of
 ;; pict and atoms.
 (struct Composite
-  (pinhash connections)
+  (pinhash nets)
   #:mutable)
 
 (define-syntax (create-simple-Composite stx)
@@ -101,35 +104,20 @@
   ;; 1. add all connections
   ;; 2. TODO external pins?
   (let ([res (create-simple-Composite)])
-    (set-Composite-connections!
+    (set-Composite-nets!
      res
-     (apply append (map Composite-connections rst)))
+     (apply append (map Composite-nets rst)))
     res))
 
 (define (combine-Composites-1 one . rst)
   "The first one's external pin is used"
   (struct-copy Composite one
-               [connections (apply append (Composite-connections one)
-                                   (map Composite-connections rst))]))
+               [nets (apply append (Composite-nets one)
+                            (map Composite-nets rst))]))
 
 ;; two-node net
-(struct Conn
-  (p1 p2)
-  #:methods gen:equal+hash
-  ;; (p1,p2) == (p2,p1)
-  [(define (equal-proc a b equal?-recur)
-     (or (and (equal?-recur (Conn-p1 a) (Conn-p1 b))
-              (equal?-recur (Conn-p2 a) (Conn-p2 b)))
-         (and (equal?-recur (Conn-p1 a) (Conn-p2 b))
-              (equal?-recur (Conn-p2 a) (Conn-p1 b)))))
-   ;; FIXME is this useful?
-   (define (hash-proc a hash-recur)
-     (+ (hash-recur (Conn-p1 a))
-        (hash-recur (Conn-p2 a))))
-   ;; FIXME the same as hash1
-   (define (hash2-proc a hash2-recur)
-     (+ (hash2-recur (Conn-p1 a))
-        (hash2-recur (Conn-p2 a))))])
+(struct Net
+  (pins weight))
 
 
 
@@ -196,56 +184,13 @@
              (datum->syntax
               #'y (parse-maybe-dot #'y)))))
 
-(define (hook-proc! comp . pins)
-  (set-Composite-connections!
+(define (hook-proc! comp . nets)
+  ;; FIXME constract for nets to be instance of Net
+  (set-Composite-nets!
    comp
    (remove-duplicates
-    (append (Composite-connections comp)
-            pins))))
-
-(myvoid
- (require "library.rkt")
- (require "library-IC.rkt")
- (Composite-connections
-  (let ([r1 (R 11)]
-        [r2 (R 22)]
-        [c1 (C 1)])
-    (hook #:pins (OUT1 OUT2)
-          (self.OUT1 r1.1)
-          (r1.2 r2.1)
-          (r2.2 c1.1)
-          (c1.2 self.OUT2))))
- (define r1 (R 1))
- (define r2 (R 2))
- (define c1 (R 1))
- (define comp (create-simple-Composite OUT1 OUT2))
- (set! comp (struct-copy Composite comp
-                         [connections "hello"]))
- (hook-proc! comp (list
-                   (pin-ref comp 'OUT1)
-                   (pin-ref r1 '1)))
- (Composite-connections comp)
- 
- (Composite-connections
-  (let-values (((r1) (#%app R 11)) ((r2) (#%app R 22)) ((c1) (#%app C 1)))
-    (let-values (((comp) (create-simple-Composite OUT1 OUT2)))
-      (hook-proc!
-       comp
-       (list
-        (pin-ref comp 'OUT1)
-        (pin-ref r1 '1))
-       (list
-        (pin-ref r1 '2)
-        (pin-ref r2 '1))
-       (list
-        (pin-ref r2 '2)
-        (pin-ref c1 '1))
-       (list
-        (pin-ref c1 '2)
-        (pin-ref comp 'OUT2)))
-      comp)))
-
- )
+    (append (Composite-nets comp)
+            nets))))
 
 (define-syntax (hook stx)
   (syntax-parse stx
@@ -254,13 +199,14 @@
      #`(let ([comp (create-simple-Composite pin ...)])
          ;; create connections
          (hook-proc! comp
-                     (list (pin-ref
-                            ;; this is a trick to bring the newly bound
-                            ;; variable "comp" into the scope for
-                            ;; replacing 'self
-                            (replace-self net.lhs comp)
-                            'net.rhs)
-                           ...)
+                     (Net (list (pin-ref
+                                 ;; this is a trick to bring the newly bound
+                                 ;; variable "comp" into the scope for
+                                 ;; replacing 'self
+                                 (replace-self net.lhs comp)
+                                 'net.rhs)
+                                ...)
+                          1)
                      ...)
          comp)]))
 
@@ -268,62 +214,69 @@
   (syntax-parse stx
     [(_ comp (net:dot ...) ...)
      #'(hook-proc! comp
-                   (list (pin-ref net.lhs 'net.rhs)
-                         ...) ...)]))
+                   (Net (list (pin-ref net.lhs 'net.rhs)
+                              ...)
+                        1)
+                   ...)]))
 
 (define (*--proc lst)
   (let ([item-1 (first lst)]
         [item-n (last lst)]
         [res (create-simple-Composite 1 2)])
     ;; connect res.2 with first.1
-    (hook-proc! res (list (pin-ref res 1)
-                          (pin-ref item-1 1)))
+    (hook-proc! res (Net (list (pin-ref res 1)
+                               (pin-ref item-1 1))
+                         1))
     (for/fold ([prev (first lst)])
               ([cur (rest lst)])
-      (hook-proc! res (list (pin-ref prev 2)
-                            (pin-ref cur 1)))
-      cur)
+      ;; if cur is a list
+      (match cur
+        [(list weight node)
+         (hook-proc! res (Net (list (pin-ref prev 2)
+                                    (pin-ref node 1))
+                              weight))
+         node]
+        [node
+         (hook-proc! res (Net (list (pin-ref prev 2)
+                                    (pin-ref cur 1))
+                              1))
+         node])
+      )
     ;; end
-    (hook-proc! res (list (pin-ref item-n 2)
-                          (pin-ref res 2)))
+    (hook-proc! res (Net (list (pin-ref item-n 2)
+                               (pin-ref res 2))
+                         1))
     res))
+
+(begin-for-syntax
+  (define-splicing-syntax-class node-or-weight
+    (pattern (~seq #:weight w node:maybe-dot)
+             #:with res #'(list w node.res))
+    (pattern (~seq node:maybe-dot)
+             #:with res #'node.res)))
 
 (define-syntax (*- stx)
   (syntax-parse stx
-    [(_ node:maybe-dot ...)
+    [(_ node:node-or-weight ...)
+     ;; TODO add #:weight
      #'(*--proc (list node.res ...))]))
 
 (define (*<-proc lst)
   (let ([res (create-simple-Composite 1 2)])
     (for ([item lst])
       (hook-proc! res
-                  (list (pin-ref res 1)
-                        (pin-ref item 1))
-                  (list (pin-ref res 2)
-                        (pin-ref item 2))))
+                  (Net (list (pin-ref res 1)
+                             (pin-ref item 1))
+                       1)
+                  (Net (list (pin-ref res 2)
+                             (pin-ref item 2))
+                       1)))
     res))
 
 (define-syntax (*< stx)
   (syntax-parse stx
     [(_ node:maybe-dot ...)
      #'(*<-proc (list node.res ...))]))
-
-(myvoid
- (require "library.rkt")
- (require "library-IC.rkt")
- (define ic (make-IC-atom ATmega8U2))
- (define comp (Composite (make-hash) '()))
- ;; connect crystal
- (let ([r1 (R 27)]
-       [c1 (C 22)]
-       [c2 (C 22)]
-       [r3 (R 1000)])
-   (hook! comp
-          (ic.XTAL1 r3.2)
-          (ic.XTAL2 r1.1 c1.2)
-          (r1.2 r3.1 c2.2)
-          (c1.1 c2.1)))
- (collect-all-atoms comp))
 
 (define (get-neighbors lsts item)
   "Get the (direct) neighbors of item inside the lsts."
@@ -358,15 +311,33 @@ res: already in this set."
   (let ([res (my-merge-helper lsts (list->seteq (apply append lsts)) (seteq))])
     (map set->list (set->list res))))
 
+(define (merge-nets nets)
+  "Merge nets and keep the special (not 1) weights."
+  (let ([merged-lsts (let* ([lsts (map Net-pins nets)]
+                            [merged (my-merge lsts)])
+                       ;; filter 1. only Atoms 2. net size at least two
+                       (filter (λ (x) (> (length x) 1))
+                               (for/list ([l merged])
+                                 (filter (λ (pin) (Atom? (Pin-parent pin))) l))))]
+        [H (for*/hash ([net nets]
+                       [pin (Net-pins net)])
+             (values pin net))])
+    (for/list ([pins merged-lsts])
+      (Net pins
+           ;; FIXME I'm simply using the first available weight. It is not
+           ;; necessary to filter the non-1 weights, I'm simply not allowing it.
+           (Net-weight (hash-ref H (first pins)))))))
+
 (define (collect-all-composites-helper todo done)
   "return all Composites this composite has reach to, except known-composites"
   (if (set-empty? todo) done
       (let ([item (set-first todo)]
             [todo (set-rest todo)])
         (let* ([new-comps (list->seteq
-                           (filter Composite? (for*/list ([conn (Composite-connections item)]
-                                                          [pin conn])
-                                                (Pin-parent pin))))]
+                           (filter Composite?
+                                   (for*/list ([net (Composite-nets item)]
+                                               [pin (Net-pins net)])
+                                     (Pin-parent pin))))]
                [done (set-add done item)]
                [todo (set-subtract (set-union todo new-comps) done)])
           (collect-all-composites-helper todo done)))))
@@ -379,25 +350,24 @@ res: already in this set."
   ;; from Composite to netlist
   ;; 1. loop through all the connections, collect atoms
   (let* ([all-comps (collect-all-composites comp)]
-         [all-conns (apply append (for/list ([comp all-comps])
-                                    (Composite-connections comp)))]
-         [merged (my-merge all-conns)])
-    (filter (λ (x) (> (length x) 1))
-            (for/list ([l merged])
-              (filter (λ (pin) (Atom? (Pin-parent pin))) l)))))
+         [all-nets (apply append (for/list ([comp all-comps])
+                                   (Composite-nets comp)))]
+         ;; this merge does not take into account weights
+         [merged (merge-nets all-nets)])
+    merged))
 
 (define (collect-all-atoms comp)
   ;; remove dupilcate and FIXME fix order
   (set->list
    (list->set
     (apply append (for/list ([net (Composite->netlist comp)])
-                    (for/list ([pin net])
+                    (for/list ([pin (Net-pins net)])
                       (Pin-parent pin)))))))
 
 (define (collect-all-pins comp)
   (remove-duplicates
    (apply append (for/list ([net (Composite->netlist comp)])
-                   (for/list ([pin net])
+                   (for/list ([pin (Net-pins net)])
                      pin)))))
 
 

@@ -14,10 +14,31 @@
 *** other
 - [ ] ergonomic (hebi) keyboard
 
-** TODO detailed placement and legalization
+** STARTED export kicad compatible netlist
+SCHEDULED: <2020-05-12 Tue>
+And read back edited results?
+
+But this would require compatibility with kicad symbol and footprint library.
+
+UPDATE actually I'm using kicad footprints, so it's quite easy to make pcbnew
+compatible netlist. Then I'll be able to take care of the routing there
+manually. This is the work tomorrow.
+** STARTED detailed placement and legalization
+SCHEDULED: <2020-05-12 Tue>
+I prefer to get this and global placement into one pass.
+** STARTED better schematic and footprint libraries
+** STARTED assign footprints
+and probably mix the two syntaxes?
+
+** TODO weighted nets
+I actually do not need any weight. More specifically, I don't need the diodes to
+be exactly near the switches.
+
+But I need weights to put filtering capacitors close to the component.
+
 ** TODO Auto-Routing
-** DONE fixed positions
-CLOSED: [2020-05-09 Sat 20:18]
+
+** TODO vectorized connections
 
 ** research problems
 
@@ -48,36 +69,6 @@ together.
 
 No more number assignment like R5, it is compiler details.
 
-** Tmp
-
-*** TODO vectorized connections
-
-*** STARTED better schematic and footprint libraries
-*** STARTED assign footprints
-and probably mix the two syntaxes?
-
-*** TODO export kicad compatible netlist
-And read back edited results?
-
-But this would require compatibility with kicad symbol and footprint library.
-
-*** DONE assign fixed locations
-CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
-*** DONE in-place part creation and corresponding syntax
-CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
-*** DONE gh60
-CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
-*** DONE a little mismatch of placed fixed positions
-CLOSED: [2020-05-12 Tue 14:35]
-*** DONE auto-visualization scale
-CLOSED: [2020-05-12 Tue 15:11]
-And use the real footprint size
-
-*** DONE placement engine wirelength
-CLOSED: [2020-05-12 Tue 15:11]
-
-*** DONE fixed diearea?
-CLOSED: [2020-05-12 Tue 15:11]
 
 ** Gerbers
 *** gerber generation
@@ -267,3 +258,25 @@ some reachable Composite
 *** DONE In place.rkt, the macro and macro pins should be unified with library as well
 CLOSED: [2020-05-06 Wed 16:55]
 specifically, the pin index of ICAtom might not be numbers, but symbols
+
+
+*** DONE assign fixed locations
+CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
+*** DONE in-place part creation and corresponding syntax
+CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
+*** DONE gh60
+CLOSED: [2020-05-09 Sat 20:19] SCHEDULED: <2020-05-08 Fri>
+*** DONE a little mismatch of placed fixed positions
+CLOSED: [2020-05-12 Tue 14:35]
+*** DONE auto-visualization scale
+CLOSED: [2020-05-12 Tue 15:11]
+And use the real footprint size
+
+*** DONE placement engine wirelength
+CLOSED: [2020-05-12 Tue 15:11]
+
+*** DONE fixed diearea?
+CLOSED: [2020-05-12 Tue 15:11]
+** DONE fixed positions
+CLOSED: [2020-05-09 Sat 20:18]
+

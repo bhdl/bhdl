@@ -86,15 +86,16 @@
            ;; Edge is list of nets. Each net is a list of nodes, a node is
            ;; (index offx offy)
            (for/list ([net netlist])
-                (for/list ([pin net])
-                  (let* ([atom (Pin-parent pin)]
-                         ;; FIXME pin index might be symbol
-                         [pin-index (Pin-index pin)]
-                         [macro (atom->macro atom symbol-or-fp)]
-                         [pin (list-ref (Macro-pins macro) (sub1 pin-index))])
-                    (list (hash-ref Hatom=>idx atom)
-                          (exact->inexact (MacroPin-offx pin))
-                          (exact->inexact (MacroPin-offy pin))))))])
+             ;; TODO weight
+             (for/list ([pin (Net-pins net)])
+               (let* ([atom (Pin-parent pin)]
+                      ;; FIXME pin index might be symbol
+                      [pin-index (Pin-index pin)]
+                      [macro (atom->macro atom symbol-or-fp)]
+                      [pin (list-ref (Macro-pins macro) (sub1 pin-index))])
+                 (list (hash-ref Hatom=>idx atom)
+                       (exact->inexact (MacroPin-offx pin))
+                       (exact->inexact (MacroPin-offy pin))))))])
       (hash 'xs xs
             'ys ys
             'ws ws
@@ -162,8 +163,8 @@
     (add-vertex! g pin))
   ;; add pins
   (for ([net (Composite->netlist comp)])
-    (for* ([pin1 net]
-           [pin2 net])
+    (for* ([pin1 (Net-pins net)]
+           [pin2 (Net-pins net)])
       (when (not (equal? pin1 pin2))
         (match-let ([(list x1 y1) (hash-ref Hpin=>xy pin1)]
                     [(list x2 y2) (hash-ref Hpin=>xy pin2)])
