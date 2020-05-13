@@ -4,21 +4,15 @@
          "sch.rkt")
 
 (provide (struct-out IC)
-         (struct-out OrientSpec)
          (struct-out FpSpec)
          (struct-out Connector)
          
-         ;; this is a little ugly
-         (contract-out
-          [IC-get-orient-pins (-> IC?
-                                  (or/c 'top 'left 'right 'bottom)
-                                  (listof (listof symbol?)))])
-
          ;; create components to use in sch.rkt
          make-IC-atom
          R C connector
          led diode fuse crystal
          switch cherry
+         usb
 
          ;; HACK this should not have been exposed
          make-simple-atom
@@ -30,15 +24,12 @@
          (struct-out Diode)
          (struct-out CherrySwitch)
          (struct-out LED)
-         (struct-out Fuse))
+         (struct-out Fuse)
+         (struct-out USB))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IC definition, for symbol and footprint
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(struct OrientSpec
-  (orient pins)
-  #:prefab)
 
 (struct FpSpec
   (package num pins)
@@ -53,23 +44,14 @@
 ;; 3. fps: this determines the exact footprint of different packaging
 (struct IC
   ;; this tells nothing about the fields. I really need type
-  (datasheet alts orients fps)
+  (datasheet alts fps)
   #:prefab)
-
-(define (IC-get-orient-pins ic dir)
-  (OrientSpec-pins
-   (findf (λ (x) (eq? (OrientSpec-orient x) dir))
-          (IC-orients ic))))
 
 (module+ test
   (define ic (IC "https://example.pdf"
                  '((PA0 TX) (PB1))
-                 (list (OrientSpec 'top '((vcc) (gnd)))
-                       (OrientSpec 'left '((pa0 pa1 pa2)
-                                           (pb0 pb1 pb2))))
                  (list (FpSpec 'QFN 20 '(pa0 pa1 pa2 vcc gnd))
-                       (FpSpec 'DIP 20 '(vcc gnd pa0 pa1 pa2)))))
-  (IC-get-orient-pins ic 'top))
+                       (FpSpec 'DIP 20 '(vcc gnd pa0 pa1 pa2))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Atoms used in schematic. This wrap around IC.
@@ -78,38 +60,22 @@
 
 (struct Resistor
   (value)
-  #:super struct:Atom
-  #:methods gen:custom-write
-  [(define (write-proc r port mode)
-     (write-string (~a "#<R(" (Resistor-value r) ")>") port))])
+  #:super struct:Atom)
 
 (struct Capacitor
   (value)
-  #:super struct:Atom
-  #:methods gen:custom-write
-  [(define (write-proc r port mode)
-     (write-string (~a "#<C(" (Capacitor-value r) ")>") port))])
+  #:super struct:Atom)
 
 (struct LED
   (color)
-  #:super struct:Atom
-  #:methods gen:custom-write
-  [(define (write-proc r port mode)
-     (write-string (~a "#<LED>") port))])
+  #:super struct:Atom)
 
-(struct Diode
-  ()
-  #:super struct:Atom
-  #:methods gen:custom-write
-  [(define (write-proc r port mode)
-     (write-string (~a "#<D>") port))])
+(struct Diode ()
+  #:super struct:Atom)
 
 (struct Fuse
   (value)
-  #:super struct:Atom
-  #:methods gen:custom-write
-  [(define (write-proc r port mode)
-     (write-string (~a "#<F>") port))])
+  #:super struct:Atom)
 
 (define (make-simple-atom proc degree . rst)
   (let ([comp (apply proc (make-hash) rst)])
@@ -143,22 +109,15 @@
 (define (switch)
   (make-simple-atom Atom 2))
 
-(struct CherrySwitch
-  ()
-  #:super struct:Atom
-  #:methods gen:custom-write
-  [(define (write-proc x port mode)
-     (write-string (~a "#<cherry>") port))])
+(struct CherrySwitch ()
+  #:super struct:Atom)
 
 (define (cherry)
   (make-simple-atom CherrySwitch 2))
 
 (struct Connector
   (num)
-  #:super struct:Atom
-  #:methods gen:custom-write
-  [(define (write-proc x port mode)
-     (write-string (~a "#<Conn(" (Connector-num x) ")>") port))])
+  #:super struct:Atom)
 
 (define (connector num)
   (let ([comp (Connector (make-hash) num)])
@@ -166,12 +125,47 @@
       (hash-set! (Atom-pinhash comp) (add1 i) (Pin comp (add1 i))))
     comp))
 
+(struct USB (type)
+  #:super struct:Atom)
+
+(define (usb type)
+  ;; I'll need the pin name to pin number mapping
+  (let ([pin-specs (case type
+                     [(a-male a-female) '((1 . VBUS)
+                                          (2 . D-)
+                                          (3 . D+)
+                                          (4 . GND))]
+                     [(micro-male
+                       micro-female
+                       mini-male
+                       mini-female) '((1 . VBUS)
+                                      (2 . D-)
+                                      (3 . D+)
+                                      ;; ??
+                                      (4 . ID)
+                                      (5 . GND))]
+                     [(c-male c-female) '((A1 . GND)
+                                          (A4 . VBUS)
+                                          (A5 . CC)
+                                          (A6 . D+)
+                                          (A7 . D-)
+                                          (A9 . VBUS)
+                                          (A12 . GND)
+                                          ;; B
+                                          (B1 . GND)
+                                          (B4 . VBUS)
+                                          (B9 . VBUS)
+                                          (B12 . GND))])])
+    (let ([res (USB (make-hash) type)])
+      (for ([pair pin-specs])
+        (let ([p (Pin res (car pair))])
+          (hash-set! (Atom-pinhash res) (car pair) p)
+          (hash-set! (Atom-pinhash res) (cdr pair) p)))
+      res)))
+
 (struct ICAtom
   (ic)
-  #:super struct:Atom
-  #:methods gen:custom-write
-  [(define (write-proc r port mode)
-     (write-string (~a "#<ICAtom>") port))])
+  #:super struct:Atom)
 
 (define (make-IC-atom ic)
   ;; For all the pins, create Pin.
@@ -181,10 +175,7 @@
   ;; 3. create Pins
   ;;
   ;; then record ic into view
-  (let ([pins (flatten (map OrientSpec-pins (IC-orients ic)))]
-        ;; FIXME i probably need to combine the footprint pins as well, just to
-        ;; make sure the orients recorded all pins. This is a verification
-        ;; check.
+  (let ([pins (flatten (map FpSpec-pins (IC-fps ic)))]
         [alts (IC-alts ic)])
     ;; this is alts extended with all pins not recorded in original alts
     (let ([alts (append (map list (set-subtract pins (flatten alts)))

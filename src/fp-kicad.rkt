@@ -73,7 +73,7 @@
                    ;; FIXME optional z
                    [`(pad ,num ,mounting-type ,shape (at ,x ,y ,z ...)
                           (size ,s1 ,s2) ,other-attrs ...)
-                    (pad-spec x y num mounting-type shape `((size ,s1 ,s2)))]
+                    (pad-spec num x y mounting-type shape `((size ,s1 ,s2)))]
                    ;; TODO
                    [`(fp_circle ,other ...)
                     #f]
@@ -83,11 +83,13 @@
                    [`(model ,other ...) #f]
                    [`(attr ,other ...) #f])))])])
       (let ([line-specs (filter line-spec? specs)]
-            [pad-specs (filter
-                        ;; FIXME the num maybe a string, most likely empty
-                        ;; string. See QFN-32 for an example.
-                        (λ (p)
-                          (number? (pad-spec-num p)))
+            [pad-specs (filter-not
+                        ;; FIXME actually I'm removing empty strings, as those
+                        ;; seem to be not useful
+                        ;;
+                        ;; most of the pin names are numbers, but some like
+                        ;; USB-C are symbols
+                        (λ (x) (string? (pad-spec-num x)))
                         (filter pad-spec? specs))])
         (footprint line-specs pad-specs)))))
 

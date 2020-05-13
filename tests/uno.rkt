@@ -249,12 +249,11 @@
 (module+ test
   (collect-all-atoms whole-circuit)
   (define place-result
-    (send-for-placement (Composite->place-spec whole-circuit 'fp)))
+    (send-for-placement (Composite->place-spec whole-circuit '(1000 1000))))
   (save-file
    (Composite->pict whole-circuit
                     '(1000 1000)
                     (hash-ref place-result 'xs)
-                    (hash-ref place-result 'ys)
-                    'fp)
-   "fp.pdf"))
+                    (hash-ref place-result 'ys))
+   "uno.pdf"))
 

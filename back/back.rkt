@@ -1035,3 +1035,77 @@ the kicad footprint format and generate gerber."
           (c1.1 c2.1)))
  (collect-all-atoms comp))
 
+
+(define (atom-sort-locs atom named-locs)
+  "sort locs based on atom's internal pin order (the Pin-index of each pin)"
+  (let* (;; 1. get all the keys
+         [keys (hash-keys (Atom-pinhash atom))]
+         ;; 3. build hash table for named-locs
+         [Hlocs (for/hash ([loc named-locs])
+                  (match loc
+                    [(NamedPoint name x y)
+                     (values name loc)]))]
+         ;; filter only the keys that are in Hlocs
+         [keys (filter (λ (k) (hash-has-key? Hlocs k)) keys)]
+         ;; sort keys based on the pin index
+         [keys (sort keys <
+                     #:key (λ (k) (Pin-index
+                                   (hash-ref (Atom-pinhash atom)
+                                             k))))])
+    (or (= (length keys) (hash-count Hlocs))
+        (error "Hlocs and keys should be equal. Maybe due to some
+case-sensitivity issue in library-IC.rkt"))
+    (for/list ([key keys])
+      (match (hash-ref Hlocs key)
+        ;; and change it back to Point
+        [(NamedPoint _ x y) (Point x y)]))))
+
+(define (binary-locs pict)
+  (let ([l (blank)]
+        [r (blank)])
+    (let ([whole (hc-append l pict r)])
+      (let-values ([(x1 y1) (cc-find whole l)]
+                   [(x2 y2) (cc-find whole r)])
+        (hash 1 (Point x1 y1)
+              2 (Point x2 y2))))))
+
+(define (atom->symbol-pict+locs atom)
+  (match atom
+    [(Resistor _) (values R-symbol-pict
+                          (binary-locs R-symbol-pict))]
+    [(Capacitor _) (values C-symbol-pict
+                           (binary-locs C-symbol-pict))]
+    [(LED _) (values D-symbol-pict
+                     (binary-locs C-symbol-pict))]
+    [(Diode) (values D-symbol-pict
+                     (binary-locs C-symbol-pict))]
+    ;; FIXME using footprint ..
+    [(Connector num) (footprint->pict+locs (fp-pin-header num))]
+    [(ICAtom ic) (let-values ([(p locs) (IC->symbol-pict+locs ic)])
+                   (values p (atom-sort-locs atom locs)))]
+    [(Atom _ _) (atom->symbol-pict+locs-fallback atom)]))
+
+
+
+(define (atom->symbol-pict atom)
+  (let-values ([(p locs) (atom->symbol-pict+locs atom)]) p))
+
+(module+ test
+  (IC->symbol-pict+Hlocs ATtiny25)
+  (IC->symbol-pict ATmega16)
+  (IC->fp-pict+Hlocs ATtiny25))
+
+
+(module+ test
+  (atom->symbol-pict+locs (make-IC-atom ATmega8U2))
+  (atom->fp-pict+locs (make-IC-atom ATmega8U2)))
+
+([texted-p ((apply
+             compose
+             (reverse
+              (for/list ([pin (hash-keys Hlocs)])
+                (λ (p) (pin-over-cc p
+                                    (Point-x (hash-ref Hlocs pin))
+                                    (Point-y (hash-ref Hlocs pin))
+                                    (text (symbol->string pin)))))))
+            p)])

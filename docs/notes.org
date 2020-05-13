@@ -30,6 +30,8 @@ I prefer to get this and global placement into one pass.
 ** STARTED assign footprints
 and probably mix the two syntaxes?
 
+** performance of placement engine, again
+
 ** TODO weighted nets
 I actually do not need any weight. More specifically, I don't need the diodes to
 be exactly near the switches.

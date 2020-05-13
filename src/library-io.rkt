@@ -1,7 +1,6 @@
 #lang racket
 
-(require "library-symbol.rkt"
-         "library-IC.rkt"
+(require "library-IC.rkt"
          "library.rkt"
          "fp.rkt"
          "fp-kicad.rkt"
@@ -13,20 +12,15 @@
          "sch.rkt"
          pict)
 
-(provide IC->symbol-pict+locs
-         IC->symbol-pict
-
-         IC->fp-pict
-         IC->fp-pict+locs
+(provide IC->fp-pict
+         IC->fp-pict+Hlocs
 
          ;; not sure if needed
          footprint->pict
-         footprint->pict+locs
+         footprint->pict+Hlocs
          ;; footprint->pad-locs
 
-         atom->symbol-pict+locs
-         atom->symbol-pict
-         atom->fp-pict+locs
+         atom->fp-pict+Hlocs
          atom->fp-pict)
 
 ;; the FP size is typically in MM, and the number is typically in the range of
@@ -52,52 +46,6 @@
 ;; (define fp-font-size (make-parameter 12))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; IC -> Schematic symbols
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; I want not only output a pict, but also the location of the pads, and the
-;; width and height
-(define (IC->symbol-pict+locs-uncached ic)
-  ;; TODO
-  (rect-symbol->pict+locs
-   ;; the location order of schematic symbol is: lrtb
-   #:left (IC-get-orient-pins ic 'left)
-   #:bottom (IC-get-orient-pins ic 'bottom)
-   #:right (IC-get-orient-pins ic 'right)
-   #:top (IC-get-orient-pins ic 'top)))
-
-(define IC->symbol-pict+locs
-  (let ([cache (make-hash)])
-    (λ (ic)
-      (if (hash-has-key? cache ic)
-          ;; CAUTION store in the hash table list
-          (match-let ([(list p locs) (hash-ref cache ic)])
-            (values p locs))
-          (let-values ([(p locs) (IC->symbol-pict+locs-uncached ic)])
-            (hash-set! cache ic (list p locs))
-            (values p locs))))))
-
-(define (IC->symbol-pict ic)
-  (let-values ([(p locs) (IC->symbol-pict+locs ic)])
-    p))
-
-(define (atom->symbol-pict+locs-fallback atom)
-  ;; this is a fallback, create a pad for each pin
-  (let-values ([(p locs) (rect-symbol->pict+locs
-                          #:bottom (list (hash-keys (Atom-pinhash atom))))])
-    (values p (atom-sort-locs
-               atom locs))))
-
-(define (atom->fp-pict+locs-fallback atom)
-  ;; FIXME using symbol
-  (let-values ([(p locs) (rect-symbol->pict+locs
-                          #:bottom (list (hash-keys (Atom-pinhash atom))))])
-    (values p (atom-sort-locs
-               atom locs))))
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IC -> footprint
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -111,13 +59,12 @@
   ;; boxes
   ;;
   ;; create an IC
-  (IC->fp-pict+locs ATmega16 'DIP)
-  (void))
+  (IC->fp-pict+Hlocs ATmega16 'DIP))
 
 
-(define (IC->fp-pict+locs ic
-                          #:package (package #f)
-                          #:pin-count (pin-count #f))
+(define (IC->fp-pict+Hlocs ic
+                           #:package (package #f)
+                           #:pin-count (pin-count #f))
   ;; generate footprint for ic
   ;; 1. get the first footprint spec that matches selection
   (let ([spec (findf (λ (spec)
@@ -136,37 +83,30 @@
                 ;; TODO other types of IC packaging?
                 [else (error (~a "Unsupported package: " package))])])
       ;; CAUTION p is scaled here
-      (let-values ([(p locs) (footprint->pict+locs fp)]
+      (let-values ([(p Hlocs) (footprint->pict+Hlocs fp)]
                    [(pins) (FpSpec-pins spec)])
-        ;; add pin name
-        (let ([texted-p ((apply
-                          compose
-                          (reverse
-                           (for/list ([loc locs]
-                                      [pin pins])
-                             (λ (p) (pin-over-cc p
-                                                 (Point-x loc)
-                                                 (Point-y loc)
-                                                 (text (symbol->string pin)))))))
-                         p)])
-          (values texted-p
-                  ;; attach names to the points
-                  (map point->named-point locs pins)))))))
+        ;; 1. compute the new Hlocs using pin name instead of number index,
+        ;; because the number index is different across different footprint
+        ;; packagings
+        (let ([Hlocs (for/hash ([pin pins]
+                                [i (in-naturals 1)])
+                       (values pin (hash-ref Hlocs i)))])
+          (values p Hlocs))))))
 
 (module+ test
-  (footprint->pict+locs (fp-QFN 32)))
+  (footprint->pict+Hlocs (fp-QFN 32)))
 
 (define (IC->fp-pict ic
                      ;; FIXME duplication
                      #:package (package #f)
                      #:pin-count (pin-count #f))
-  (let-values ([(p locs) (IC->fp-pict+locs ic
-                                           #:package package
-                                           #:pin-count pin-count)])
+  (let-values ([(p Hlocs) (IC->fp-pict+Hlocs ic
+                                             #:package package
+                                             #:pin-count pin-count)])
     p))
 
 ;; FIXME it should be in fp.rkt?
-(define (footprint->pict+locs-uncached fp)
+(define (footprint->pict+Hlocs-uncached fp)
   "This functions takes care of two additional things:
 
 1. the offset created by turning gerber into pict
@@ -184,20 +124,19 @@
        ;; 1. scale the picture
        (scale p (fp-scale))
        ;; 2. offset and scale the loc
-       (for/list ([pad (sort (footprint-pads fp)
-                             <
-                             #:key pad-spec-num)])
-         (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))
-                (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale))))))))
+       (for/hash ([pad (footprint-pads fp)])
+         (values (pad-spec-num pad)
+                 (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))
+                        (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale)))))))))
 
-(define footprint->pict+locs
+(define footprint->pict+Hlocs
   (let ([cache (make-hash)])
     (λ (fp)
       ;; FIXME hash the footprint struct?
       (if (hash-has-key? cache fp)
           (match-let ([(list p locs) (hash-ref cache fp)])
             (values p locs))
-          (let-values ([(p locs) (footprint->pict+locs-uncached fp)])
+          (let-values ([(p locs) (footprint->pict+Hlocs-uncached fp)])
             (hash-set! cache fp (list p locs))
             (values p locs))))))
 
@@ -205,13 +144,7 @@
   (footprint->pict (fp-QFN 32)))
 
 (define (footprint->pict fp)
-  (let-values ([(p _) (footprint->pict+locs fp)]) p))
-
-
-(module+ test
-  (IC->symbol-pict+locs ATtiny25)
-  (IC->symbol-pict ATmega16)
-  (IC->fp-pict+locs ATtiny25))
+  (let-values ([(p _) (footprint->pict+Hlocs fp)]) p))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -219,80 +152,34 @@
 ;; defined in atom pin's Pin-index
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define (binary-locs pict)
-  (let ([l (blank)]
-        [r (blank)])
-    (let ([whole (hc-append l pict r)])
-      (let-values ([(x1 y1) (cc-find whole l)]
-                   [(x2 y2) (cc-find whole r)])
-        (list (Point x1 y1)
-              (Point x2 y2))))))
-
-(define (atom-sort-locs atom named-locs)
-  "sort locs based on atom's internal pin order (the Pin-index of each pin)"
-  (let* (;; 1. get all the keys
-         [keys (hash-keys (Atom-pinhash atom))]
-         ;; 3. build hash table for named-locs
-         [Hlocs (for/hash ([loc named-locs])
-                  (match loc
-                    [(NamedPoint name x y)
-                     (values name loc)]))]
-         ;; filter only the keys that are in Hlocs
-         [keys (filter (λ (k) (hash-has-key? Hlocs k)) keys)]
-         ;; sort keys based on the pin index
-         [keys (sort keys <
-                     #:key (λ (k) (Pin-index
-                                   (hash-ref (Atom-pinhash atom)
-                                             k))))])
-    (or (= (length keys) (hash-count Hlocs))
-        (error "Hlocs and keys should be equal. Maybe due to some
-case-sensitivity issue in library-IC.rkt"))
-    (for/list ([key keys])
-      (match (hash-ref Hlocs key)
-        ;; and change it back to Point
-        [(NamedPoint _ x y) (Point x y)]))))
-
-
-(define (atom->symbol-pict+locs atom)
-  (match atom
-    [(Resistor _) (values R-symbol-pict
-                          (binary-locs R-symbol-pict))]
-    [(Capacitor _) (values C-symbol-pict
-                           (binary-locs C-symbol-pict))]
-    [(LED _) (values D-symbol-pict
-                     (binary-locs C-symbol-pict))]
-    [(Diode) (values D-symbol-pict
-                     (binary-locs C-symbol-pict))]
-    ;; FIXME using footprint ..
-    [(Connector num) (footprint->pict+locs (fp-pin-header num))]
-    [(ICAtom ic) (let-values ([(p locs) (IC->symbol-pict+locs ic)])
-                   (values p (atom-sort-locs atom locs)))]
-    [(Atom _ _) (atom->symbol-pict+locs-fallback atom)]))
-
-
-
-(define (atom->symbol-pict atom)
-  (let-values ([(p locs) (atom->symbol-pict+locs atom)]) p))
-
-(define (atom->fp-pict+locs atom)
+(define (atom->fp-pict+Hlocs atom)
   (match atom
     ;; FIXME fixed footprint packaging
-    [(Resistor _) (footprint->pict+locs (fp-resistor "0603"))]
-    [(Capacitor _) (footprint->pict+locs (fp-capacitor "0603"))]
-    [(Diode) (footprint->pict+locs fp-diode)]
-    [(LED _) (footprint->pict+locs fp-diode)]
-    [(CherrySwitch) (footprint->pict+locs (fp-switch-keyboard 1.25 'pcb))]
+    [(Resistor _) (footprint->pict+Hlocs (fp-resistor "0603"))]
+    [(Capacitor _) (footprint->pict+Hlocs (fp-capacitor "0603"))]
+    [(Diode) (footprint->pict+Hlocs fp-diode)]
+    [(LED _) (footprint->pict+Hlocs fp-diode)]
+    [(CherrySwitch) (footprint->pict+Hlocs (fp-switch-keyboard 1.25 'pcb))]
+    [(USB type) (footprint->pict+Hlocs (fp-usb type))]
     ;; FIXME pin header? Double column?
-    [(Connector num) (footprint->pict+locs (fp-pin-header num))]
+    [(Connector num) (footprint->pict+Hlocs (fp-pin-header num))]
     ;; FIXME only IC needs to sort locs based. Other simple ones should have the
     ;; correct and consistent order
-    [(ICAtom ic) (let-values ([(p locs) (IC->fp-pict+locs ic)])
-                   (values p (atom-sort-locs atom locs)))]
-    [(Atom _ _) (atom->fp-pict+locs-fallback atom)]))
+    [(ICAtom ic) (IC+Atom->fp-pict+Hlocs ic atom)]
+    [(Atom _ _) (footprint->pict+Hlocs
+                 (fp-pin-header
+                  (length
+                   (remove-duplicates
+                    (hash-values (Atom-pinhash atom))))))]))
+
+(define (IC+Atom->fp-pict+Hlocs ic atom)
+  (let-values ([(p Hlocs) (IC->fp-pict+Hlocs ic)])
+    (let ([Hlocs (for/hash ([(name point) Hlocs])
+                   (values
+                    ;; basically change the name to the index of the atom
+                    (Pin-index (hash-ref (Atom-pinhash atom) name))
+                    point))])
+      (values p Hlocs))))
 
 (define (atom->fp-pict atom)
-  (let-values ([(p locs) (atom->fp-pict+locs atom)]) p))
-
-(module+ test
-  (atom->symbol-pict+locs (make-IC-atom ATmega8U2))
-  (atom->fp-pict+locs (make-IC-atom ATmega8U2)))
+  (let-values ([(p locs) (atom->fp-pict+Hlocs atom)]) p))

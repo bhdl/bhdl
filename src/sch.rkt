@@ -55,7 +55,7 @@
 
 (struct Atom
   (pinhash [loc #:auto])
-  #:prefab
+  ;; #:prefab
   ;; CAUTION #:mutable only for changing loc
   #:mutable)
 

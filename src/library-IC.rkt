@@ -18,20 +18,6 @@
   (define-syntax-class symbol-spec
     (pattern ((group:id ...) ...)))
 
-  (define-splicing-syntax-class orient-spec
-    (pattern (~seq #:TOP spec:symbol-spec)
-             #:with which #'top
-             #:with ((group ...) ...) #'((spec.group ...) ...))
-    (pattern (~seq #:BOTTOM spec:symbol-spec)
-             #:with which #'bottom
-             #:with ((group ...) ...) #'((spec.group ...) ...))
-    (pattern (~seq #:LEFT spec:symbol-spec)
-             #:with which #'left
-             #:with ((group ...) ...) #'((spec.group ...) ...))
-    (pattern (~seq #:RIGHT spec:symbol-spec)
-             #:with which #'right
-             #:with ((group ...) ...) #'((spec.group ...) ...)))
-  
   (define-splicing-syntax-class footprint-spec
     (pattern (~seq #:DIP (num pin ...))
              #:with package #'DIP)
@@ -44,13 +30,10 @@
         ;; CAUTION currently only fixed order is implemented
         #:datasheet url
         #:ALTS ((alt ...) ...)
-        orient:orient-spec ...
         footprint:footprint-spec ...)
      #`(define-alias (name ...)
          (IC url
              '((alt ...) ...)
-             (list (OrientSpec 'orient.which '((orient.group ...) ...))
-                   ...)
              (list (FpSpec 'footprint.package footprint.num '(footprint.pin ...))
                    ...)))]))
 
@@ -64,10 +47,6 @@
           [PB3 PCINT3 XTAL1 CLKI OC1B ADC3]
           [PB4 PCINT4 XTAL2 CLKO OC1B ADC2]
           [PB5 PCINT5 RESET ADC0 DW])
-  #:TOP ((VCC))
-  #:BOTTOM ((GND))
-  #:LEFT ((PB0 PB1 PB2 PB3 PB4 PB5))
-  #:RIGHT ()
   #:DIP (8 PB5 PB3 PB4 GND PB0 PB1 PB2 VCC)
   #:QFN (20 PB5 PB3 DNC DNC PB4
             DNC DNC GND DNC DNC
@@ -87,12 +66,6 @@
           (PC4 TDO) (PC5 TDI) (PC6 TOSC1) (PC7 TOSC2)
           (PD0 RXD) (PD1 TXD) (PD2 INT0) (PD3 INT1) (PD4 OC1B)
           (PD5 OC1A) (PD6 ICP1) (PD7 OC2))
-  #:TOP ((VCC) (AVCC) (AREF) (RESET))
-  #:BOTTOM ((GND) (XTAL2) (XTAL1))
-  #:LEFT ([PA0 PA1 PA2 PA3 PA4 PA5 PA6 PA7]
-          [PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7])
-  #:RIGHT ([PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7]
-           [PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
   #:DIP (40 PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7
             RESET VCC GND XTAL2 XTAL1
             PD0 PD1 PD2 PD3 PD4 PD5 PD6
@@ -124,15 +97,6 @@
           (PF0 ADC0) (PF1 ADC1) (PF2 ADC2) (PF3 ADC3) (PF4 ADC4 TCK)
           (PF5 ADC5 TMS) (PF6 ADC6 TDO) (PF7 ADC7 TDI)
           (PG0 WR) (PG1 RD) (PG2 ALE) (PG3 TOSC2) (PG4 TOSC1))
-  #:TOP ((RESET) (VCC) (AVCC))
-  #:BOTTOM ((GND) (XTAL2) (XTAL1) (AREF))
-  #:LEFT ([PA0 AD1 AD2 AD3 PA4 AD5 AD6 AD7]
-          [PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
-          [PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7])
-  #:RIGHT ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7]
-           [PEN PE0 PE1 PE2 PE3 PE4 PE5 PE6 PE7]
-           [PF0 PF1 PF2 PF3 PF4 PF5 PF6 PF7]
-           [PG0 PG1 PG2 PG3 PG4])
   #:QFN (64 PEN PE0 PE1 PE2 PE3 PE4 PE5 PE6 PE7 PB0 PB1 PB2 PB3 PB4 PB5 PB6
             PB7 PG3 PG4 RESET VCC GND XTAL1 XTAL1 PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7
             PG0 PG1 PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7 PG2 PA7 PA6 PA5 PA4 PA3
@@ -168,11 +132,6 @@
                 (PD5 PCINT1 OC0B T1)
                 (PD6 PCINT22 OC0A AIN0)
                 (PD7 PCINT23 AIN1))
-  #:TOP ((VCC) (AVCC))
-  #:BOTTOM ((GND) (AREF))
-  #:LEFT ([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
-          [PC0 PC1 PC2 PC3 PC4 PC5 PC6])
-  #:RIGHT ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
   #:DIP (28 PC6 PD0 PD1 PD2 PD3 PD4 VCC GND PB6 PB7 PD5 PD6 PD7 PB0
             PB1 PB2 PB3 PB4 PB5 AVCC AREF GND PC0 PC1 PC2 PC3 PC4 PC5)
   #:QFN (28 PD3 PD4 VCC GND PB6 PB7 PD5
@@ -200,13 +159,6 @@
           (PD0 OC0B INT0) (PD1 AIN0 INT1) (PD2 RXD1 AIN1 INT2) (PD3 TXD1 INT3)
           (PD4 INT5 AIN3) (PD5 XCK AIN4 PCINT12)
           (PD6 RTS AIN5 INT6) (PD7 CTS HWB AIN6 TO INT7))
-  #:TOP ((VCC) (GND) (AVCC)
-               ;; (PAD)
-               (XTAL1))
-  #:BOTTOM ((UCAP) (UVCC) (UGND) (D-) (D+))
-  #:LEFT ([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
-          [PC0 PC1 PC2 PC4 PC5 PC6 PC7])
-  #:RIGHT ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
   #:QFN (32 XTAL1 XTAL2 GND VCC PC2 PD0 PD1 PD2
             PD3 PD4 PD5 PD6 PD7 PB0 PB1 PB2
             PB3 PB4 PB5 PB6 PB7 PC7 PC6 RESET
@@ -246,15 +198,6 @@
           (PF5 ADC5 TMS)
           (PF6 ADC6 TDO)
           (PF7 ADC7 TDI))
-  #:TOP ((VCC AVCC RESET AREF))
-  #:BOTTOM ((GND))
-  #:LEFT ((UVCC D- D+ UGND UCAP)
-          (XTAL2 XTAL1 VBUS)
-          (PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7))
-  #:RIGHT ((PC6 PC7)
-           (PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7)
-           (PE2 PE6)
-           (PF0 PF1 PF4 PF5 PF6 PF7))
   #:QFN (44 PE6 UVCC D- D+ UGND UCAP VBUS PB0 PB1 PB2 PB3
             PB7 RESET VCC GND XTAL2 XTAL1 PD0 PD1 PD2 PD3 PD5
             GND AVCC PD4 PD6 PD7 PB4 PB5 PB6 PC6 PC7 PE2
@@ -288,11 +231,6 @@
           [PC4 ADC4 SDA]
           [PC5 ADC5 SCL]
           [PC6 RESET])
-  #:TOP ((VCC AVCC AREF))
-  #:BOTTOM ((GND))
-  #:LEFT ([PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7]
-          [PC0 PC1 PC2 PC3 PC4 PC5 PC6])
-  #:RIGHT ([PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7])
   #:DIP (28 PC6 PD0 PD1 PD2 PD3 PD4 VCC GND PB6 PB7 PD5 PD6 PD7 PB0
             PB1 PB2 PB3 PB4 PB5 AVCC AREF GND PC0 PC1 PC2 PC3 PC4 PC5)
   #:QFN (32 PD3 PD4 GND VCC GND VCC PB6 PB7
@@ -304,10 +242,6 @@
   #:datasheet ""
   ;; FIXME when there're no alts, I should be able to just leave it blank
   #:ALTS ()
-  #:TOP ((VCC))
-  #:BOTTOM ((GND))
-  #:LEFT ((TR OUTPUT RESET))
-  #:RIGHT ((DIS THR CV))
   #:DIP (8 GND TR OUTPUT RESET CV THR DIS VCC))
 
 ;; ;; FIXME this is comparator, should have triangular symbol

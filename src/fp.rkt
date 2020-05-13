@@ -23,6 +23,8 @@
   #:prefab)
 
 (struct pad-spec
-  (x y num mounting-type shape shape-attr)
+  (num
+   x y
+   mounting-type shape shape-attr)
   #:prefab)
 

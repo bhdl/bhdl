@@ -57,10 +57,10 @@
                           (filled-rectangle 20 3)))])
     (scale-width-to res 100)))
 
-(define (rect-symbol->pict+locs #:left [left '()]
-                                #:right [right '()]
-                                #:top [top '()]
-                                #:bottom [bottom '()])
+(define (rect-symbol->pict+Hlocs #:left [left '()]
+                                 #:right [right '()]
+                                 #:top [top '()]
+                                 #:bottom [bottom '()])
   "Return (pict, ((name x y) ...)"
   (let* ([pins-lbrt (list left bottom right top)]
          [any->string
@@ -118,24 +118,25 @@
              ;; the whole pict
              res
              ;; the position information for all the pins
-             ;; DEBUG flattern the locs
-             (flatten
-              (compose-pipe
-               points-lbrt
-               pins-lbrt
-               (list lc-find lc-find rc-find rc-find)
-               #:...> (λ (p name find)
-                        (let-values ([(x y) (find res p)])
-                          (NamedPoint name x y))))))))))))
+             (for/hash ([point (flatten
+                                (compose-pipe
+                                 points-lbrt
+                                 pins-lbrt
+                                 (list lc-find lc-find rc-find rc-find)
+                                 #:...> (λ (p name find)
+                                          (let-values ([(x y) (find res p)])
+                                            (NamedPoint name x y)))))])
+               (values (NamedPoint-name point)
+                       (Point x y))))))))))
 
 (define (rect-symbol->pict #:left [left '()]
                            #:right [right '()]
                            #:top [top '()]
                            #:bottom [bottom '()])
-  (let-values ([(p l) (rect-symbol->pict+locs #:left left
-                                              #:right right
-                                              #:top top
-                                              #:bottom bottom)])
+  (let-values ([(p l) (rect-symbol->pict+Hlocs #:left left
+                                               #:right right
+                                               #:top top
+                                               #:bottom bottom)])
     p))
 
 

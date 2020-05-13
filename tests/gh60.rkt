@@ -181,9 +181,7 @@
            (matrix-module.col13 ic.PD6)
            (matrix-module.col14 ic.PB3))
     ;; USB module
-    ;;
-    ;; FIXME use USB
-    (let ([usb-header (connector 5)]
+    (let ([usb (usb 'a-male)]
           [r1 (R 22)]
           [r2 (R 22)]
           [c (C '1u)])
@@ -191,10 +189,10 @@
              (ic.UVCC ic.VBUS global.VCC)
              (ic.UGND global.GND)
              (ic.UCAP c.1) (c.2 global.GND)
-             (usb-header.1 global.VCC)
-             (usb-header.2 r1.1) (r1.2 ic.D-)
-             (usb-header.3 r2.1) (r2.2 ic.D+)
-             (usb-header.5 global.GND)))
+             (usb.VBUS global.VCC)
+             (usb.D- r1.1) (r1.2 ic.D-)
+             (usb.D+ r2.1) (r2.2 ic.D+)
+             (usb.GND global.GND)))
     ;; crystal module
     ;;
     ;; FIXME crystal type
@@ -234,31 +232,30 @@
 (module+ test
   (collect-all-atoms whole)
   (Composite-nets whole)
-  (pict-height (footprint->pict (fp-switch-keyboard 1 'pcb)))
-  (define init-place (Composite->place-spec whole 'fp '(2000 1000)))
+  (pict-height (footprint->pict (fp-switch-keyboard 1)))
+  (define init-place (Composite->place-spec whole '(2000 1000)))
   (Composite->pict whole
                    '(2000 1000)
                    (hash-ref init-place 'xs)
-                   (hash-ref init-place 'ys)
-                   'fp)
+                   (hash-ref init-place 'ys))
 
   ;; there seems to be a little off, i.e. fixed xs and ys changed a little
   (make-directory* "/tmp/rackematic/out/")
-  (save-for-placement (Composite->place-spec whole 'fp '(2000 1000))
+  (save-for-placement (Composite->place-spec whole '(2000 1000))
                       "/tmp/rackematic/out/gh60.json")
   (define place-result
     (send-for-placement
-     (Composite->place-spec whole 'fp '(2000 1000))))
+     (Composite->place-spec whole '(2000 1000))))
   
   (define place-result-2
     (call-with-input-file "/tmp/rackematic/out/gh60-sol.json"
       (λ (in) (string->jsexpr (port->string in)))))
+
   (save-file (Composite->pict whole
                               '(2000 1000)
                               (hash-ref place-result 'xs)
-                              (hash-ref place-result 'ys)
-                              'fp)
-             "a.pdf")
+                              (hash-ref place-result 'ys))
+             "gh60.pdf")
 
   (collect-all-atoms ic-module)
   (collect-all-atoms matrix-module)
