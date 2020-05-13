@@ -1,2 +1,7 @@
 lefdef/
 out/
+
+
+fp-info-cache
+*.kicad_pcb
+*.pro

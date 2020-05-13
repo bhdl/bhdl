@@ -21,7 +21,9 @@
          ;; footprint->pad-locs
 
          atom->fp-pict+Hlocs
-         atom->fp-pict)
+         atom->fp-pict
+
+         atom->fp-sexp)
 
 ;; the FP size is typically in MM, and the number is typically in the range of
 ;; [1,10]. When this scale is applied, the result picture looks normal in size.
@@ -61,6 +63,22 @@
   ;; create an IC
   (IC->fp-pict+Hlocs ATmega16 'DIP))
 
+(define (IC->fp ic
+                #:package (package #f)
+                #:pin-count (pin-count #f))
+  "DEBUG"
+  (let ([spec (findf (λ (spec)
+                       (and (or (not package)
+                                (eq? package
+                                     (FpSpec-package spec)))
+                            (or (not pin-count)
+                                (= pin-count (FpSpec-num spec)))))
+                     (IC-fps ic))])
+    (or spec (error (~a "No matching footprint packaging for IC.") ))
+    (case (FpSpec-package spec)
+      [(DIP) (fp-DIP (FpSpec-num spec))]
+      [(QFN) (fp-QFN (FpSpec-num spec))]
+      [else (error (~a "Unsupported package: " package))])))
 
 (define (IC->fp-pict+Hlocs ic
                            #:package (package #f)
@@ -153,24 +171,52 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (atom->fp-pict+Hlocs atom)
+  (if (ICAtom? atom)
+      (IC+Atom->fp-pict+Hlocs (ICAtom-ic atom) atom)
+      (footprint->pict+Hlocs (atom->fp atom))))
+
+(define (atom->fp atom)
   (match atom
     ;; FIXME fixed footprint packaging
-    [(Resistor _) (footprint->pict+Hlocs (fp-resistor "0603"))]
-    [(Capacitor _) (footprint->pict+Hlocs (fp-capacitor "0603"))]
-    [(Diode) (footprint->pict+Hlocs fp-diode)]
-    [(LED _) (footprint->pict+Hlocs fp-diode)]
-    [(CherrySwitch) (footprint->pict+Hlocs (fp-switch-keyboard 1.25 'pcb))]
-    [(USB type) (footprint->pict+Hlocs (fp-usb type))]
+    [(Resistor _) (fp-resistor "0603")]
+    [(Capacitor _) (fp-capacitor "0603")]
+    [(Diode) fp-diode]
+    [(LED _) fp-diode]
+    [(CherrySwitch) (fp-switch-keyboard 1.25 'pcb)]
+    [(USB type) (fp-usb type)]
     ;; FIXME pin header? Double column?
-    [(Connector num) (footprint->pict+Hlocs (fp-pin-header num))]
+    [(Connector num) (fp-pin-header num)]
     ;; FIXME only IC needs to sort locs based. Other simple ones should have the
     ;; correct and consistent order
-    [(ICAtom ic) (IC+Atom->fp-pict+Hlocs ic atom)]
-    [(Atom _ _) (footprint->pict+Hlocs
-                 (fp-pin-header
-                  (length
-                   (remove-duplicates
-                    (hash-values (Atom-pinhash atom))))))]))
+    [(ICAtom ic) (println "WARNING: DEBUG")
+                 (IC->fp ic)]
+    [(Atom _ _) (fp-pin-header
+                 (length
+                  (remove-duplicates
+                   (hash-values (Atom-pinhash atom)))))]))
+
+(define (atom->fp-sexp atom x y)
+  "Generate FP raw kicad sexp."
+  (let ([fp (atom->fp atom)])
+    `(module PLACEHOLDER (layer F.Cu) (tedit 0) (tstamp 0)
+             ;; CAUTION placement
+             (at ,x ,y)
+             (path placeholder)
+             ,@(for/list ([line (footprint-lines fp)])
+                 (match line
+                   [(line-spec x1 y1 x2 y2 width)
+                    `(fp_line (start ,x1 ,y1) (end ,x2 ,y2)
+                              (layer F.SilkS) (width ,width))]))
+             ,@(for/list ([pad (footprint-pads fp)])
+                (match pad
+                  [(pad-spec num x y mounting-type shape shape-attr)
+                   `(pad ,num ,mounting-type ,shape (at ,x ,y)
+                         ;; FIXME placeholder
+                         (size 2 2) (drill 1)
+                         (layers *.Cu *.Mask F.SilkS))]))
+             ;; FIXME placeholder
+             ;; (net 21 /Leds/lrow3)
+             )))
 
 (define (IC+Atom->fp-pict+Hlocs ic atom)
   (let-values ([(p Hlocs) (IC->fp-pict+Hlocs ic)])

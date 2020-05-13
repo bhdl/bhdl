@@ -23,6 +23,11 @@ But this would require compatibility with kicad symbol and footprint library.
 UPDATE actually I'm using kicad footprints, so it's quite easy to make pcbnew
 compatible netlist. Then I'll be able to take care of the routing there
 manually. This is the work tomorrow.
+
+*** DONE components
+CLOSED: [2020-05-13 Wed 22:24]
+*** TODO netlist
+
 ** STARTED detailed placement and legalization
 SCHEDULED: <2020-05-12 Tue>
 I prefer to get this and global placement into one pass.

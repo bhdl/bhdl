@@ -17,6 +17,8 @@
           [Composite->place-spec (any/c any/c . -> . any)]
           [Composite->pict       (any/c any/c any/c any/c . -> . any)])
 
+         Composite->kicad-pcb
+
          save-for-placement
          send-for-placement)
 
@@ -223,3 +225,122 @@
                  [h (pict-height final-res)]
                  [factor (min 1 (/ 640 w) (/ 480 h))])
             (scale final-res factor)))))))
+
+
+
+(define (kicad-pcb-prefix diearea)
+  `((version 4)
+    (host pcbnew 4.0.2-stable)
+    (general
+     (links 469)
+     (no_connects 0)
+     (area 0 0 ,(first diearea) ,(second diearea))
+     (thickness 1.6002)
+     (drawings 311)
+     (tracks 3484)
+     (zones 0)
+     (modules 338)
+     (nets 131)
+     )
+    (page A3)
+    (title_block
+     (title GH60)
+     (date "20 jan 2014")
+     (rev B)
+     (company "geekhack GH60 design team")
+     )
+    (layers
+     (0 F.Cu signal)
+     (31 B.Cu signal)
+     (32 B.Adhes user)
+     (33 F.Adhes user)
+     (34 B.Paste user)
+     (35 F.Paste user)
+     (36 B.SilkS user)
+     (37 F.SilkS user)
+     (38 B.Mask user)
+     (39 F.Mask user)
+     (40 Dwgs.User user)
+     (41 Cmts.User user)
+     (42 Eco1.User user)
+     (43 Eco2.User user)
+     (44 Edge.Cuts user)
+     (48 B.Fab user)
+     (49 F.Fab user)
+     )
+    (setup
+     (last_trace_width 0.4064)
+     (user_trace_width 0.254)
+     (user_trace_width 0.4064)
+     (user_trace_width 0.889)
+     (trace_clearance 0.2032)
+     (zone_clearance 0.307299)
+     (zone_45_only yes)
+     (trace_min 0.2032)
+     (segment_width 2)
+     (edge_width 0.0991)
+     (via_size 1)
+     (via_drill 0.4)
+     (via_min_size 1)
+     (via_min_drill 0.4)
+     (uvia_size 0.508)
+     (uvia_drill 0.127)
+     (uvias_allowed no)
+     (uvia_min_size 0.508)
+     (uvia_min_drill 0.127)
+     (pcb_text_width 0.3048)
+     (pcb_text_size 1.524 2.032)
+     (mod_edge_width 0.3)
+     (mod_text_size 1.524 1.524)
+     (mod_text_width 0.3048)
+     (pad_size 0.9 0.9)
+     (pad_drill 0.9)
+     (pad_to_mask_clearance 0.1016)
+     (pad_to_paste_clearance -0.02)
+     (aux_axis_origin 62.29 64.62)
+     (visible_elements FFFFFFFF)
+     (pcbplotparams
+      (layerselection 0x012a0_00000000)
+      (usegerberextensions false)
+      (excludeedgelayer true)
+      (linewidth 0.150000)
+      (plotframeref false)
+      (viasonmask false)
+      (mode 1)
+      (useauxorigin false)
+      (hpglpennumber 1)
+      (hpglpenspeed 20)
+      (hpglpendiameter 15)
+      (hpglpenoverlay 0)
+      (psnegative false)
+      (psa4output false)
+      (plotreference true)
+      (plotvalue false)
+      (plotinvisibletext false)
+      (padsonsilk false)
+      (subtractmaskfromsilk false)
+      (outputformat 4)
+      (mirror false)
+      (drillshape 0)
+      (scaleselection 1)
+      (outputdirectory gerber/))
+     )))
+
+(define (Composite->kicad-pcb comp diearea xs ys)
+  "Generate .kicad_pcb."
+  ;; 1. collect all atoms
+  (let* ([atoms (collect-all-atoms comp)]
+         [die (match diearea
+                [(list w h) (rectangle w h)])]
+         ;; atom position
+         [Hatom=>xy (for/hash ([atom atoms]
+                               [x xs]
+                               [y ys])
+                      (values atom (list x y)))])
+    ;; 2. generate!
+    `(kicad_pcb ,@(kicad-pcb-prefix diearea)
+                ;; FIXME TODO add netlist
+                ,@(for/list ([atom atoms])
+                    (match-let ([(list x y) (hash-ref Hatom=>xy atom)])
+                      (atom->fp-sexp atom x y))))))
+

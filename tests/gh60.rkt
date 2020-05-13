@@ -261,3 +261,14 @@
   (collect-all-atoms matrix-module)
   (Composite-pinhash power-module)
   (collect-all-atoms power-module))
+
+(module+ test-kicad
+  (define init-place (Composite->place-spec whole '(2000 1000)))
+  (call-with-output-file "out.kicad_pcb"
+    #:exists 'replace
+    (λ (out)
+      (pretty-write (Composite->kicad-pcb whole '(2000 1000)
+                                          (hash-ref init-place 'xs)
+                                          (hash-ref init-place 'ys))
+                    out))))
+
