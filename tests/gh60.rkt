@@ -232,8 +232,10 @@
 (module+ test
   (collect-all-atoms whole)
   (Composite-nets whole)
-  (pict-height (footprint->pict (fp-switch-keyboard 1)))
+  (pict-height (footprint->pict (fp-switch-keyboard 1 'pcb)))
   (define init-place (Composite->place-spec whole '(2000 1000)))
+
+  ;; TODO die-area should be inside place spec
   (Composite->pict whole
                    '(2000 1000)
                    (hash-ref init-place 'xs)
@@ -243,24 +245,41 @@
   (make-directory* "/tmp/rackematic/out/")
   (save-for-placement (Composite->place-spec whole '(2000 1000))
                       "/tmp/rackematic/out/gh60.json")
-  (define place-result
-    (send-for-placement
-     (Composite->place-spec whole '(2000 1000))))
-  
-  (define place-result-2
-    (call-with-input-file "/tmp/rackematic/out/gh60-sol.json"
-      (λ (in) (string->jsexpr (port->string in)))))
 
   (save-file (Composite->pict whole
                               '(2000 1000)
-                              (hash-ref place-result 'xs)
-                              (hash-ref place-result 'ys))
+                              (hash-ref init-place 'xs)
+                              (hash-ref init-place 'ys))
              "gh60.pdf")
 
   (collect-all-atoms ic-module)
   (collect-all-atoms matrix-module)
   (Composite-pinhash power-module)
   (collect-all-atoms power-module))
+
+(module+ test-place
+  (define place-result
+    (send-for-placement
+     ;; TODO the diearea should be specified only once
+     (Composite->place-spec whole '(2000 1000))))
+  
+  ;; save place result
+  (call-with-output-file "/tmp/rackematic/out/gh60-sol.json"
+    (λ (out)
+      (write-string (jsexpr->string place-result) out))
+    #:exists 'replace)
+
+  (define place-result-loaded
+    (call-with-input-file "/tmp/rackematic/out/gh60-sol.json"
+      (λ (in)
+        (string->jsexpr (port->string in)))))
+
+  ;; FIXME the whole circuits should be centered on the diearea
+  (save-file (Composite->pict whole
+                              '(2000 1000)
+                              (hash-ref place-result 'xs)
+                              (hash-ref place-result 'ys))
+             "gh60.pdf"))
 
 (module+ test-kicad
   (define init-place (Composite->place-spec whole '(2000 1000)))
