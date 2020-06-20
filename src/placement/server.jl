@@ -56,28 +56,22 @@ function web_server()
     end
 end
 
-function test()
-    # read json directly for debugging
-    #
+function warmup()
     # FIXME relative path might not work
     str = open("../../tests/warmup.json") do io
         read(io, String)
     end
     jobj = JSON.parse(str)
-
     xs, ys, ws, hs, Es, mask, diearea = decode_place_spec(jobj)
-
     # place(xs, ys, ws, hs, Es, mask, diearea, vis=true)
-
     @time solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false)
-
     # visualize(xs, ys, ws, hs, R)
     # visualize(solxs, solys, ws, hs, R)
 end
 
 function main()
     @info "starting a test run to warm the model up .."
-    test()
+    warmup()
     @info "starting server .."
     web_server()
 end
