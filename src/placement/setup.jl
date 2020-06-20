@@ -13,6 +13,7 @@ Pkg.add(["CUDAdrv", "CUDAnative", "CuArrays"])
 Pkg.test(["CUDAdrv", "CUDAnative", "CuArrays"])
 Pkg.add("HTTP")
 Pkg.add("JSON")
+Pkg.add("ProfileView")
 
 Pkg.rm("CuArrays")
 
