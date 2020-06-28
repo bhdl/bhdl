@@ -45,6 +45,10 @@ function web_server()
         # solys = solys .- hs ./ 2
         res_payload = Dict("xs"=>solxs, "ys"=>solys) |> JSON.json
 
+        # TODO I also want to send back visualizations UPDATE probably just send
+        # back the coordinates and optionally meta data during the process. The
+        # rendering can be done on the client side.
+
         # parse this directly as json, and save data to internal data structure
         # and start placement and routing.
         try

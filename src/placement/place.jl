@@ -43,7 +43,9 @@ function We_grad_x_impl(x)
 end
 
 function We_grad_x(net, x, xory)
-    res = spzeros(length(x))
+    # FIXME why sparse?
+    # res = spzeros(length(x))
+    res = zeros(length(x))
     # all the x values of net
 
     if xory == :x
@@ -62,25 +64,23 @@ end
 
 function W_grad_x(nets, x, xory)
     # batched by default
-    f = e->We_grad_x(e,x,xory)
+    # f = e->We_grad_x(e,x,xory)
     # res = spzeros(length(x))
     tmp = Array{Any}(nothing, length(nets))
-    Threads.@threads for i in 1:length(nets)
-        tmp[i] = f(nets[i])
+
+    # export JULIA_NUM_THREADS=4
+    #
+    # Threads.@threads
+    for i in 1:length(nets)
+        # tmp[i] = f(nets[i])
+        tmp[i] = We_grad_x(nets[i], x, xory)
     end
     sum(tmp)
 end
 
-# function W_grad(Es, xs, ys)
-#     wx = W_grad_x(Es, xs, :x)
-#     wy = W_grad_x(Es, ys, :y)
-#     wx, wy
-# end
-
 function test()
-    # export JULIA_NUM_THREADS=4
     Threads.nthreads()
-    @time W_grad_x(Es, xs)
+    @time W_grad_x(Es, xs, :x)
 end
 
 function rho_v_many(pxs, pys, pws, phs, bx1s, by1s, bx2s, by2s)
@@ -106,10 +106,10 @@ function rho_cells(vs, R)
     phs = reshape(hs, 1, 1, length(hs))
 
     # FIXME moving data between cpu and gpu
-    x1 = max.(pxs .- pws / 2, cpu(R.bx1s))
-    y1 = max.(pys .- phs / 2, cpu(R.by1s))
-    x2 = min.(pxs .+ pws / 2, cpu(R.bx2s))
-    y2 = min.(pys .+ phs / 2, cpu(R.by2s))
+    x1 = max.(pxs .- pws / 2, R.bx1s)
+    y1 = max.(pys .- phs / 2, R.by1s)
+    x2 = min.(pxs .+ pws / 2, R.bx2s)
+    y2 = min.(pys .+ phs / 2, R.by2s)
 
     max.(x2 - x1, 0) .* max.(y2 - y1, 0)
 end
@@ -122,7 +122,6 @@ function rho_fast(vs, R)
     pws = reshape(ws, 1, 1, length(ws))
     phs = reshape(hs, 1, 1, length(hs))
     # FIXME whether to use GPU or not for small scale
-    pxs, pys, pws, phs = (pxs, pys, pws, phs) .|> gpu
     res = rho_v_many(pxs, pys, pws, phs,
                      R.bx1s, R.by1s, R.bx2s, R.by2s)
     dropdims(res, dims=3) |> cpu
@@ -143,7 +142,7 @@ end
 
 function density(vs, R)
     # vs = xs, ys, ws, hs
-    xs, ys, ws, hs = vs
+    xs, ys, ws, hs = gpu.(vs)
     # 1. calculate rho
     @info "calculating rho .."
     # rho = rho_all(vs, R)
@@ -155,13 +154,11 @@ function density(vs, R)
     # calculate for each v
 
     # M,M,N
-    @time rrr = rho_cells(vs, R);
-    size(rrr)
-    size(phi)
-    one = dropdims(sum(rrr .* phi, dims=(1,2)), dims=(1,2))
-    two = dropdims(sum(rrr .* Ephix, dims=(1,2)), dims=(1,2))
-    three = dropdims(sum(rrr .* Ephiy, dims=(1,2)), dims=(1,2))
-    return one, two, three
+    @time rrr = rho_cells((xs, ys, ws, hs), R);
+    d = dropdims(sum(rrr .* gpu(phi), dims=(1,2)), dims=(1,2))
+    dx = dropdims(sum(rrr .* gpu(Ephix), dims=(1,2)), dims=(1,2))
+    dy = dropdims(sum(rrr .* gpu(Ephiy), dims=(1,2)), dims=(1,2))
+    return d, dx, dy
 end
 
 struct Region
@@ -269,7 +266,7 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, iter=50)
 
         # FIXME this density impl seems to be wrong
         @info "Calculating fft density .."
-        d, dx, dy = density((xs, ys, ws, hs), R);
+        d, dx, dy = density((xs, ys, ws, hs), R) .|> cpu
         dx[mask .== 0] .= 0
         dy[mask .== 0] .= 0
         # weights HP here
@@ -308,14 +305,14 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, iter=50)
         ys[ys .+ hs ./ 2 .> R.ymax] .= (hs ./ 2 .- R.ymax)[ys .+ hs ./ 2 .> R.ymax]
         if vis visualize(xs, ys, ws, hs, R) end
     end
-    if vis visualize_density((xs, ys, ws, hs), R) end
+    # if vis visualize_density((xs, ys, ws, hs), R) end
     xs, ys
 end
 
 function visualize_density(vs, R)
     xs, ys, ws, hs = vs
     visualize(xs, ys, ws, hs, R)
-    rho = rho_fast(vs, R)
+    rho = rho_fast(gpu.(vs), R)
     phi, Ephix, Ephiy = phi_b(rho, R)
     # display_plot(Plots.heatmap(rho))
     display_plot(Plots.heatmap(reverse(rho, dims=1)))

@@ -39,7 +39,8 @@ function test()
 
     # place(xs, ys, ws, hs, Es, mask, diearea, vis=true)
 
-    @time solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=true, iter=20)
+    place(xs, ys, ws, hs, Es, mask, diearea, vis=true, iter=100)
+    @time solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false, iter=100)
     Profile.@profile solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, iter=20)
     # save to json file
     res_payload = Dict("xs"=>solxs, "ys"=>solys) |> JSON.json
