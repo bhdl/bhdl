@@ -56,14 +56,20 @@
   "generate directly xs, ys, ws, hs, mask, Es, diearea"
   (let* ([netlist (Composite->netlist comp)]
          [atoms (collect-all-atoms comp)]
-         [Hatom=>idx (annotate-atoms atoms)])
-    (let ([xs (for/list ([atom atoms]) (if (Atom-loc atom)
-                                           (Point-x (Atom-loc atom))
-                                           0))]
-          [ys (for/list ([atom atoms]) (if (Atom-loc atom)
-                                           (Point-y (Atom-loc atom))
-                                           0))]
-          [mask (for/list ([atom atoms]) (if (Atom-loc atom) 0 1))]
+         [Hatom=>idx (annotate-atoms atoms)]
+         ;; enlarge pict by 200
+         [diepict (inset (Composite-pict comp) 200)]
+         [locs (for/list ([atom atoms])
+                 (if (Atom-pict atom)
+                     ;; FIXME assuming the pict can always be found
+                     (let-values ([(x y) (cc-find diepict (Atom-pict atom))])
+                       (Point x y))
+                     (Point 0 0)))])
+    (let ([xs (for/list ([loc locs])
+                (Point-x loc))]
+          [ys (for/list ([loc locs])
+                (Point-y loc))]
+          [mask (for/list ([atom atoms]) (if (Atom-pict atom) 0 1))]
           [ws (for/list ([atom atoms])
                 (exact->inexact (Macro-w (atom->macro atom))))]
           [hs (for/list ([atom atoms])
@@ -87,7 +93,8 @@
             'ws ws
             'hs hs
             'Es Es
-            'diearea diearea
+            'diearea (list (pict-width diepict)
+                           (pict-height diepict))
             'mask mask))))
 
 (define (save-for-placement specs fname)

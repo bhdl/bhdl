@@ -29,7 +29,9 @@
          combine-Composites
          combine-Composites-1
 
-         loced-atom!
+         define-Composite
+
+         picted-atom!
 
          *-
          *<
@@ -54,7 +56,7 @@
                    port))])
 
 (struct Atom
-  (pinhash [loc #:auto])
+  (pinhash [pict #:auto])
   ;; #:prefab
   ;; CAUTION #:mutable only for changing loc
   #:mutable)
@@ -62,8 +64,8 @@
 ;; CAUTION FIXME there is no functional way to do this, because I do not want to
 ;; create extra pins. Also, Atom is marked with #:auto fields, and that is not
 ;; copiable in the sense of struct-copy
-(define (loced-atom! atom loc)
-  (set-Atom-loc! atom loc)
+(define (picted-atom! atom p)
+  (set-Atom-pict! atom p)
   atom)
 
 
@@ -86,7 +88,10 @@
 ;; simplify the logic. Even better, I can create a one-to-one correspondence of
 ;; pict and atoms.
 (struct Composite
-  (pinhash nets)
+  ;; this should also contain the location information, including:
+  ;; 1. the whole pict, and it shall be the diearea for placement
+  ;; 2. the mapping from atom to sub-pict
+  (pinhash nets [pict #:auto])
   #:mutable)
 
 (define-syntax (create-simple-Composite stx)
@@ -99,23 +104,53 @@
          ...
          res)]))
 
-(define (combine-Composites . rst)
+(define-syntax (define-Composite stx)
+  (syntax-parse stx
+    [(_ name (~alt
+              (~optional (~seq #:external-pins (ext-pin ...))
+                         #:defaults ([(ext-pin 1) null]))
+              (~optional (~seq #:pict p-name))
+              (~optional (~seq #:where where-clause)
+                         #:defaults ([where-clause #'()]))
+              (~seq #:atoms (atom-clause ...))
+              (~seq #:connect connect-clause)
+              (~seq #:hooks (hook-clause ...))) ...)
+     (with-syntax ([self (datum->syntax stx 'self)])
+       #`(define name
+           (let ([self (create-simple-Composite ext-pin ...)])
+             ;; reverse where clause
+             (let* where-clause
+               #,(if (attribute p-name)
+                       #'(set-Composite-pict! self p-name)
+                       #'(void))
+               ;; create atoms
+               (let* (atom-clause ... ...)
+                 ;; do the hooks
+                 (hook! self hook-clause ...) ...
+                 ;; do the connections
+                 (combine-Composites-1
+                  (flatten (list self
+                                 connect-clause ...))))))))]))
+
+(define (combine-Composites lst)
   "This function effectively merge separated Composite into one."
   ;; 1. add all connections
   ;; 2. TODO external pins?
   (let ([res (create-simple-Composite)])
     (set-Composite-nets!
      res
-     (apply append (map Composite-nets rst)))
+     (apply append (map Composite-nets lst)))
     res))
 
-(define (combine-Composites-1 one . rst)
+(define (combine-Composites-1 lst)
   "The first one's external pin is used"
-  (struct-copy Composite one
-               [nets (apply append (Composite-nets one)
-                            (map Composite-nets rst))]))
+  (let ([res (combine-Composites lst)])
+    (set-Composite-pinhash! res (Composite-pinhash (first lst)))
+    (set-Composite-pict! res (Composite-pict (first lst)))
+    res))
 
 ;; two-node net
+;; FIXME well, it is not necessarily two-node nets
 (struct Net
   (pins weight))
 
