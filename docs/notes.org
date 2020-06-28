@@ -1,7 +1,6 @@
 #+TITLE: Implementation Notes
 
-
-* TODO-list
+* TODO-list Summer
 
 ** STARTED detailed placement and legalization
 SCHEDULED: <2020-06-27 Sat>
@@ -14,21 +13,6 @@ I prefer to get this and global placement into one pass.
   holes
 *** consider non-overlapping of copper layer
 *** rotation of components
-
-** visual programming
-
-** TODO save plot during placement
-
-** TODO write some boards
-
-- [X] arduino uno
-- [ ] lichee nano
-- [X] gh60: https://github.com/komar007/gh60
-- [ ] pyboard
-- [ ] linux business card
-
-*** other
-- [ ] ergonomic (hebi) keyboard
 
 ** STARTED export kicad compatible netlist
 SCHEDULED: <2020-05-12 Tue>
@@ -44,19 +28,27 @@ manually. This is the work tomorrow.
 CLOSED: [2020-05-13 Wed 22:24]
 *** TODO netlist
 
+** TODO Auto-Routing
+** TODO write some boards
+
+- [X] arduino uno
+- [ ] lichee nano
+- [X] gh60: https://github.com/komar007/gh60
+- [ ] pyboard
+- [ ] linux business card
+
+*** other
+- [ ] ergonomic (hebi) keyboard
 ** STARTED better schematic and footprint libraries
+
+* TODO-list Visual programming
+
+* TODO-list
+
+** TODO save plot during placement
+
 ** STARTED assign footprints
 and probably mix the two syntaxes?
-
-** performance of placement engine, again
-
-** TODO weighted nets
-I actually do not need any weight. More specifically, I don't need the diodes to
-be exactly near the switches.
-
-But I need weights to put filtering capacitors close to the component.
-
-** TODO Auto-Routing
 
 ** TODO vectorized connections
 
@@ -310,3 +302,11 @@ CLOSED: [2020-06-28 Sun 14:20]
 
 ** CANCELED work for both GPU and CPU
 CLOSED: [2020-06-27 Sat 11:53]
+** DONE performance of placement engine, again
+CLOSED: [2020-06-28 Sun 22:45]
+** CANCELED weighted nets
+CLOSED: [2020-06-28 Sun 22:45]
+I actually do not need any weight. More specifically, I don't need the diodes to
+be exactly near the switches.
+
+But I need weights to put filtering capacitors close to the component.
