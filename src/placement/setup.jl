@@ -14,6 +14,7 @@ Pkg.test(["CUDAdrv", "CUDAnative", "CuArrays"])
 Pkg.add("HTTP")
 Pkg.add("JSON")
 Pkg.add("ProfileView")
+Pkg.add("PackageCompiler")
 
 Pkg.rm("CuArrays")
 

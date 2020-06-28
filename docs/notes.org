@@ -4,13 +4,20 @@
 * TODO-list
 
 ** STARTED detailed placement and legalization
-SCHEDULED: <2020-05-12 Tue>
+SCHEDULED: <2020-06-27 Sat>
 I prefer to get this and global placement into one pass.
-** TODO work for both GPU and CPU
-** TODO placement engine efficiency
-*** also precompile the julia code
+
+*** consider the offset of pins
+*** consider double side placement and physical conflicts
+- and through-hole component is special
+- some components can overlap, e.g. cherry switch and LED, because there're LED
+  holes
+*** consider non-overlapping of copper layer
+*** rotation of components
 
 ** visual programming
+
+** TODO save plot during placement
 
 ** TODO write some boards
 
@@ -293,3 +300,13 @@ CLOSED: [2020-05-12 Tue 15:11]
 ** DONE fixed positions
 CLOSED: [2020-05-09 Sat 20:18]
 
+** DONE placement engine efficiency
+CLOSED: [2020-06-28 Sun 14:20]
+In density computation, the rho_cells have large matrix operation. Use GPU makes
+it much faster.
+
+*** DONE also precompile the julia code
+CLOSED: [2020-06-28 Sun 14:20]
+
+** CANCELED work for both GPU and CPU
+CLOSED: [2020-06-27 Sat 11:53]
