@@ -424,6 +424,14 @@ function simulated_annealing_legalization(xs, ys, ws, hs, mask, diearea, vis=fal
                 ys[i] = y
             end
         end
+
+        # map back to valid region
+        # FIXME consider w and h
+        xs[xs .- ws ./ 2 .< R.xmin] .= (ws ./ 2 .+ R.xmin)[xs .- ws ./ 2 .< R.xmin]
+        xs[xs .+ ws ./ 2 .> R.xmax] .= (ws ./ 2 .- R.xmax)[xs .+ ws ./ 2 .> R.xmax]
+        ys[ys .- hs ./ 2 .< R.ymin] .= (hs ./ 2 .+ R.ymin)[ys .- hs ./ 2 .< R.ymin]
+        ys[ys .+ hs ./ 2 .> R.ymax] .= (hs ./ 2 .- R.ymax)[ys .+ hs ./ 2 .> R.ymax]
+
         # print how many conflicts
         @info "remaining conflicts: $(num_conflicts(xs, ys, ws, hs))"
         if vis visualize(xs, ys, ws, hs, R) end
