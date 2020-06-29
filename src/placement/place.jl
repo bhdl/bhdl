@@ -322,3 +322,111 @@ function visualize_density(vs, R)
     # display_plot(Plots.bar(sort(bxs)))
 end
 
+function greedy_legalization(xs, ys, ws, hs, mask)
+    # A Tetris-like greedy algorithm. It process items one by one, move to the
+    # legal location. The legal for VLSI is (1) valid row/column grids (2)
+    # non-overlapping. For us, the grid on PCB is mostly continuous, so we only
+    # consider non-overlapping.
+
+    # We have mixed-size components. Moving larger ones is harder. Thus should
+    # we consider move them first?
+
+    for i in 1:length(xs)
+        if mask[i] == 0: continue end
+        # 1. check if this cell overlaps with others. FIXME this sounds costly
+        #
+        # 2. if overlap, find the closest empty spot. FIXME how to find those
+        # spots? I probably generate random locations, and check?
+    end
+
+    return xs, ys
+end
+
+function cost_f(xs, ys, ws, hs, x, y, w, h)
+    x1 = x - w/2
+    y1 = y - h/2
+    x2 = x + w/2
+    y2 = y + h/2
+
+    x1s = xs .- ws ./ 2
+    y1s = ys .- hs ./ 2
+
+    x2s = xs .+ ws ./ 2
+    y2s = ys .+ hs ./ 2
+
+    return sum((x1s .< x2) .& (y1s .< y2) .& (x2s .> x1) .& (y2s .> y1))
+end
+
+function accept(xs, ys, ws, hs, x, y, i, t)
+    # calculate the xs[i], ys[i] conflicts with how many others
+    c0 = cost_f(xs, ys, ws, hs, xs[i], ys[i], ws[i], hs[i]) - 1
+    # FIXME I should remove the conflict with itself
+    c1 = cost_f(xs, ys, ws, hs, x, y, ws[i], hs[i])
+    if c1 < c0
+        @info "cost improves from $c0 to $c1"
+        return true
+    end
+    p = exp(-(c1 - c0) / t)
+    # @show p
+    if rand() < p
+        return true
+    else
+        return false
+    end
+end
+
+function temperature(step)
+    1 / log(step)
+end
+
+"""number of conflicts of all components
+FIXME fixed position?
+TODO report and debug this if there are still conflicts left?
+"""
+function num_conflicts(xs, ys, ws, hs)
+    ct = 0
+    for i in 1:length(xs)
+        if cost_f(xs, ys, ws, hs, xs[i], ys[i], ws[i], hs[i]) > 1
+            ct += 1
+        end
+    end
+    return ct
+end
+
+function simulated_annealing_legalization(xs, ys, ws, hs, mask, diearea, vis=false)
+    # FIXME make a copy?
+    xs = Float32.(xs)
+    ys = Float32.(ys)
+    ws = Float32.(ws)
+    hs = Float32.(hs)
+    R = Region(xs, ys, ws, hs, diearea, 1000)
+    # actually I can probably parallelize the SA process, by trying to move
+    # multiple components
+    # t = 50
+    # randomly choose a point
+    for cycle in 2:20
+        t = temperature(cycle)
+        for step in 1:100
+            i = rand(findall(mask .== 1))
+            if cost_f(xs, ys, ws, hs, xs[i], ys[i], ws[i], hs[i]) == 1
+                continue
+            end
+            # i = rand(1:length(xs))
+            # FIXME the scale of the movement
+            x = xs[i] + 50 * randn()
+            y = ys[i] + 50 * randn()
+
+            # newxs = xs .+ randn()
+            # newys = ys .+ randn()
+            if accept(xs, ys, ws, hs, x, y, i, t)
+                # @info "cycle $cycle step $step accepted"
+                xs[i] = x
+                ys[i] = y
+            end
+        end
+        # print how many conflicts
+        @info "remaining conflicts: $(num_conflicts(xs, ys, ws, hs))"
+        if vis visualize(xs, ys, ws, hs, R) end
+    end
+    return xs, ys
+end

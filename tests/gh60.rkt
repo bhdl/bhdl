@@ -271,7 +271,7 @@
     #:exists 'replace
     (λ (out)
       (pretty-write (Composite->kicad-pcb whole '(2000 1000)
-                                          (hash-ref init-place 'xs)
-                                          (hash-ref init-place 'ys))
+                                          (hash-ref place-result 'xs)
+                                          (hash-ref place-result 'ys))
                     out))))
 

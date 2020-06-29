@@ -2,11 +2,12 @@
 
 * TODO-list Summer
 
-** STARTED detailed placement and legalization
-SCHEDULED: <2020-06-27 Sat>
+** DONE detailed placement and legalization
+CLOSED: [2020-06-29 Mon 21:02] SCHEDULED: <2020-06-27 Sat>
 I prefer to get this and global placement into one pass.
+*** DONE [#A] cite:2008-Book-Alpert-Handbook Handbook of Algorithms for VLSI Physical Design Automation
 
-*** consider the offset of pins
+*** TODO consider the offset of pins
 *** consider double side placement and physical conflicts
 - and through-hole component is special
 - some components can overlap, e.g. cherry switch and LED, because there're LED

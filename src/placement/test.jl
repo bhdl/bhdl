@@ -39,7 +39,11 @@ function test()
 
     # place(xs, ys, ws, hs, Es, mask, diearea, vis=true)
 
-    place(xs, ys, ws, hs, Es, mask, diearea, vis=true, iter=100)
+    solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=true, iter=50)
+    legalize_place(solxs, solys, ws, hs, Es, mask, diearea, vis=true, iter=50)
+
+    simulated_annealing_legalization(solxs, solys, ws, hs, mask, diearea)
+
     @time solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false, iter=100)
     Profile.@profile solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, iter=20)
     # save to json file

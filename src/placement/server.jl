@@ -24,6 +24,8 @@ function web_server()
         xs, ys, ws, hs, Es, mask, diearea = decode_place_spec(jobj)
         @info "running placement .."
         solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false, iter=100)
+        solxs, solys = simulated_annealing_legalization(
+            solxs, solys, ws, hs, mask, diearea)
         # FIXME run iterations
 
         # @info "visualizing .."
