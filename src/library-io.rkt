@@ -195,28 +195,46 @@
                   (remove-duplicates
                    (hash-values (Atom-pinhash atom)))))]))
 
-(define (atom->fp-sexp atom x y)
+(define (atom->fp-sexp atom w h Hatom=>xy Hpin=>net Hnet=>index)
   "Generate FP raw kicad sexp."
-  (let ([fp (atom->fp atom)])
-    `(module PLACEHOLDER (layer F.Cu) (tedit 0) (tstamp 0)
-             ;; CAUTION placement
-             (at ,x ,y)
-             (path placeholder)
-             ,@(for/list ([line (footprint-lines fp)])
-                 (match line
-                   [(line-spec x1 y1 x2 y2 width)
-                    `(fp_line (start ,x1 ,y1) (end ,x2 ,y2)
-                              (layer F.SilkS) (width ,width))]))
-             ,@(for/list ([pad (footprint-pads fp)])
-                (match pad
-                  [(pad-spec num x y mounting-type shape shape-attr)
-                   `(pad ,num ,mounting-type ,shape (at ,x ,y)
-                         ;; FIXME placeholder
-                         (size 2 2) (drill 1)
-                         (layers *.Cu *.Mask F.SilkS))]))
-             ;; FIXME placeholder
-             ;; (net 21 /Leds/lrow3)
-             )))
+  (match-let ([(list x y) (hash-ref Hatom=>xy atom)]
+              [pinhash (Atom-pinhash atom)])
+    (let ([fp (atom->fp atom)])
+      `(module PLACEHOLDER (layer F.Cu) (tedit 0) (tstamp 0)
+               ;; CAUTION placement
+               ;; FIXME scale
+               ;;
+               ;; FIXME however, this is centered location, but kicad seems to
+               ;; expect top-left corner. But this still does not match exactly.
+               (at ,(/ (- x (/ w 2)) (fp-scale)) ,(/ (- y (/ h 2)) (fp-scale)))
+               (path placeholder)
+               ,@(for/list ([line (footprint-lines fp)])
+                   (match line
+                     [(line-spec x1 y1 x2 y2 width)
+                      `(fp_line (start ,x1 ,y1) (end ,x2 ,y2)
+                                (layer F.SilkS) (width ,width))]))
+               ,@(for/list ([pad (footprint-pads fp)])
+                   (match pad
+                     [(pad-spec num x y mounting-type shape shape-attr)
+                      ;; FIXME the fp dimension and the location seems to be in
+                      ;; different units
+                      `(pad ,num ,mounting-type ,shape (at ,x ,y)
+                            ;; FIXME placeholder
+                            (size 2 2) (drill 1)
+                            (layers *.Cu *.Mask F.SilkS)
+                            ,@(if (and (hash-has-key? pinhash num)
+                                       (hash-has-key? Hpin=>net
+                                                      (hash-ref pinhash num)))
+                                  (let ([index (hash-ref
+                                                Hnet=>index
+                                                (hash-ref Hpin=>net
+                                                          (hash-ref pinhash num)))])
+                                    `((net ,index
+                                           ,(number->string index))))
+                                  null))]))
+               ;; FIXME placeholder
+               ;; (net 21 /Leds/lrow3)
+               ))))
 
 (define (IC+Atom->fp-pict+Hlocs ic atom)
   (let-values ([(p Hlocs) (IC->fp-pict+Hlocs ic)])

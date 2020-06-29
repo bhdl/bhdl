@@ -253,6 +253,8 @@
       (write-string (jsexpr->string place-result) out))
     #:exists 'replace)
 
+  ;; FIXME the order of the hash tables seems to be changing, as the saved
+  ;; results cannot be used directly
   (define place-result-loaded
     (call-with-input-file "/tmp/rackematic/out/gh60-sol.json"
       (λ (in)
@@ -266,7 +268,15 @@
              "gh60.pdf"))
 
 (module+ test-kicad
-  (define init-place (Composite->place-spec whole '(2000 1000)))
+  (define place-result
+    (send-for-placement
+     ;; TODO the diearea should be specified only once
+     (Composite->place-spec whole '(2000 1000))))
+  (save-file (Composite->pict whole
+                              '(2000 1000)
+                              (hash-ref place-result 'xs)
+                              (hash-ref place-result 'ys))
+             "gh60.pdf")
   (call-with-output-file "out.kicad_pcb"
     #:exists 'replace
     (λ (out)
@@ -274,4 +284,3 @@
                                           (hash-ref place-result 'xs)
                                           (hash-ref place-result 'ys))
                     out))))
-

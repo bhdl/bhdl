@@ -339,6 +339,18 @@
   (let* ([atoms (collect-all-atoms comp)]
          [die (match diearea
                 [(list w h) (rectangle w h)])]
+         ;; net
+         ;; 1. get a list of nets
+         [nets (Composite->netlist comp)]
+         ;; 2. assign names for the nets
+         [Hnet=>index (for/hash ([net nets]
+                                 ;; CAUTION the net 0 is special, and must have ID ""
+                                 [i (in-naturals 1)])
+                        (values net i))]
+         ;; 3. get a map from atom pin to nets
+         [Hpin=>net (for*/hash ([net nets]
+                                [pin (Net-pins net)])
+                      (values pin net))]
          ;; atom position
          [Hatom=>xy (for/hash ([atom atoms]
                                [x xs]
@@ -347,7 +359,17 @@
     ;; 2. generate!
     `(kicad_pcb ,@(kicad-pcb-prefix diearea)
                 ;; FIXME TODO add netlist
+                ;; 4. add the nets declaration
+                ,@(for/list ([i (hash-values Hnet=>index)])
+                    ;; FIXME the name PLACEHOLDER?
+                    `(net ,i
+                          ,(number->string i)))
                 ,@(for/list ([atom atoms])
-                    (match-let ([(list x y) (hash-ref Hatom=>xy atom)])
-                      (atom->fp-sexp atom x y))))))
+                    ;; 5. attach proper net information for the components
+                    (atom->fp-sexp atom
+                                   ;; w and h
+                                   (exact->inexact (Macro-w (atom->macro atom)))
+                                   (exact->inexact (Macro-h (atom->macro atom)))
+                                   ;; hash tables
+                                   Hatom=>xy Hpin=>net Hnet=>index)))))
 
