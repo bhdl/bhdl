@@ -23,6 +23,7 @@
 
          atom->fp-pict+Hlocs
          atom->fp-pict
+         picted-atom!
 
          atom->fp-sexp)
 
@@ -277,3 +278,11 @@
 
 (define (atom->fp-pict atom)
   (let-values ([(p locs) (atom->fp-pict+Hlocs atom)]) p))
+
+
+;; CAUTION FIXME there is no functional way to do this, because I do not want to
+;; create extra pins. Also, Atom is marked with #:auto fields, and that is not
+;; copiable in the sense of struct-copy
+(define (picted-atom! atom [p (atom->fp-pict atom)])
+  (set-Atom-pict! atom p)
+  atom)

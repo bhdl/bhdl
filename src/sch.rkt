@@ -31,8 +31,6 @@
 
          define-Composite
 
-         picted-atom!
-
          *-
          *<
 
@@ -60,13 +58,6 @@
   ;; #:prefab
   ;; CAUTION #:mutable only for changing loc
   #:mutable)
-
-;; CAUTION FIXME there is no functional way to do this, because I do not want to
-;; create extra pins. Also, Atom is marked with #:auto fields, and that is not
-;; copiable in the sense of struct-copy
-(define (picted-atom! atom p)
-  (set-Atom-pict! atom p)
-  atom)
 
 
 ;; DESIGN each composite should keep a location map of Atoms and (not yet
@@ -120,11 +111,13 @@
            (let ([self (create-simple-Composite ext-pin ...)])
              ;; reverse where clause
              (let* where-clause
-               #,(if (attribute p-name)
-                       #'(set-Composite-pict! self p-name)
-                       #'(void))
                ;; create atoms
                (let* (atom-clause ... ...)
+
+                 #,(if (attribute p-name)
+                       #'(set-Composite-pict! self p-name)
+                       #'(void))
+
                  ;; do the hooks
                  (hook! self hook-clause ...) ...
                  ;; do the connections

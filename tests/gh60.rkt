@@ -128,9 +128,12 @@
                                             ;; assign locations
                                             (picted-atom! (cherry) p)))]))
 
+;; Declare here so that I can access the pict and assign locations for them
+(define ic (picted-atom! (make-IC-atom ATmega32U4)))
+(define usb1 (picted-atom! (usb 'a-male)))
+
 (define-Composite ic-module
   #:external-pins ()
-  #:atoms ([ic (make-IC-atom ATmega32U4)])
   #:hooks ((ic.VCC global.VCC)
            (ic.GND global.GND))
   ;; connect IO module
@@ -161,17 +164,16 @@
            (matrix-module.col13 ic.PD6)
            (matrix-module.col14 ic.PB3))
   ;; USB module
-  #:atoms ([usb (usb 'a-male)]
-           [r1 (R 22)]
+  #:atoms ([r1 (R 22)]
            [r2 (R 22)]
            [c (C '1u)])
   #:hooks ((ic.UVCC ic.VBUS global.VCC)
            (ic.UGND global.GND)
            (ic.UCAP c.1) (c.2 global.GND)
-           (usb.VBUS global.VCC)
-           (usb.D- r1.1) (r1.2 ic.D-)
-           (usb.D+ r2.1) (r2.2 ic.D+)
-           (usb.GND global.GND))
+           (usb1.VBUS global.VCC)
+           (usb1.D- r1.1) (r1.2 ic.D-)
+           (usb1.D+ r2.1) (r2.2 ic.D+)
+           (usb1.GND global.GND))
   ;; crystal module
   ;;
   ;; FIXME crystal type
@@ -202,7 +204,10 @@
 
 (define-Composite whole
   ;; CAUTION just to declare the pict
-  #:pict (inset (Composite-pict matrix-module) 200)
+  #:pict (inset (hb-append -100
+                           (Atom-pict ic)
+                           (Composite-pict matrix-module)
+                           (Atom-pict usb1)) 200)
   #:connect (list ic-module
                   matrix-module
                   power-module
@@ -211,6 +216,8 @@
 (module+ test
   (Composite-pict matrix-module)
   (Composite-pict ic-module)
+  (Composite-pict whole)
+
   (cc-find (inset (Composite-pict whole) 200)
            (Composite-pict whole))
 
@@ -269,7 +276,17 @@
   (define place-result
     (send-for-placement
      ;; TODO the diearea should be specified only once
-     (Composite->place-spec whole)))
+     (Composite->place-spec whole
+                            #:place-nsteps 50
+                            #:place-nbins 300
+                            ;; When cycle increases, the temperature cools down,
+                            ;; and the later cycles are not very useful to
+                            ;; remove conflicts. Thus, for this application, I
+                            ;; might consider using only the first few cycles,
+                            ;; and use a large number of steps (per cycle)
+                            #:sa-ncycles 30
+                            #:sa-nsteps 2000
+                            #:sa-stepsize 10)))
   (save-file (Composite->pict whole
                               (hash-ref place-result 'xs)
                               (hash-ref place-result 'ys))
