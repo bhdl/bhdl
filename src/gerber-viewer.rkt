@@ -136,15 +136,15 @@
            ;; to access the current aperture
            ;;
            ;; FIXME magic number 0.05 repeated
-           [(1) (update-bounding-box (xx x) (yy y) 0.05 0.05)
+           [(1) (update-bounding-box (xx x) (yy y))
                 (send dc draw-line
                       (car cur-pos) (cdr cur-pos)
                       (xx x) (yy y))]
-           [(2) (update-bounding-box (xx x) (yy y) 0.05 0.05)]
+           [(2) (update-bounding-box (xx x) (yy y))]
            ;; flash current aperture
            [(3) (let-values ([(dx dy) (values (first (second cur-aperture))
                                               (second (second cur-aperture)))])
-                  (update-bounding-box (xx x) (yy y) (/ dx 2) (/ dy 2)))
+                  (update-bounding-box (xx x) (yy y)))
                 (case (first cur-aperture)
                   [("R") (flash-rectangle dc (xx x) (yy y))]
                   ;; FIXME I should flash the ellipse

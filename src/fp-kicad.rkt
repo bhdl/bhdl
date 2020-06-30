@@ -72,8 +72,10 @@
                     (line-spec sx sy ex ey w)]
                    ;; FIXME optional z
                    [`(pad ,num ,mounting-type ,shape (at ,x ,y ,z ...)
-                          (size ,s1 ,s2) ,other-attrs ...)
-                    (pad-spec num x y mounting-type shape `((size ,s1 ,s2)))]
+                          (size ,s1 ,s2)
+                          ;; FIXME optional dsize
+                          (drill ,dsize) ... ,other-attrs ...)
+                    (pad-spec num x y mounting-type shape (list s1 s2) dsize)]
                    ;; TODO
                    [`(fp_circle ,other ...)
                     #f]

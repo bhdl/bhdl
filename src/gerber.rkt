@@ -32,10 +32,10 @@
                         (gerber-format-xy (+ x1 dx) (+ y1 dy)) "D02*" "\n"
                         (gerber-format-xy (+ x2 dx) (+ y2 dy)) "D01*")))]
         [body-pad (for/list ([pad (footprint-pads fp)])
-                    (let* ([size (assoc 'size (pad-spec-shape-attr pad))]
+                    (let* ([size (pad-spec-size pad)]
                            [shape (pad-spec-shape pad)]
-                           [s1 (second size)]
-                           [s2 (third size)]
+                           [s1 (first size)]
+                           [s2 (second size)]
                            [x (pad-spec-x pad)]
                            [y (pad-spec-y pad)])
                       (string-append

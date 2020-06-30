@@ -14,8 +14,8 @@
          pict)
 
 (provide (contract-out
-          [Composite->place-spec (any/c any/c . -> . any)]
-          [Composite->pict       (any/c any/c any/c any/c . -> . any)])
+          [Composite->place-spec (any/c . -> . any)]
+          [Composite->pict       (any/c any/c any/c . -> . any)])
 
          Composite->kicad-pcb
 
@@ -52,13 +52,12 @@
              [i (in-naturals)])
     (values atom (add1 i))))
 
-(define (Composite->place-spec comp diearea)
+(define (Composite->place-spec comp)
   "generate directly xs, ys, ws, hs, mask, Es, diearea"
   (let* ([netlist (Composite->netlist comp)]
          [atoms (collect-all-atoms comp)]
          [Hatom=>idx (annotate-atoms atoms)]
-         ;; enlarge pict by 200
-         [diepict (inset (Composite-pict comp) 200)]
+         [diepict (Composite-pict comp)]
          [locs (for/list ([atom atoms])
                  (if (Atom-pict atom)
                      ;; FIXME assuming the pict can always be found
@@ -171,11 +170,13 @@
   ;; (min-st-kruskal g)
   g)
 
-(define (Composite->pict comp diearea xs ys)
+(define (Composite->pict comp xs ys)
   ;; 1. draw the macro of each atoms on the right location
   (let* ([atoms (collect-all-atoms comp)]
-         [die (match diearea
-                [(list w h) (rectangle w h)])]
+         ;; create an empty rectangle because the pict might contains extra
+         ;; drawings that are intended for debugging
+         [die (rectangle (pict-width (Composite-pict comp))
+                         (pict-height (Composite-pict comp)))]
          ;; atom position
          [Hatom=>xy (for/hash ([atom atoms]
                                [x xs]
@@ -235,13 +236,13 @@
 
 
 
-(define (kicad-pcb-prefix diearea)
+(define (kicad-pcb-prefix w h)
   `((version 4)
     (host pcbnew 4.0.2-stable)
     (general
      (links 469)
      (no_connects 0)
-     (area 0 0 ,(first diearea) ,(second diearea))
+     (area 0 0 ,w ,h)
      (thickness 1.6002)
      (drawings 311)
      (tracks 3484)
@@ -333,12 +334,11 @@
       (outputdirectory gerber/))
      )))
 
-(define (Composite->kicad-pcb comp diearea xs ys)
+(define (Composite->kicad-pcb comp xs ys)
   "Generate .kicad_pcb."
   ;; 1. collect all atoms
   (let* ([atoms (collect-all-atoms comp)]
-         [die (match diearea
-                [(list w h) (rectangle w h)])]
+         [die (Composite-pict comp)]
          ;; net
          ;; 1. get a list of nets
          [nets (Composite->netlist comp)]
@@ -357,7 +357,8 @@
                                [y ys])
                       (values atom (list x y)))])
     ;; 2. generate!
-    `(kicad_pcb ,@(kicad-pcb-prefix diearea)
+    `(kicad_pcb ,@(kicad-pcb-prefix (pict-width die)
+                                    (pict-height die))
                 ;; FIXME TODO add netlist
                 ;; 4. add the nets declaration
                 ,@(for/list ([i (hash-values Hnet=>index)])

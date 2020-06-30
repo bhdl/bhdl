@@ -202,7 +202,7 @@
 
 (define-Composite whole
   ;; CAUTION just to declare the pict
-  #:pict (Composite-pict matrix-module)
+  #:pict (inset (Composite-pict matrix-module) 200)
   #:connect (list ic-module
                   matrix-module
                   power-module
@@ -217,21 +217,20 @@
   (collect-all-atoms whole)
   (Composite-nets whole)
   (pict-height (footprint->pict (fp-switch-keyboard 1 'pcb)))
-  (define init-place (Composite->place-spec whole '(2000 1000)))
+  (define init-place (Composite->place-spec whole))
 
   ;; TODO die-area should be inside place spec
+  (pict-height (Composite-pict whole))
   (Composite->pict whole
-                   '(2000 1000)
                    (hash-ref init-place 'xs)
                    (hash-ref init-place 'ys))
 
   ;; there seems to be a little off, i.e. fixed xs and ys changed a little
   (make-directory* "/tmp/rackematic/out/")
-  (save-for-placement (Composite->place-spec whole '(2000 1000))
+  (save-for-placement (Composite->place-spec whole)
                       "/tmp/rackematic/out/gh60.json")
 
   (save-file (Composite->pict whole
-                              '(2000 1000)
                               (hash-ref init-place 'xs)
                               (hash-ref init-place 'ys))
              "gh60-init.pdf")
@@ -245,7 +244,7 @@
   (define place-result
     (send-for-placement
      ;; TODO the diearea should be specified only once
-     (Composite->place-spec whole '(2000 1000))))
+     (Composite->place-spec whole)))
   
   ;; save place result
   (call-with-output-file "/tmp/rackematic/out/gh60-sol.json"
@@ -262,7 +261,6 @@
 
   ;; FIXME the whole circuits should be centered on the diearea
   (save-file (Composite->pict whole
-                              '(2000 1000)
                               (hash-ref place-result 'xs)
                               (hash-ref place-result 'ys))
              "gh60.pdf"))
@@ -271,16 +269,15 @@
   (define place-result
     (send-for-placement
      ;; TODO the diearea should be specified only once
-     (Composite->place-spec whole '(2000 1000))))
+     (Composite->place-spec whole)))
   (save-file (Composite->pict whole
-                              '(2000 1000)
                               (hash-ref place-result 'xs)
                               (hash-ref place-result 'ys))
              "gh60.pdf")
   (call-with-output-file "out.kicad_pcb"
     #:exists 'replace
     (λ (out)
-      (pretty-write (Composite->kicad-pcb whole '(2000 1000)
+      (pretty-write (Composite->kicad-pcb whole
                                           (hash-ref place-result 'xs)
                                           (hash-ref place-result 'ys))
                     out))))

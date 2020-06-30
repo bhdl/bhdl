@@ -29,8 +29,11 @@ CLOSED: [2020-05-13 Wed 22:24]
 *** DONE netlist
 CLOSED: [2020-06-29 Mon 22:48]
 
-*** STARTED position is a little off
+*** DONE position is a little off
+CLOSED: [2020-06-30 Tue 15:50]
 maybe the corner/center coordinate system, or the fp-scale of pict
+
+That is because the origin of the kicad footprint is not the center or corder.
 *** STARTED remove all overlapping, or report it out
 *** TODO And read back edited results?
 

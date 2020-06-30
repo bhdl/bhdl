@@ -159,6 +159,26 @@
             (hash-set! cache fp (list p locs))
             (values p locs))))))
 
+(define (footprint->offset-uncached fp)
+  (let ([fname (make-temporary-file)])
+    (println (~a "DEBUG: " fname))
+    (call-with-output-file fname
+      #:exists 'replace
+      (λ (out)
+        (write-string (footprint->gerber fp)
+                      out)))
+    (let-values ([(p offset) (gerber-file->pict+offset fname)])
+      offset)))
+
+(define footprint->offset
+  (let ([cache (make-hash)])
+    (λ (fp)
+      (if (hash-has-key? cache fp)
+          (hash-ref cache fp)
+          (let ([offset (footprint->offset-uncached fp)])
+            (hash-set! cache fp offset)
+            offset)))))
+
 (module+ test
   (footprint->pict (fp-QFN 32)))
 
@@ -200,14 +220,16 @@
   "Generate FP raw kicad sexp."
   (match-let ([(list x y) (hash-ref Hatom=>xy atom)]
               [pinhash (Atom-pinhash atom)])
-    (let ([fp (atom->fp atom)])
+    (match-let* ([fp (atom->fp atom)]
+                 [(Point xmin ymin) (footprint->offset fp)])
       `(module ,(uuid-string) (layer F.Cu) (tedit 0) (tstamp 0)
                ;; CAUTION placement
                ;; FIXME scale
                ;;
                ;; FIXME however, this is centered location, but kicad seems to
                ;; expect top-left corner. But this still does not match exactly.
-               (at ,(/ (- x (/ w 2)) (fp-scale)) ,(/ (- y (/ h 2)) (fp-scale)))
+               (at ,(- (/ (- x (/ w 2)) (fp-scale)) xmin)
+                   ,(- (/ (- y (/ h 2)) (fp-scale)) ymin))
                (path placeholder)
                (fp_text reference
                         ;; this reference is required for Spectra export of
@@ -222,12 +244,13 @@
                                 (layer F.SilkS) (width ,width))]))
                ,@(for/list ([pad (footprint-pads fp)])
                    (match pad
-                     [(pad-spec num x y mounting-type shape shape-attr)
+                     [(pad-spec num x y mounting-type shape (list s1 s2) dsize)
                       ;; FIXME the fp dimension and the location seems to be in
                       ;; different units
                       `(pad ,num ,mounting-type ,shape (at ,x ,y)
-                            ;; FIXME placeholder
-                            (size 2 2) (drill 1)
+                            (size ,s1 ,s2)
+                            ;; FIXME optional drill
+                            ;; (drill ,dsize)
                             (layers *.Cu *.Mask F.SilkS)
                             ,@(if (and (hash-has-key? pinhash num)
                                        (hash-has-key? Hpin=>net
