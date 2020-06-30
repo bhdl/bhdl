@@ -14,8 +14,9 @@
          pict)
 
 (provide (contract-out
-          [Composite->place-spec (any/c . -> . any)]
+          ;; [Composite->place-spec (any/c . -> . any)]
           [Composite->pict       (any/c any/c any/c . -> . any)])
+         Composite->place-spec
 
          Composite->kicad-pcb
 
@@ -52,7 +53,12 @@
              [i (in-naturals)])
     (values atom (add1 i))))
 
-(define (Composite->place-spec comp)
+(define (Composite->place-spec comp
+                               #:place-nsteps [place-nsteps 50]
+                               #:place-nbins[place-nbins 300]
+                               #:sa-ncycles [sa-ncycles 20]
+                               #:sa-nsteps [sa-nsteps 100]
+                               #:sa-stepsize [sa-stepsize 50])
   "generate directly xs, ys, ws, hs, mask, Es, diearea"
   (let* ([netlist (Composite->netlist comp)]
          [atoms (collect-all-atoms comp)]
@@ -94,6 +100,11 @@
             'Es Es
             'diearea (list (pict-width diepict)
                            (pict-height diepict))
+            'place-params (hash 'place-nsteps place-nsteps
+                                'place-nbins place-nbins
+                                'sa-ncycles sa-ncycles
+                                'sa-nsteps sa-nsteps
+                                'sa-stepsize sa-stepsize)
             'mask mask))))
 
 (define (save-for-placement specs fname)

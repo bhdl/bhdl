@@ -48,7 +48,12 @@ Free routing seems to work. However, some footprints seems to be problematic:
 
 After all, there's not a lot of boards. I can route them manually for now.
 
+*** TODO freerouting CMD tool?
+
 *** TODO integrate with Youbiao's router
+
+** TODO better positioning
+Positioning without exposing to =pict= library, and support for rotation
 
 ** STARTED better schematic and footprint libraries
 SCHEDULED: <2020-06-30 Tue>

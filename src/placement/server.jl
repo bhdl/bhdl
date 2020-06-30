@@ -21,11 +21,16 @@ function web_server()
         @info "parsing payload .."
         jstr = String(payload)
         jobj = JSON.parse(jstr)
-        xs, ys, ws, hs, Es, mask, diearea = decode_place_spec(jobj)
+        xs, ys, ws, hs, Es, mask, diearea, params = decode_place_spec(jobj)
         @info "running placement .."
-        solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false, iter=100)
+        solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea,
+                             nsteps=params["place-nsteps"],
+                             nbins=params["place-nbins"])
         solxs, solys = simulated_annealing_legalization(
-            solxs, solys, ws, hs, mask, diearea)
+            solxs, solys, ws, hs, mask, diearea,
+            ncycles=params["sa-ncycles"],
+            nsteps=params["sa-nsteps"],
+            stepsize=params["sa-stepsize"])
         # FIXME run iterations
 
         # @info "visualizing .."
@@ -68,7 +73,7 @@ function warmup()
         read(io, String)
     end
     jobj = JSON.parse(str)
-    xs, ys, ws, hs, Es, mask, diearea = decode_place_spec(jobj)
+    xs, ys, ws, hs, Es, mask, diearea, params = decode_place_spec(jobj)
     # place(xs, ys, ws, hs, Es, mask, diearea, vis=true)
     @time solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false)
     # visualize(xs, ys, ws, hs, R)
@@ -76,8 +81,8 @@ function warmup()
 end
 
 function main()
-    @info "starting a test run to warm the model up .."
-    warmup()
+    # @info "starting a test run to warm the model up .."
+    # warmup()
     @info "starting server .."
     web_server()
 end

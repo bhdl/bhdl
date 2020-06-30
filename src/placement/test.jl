@@ -35,17 +35,17 @@ function test()
     end;
     jobj = JSON.parse(str)
 
-    xs, ys, ws, hs, Es, mask, diearea = decode_place_spec(jobj);
+    xs, ys, ws, hs, Es, mask, diearea, params = decode_place_spec(jobj);
 
     # place(xs, ys, ws, hs, Es, mask, diearea, vis=true)
 
-    solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=true, iter=50)
-    legalize_place(solxs, solys, ws, hs, Es, mask, diearea, vis=true, iter=50)
+    solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=true, nsteps=50)
+    legalize_place(solxs, solys, ws, hs, Es, mask, diearea, vis=true, nsteps=50)
 
     simulated_annealing_legalization(solxs, solys, ws, hs, mask, diearea)
 
-    @time solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false, iter=100)
-    Profile.@profile solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, iter=20)
+    @time solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false, nsteps=100)
+    Profile.@profile solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, nsteps=20)
     # save to json file
     res_payload = Dict("xs"=>solxs, "ys"=>solys) |> JSON.json
     open("/tmp/rackematic/out/gh60-sol.json", "w") do io

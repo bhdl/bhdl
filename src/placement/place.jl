@@ -229,7 +229,7 @@ function display_plot(p)
 end
 
 # return a new pos
-function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, iter=50)
+function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, nsteps=50, nbins=300)
     xs = Float32.(xs)
     ys = Float32.(ys)
     ws = Float32.(ws)
@@ -238,7 +238,7 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, iter=50)
     # first, devide into bins
     # FIXME use a more formal way of deciding the bouding box
     # FIXME more bins
-    R = Region(xs, ys, ws, hs, diearea, 300)
+    R = Region(xs, ys, ws, hs, diearea, nbins)
 
     # loss: HPWL and density penalty
     hpwl(xs, ys, Es)
@@ -253,7 +253,7 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, iter=50)
     # iteratively solve the loss
     # 800 * 10 / 3600 = 2.2 hour
     # FIXME stop criteria: when the update is small enough for several epochs
-    for step in 1:iter
+    for step in 1:nsteps
         @info "step: $step"
         @info "calculating W .."
         w = W(Es, xs, ys)
@@ -363,7 +363,7 @@ function accept(xs, ys, ws, hs, x, y, i, t)
     # FIXME I should remove the conflict with itself
     c1 = cost_f(xs, ys, ws, hs, x, y, ws[i], hs[i])
     if c1 < c0
-        @info "cost improves from $c0 to $c1"
+        # @info "cost improves from $c0 to $c1"
         return true
     end
     p = exp(-(c1 - c0) / t)
@@ -393,28 +393,31 @@ function num_conflicts(xs, ys, ws, hs)
     return ct
 end
 
-function simulated_annealing_legalization(xs, ys, ws, hs, mask, diearea, vis=false)
+function simulated_annealing_legalization(xs, ys, ws, hs, mask, diearea;
+                                          vis=false, ncycles=20,
+                                          nsteps=100, stepsize=50)
     # FIXME make a copy?
     xs = Float32.(xs)
     ys = Float32.(ys)
     ws = Float32.(ws)
     hs = Float32.(hs)
-    R = Region(xs, ys, ws, hs, diearea, 1000)
+    # FIXME this is for visulization and map back to valid region
+    R = Region(xs, ys, ws, hs, diearea, 300)
     # actually I can probably parallelize the SA process, by trying to move
     # multiple components
     # t = 50
     # randomly choose a point
-    for cycle in 2:20
+    for cycle in 2:ncycles+1
         t = temperature(cycle)
-        for step in 1:100
+        for step in 1:nsteps
             i = rand(findall(mask .== 1))
             if cost_f(xs, ys, ws, hs, xs[i], ys[i], ws[i], hs[i]) == 1
                 continue
             end
             # i = rand(1:length(xs))
             # FIXME the scale of the movement
-            x = xs[i] + 50 * randn()
-            y = ys[i] + 50 * randn()
+            x = xs[i] + stepsize * randn()
+            y = ys[i] + stepsize * randn()
 
             # newxs = xs .+ randn()
             # newys = ys .+ randn()
@@ -433,7 +436,7 @@ function simulated_annealing_legalization(xs, ys, ws, hs, mask, diearea, vis=fal
         ys[ys .+ hs ./ 2 .> R.ymax] .= (hs ./ 2 .- R.ymax)[ys .+ hs ./ 2 .> R.ymax]
 
         # print how many conflicts
-        @info "remaining conflicts: $(num_conflicts(xs, ys, ws, hs))"
+        @info "cycle $cycle, remaining conflicts: $(num_conflicts(xs, ys, ws, hs))"
         if vis visualize(xs, ys, ws, hs, R) end
     end
     return xs, ys
