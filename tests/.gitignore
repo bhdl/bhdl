@@ -5,3 +5,7 @@ out/
 fp-info-cache
 *.kicad_pcb
 *.pro
+*.kicad_pcb-bak
+*.rules
+*.dsn
+*.ses

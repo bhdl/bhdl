@@ -10,7 +10,8 @@
          "common.rkt"
          ;; FIXME dependency
          "sch.rkt"
-         pict)
+         pict
+         uuid)
 
 (provide IC->fp-pict
          IC->fp-pict+Hlocs
@@ -200,7 +201,7 @@
   (match-let ([(list x y) (hash-ref Hatom=>xy atom)]
               [pinhash (Atom-pinhash atom)])
     (let ([fp (atom->fp atom)])
-      `(module PLACEHOLDER (layer F.Cu) (tedit 0) (tstamp 0)
+      `(module ,(uuid-string) (layer F.Cu) (tedit 0) (tstamp 0)
                ;; CAUTION placement
                ;; FIXME scale
                ;;
@@ -208,6 +209,12 @@
                ;; expect top-left corner. But this still does not match exactly.
                (at ,(/ (- x (/ w 2)) (fp-scale)) ,(/ (- y (/ h 2)) (fp-scale)))
                (path placeholder)
+               (fp_text reference
+                        ;; this reference is required for Spectra export of
+                        ;; KiCAD. But this UUID is too long for this purpose
+                        ,(uuid-string)
+                        (at 0 0 0) (layer F.SilkS) hide
+                        (effects (font (size 1.524 1.524) (thickness 0.3048))))
                ,@(for/list ([line (footprint-lines fp)])
                    (match line
                      [(line-spec x1 y1 x2 y2 width)

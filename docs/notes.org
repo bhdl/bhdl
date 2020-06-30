@@ -29,13 +29,29 @@ CLOSED: [2020-05-13 Wed 22:24]
 *** DONE netlist
 CLOSED: [2020-06-29 Mon 22:48]
 
-*** TODO position is a little off
+*** STARTED position is a little off
 maybe the corner/center coordinate system, or the fp-scale of pict
+*** STARTED remove all overlapping, or report it out
 *** TODO And read back edited results?
 
-** CANCELED Auto-Routing
-CLOSED: [2020-06-29 Mon 22:49]
-** TODO write some boards
+** DONE Auto-Routing
+CLOSED: [2020-06-30 Tue 13:55]
+
+Free routing seems to work. However, some footprints seems to be problematic:
+- footprint itself is clapsed together
+- still overlapping
+- non overlapping on the placement results, but overlaps in kicad due to some
+  tiny mismatch
+
+After all, there's not a lot of boards. I can route them manually for now.
+
+*** TODO integrate with Youbiao's router
+
+** STARTED better schematic and footprint libraries
+SCHEDULED: <2020-06-30 Tue>
+
+** STARTED write some boards
+SCHEDULED: <2020-06-30 Tue>
 
 - [X] arduino uno
 - [ ] lichee nano
@@ -45,9 +61,18 @@ CLOSED: [2020-06-29 Mon 22:49]
 
 *** other
 - [ ] ergonomic (hebi) keyboard
-** STARTED better schematic and footprint libraries
+
+** TODO software library
+- vectorized connections
+- frequently used components
+  - filtering capacitor
+  - ICSP header
+  - USB connector
+
+
 
 * TODO-list Visual programming
+** TODO Visual programming
 
 * TODO-list
 
