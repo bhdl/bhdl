@@ -6,6 +6,8 @@
          "utils.rkt"
          "pict-utils.rkt"
          "library-io.rkt"
+         ;; for padstack-id
+         "fp.rkt"
          ;; https://docs.racket-lang.org/json/index.html
          json
          graph
@@ -19,6 +21,7 @@
          Composite->place-spec
 
          Composite->kicad-pcb
+         Composite->dsn
 
          save-for-placement
          send-for-placement)
@@ -345,10 +348,55 @@
       (outputdirectory gerber/))
      )))
 
+(define (dsn-prefix w h)
+  `((parser (parser
+             (string_quote #\")
+             (space_in_quoted_tokens on)
+             (host_cad "KiCad's Pcbnew")
+             (host_version "5.1.4+dfsg1-1")))
+    ;; CAUTION small value (e.g. 1) doesn't work, leave many unrouted
+    (resolution um 10)
+    (unit um)
+    (structure
+     (layer F.Cu
+            (type signal)
+            (property
+             (index 0)))
+     (layer B.Cu
+            (type signal)
+            (property
+             (index 1)))
+     (boundary
+      (rect pcb
+            ;; CAUTION negative!
+            0 ,(- (* h 1000))
+            ,(* w 1000) 0))
+     (via "Via[0-1]_1000:400_um")
+     (rule
+      (width 250)
+      (clearance 203.3)
+      (clearance 203.3 (type default_smd))
+      (clearance 50.8 (type smd_smd))))))
+
+(define (atom->ID atom Hatom=>index)
+  (~a "ATOM" (hash-ref Hatom=>index atom)))
+
+(define (fix-atom-xy atom Hatom=>xy)
+  (match-let* ([(Point xmin ymin) (footprint->offset (atom->fp atom))]
+               [(list x y) (hash-ref Hatom=>xy atom)]
+               [w (exact->inexact (Macro-w (atom->macro atom)))]
+               [h (exact->inexact (Macro-h (atom->macro atom)))]
+               [fixed-x (- (/ (- x (/ w 2)) (fp-scale)) xmin)]
+               [fixed-y (- (/ (- y (/ h 2)) (fp-scale)) ymin)])
+    (values fixed-x fixed-y)))
+
 (define (Composite->kicad-pcb comp xs ys)
   "Generate .kicad_pcb."
   ;; 1. collect all atoms
   (let* ([atoms (collect-all-atoms comp)]
+         [Hatom=>index (for/hash ([atom atoms]
+                                  [i (in-naturals 1)])
+                         (values atom i))]
          [die (Composite-pict comp)]
          ;; net
          ;; 1. get a list of nets
@@ -368,8 +416,8 @@
                                [y ys])
                       (values atom (list x y)))])
     ;; 2. generate!
-    `(kicad_pcb ,@(kicad-pcb-prefix (pict-width die)
-                                    (pict-height die))
+    `(kicad_pcb ,@(kicad-pcb-prefix (/ (pict-width die) (fp-scale))
+                                    (/ (pict-height die) (fp-scale)))
                 ;; FIXME TODO add netlist
                 ;; 4. add the nets declaration
                 ,@(for/list ([i (hash-values Hnet=>index)])
@@ -377,11 +425,152 @@
                     `(net ,i
                           ,(number->string i)))
                 ,@(for/list ([atom atoms])
-                    ;; 5. attach proper net information for the components
-                    (atom->fp-sexp atom
-                                   ;; w and h
-                                   (exact->inexact (Macro-w (atom->macro atom)))
-                                   (exact->inexact (Macro-h (atom->macro atom)))
-                                   ;; hash tables
-                                   Hatom=>xy Hpin=>net Hnet=>index)))))
+                    (let-values ([(x y) (fix-atom-xy atom Hatom=>xy)])
+                      ;; 5. attach proper net information for the components
+                      (atom->fp-sexp atom
+                                     x y
+                                     (atom->ID atom Hatom=>index)
+                                     ;; hash tables
+                                     Hpin=>net Hnet=>index))))))
 
+(define (padstack-id pad)
+  (match pad
+    [(pad-spec num x y mounting-type
+               shape (list s1 s2) dsize)
+     (case shape
+       ;; FIXME treat roundrect as rect
+       [(rect roundrect) (~a "RectPad_"
+                             (* s1 1000) "x"
+                             (* s2 1000)
+                             "_um")]
+       ;; FIXME
+       [(circle) (~a "RoundPad_" (* s1 1000) "_um")]
+       ;; Oval[A]Pad_3500x1900_um
+       [(oval) (~a "OvalPad_"
+                   (* s1 1000) "x"
+                   (* s2 1000)
+                   "_um")]
+       [else (error (~a "padstack-id: shape " shape " not supported"))])]))
+
+(define (padstack-spec pad)
+  (match pad
+    [(pad-spec num x y mounting-type
+               shape (list s1 s2) dsize)
+     ;; return PADSTACK-ID
+     (case shape
+       ;; FIXME treat roundrect as rect
+       [(rect roundrect)
+        (let ([ID (padstack-id pad)])
+          `(padstack ,ID
+                     (shape (rect F.Cu
+                                  ,(- (/ (* s1 1000) 2))
+                                  ,(- (/ (* s2 1000) 2))
+                                  ,(/ (* s1 1000) 2)
+                                  ,(/ (* s2 1000) 2)))
+                     (shape (rect B.Cu
+                                  ,(- (/ (* s1 1000) 2))
+                                  ,(- (/ (* s2 1000) 2))
+                                  ,(/ (* s1 1000) 2)
+                                  ,(/ (* s2 1000) 2)))
+                     (attach off)))]
+       ;; FIXME
+       [(circle) (let ([ID (padstack-id pad)])
+                   `(padstack ,ID
+                              (shape (circle F.Cu ,(* s1 1000)))
+                              (shape (circle B.Cu ,(* s1 1000)))
+                              (attach off)))]
+       [(oval) (let ([ID (padstack-id pad)])
+                 `(padstack ,ID
+                            (shape (path F.Cu ,(* s2 1000)
+                                         ;; FIXME not always 0
+                                         0 0 0 0))
+                            (shape (path B.Cu ,(* s2 1000)
+                                         ;; FIXME not always 0
+                                         0 0 0 0))
+                            (attach off)))])]))
+
+(define (Composite->dsn comp xs ys)
+  "Generate Spectra file .dsn to be used for routing."
+  ;; 1. collect all atoms
+  (let* ([atoms (collect-all-atoms comp)]
+         ;; FIXME these index should be same across different calls
+         [Hatom=>index (for/hash ([atom atoms]
+                                  [i (in-naturals 1)])
+                         (values atom i))]
+         [die (Composite-pict comp)]
+         ;; net
+         ;; 1. get a list of nets
+         [nets (Composite->netlist comp)]
+         ;; 2. assign names for the nets
+         [Hnet=>index (for/hash ([net nets]
+                                 ;; CAUTION the net 0 is special, and must have ID ""
+                                 [i (in-naturals 1)])
+                        (values net i))]
+         ;; 3. get a map from atom pin to nets
+         [Hpin=>net (for*/hash ([net nets]
+                                [pin (Net-pins net)])
+                      (values pin net))]
+         ;; atom position
+         [Hatom=>xy (for/hash ([atom atoms]
+                               [x xs]
+                               [y ys])
+                      (values atom (list x y)))])
+    `(pcb placeholder.dsn
+          ,@(dsn-prefix (/ (pict-width die) (fp-scale))
+                        (/ (pict-height die) (fp-scale)))
+          (placement ,@(for/list ([atom atoms])
+                         (let-values ([(x y) (fix-atom-xy atom Hatom=>xy)]
+                                      [(ID) (atom->ID atom Hatom=>index)])
+                           `(component ,ID (place ,ID
+                                                  ;; from mm to um
+                                                  ;;
+                                                  ;; FIXME exact-round
+                                                  ,(* x 1000)
+                                                  ;; CAUTION all y are negative!
+                                                  ,(* (- y) 1000)
+                                                  front 0)))))
+          (library
+           ,@(for/list ([atom atoms])
+               `(image ,(atom->ID atom Hatom=>index)
+                       ,@(for/list ([line (footprint-lines (atom->fp atom))])
+                           (match line
+                             [(line-spec x1 y1 x2 y2 width)
+                              `(outline (path signal
+                                              ,(* 1000 width)
+                                              ,(* 1000 x1)
+                                              ;; CAUTION all y are negative
+                                              ,(* 1000 (- y1))
+                                              ,(* 1000 x2)
+                                              ,(* 1000 (- y2))))]))
+                       ,@(for/list ([pad (footprint-pads (atom->fp atom))]
+                                    [i (in-naturals 1)])
+                           (match pad
+                             [(pad-spec num x y mounting-type
+                                        shape (list s1 s2) dsize)
+                              `(pin ,(padstack-id pad)
+                                    ;; CAUTION all y are negative
+                                    ,i ,(* x 1000) ,(* (- y) 1000))]))))
+           ;; padstacks FIXME remove duplicate
+           ,@(remove-duplicates
+              (apply append
+               (for/list ([atom atoms])
+                 (for/list ([pad (footprint-pads (atom->fp atom))])
+                   (match pad
+                     [(pad-spec num x y mounting-type
+                                shape (list s1 s2) dsize)
+                      (padstack-spec pad)])))))
+           ;; one last pre-defined via
+           (padstack "Via[0-1]_1000:400_um"
+                     (shape (circle F.Cu 1000))
+                     (shape (circle B.Cu 1000))
+                     (attach off)))
+          (network ,@(for/list ([net nets]
+                                [i (in-naturals 1)])
+                       ;; FIXME there seems to be overlapping in nets
+                       `(net ,i (pins
+                                 ,@(for/list ([pin (Net-pins net)])
+                                     (string->symbol
+                                      (~a "ATOM"
+                                          (hash-ref Hatom=>index (Pin-parent pin))
+                                          "-"
+                                          (Pin-index pin)))))))))))

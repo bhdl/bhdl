@@ -20,12 +20,16 @@
          footprint->pict
          footprint->pict+Hlocs
          ;; footprint->pad-locs
+         footprint->offset
 
          atom->fp-pict+Hlocs
          atom->fp-pict
+         atom->fp
          picted-atom!
 
-         atom->fp-sexp)
+         atom->fp-sexp
+
+         fp-scale)
 
 ;; the FP size is typically in MM, and the number is typically in the range of
 ;; [1,10]. When this scale is applied, the result picture looks normal in size.
@@ -217,25 +221,23 @@
                   (remove-duplicates
                    (hash-values (Atom-pinhash atom)))))]))
 
-(define (atom->fp-sexp atom w h Hatom=>xy Hpin=>net Hnet=>index)
+(define (atom->fp-sexp atom x y ID Hpin=>net Hnet=>index)
   "Generate FP raw kicad sexp."
-  (match-let ([(list x y) (hash-ref Hatom=>xy atom)]
-              [pinhash (Atom-pinhash atom)])
+  (match-let ([pinhash (Atom-pinhash atom)])
     (match-let* ([fp (atom->fp atom)]
                  [(Point xmin ymin) (footprint->offset fp)])
-      `(module ,(uuid-string) (layer F.Cu) (tedit 0) (tstamp 0)
+      `(module ,ID (layer F.Cu) (tedit 0) (tstamp 0)
                ;; CAUTION placement
                ;; FIXME scale
                ;;
                ;; FIXME however, this is centered location, but kicad seems to
                ;; expect top-left corner. But this still does not match exactly.
-               (at ,(- (/ (- x (/ w 2)) (fp-scale)) xmin)
-                   ,(- (/ (- y (/ h 2)) (fp-scale)) ymin))
+               (at ,x ,y)
                (path placeholder)
                (fp_text reference
                         ;; this reference is required for Spectra export of
                         ;; KiCAD. But this UUID is too long for this purpose
-                        ,(uuid-string)
+                        ,ID
                         (at 0 0 0) (layer F.SilkS) hide
                         (effects (font (size 1.524 1.524) (thickness 0.3048))))
                ,@(for/list ([line (footprint-lines fp)])

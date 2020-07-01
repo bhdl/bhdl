@@ -2,63 +2,15 @@
 
 * TODO-list Summer
 
-** DONE detailed placement and legalization
-CLOSED: [2020-06-29 Mon 21:02] SCHEDULED: <2020-06-27 Sat>
-I prefer to get this and global placement into one pass.
-*** DONE [#A] cite:2008-Book-Alpert-Handbook Handbook of Algorithms for VLSI Physical Design Automation
-
-*** TODO consider the offset of pins
-*** consider double side placement and physical conflicts
-- and through-hole component is special
-- some components can overlap, e.g. cherry switch and LED, because there're LED
-  holes
-*** consider non-overlapping of copper layer
-*** rotation of components
-
-** DONE export kicad compatible netlist
-CLOSED: [2020-06-29 Mon 22:47] SCHEDULED: <2020-05-12 Tue>
-
-But this would require compatibility with kicad symbol and footprint library.
-
-UPDATE actually I'm using kicad footprints, so it's quite easy to make pcbnew
-compatible netlist. Then I'll be able to take care of the routing there
-manually. This is the work tomorrow.
-
-*** DONE components
-CLOSED: [2020-05-13 Wed 22:24]
-*** DONE netlist
-CLOSED: [2020-06-29 Mon 22:48]
-
-*** DONE position is a little off
-CLOSED: [2020-06-30 Tue 15:50]
-maybe the corner/center coordinate system, or the fp-scale of pict
-
-That is because the origin of the kicad footprint is not the center or corder.
-*** STARTED remove all overlapping, or report it out
-*** TODO And read back edited results?
-
-** DONE Auto-Routing
-CLOSED: [2020-06-30 Tue 13:55]
-
-Free routing seems to work. However, some footprints seems to be problematic:
-- footprint itself is clapsed together
-- still overlapping
-- non overlapping on the placement results, but overlaps in kicad due to some
-  tiny mismatch
-
-After all, there's not a lot of boards. I can route them manually for now.
-
-*** TODO freerouting CMD tool?
-
-*** TODO integrate with Youbiao's router
-
-** TODO better positioning
+** TODO [#A] better positioning
 Positioning without exposing to =pict= library, and support for rotation
 
-** STARTED better schematic and footprint libraries
+*** TODO rotation for fixed position
+
+** STARTED [#A] better schematic and footprint libraries
 SCHEDULED: <2020-06-30 Tue>
 
-** STARTED write some boards
+** STARTED [#A] write some boards
 SCHEDULED: <2020-06-30 Tue>
 
 - [X] arduino uno
@@ -66,23 +18,61 @@ SCHEDULED: <2020-06-30 Tue>
 - [X] gh60: https://github.com/komar007/gh60
 - [ ] pyboard
 - [ ] linux business card
+- [ ] spreadboard
 
 *** other
 - [ ] ergonomic (hebi) keyboard
 
-** TODO software library
+** STARTED [#A] software library
 - vectorized connections
 - frequently used components
   - filtering capacitor
   - ICSP header
   - USB connector
 
-
+** TODO remove verbose syntax
 
 * TODO-list Visual programming
 ** TODO Visual programming
 
+* Reference
+** JITX HN discussion
+https://news.ycombinator.com/item?id=17654865
+
+Quoting hwillis:
+
+#+begin_quote
+Prototyping is an excellent application. Whats your support roadmap look like?
+Add more chips so you can continue making small widgets cheaply? Any plans to
+get into higher-risk design work? If you can reliably deliver high
+frequency/radio designs near FCC limits, that frees up a lot of RF
+engineers. For anyone who doesn't know, the cost to navigate FCC regulations is
+huge, and testing is worse (10k tests with months of wait, worst case). Probably
+even more people would be interested in high power designs, given the surging
+popularity of lithium personal transport and vehicles. Mains voltage/mixed
+signal designs would also be huge, but that's a whole other kettle of bears. I'm
+sure you've got internal metrics tracking what you all spend the most time doing
+and where you're bottlenecking. Even past the huge tasks of advanced engineering
+there are opportunities to integrate with 3d printing, automated enclosure or
+laser-cut design. I suspect/hope at some point in the future you guys will be
+hiring a LOT of people!
+
+I'd love more examples, even on the front page. As long as they're relatively
+dense, readable and well-laid they'll inspire a lot of trust in engineers. Also,
+I think test fixturing is a strong asset and you guys should feature it more
+heavily! I'm not sure how you guys do it, but I'd love to see real examples. It
+might be the best suited automation of the things you guys do. Designing a
+comprehensive test fixture can take almost as long as designing the actual part,
+but with the basic functionality defined you could generate test routines,
+circuits, firmware, and jigs automatically. And my favorite kind of test jig
+looks like this[1], so gerbers are all I need to be happy.
+#+end_quote
+
 * TODO-list
+
+** deterministic placement
+- deterministic
+- incremental
 
 ** TODO save plot during placement
 
@@ -349,3 +339,68 @@ I actually do not need any weight. More specifically, I don't need the diodes to
 be exactly near the switches.
 
 But I need weights to put filtering capacitors close to the component.
+
+** DONE detailed placement and legalization
+CLOSED: [2020-06-29 Mon 21:02] SCHEDULED: <2020-06-27 Sat>
+I prefer to get this and global placement into one pass.
+*** DONE [#A] cite:2008-Book-Alpert-Handbook Handbook of Algorithms for VLSI Physical Design Automation
+
+*** TODO consider the offset of pins
+*** consider double side placement and physical conflicts
+- and through-hole component is special
+- some components can overlap, e.g. cherry switch and LED, because there're LED
+  holes
+*** consider non-overlapping of copper layer
+*** rotation of components
+
+** DONE export kicad compatible netlist
+CLOSED: [2020-06-29 Mon 22:47] SCHEDULED: <2020-05-12 Tue>
+
+But this would require compatibility with kicad symbol and footprint library.
+
+UPDATE actually I'm using kicad footprints, so it's quite easy to make pcbnew
+compatible netlist. Then I'll be able to take care of the routing there
+manually. This is the work tomorrow.
+
+*** DONE components
+CLOSED: [2020-05-13 Wed 22:24]
+*** DONE netlist
+CLOSED: [2020-06-29 Mon 22:48]
+
+*** DONE position is a little off
+CLOSED: [2020-06-30 Tue 15:50]
+maybe the corner/center coordinate system, or the fp-scale of pict
+
+That is because the origin of the kicad footprint is not the center or corder.
+*** TODO remove all overlapping, or report it out
+*** TODO And read back edited results?
+
+** DONE Auto-Routing
+CLOSED: [2020-06-30 Tue 13:55]
+
+Free routing seems to work. However, some footprints seems to be problematic:
+- footprint itself is clapsed together
+- still overlapping
+- non overlapping on the placement results, but overlaps in kicad due to some
+  tiny mismatch
+
+After all, there's not a lot of boards. I can route them manually for now.
+
+*** DONE [#A] dsn generation
+CLOSED: [2020-07-02 Thu 01:16]
+I need the dsn file. I can get it via KiCAD, but I need to see if KiCAD provides
+cmd tool for that. Or I can export dsn file.
+*** DONE [#A] integrate freerouting CMD tool
+CLOSED: [2020-07-02 Thu 01:20]
+The current version has CMD tool broken. I found [[https://github.com/freerouting/freerouting/commit/752065ae22e6533bc9f92a2b027f45803f19cfd5][commit 752065a]] has CMD working.
+
+UPDATE well, the newest version (1.4.4) actually works. The one comes with
+layouteditor does not work. The command line to use is
+
+#+begin_example
+-de input.dsn -do output.ses -mp 5
+#+end_example
+
+where -mp 5 is the number of passes to run.
+
+*** TODO integrate with Youbiao's router

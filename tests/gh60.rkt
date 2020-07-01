@@ -297,4 +297,15 @@
       (pretty-write (Composite->kicad-pcb whole
                                           (hash-ref place-result 'xs)
                                           (hash-ref place-result 'ys))
-                    out))))
+                    out)))
+  (call-with-output-file "out.dsn"
+    #:exists 'replace
+    (λ (out)
+      (pretty-write (Composite->dsn whole
+                                    (hash-ref place-result 'xs)
+                                    (hash-ref place-result 'ys))
+                    out)))
+  ;; call command line tool to do routing
+  (current-directory)
+  (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 5")
+  (system "ls"))
