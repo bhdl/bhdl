@@ -72,7 +72,9 @@
                      ;; FIXME assuming the pict can always be found
                      (let-values ([(x y) (cc-find diepict (Atom-pict atom))])
                        (Point x y))
-                     (Point 0 0)))])
+                     ;; initially place to middle, for better visualization
+                     (Point (/ (pict-width diepict) 2)
+                            (/ (pict-height diepict) 2))))])
     (let ([xs (for/list ([loc locs])
                 (Point-x loc))]
           [ys (for/list ([loc locs])
