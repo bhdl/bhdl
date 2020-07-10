@@ -1109,3 +1109,93 @@ case-sensitivity issue in library-IC.rkt"))
                                     (Point-y (hash-ref Hlocs pin))
                                     (text (symbol->string pin)))))))
             p)])
+
+
+
+(define-syntax (let-values-fn stx)
+  (syntax-parse
+   stx
+   [(_ ([(var ...) thunk] ...) body ...)
+    #'(match-let ([(list var ...) (make-list (length '(var ...))
+                                             (thunk))]
+                  ...)
+        body ...)]))
+
+(define-syntax (define-values-fn stx)
+  (syntax-parse
+   stx
+   [(_ ([(var ...) fn] ...))
+    #'(begin
+        (match-define (list var ...)
+                      #;
+                      (make-list (length '(var ...)) ;
+                      (thunk))
+                      (map fn '(var ...)))
+        ...)]))
+
+(myvoid
+  (let-values-fn ([(a b c) (lambda () 1)])
+                 (+ a b c))
+  (define-values-fn ([(a b c) (lambda () 1)]))
+  (match-define ([(list a b c) (list 1 2 3)])))
+
+
+(define-values-fn ([(k1 k2 k3 k4 k5 k6 k7 k8 k9 k0
+                        q w e r t y u i o p
+                        a s d f g h j k l |k;|
+                        z x c v b n m |k,| |k.| |k/|)
+                    (create-switch-fn 1)]
+                   ;; leftmost and rightmost cols
+                   [(esc tab caps lshift
+                         backspace enter k\\ rshift)
+                    (create-switch-fn 1.5)]
+                   ;; bottom function row
+                   [(lctrl lfn lsuper lTBD lalt
+                           ralt rTBD rsuper rfn rctrl)
+                    (create-switch-fn 1)]
+                   ;; middle columns
+                   [(lspace rspace) (create-switch-fn 2.75)]
+                   [(lmid1 lmid2 rmid1 rmid2) (create-switch-fn 1.5)]))
+
+(hc-append -100
+           (make-half 'left
+                      (list esc tab caps lshift lctrl)
+                      (list k1 q a z lsuper)
+                      (list k2 w s x lfn)
+                      (list k3 e d c lalt)
+                      (list k4 r f v lTBD)
+                      (list k5 t g b
+                            lmid1 lmid2
+                            lspace))
+           (make-half 'right
+                      (list backspace k\\ enter rshift rctrl)
+                      (list k0 p k|;| k|/| rsuper)
+                      (list k9 o l k|.| rfn)
+                      (list k8 i k k|,| ralt)
+                      (list k7 u j m rTBD)
+                      (list k6 y h n rmid1 rmid2 rspace)))
+
+([matrix (list (list esc k1 k2 k3 k4 k5 k6 k7 k8 k9 k0 backspace)
+               (list tab q w e r t y u i o p k\\)
+               (list caps a s d f g h j k l k\; enter)
+               (list lshift z x c v b n m k\, k\. k\/ rshift)
+               (list lctrl lfn lsuper lalt lspace
+                     rspace ralt rsuper rfn rctrl))])
+
+(module+ test
+  (let ([row-1 (apply hc-append 20 (append (make-list 13 (sw 1))
+                                           (list (sw 1.25))))]
+        [row-q (apply hc-append 20 (sw 1.25)
+                      (make-list 13 (sw 1)))]
+        [row-a (apply hc-append 20 (append (list (sw 1.75))
+                                           (make-list 11 (sw 1))
+                                           (list (sw 1.75))))]
+        [row-z (apply hc-append 20 (append (list (sw 2.25))
+                                           (make-list 10 (sw 1))
+                                           (list (sw 2.25))))]
+        [row-fn (apply hc-append 20 (make-list 10 (sw 1.5)))])
+    ;; FIXME must be equal width
+    ;;
+    ;; TODO split and rotate, but this is pretty hard
+    (vc-append 20 row-1 row-q row-a row-z row-fn)))
+
