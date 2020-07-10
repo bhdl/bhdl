@@ -100,30 +100,26 @@
     [(_ name (~alt
               (~optional (~seq #:external-pins (ext-pin ...))
                          #:defaults ([(ext-pin 1) null]))
-              (~optional (~seq #:pict p-name))
+              (~optional (~seq #:layout p-name))
               (~optional (~seq #:where where-clause)
                          #:defaults ([where-clause #'()]))
-              (~seq #:atoms (atom-clause ...))
+              (~seq #:vars (var-clause ...))
               (~seq #:connect connect-clause)
               (~seq #:hooks (hook-clause ...))) ...)
      (with-syntax ([self (datum->syntax stx 'self)])
        #`(define name
            (let ([self (create-simple-Composite ext-pin ...)])
-             ;; reverse where clause
-             (let* where-clause
-               ;; create atoms
-               (let* (atom-clause ... ...)
+             (let* (var-clause ... ...)
+               #,(if (attribute p-name)
+                     #'(set-Composite-pict! self p-name)
+                     #'(void))
 
-                 #,(if (attribute p-name)
-                       #'(set-Composite-pict! self p-name)
-                       #'(void))
-
-                 ;; do the hooks
-                 (hook! self hook-clause ...) ...
-                 ;; do the connections
-                 (combine-Composites-1
-                  (flatten (list self
-                                 connect-clause ...))))))))]))
+               ;; do the hooks
+               (hook! self hook-clause ...) ...
+               ;; do the connections
+               (combine-Composites-1
+                (flatten (list self
+                               connect-clause ...)))))))]))
 
 (define (combine-Composites lst)
   "This function effectively merge separated Composite into one."

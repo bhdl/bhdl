@@ -78,12 +78,12 @@
   #:super struct:Atom)
 
 (define (make-simple-atom proc degree . rst)
-  (let ([comp (apply proc (make-hash) rst)])
+  (let ([res (apply proc (make-hash) rst)])
     (for ([i (map add1 (range degree))])
       ;; FIXME use number as pin name
       ;; FIXME start from 1
-      (hash-set! (Atom-pinhash comp) i (Pin comp i)))
-    comp))
+      (hash-set! (Atom-pinhash res) i (Pin res i)))
+    res))
 
 (define (R value)
   (make-simple-atom Resistor 2 value))
@@ -109,11 +109,11 @@
 (define (switch)
   (make-simple-atom Atom 2))
 
-(struct CherrySwitch ()
+(struct CherrySwitch (spacing)
   #:super struct:Atom)
 
-(define (cherry)
-  (make-simple-atom CherrySwitch 2))
+(define (cherry [spacing 1])
+  (make-simple-atom CherrySwitch 2 spacing))
 
 (struct Connector
   (num)

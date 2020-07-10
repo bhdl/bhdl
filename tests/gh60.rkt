@@ -23,7 +23,7 @@
     res))
 
 (define-Composite power-module
-  #:atoms ([c1 (C '1u)]
+  #:vars ([c1 (C '1u)]
            [c2 (C '100n)]
            [c3 (C '100n)]
            [c4 (C '100n)]
@@ -34,14 +34,14 @@
 (define-Composite io-module
   ;; GPIO 0-3
   #:external-pins (0 1 2 3)
-  #:atoms ([backlight (connector 6)])
+  #:vars ([backlight (connector 6)])
   #:hooks ((backlight.1 global.VCC)
            (backlight.2 self.0)
            (backlight.3 self.1)
            (backlight.4 self.2)
            (backlight.5 self.3)
            (backlight.6 global.GND))
-  #:atoms ([universal (connector 6)])
+  #:vars ([universal (connector 6)])
   #:hooks ((universal.1 self.0)
            (universal.2 self.1)
            (universal.3 self.2)
@@ -84,7 +84,7 @@
   #:external-pins (row1 row2 row3 row4 row5
                         col1 col2 col3 col4 col5 col6 col7
                         col8 col9 col10 col11 col12 col13 col14)
-  #:pict one-pict
+  #:layout one-pict
   ;; FIXME these are nested lists of Composites
   #:connect (for/list ([atoms atom-rows]
                        [i '(row1 row2 row3 row4 row5)])
@@ -95,10 +95,10 @@
                  ;; col
                  (pin-ref self j)
                  ;; TODO I actually want to assign larger weight to this link
-                 (diode) #:weight 2 atom
+                 (diode) atom
                  ;; row
                  (pin-ref self i))))
-  #:where ([name-rows '((ESC 1 2 3 4 5 6 7 8 9 0 - = backspace)
+  #:vars ([name-rows '((ESC 1 2 3 4 5 6 7 8 9 0 - = backspace)
                         (Tab Q W E R T y u i o p #\[ #\] #\\)
                         (caps a s d f g h j k l #\; #\' enter)
                         (lshift z x c v b n m #\, #\. #\/ rshift)
@@ -164,7 +164,7 @@
            (matrix-module.col13 ic.PD6)
            (matrix-module.col14 ic.PB3))
   ;; USB module
-  #:atoms ([r1 (R 22)]
+  #:vars ([r1 (R 22)]
            [r2 (R 22)]
            [c (C '1u)])
   #:hooks ((ic.UVCC ic.VBUS global.VCC)
@@ -178,7 +178,7 @@
   ;;
   ;; FIXME crystal type
   ;; FIXME general crystal constructor
-  #:atoms ([x (make-simple-atom Atom 4)]
+  #:vars ([x (make-simple-atom Atom 4)]
            [c1 (C '22p)]
            [c2 (C '22p)])
   #:hooks ((ic.XTAL1 c2.1)
@@ -188,7 +188,7 @@
   ;; ICSP module
   ;;
   ;; FIXME switch type
-  #:atoms ([sw (make-simple-atom Atom 4)]
+  #:vars ([sw (make-simple-atom Atom 4)]
            [icsp (connector 6)]
            [r (R '10k)])
   #:hooks ((ic.RESET sw.3)
@@ -204,7 +204,7 @@
 
 (define-Composite whole
   ;; CAUTION just to declare the pict
-  #:pict (inset (hb-append -100
+  #:layout (inset (hb-append -100
                            (Atom-pict ic)
                            (Composite-pict matrix-module)
                            (Atom-pict usb1)) 200)

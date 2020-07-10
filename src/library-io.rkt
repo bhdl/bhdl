@@ -208,7 +208,8 @@
     [(Capacitor _) (fp-capacitor "0603")]
     [(Diode) fp-diode]
     [(LED _) fp-diode]
-    [(CherrySwitch) (fp-switch-keyboard 1.25 'pcb)]
+    ;; TODO different size switches
+    [(CherrySwitch spacing) (fp-switch-keyboard spacing 'pcb)]
     [(USB type) (fp-usb type)]
     ;; FIXME pin header? Double column?
     [(Connector num) (fp-pin-header num)]
@@ -285,6 +286,8 @@
 ;; CAUTION FIXME there is no functional way to do this, because I do not want to
 ;; create extra pins. Also, Atom is marked with #:auto fields, and that is not
 ;; copiable in the sense of struct-copy
+;;
+;; TODO the atom with pict should by default
 (define (picted-atom! atom [p (atom->fp-pict atom)])
   (set-Atom-pict! atom p)
   atom)
