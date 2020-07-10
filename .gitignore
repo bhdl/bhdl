@@ -9,3 +9,8 @@
 _minted-*
 
 *.log
+
+*.dsn
+*.kicad_pcb
+*.pro
+fp-info-cache

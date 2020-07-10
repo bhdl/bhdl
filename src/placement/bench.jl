@@ -165,13 +165,14 @@ end
 function decode_place_spec(jobj)
     xs = jobj["xs"]
     ys = jobj["ys"]
+    as = jobj["as"]
     ws = jobj["ws"]
     hs = jobj["hs"]
     Es = jobj["Es"]
     mask = jobj["mask"]
     diearea = jobj["diearea"]
     params = jobj["place-params"]
-    xs, ys, ws, hs, Es, mask, diearea, params
+    xs, ys, as, ws, hs, Es, mask, diearea, params
 end
 
 function test()

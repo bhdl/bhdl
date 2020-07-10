@@ -1,12 +1,17 @@
 #lang racket
 
 (require pict
+         pict/convert
          file/convertible
          racket/draw)
 
 (provide triangular
          mytext
          pin-over-cc
+
+         sincos->theta
+         angle-find
+
          save-file)
 
 (define (draw-shape/border w h draw-fun
@@ -78,3 +83,75 @@
                               [else (error "Not supported")]))
                  out)
     (close-output-port out)))
+
+(struct converted-pict pict (parent))
+
+(define (pict-path-element=? a b)
+  (or (eq? a b)
+      (if (converted-pict? a)
+          (if (converted-pict? b)
+              (eq? (converted-pict-parent a) (converted-pict-parent b))
+              (eq? (converted-pict-parent a) b))
+          (if (converted-pict? b)
+              (eq? (converted-pict-parent b) a)
+              #f))))
+
+(define (compute-child-theta p)
+  ;; FIXME assuming one child
+  (let ([child (car (pict-children p))])
+    ;; FIXME should be fixed by d88cd6, the correct one should be child-sxy now
+    (let ([sinθ (child-syx child)]
+          [cosθ (child-sx child)])
+      (sincos->theta sinθ cosθ))))
+
+(define (sincos->theta sinθ cosθ)
+  "Return a angle in the range of [0,2π)"
+  (match (cons (>= sinθ 0) (>= cosθ 0))
+    [(cons #t #t) (asin sinθ)]
+    [(cons #t #f) (acos cosθ)]
+    [(cons #f #f) (- (acos cosθ))]
+    [(cons #f #t) (asin sinθ)]
+    [else (error "error!")]))
+
+(define (single-pict-angle pict subbox Δa)
+  (let floop ([box pict]
+              [found values]
+              [not-found (lambda () (error 'find-XX
+                                           "sub-pict: ~a not found in: ~a" 
+                                           subbox pict))])
+    (if (pict-path-element=? subbox box)
+        (found Δa)
+        (let loop ([c (pict-children box)])
+          (if (null? c)
+              (not-found)
+              (floop (child-pict (car c))
+                     (lambda (Δa)
+                       (let ([c (car c)])
+                         (let-values ([(Δa)
+                                       ;; FIXME (transform ...) ?
+                                       ;;
+                                       ;; or simply add the offset angle?
+                                       (+ Δa (compute-child-theta box))])
+                           (found Δa))))
+                     (lambda ()
+                       (loop (cdr c)))))))))
+
+(define (angle-find pict subbox-path)
+  (if (pict-convertible? subbox-path)
+      (single-pict-angle pict subbox-path 0)
+      (let loop ([l (cons pict subbox-path)])
+        (if (null? (cdr l))
+            (values 0)
+            (let-values ([(Δa) (loop (cdr l))])
+              (single-pict-angle (car l) (cadr l) Δa))))))
+
+(module+ test
+  ;; (require pict)
+  (define r (rectangle 20 30))
+  (pict-convertible? r)
+  (pict-children r)
+  (angle-find (rotate (hc-append (rotate r (- (/ 3.14 5))) (circle 100))
+                      (/ 3.14 4)) r)
+  (cc-find (rotate (hc-append r (circle 100)) (/ 3.14 4)) r)
+  ;; TODO whether I can reconstruct the pict using the angle
+  )

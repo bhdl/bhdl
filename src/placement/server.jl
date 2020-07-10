@@ -21,7 +21,7 @@ function web_server()
         @info "parsing payload .."
         jstr = String(payload)
         jobj = JSON.parse(jstr)
-        xs, ys, ws, hs, Es, mask, diearea, params = decode_place_spec(jobj)
+        xs, ys, as, ws, hs, Es, mask, diearea, params = decode_place_spec(jobj)
         @info "running placement .."
         solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea,
                              nsteps=params["place-nsteps"],
@@ -31,6 +31,10 @@ function web_server()
             ncycles=params["sa-ncycles"],
             nsteps=params["sa-nsteps"],
             stepsize=params["sa-stepsize"])
+
+        # FIXME change as
+        solas = as
+
         # FIXME run iterations
 
         # @info "visualizing .."
@@ -50,7 +54,7 @@ function web_server()
         # UPDATE I'm using center at every locations, to be consistent for fixed locations
         # solxs = solxs .- ws ./ 2
         # solys = solys .- hs ./ 2
-        res_payload = Dict("xs"=>solxs, "ys"=>solys) |> JSON.json
+        res_payload = Dict("xs"=>solxs, "ys"=>solys, "as"=>solas) |> JSON.json
 
         # TODO I also want to send back visualizations UPDATE probably just send
         # back the coordinates and optionally meta data during the process. The

@@ -15,11 +15,10 @@
          net/url
          pict)
 
-(provide (contract-out
-          ;; [Composite->place-spec (any/c . -> . any)]
-          [Composite->pict       (any/c any/c any/c . -> . any)])
-         Composite->place-spec
+(provide Composite->place-spec
 
+         ;; these requires (xs ys as)
+         Composite->pict
          Composite->kicad-pcb
          Composite->dsn
 
@@ -62,7 +61,8 @@
                                #:sa-ncycles [sa-ncycles 20]
                                #:sa-nsteps [sa-nsteps 100]
                                #:sa-stepsize [sa-stepsize 50])
-  "generate directly xs, ys, ws, hs, mask, Es, diearea"
+  "generate directly xs, ys, as (angle), ws (width), hs (height), mask,
+Es (Edge, i.e. netlist), diearea"
   (let* ([netlist (Composite->netlist comp)]
          [atoms (collect-all-atoms comp)]
          [Hatom=>idx (annotate-atoms atoms)]
@@ -70,36 +70,39 @@
          [locs (for/list ([atom atoms])
                  (if (Atom-pict atom)
                      ;; FIXME assuming the pict can always be found
-                     (let-values ([(x y) (cc-find diepict (Atom-pict atom))])
-                       (Point x y))
+                     (let-values ([(x y) (cc-find diepict (Atom-pict atom))]
+                                  [(a) (angle-find diepict (Atom-pict atom))])
+                       (Point x y a))
                      ;; initially place to middle, for better visualization
                      (Point (/ (pict-width diepict) 2)
-                            (/ (pict-height diepict) 2))))])
-    (let ([xs (for/list ([loc locs])
-                (Point-x loc))]
-          [ys (for/list ([loc locs])
-                (Point-y loc))]
-          [mask (for/list ([atom atoms]) (if (Atom-pict atom) 0 1))]
-          [ws (for/list ([atom atoms])
-                (exact->inexact (Macro-w (atom->macro atom))))]
-          [hs (for/list ([atom atoms])
-                (exact->inexact (Macro-h (atom->macro atom))))]
-          [Es
-           ;; Edge is list of nets. Each net is a list of nodes, a node is
-           ;; (index offx offy)
-           (for/list ([net netlist])
-             ;; TODO weight
-             (for/list ([pin (Net-pins net)])
-               (let* ([atom (Pin-parent pin)]
-                      ;; FIXME pin index might be symbol
-                      [pin-index (Pin-index pin)]
-                      [macro (atom->macro atom)]
-                      [offset (hash-ref (Macro-Hlocs macro) pin-index)])
-                 (list (hash-ref Hatom=>idx atom)
-                       (exact->inexact (Point-x offset))
-                       (exact->inexact (Point-y offset))))))])
+                            (/ (pict-height diepict) 2)
+                            0)))])
+    (let-values ([(xs ys as) (for/lists (l1 l2 l3)
+                                 ([loc locs])
+                               (match-let ([(Point x y a) loc])
+                                 (values x y a)))]
+                 [(mask) (for/list ([atom atoms]) (if (Atom-pict atom) 0 1))]
+                 [(ws hs) (for/lists (l1 l2)
+                              ([atom atoms])
+                            (values (exact->inexact (Macro-w (atom->macro atom)))
+                                    (exact->inexact (Macro-h (atom->macro atom)))))]
+                 [(Es)
+                  ;; Edge is list of nets. Each net is a list of nodes, a node is
+                  ;; (index offx offy)
+                  (for/list ([net netlist])
+                    ;; TODO weight
+                    (for/list ([pin (Net-pins net)])
+                      (let* ([atom (Pin-parent pin)]
+                             ;; FIXME pin index might be symbol
+                             [pin-index (Pin-index pin)]
+                             [macro (atom->macro atom)]
+                             [offset (hash-ref (Macro-Hlocs macro) pin-index)])
+                        (list (hash-ref Hatom=>idx atom)
+                              (exact->inexact (Point-x offset))
+                              (exact->inexact (Point-y offset))))))])
       (hash 'xs xs
             'ys ys
+            'as as
             'ws ws
             'hs hs
             'Es Es
@@ -186,50 +189,48 @@
   ;; (min-st-kruskal g)
   g)
 
-(define (Composite->pict comp xs ys)
+(define (Composite->pict comp place-spec)
   ;; 1. draw the macro of each atoms on the right location
-  (let* ([atoms (collect-all-atoms comp)]
+  (let* ([xs (hash-ref place-spec 'xs)]
+         [ys (hash-ref place-spec 'ys)]
+         [as (hash-ref place-spec 'as)]
+         [atoms (collect-all-atoms comp)]
          ;; create an empty rectangle because the pict might contains extra
          ;; drawings that are intended for debugging
          [die (rectangle (pict-width (Composite-pict comp))
                          (pict-height (Composite-pict comp)))]
          ;; atom position
-         [Hatom=>xy (for/hash ([atom atoms]
-                               [x xs]
-                               [y ys])
-                      (values atom (list x y)))]
+         [Hatom=>loc (for/hash ([atom atoms]
+                                [x xs]
+                                [y ys]
+                                [a as])
+                       (values atom (Point x y a)))]
          ;; pin positions
          [Hpin=>xy (for/hash ([pin (collect-all-pins comp)])
                      (let* ([atom (Pin-parent pin)]
                             [index  (Pin-index pin)]
                             [macro (atom->macro atom)]
                             [offset (hash-ref (Macro-Hlocs macro) index)])
-                       (match (hash-ref Hatom=>xy atom)
-                         [(list x y)
-                          (values pin
-                                  (list
-                                   ;; CAUTION this macro pin offset is not
-                                   ;; centered, to keep consistent with gerber
-                                   ;; file convention.
-                                   (+ (- x (/ (Macro-w macro) 2))
-                                      (Point-x offset))
-                                   (+ (- y (/ (Macro-h macro) 2))
-                                      (Point-y offset))))])))])
+                       (match-let ([(Point x y a) (fix-atom-xy-pin
+                                                   atom (hash-ref Hatom=>loc atom)
+                                                   offset)])
+                         (values pin (list x y)))))])
     (let ([res (for/fold ([die die])
-                         ([atom atoms]
-                          [x xs]
-                          [y ys])
+                   ([atom atoms]
+                    [x xs]
+                    [y ys]
+                    [a as])
                  (let* ([m (atom->macro atom)]
                         [w (Macro-w m)]
                         [h (Macro-h m)])
                    (pin-over-cc die x y
-                                (atom->fp-pict atom))))])
+                                (rotate (atom->fp-pict atom) a))))])
       ;; Draw airwires.  Construct graph using racket's graph library, and find
       ;; MST with distance as weights
       (let* ([g (Composite->graph comp Hpin=>xy)]
              [edges (min-st-kruskal g)])
         (let ([final-res (for/fold ([res res])
-                                   ([edge edges])
+                             ([edge edges])
                            (let ([src (first edge)]
                                  [dst (second edge)])
                              (match-let ([(list x1 y1) (hash-ref Hpin=>xy src)]
@@ -383,19 +384,75 @@
 (define (atom->ID atom Hatom=>index)
   (~a "ATOM" (hash-ref Hatom=>index atom)))
 
-(define (fix-atom-xy atom Hatom=>xy)
-  (match-let* ([(Point xmin ymin) (footprint->offset (atom->fp atom))]
-               [(list x y) (hash-ref Hatom=>xy atom)]
+(define (fix-atom-xy atom loc)
+  ;; this is origin offset
+  (match-let* ([(Point xmin ymin _) (footprint->offset (atom->fp atom))]
+               [(Point x y a) loc]
                [w (exact->inexact (Macro-w (atom->macro atom)))]
                [h (exact->inexact (Macro-h (atom->macro atom)))]
-               [fixed-x (- (/ (- x (/ w 2)) (fp-scale)) xmin)]
-               [fixed-y (- (/ (- y (/ h 2)) (fp-scale)) ymin)])
-    (values fixed-x fixed-y)))
+               [fixed-x-old (- (/ (- x (/ w 2)) (fp-scale)) xmin)]
+               [fixed-y-old (- (/ (- y (/ h 2)) (fp-scale)) ymin)]
+               [scaled-x (/ x (fp-scale))]
+               [scaled-y (/ y (fp-scale))]
+               [Δx (- (+ (/ (/ w 2) (fp-scale)) xmin))]
+               [Δy (- (+ (/ (/ h 2) (fp-scale)) ymin))]
+               [r (sqrt (+ (expt Δx 2) (expt Δy 2)))]
+               ;; CAUTION negative
+               [sinθ (/ (- Δy) r)]
+               [cosθ (/ Δx r)]
+               [θ (sincos->theta sinθ cosθ)]
+               [fixed-θ (+ θ a)]
+               [fixed-x (+ scaled-x (* r (cos fixed-θ)))]
+               ;; CAUTION negative
+               [fixed-y (- scaled-y (* r (sin fixed-θ)))])
+    (Point
+     ;; fixed-x-old fixed-y-old
+     fixed-x fixed-y
+     ;; (/ (- x (/ w 2)) (fp-scale))
+     ;; (/ (- y (/ h 2)) (fp-scale))
+     ;; the result angle should be calculated according to the footprint origin
+     a)))
 
-(define (Composite->kicad-pcb comp xs ys)
+(let ([r (rectangle 30 30)])
+  (cc-find (rotate r (/ pi 4)) r))
+
+(define (fix-atom-xy-pin atom loc offset)
+  ;; this is pin offset
+  (match-let* ([(Point x y a) loc]
+               [(Point offx offy _) offset]
+               [macro (atom->macro atom)]
+               [w (Macro-w macro)]
+               [h (Macro-h macro)]
+               ;; FIXME duplicate code
+               [Δx (+ (- (/ w 2)) offx)]
+               [Δy (+ (- (/ h 2)) offy)]
+               [r (sqrt (+ (expt Δx 2) (expt Δy 2)))]
+               [sinθ (/ Δy r)]
+               [cosθ (/ Δx r)]
+               [θ (sincos->theta sinθ cosθ)]
+               [fixed-θ (+ θ a)]
+               [fixed-x (+ x (* r (cos fixed-θ)))]
+               [fixed-y (+ y (* r (sin fixed-θ)))])
+    ;; FIXME well, I'm using the old code. But both the old and new is not
+    ;; precise for the pin location. But that doesn't matter, because KiCAD and
+    ;; .dsn files do not use the pin locations, this is only for visualization
+    ;; purpose.
+    (Point
+     ;; CAUTION this macro pin offset is not centered, to keep consistent with
+     ;; gerber file convention.
+     (+ (- x (/ w 2)) offx)
+     (+ (- y (/ h 2)) offy)
+    0)
+    #;(Point fixed-x fixed-y a)
+    ))
+
+(define (Composite->kicad-pcb comp place-spec)
   "Generate .kicad_pcb."
   ;; 1. collect all atoms
-  (let* ([atoms (collect-all-atoms comp)]
+  (let* ([xs (hash-ref place-spec 'xs)]
+         [ys (hash-ref place-spec 'ys)]
+         [as (hash-ref place-spec 'as)]
+         [atoms (collect-all-atoms comp)]
          [Hatom=>index (for/hash ([atom atoms]
                                   [i (in-naturals 1)])
                          (values atom i))]
@@ -413,10 +470,11 @@
                                 [pin (Net-pins net)])
                       (values pin net))]
          ;; atom position
-         [Hatom=>xy (for/hash ([atom atoms]
-                               [x xs]
-                               [y ys])
-                      (values atom (list x y)))])
+         [Hatom=>loc (for/hash ([atom atoms]
+                                [x xs]
+                                [y ys]
+                                [a as])
+                       (values atom (Point x y a)))])
     ;; 2. generate!
     `(kicad_pcb ,@(kicad-pcb-prefix (/ (pict-width die) (fp-scale))
                                     (/ (pict-height die) (fp-scale)))
@@ -427,10 +485,11 @@
                     `(net ,i
                           ,(number->string i)))
                 ,@(for/list ([atom atoms])
-                    (let-values ([(x y) (fix-atom-xy atom Hatom=>xy)])
+                    (match-let ([(Point x y a) (fix-atom-xy
+                                                atom (hash-ref Hatom=>loc atom))])
                       ;; 5. attach proper net information for the components
                       (atom->fp-sexp atom
-                                     x y
+                                     x y a
                                      (atom->ID atom Hatom=>index)
                                      ;; hash tables
                                      Hpin=>net Hnet=>index))))))
@@ -491,10 +550,13 @@
                                          0 0 0 0))
                             (attach off)))])]))
 
-(define (Composite->dsn comp xs ys)
+(define (Composite->dsn comp place-spec)
   "Generate Spectra file .dsn to be used for routing."
   ;; 1. collect all atoms
-  (let* ([atoms (collect-all-atoms comp)]
+  (let* ([xs (hash-ref place-spec 'xs)]
+         [ys (hash-ref place-spec 'ys)]
+         [as (hash-ref place-spec 'as)]
+         [atoms (collect-all-atoms comp)]
          ;; FIXME these index should be same across different calls
          [Hatom=>index (for/hash ([atom atoms]
                                   [i (in-naturals 1)])
@@ -513,24 +575,33 @@
                                 [pin (Net-pins net)])
                       (values pin net))]
          ;; atom position
-         [Hatom=>xy (for/hash ([atom atoms]
-                               [x xs]
-                               [y ys])
-                      (values atom (list x y)))])
+         [Hatom=>loc (for/hash ([atom atoms]
+                                [x xs]
+                                [y ys]
+                                [a as])
+                       (values atom (Point x y a)))])
     `(pcb placeholder.dsn
           ,@(dsn-prefix (/ (pict-width die) (fp-scale))
                         (/ (pict-height die) (fp-scale)))
           (placement ,@(for/list ([atom atoms])
-                         (let-values ([(x y) (fix-atom-xy atom Hatom=>xy)]
-                                      [(ID) (atom->ID atom Hatom=>index)])
-                           `(component ,ID (place ,ID
-                                                  ;; from mm to um
-                                                  ;;
-                                                  ;; FIXME exact-round
-                                                  ,(* x 1000)
-                                                  ;; CAUTION all y are negative!
-                                                  ,(* (- y) 1000)
-                                                  front 0)))))
+                         (match-let ([(Point x y a) (fix-atom-xy
+                                                     atom (hash-ref Hatom=>loc atom))]
+                                     [ID (atom->ID atom Hatom=>index)])
+                           `(component
+                             ,ID (place ,ID
+                                        ;; from mm to um
+                                        ;;
+                                        ;; FIXME exact-round
+                                        ,(* x 1000)
+                                        ;; CAUTION all y are negative!
+                                        ,(* (- y) 1000)
+                                        ;; side: front or back
+                                        front
+                                        ;; rotation, in degrees, contains up to
+                                        ;; 2 digits after
+                                        ;; decimal. Counterclockwise from X
+                                        ;; positive.
+                                        ,(* (/ a pi) 180))))))
           (library
            ,@(for/list ([atom atoms])
                `(image ,(atom->ID atom Hatom=>index)

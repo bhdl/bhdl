@@ -6,5 +6,5 @@
 
 ;; TODO use Point for all locations
 (struct Point
-  (x y)
+  (x y a)
   #:prefab)

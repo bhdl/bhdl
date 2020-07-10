@@ -91,8 +91,8 @@
 (define-key-matrix matrix
   ([(esc 1.5)    k1 k2 k3 k4    k5       -         -        k6 k7 k8  k9  k0   (backspace 1.5)]
    [(tab 1.5)    Q  W  E  R     T        -         -        Y  U  I   O   P    (k\\ 1.5)]
-   [(caps 1.5)   A  S  D  F     G        lmid1 rmid1        H  J  K   L   k\;  (enter 1.5)]
-   [(lshift 1.5) Z  X  C  V     B        lmid2 rmid2        N  M  k\, k\. k\/  (rshift 1.5)]
+   [(caps 1.5)   A  S  D  F     G        (lmid1 1.5) (rmid1 1.5)        H  J  K   L   k\;  (enter 1.5)]
+   [(lshift 1.5) Z  X  C  V     B        (lmid2 1.5) (rmid2 1.5)        N  M  k\, k\. k\/  (rshift 1.5)]
    [lctrl lfn lsuper lalt lTBD (lspace 2.75) - - (rspace 2.75) rTBD ralt rsuper rfn rctrl]))
 
 (module+ test
@@ -159,18 +159,20 @@
                    (when key
                      (*- (pin-ref self yname) (diode) key (pin-ref self xname))))))))
 
+;; DEBUG
+;; TODO the rest of circuit
+(define whole matrix-module)
+
 (module+ test
  (Composite-pict matrix-module)
  (Composite-nets matrix-module)
 
- (define whole matrix-module)
-
  (Composite-pict whole)
  ;; TODO NOW rotation of fixed-location components
  (define init-place (Composite->place-spec whole))
- (Composite->pict whole
-                  (hash-ref init-place 'xs)
-                  (hash-ref init-place 'ys)))
+ ;; DEBUG
+ (define place-result init-place)
+ (save-file (Composite->pict whole init-place) "out.pdf"))
 
 (module+ test-kicad
   (define whole matrix-module)
@@ -188,23 +190,17 @@
                             #:sa-ncycles 30
                             #:sa-nsteps 2000
                             #:sa-stepsize 10)))
-  (save-file (Composite->pict whole
-                              (hash-ref place-result 'xs)
-                              (hash-ref place-result 'ys))
-             "gh60.pdf")
+  (save-file (Composite->pict whole place-result)
+             "out.pdf")
   (call-with-output-file "out.kicad_pcb"
     #:exists 'replace
     (λ (out)
-      (pretty-write (Composite->kicad-pcb whole
-                                          (hash-ref place-result 'xs)
-                                          (hash-ref place-result 'ys))
+      (pretty-write (Composite->kicad-pcb whole place-result)
                     out)))
   (call-with-output-file "out.dsn"
     #:exists 'replace
     (λ (out)
-      (pretty-write (Composite->dsn whole
-                                    (hash-ref place-result 'xs)
-                                    (hash-ref place-result 'ys))
+      (pretty-write (Composite->dsn whole place-result)
                     out)))
   ;; call command line tool to do routing
   (current-directory)

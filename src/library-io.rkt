@@ -151,7 +151,8 @@
        (for/hash ([pad (footprint-pads fp)])
          (values (pad-spec-num pad)
                  (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))
-                        (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale)))))))))
+                        (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale))
+                        0)))))))
 
 (define footprint->pict+Hlocs
   (let ([cache (make-hash)])
@@ -222,18 +223,17 @@
                   (remove-duplicates
                    (hash-values (Atom-pinhash atom)))))]))
 
-(define (atom->fp-sexp atom x y ID Hpin=>net Hnet=>index)
+(define (atom->fp-sexp atom x y a ID Hpin=>net Hnet=>index)
   "Generate FP raw kicad sexp."
   (match-let ([pinhash (Atom-pinhash atom)])
-    (match-let* ([fp (atom->fp atom)]
-                 [(Point xmin ymin) (footprint->offset fp)])
+    (match-let* ([fp (atom->fp atom)])
       `(module ,ID (layer F.Cu) (tedit 0) (tstamp 0)
                ;; CAUTION placement
                ;; FIXME scale
                ;;
                ;; FIXME however, this is centered location, but kicad seems to
                ;; expect top-left corner. But this still does not match exactly.
-               (at ,x ,y)
+               (at ,x ,y ,(* (/ a pi) 180))
                (path placeholder)
                (fp_text reference
                         ;; this reference is required for Spectra export of

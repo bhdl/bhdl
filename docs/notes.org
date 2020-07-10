@@ -1,16 +1,57 @@
 #+TITLE: Implementation Notes
 
-* TODO-list Summer
+* For Arxiv and first release, July
 
-** TODO [#A] better positioning
+** STARTED Make it happends
+*** TODO Make the HBkb
+
+- [X] the pict shape is roughly done
+- [X] wire things up
+- [ ] pick the MCU and firmware
+  - [ ] bluetooth and RF?
+    - [ ] battery and (fast) charging circuit?
+- [ ] connect everything
+- [ ] connect LEDs?
+- [ ] case CAD co-design?
+- [ ] double-check footprint for manufacturing
+
+*** TODO Make spreadboard
+*** Make a K210 development board
+
+** STARTED [#A] better positioning
 Positioning without exposing to =pict= library, and support for rotation
 
-*** TODO rotation for fixed position
+*** DONE rotation for fixed position
+CLOSED: [2020-07-11 Sat 02:38]
+
+Actually,the fixed position should be readily exported to KiCAD, with some fix
+of origin offset.
+
+**** DONE hide pict for positioning
+CLOSED: [2020-07-10 Fri 21:21]
+I have no choice but to do this. Rotation can not be discovered by cc-find.
+*** STARTED rotation for SA detailed placement
+
+*** STARTED deterministic placement
+**** deterministic
+**** incremental
+*** double side placement (just specify the side)
+
+** TODO vectorized connections
+
+** TODO paper writing
+
+*** syntax
+*** semantics
+*** system
+*** evaluation and case study
+
+* TODO-list Summer
 
 ** STARTED [#A] better schematic and footprint libraries
 SCHEDULED: <2020-06-30 Tue>
 
-** STARTED [#A] write some boards
+** TODO [#A] write some boards
 SCHEDULED: <2020-06-30 Tue>
 
 - [X] arduino uno
@@ -19,6 +60,7 @@ SCHEDULED: <2020-06-30 Tue>
 - [ ] pyboard
 - [ ] linux business card
 - [ ] spreadboard
+- [ ] a K210 board
 
 *** other
 - [ ] ergonomic (hebi) keyboard
@@ -69,10 +111,6 @@ looks like this[1], so gerbers are all I need to be happy.
 #+end_quote
 
 * TODO-list
-
-** deterministic placement
-- deterministic
-- incremental
 
 ** TODO save plot during placement
 

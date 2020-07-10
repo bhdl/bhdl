@@ -228,18 +228,14 @@
 
   ;; TODO die-area should be inside place spec
   (pict-height (Composite-pict whole))
-  (Composite->pict whole
-                   (hash-ref init-place 'xs)
-                   (hash-ref init-place 'ys))
+  (Composite->pict whole init-place)
 
   ;; there seems to be a little off, i.e. fixed xs and ys changed a little
   (make-directory* "/tmp/rackematic/out/")
   (save-for-placement (Composite->place-spec whole)
                       "/tmp/rackematic/out/gh60.json")
 
-  (save-file (Composite->pict whole
-                              (hash-ref init-place 'xs)
-                              (hash-ref init-place 'ys))
+  (save-file (Composite->pict whole init-place)
              "gh60-init.pdf")
 
   (collect-all-atoms ic-module)
@@ -267,9 +263,7 @@
         (string->jsexpr (port->string in)))))
 
   ;; FIXME the whole circuits should be centered on the diearea
-  (save-file (Composite->pict whole
-                              (hash-ref place-result 'xs)
-                              (hash-ref place-result 'ys))
+  (save-file (Composite->pict whole place-result)
              "gh60.pdf"))
 
 (module+ test-kicad
@@ -287,23 +281,17 @@
                             #:sa-ncycles 30
                             #:sa-nsteps 2000
                             #:sa-stepsize 10)))
-  (save-file (Composite->pict whole
-                              (hash-ref place-result 'xs)
-                              (hash-ref place-result 'ys))
+  (save-file (Composite->pict whole place-result)
              "gh60.pdf")
   (call-with-output-file "out.kicad_pcb"
     #:exists 'replace
     (λ (out)
-      (pretty-write (Composite->kicad-pcb whole
-                                          (hash-ref place-result 'xs)
-                                          (hash-ref place-result 'ys))
+      (pretty-write (Composite->kicad-pcb whole place-result)
                     out)))
   (call-with-output-file "out.dsn"
     #:exists 'replace
     (λ (out)
-      (pretty-write (Composite->dsn whole
-                                    (hash-ref place-result 'xs)
-                                    (hash-ref place-result 'ys))
+      (pretty-write (Composite->dsn whole place-result)
                     out)))
   ;; call command line tool to do routing
   (current-directory)

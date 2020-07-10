@@ -30,15 +30,18 @@
     #`(#%app apply proc (append arg.x ...)
              (~@ key value) ...)]))
 
-(module+ test
-  (list 1 2 (list 3 4) .. 5 (list 6 7) 8)
-  ;; should be expanded to:
-  (apply list (append (list 1)
-                      (list 2)
-                      (list 3 4)
-                      (list 5)
-                      (list 6 7)
-                      (list 8)) ))
+
+;; This test must be evaluated in a separate script
+;;
+;; (module+ test
+;;   (list 1 2 (list 3 4) .. 5 (list 6 7) 8)
+;;   ;; should be expanded to:
+;;   (apply list (append (list 1)
+;;                       (list 2)
+;;                       (list 3 4)
+;;                       (list 5)
+;;                       (list 6 7)
+;;                       (list 8)) ))
 
 (module+ test
   (define hello (list 1 2))

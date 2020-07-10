@@ -181,7 +181,7 @@
   "Return a pict for the gerber file."
   (let-values ([(p box) (execute-gbr-instructions (gbr->instructions gbr-file))])
     (match box
-      [(list xmin ymin _ _) (values p (Point xmin ymin))])))
+      [(list xmin ymin _ _) (values p (Point xmin ymin 0))])))
 
 (define (gerber-file->pict gbr-file)
   (let-values ([(p _) (gerber-file->pict+offset gbr-file)])
