@@ -70,6 +70,11 @@
   (let ([out (open-output-file filename
                                #:mode 'binary
                                #:exists 'replace)])
-    (write-bytes (convert p 'pdf-bytes)
+    ;; depends on the filename extension
+    (write-bytes (convert p (case (filename-extension filename)
+                              [(#"pdf") 'pdf-bytes]
+                              [(#"svg") 'svg-bytes]
+                              [(#"png") 'png-bytes]
+                              [else (error "Not supported")]))
                  out)
     (close-output-port out)))
