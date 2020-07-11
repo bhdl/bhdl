@@ -25,6 +25,9 @@
          ;; genereting place spec
          (struct-out Net)
 
+         nplaced-atoms
+         nfree-atoms
+
          create-simple-Composite
          combine-Composites
          combine-Composites-1
@@ -393,6 +396,18 @@ res: already in this set."
    (apply append (for/list ([net (Composite->netlist comp)])
                    (for/list ([pin (Net-pins net)])
                      pin)))))
+
+(define (nplaced-atoms comp)
+  "The atoms that are placed to locations."
+  (length (filter
+           identity
+           (map Atom-pict (collect-all-atoms comp)))))
+
+(define (nfree-atoms comp)
+  "The atoms that are NOT placed to fixed locations."
+  (length (filter-not
+           identity
+           (map Atom-pict (collect-all-atoms comp)))))
 
 
 (module+ test

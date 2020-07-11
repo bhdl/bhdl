@@ -44,15 +44,25 @@
       (substring name 1)
       name))
 
+;; or just key-with-diode group
 (define (create-switch-fn spacing)
   (lambda (name)
     (if (= spacing 0)
         #f
-        (let ([atom (cherry spacing)])
-          (picted-atom! atom
-                        (cc-superimpose (atom->fp-pict atom)
-                                        (text
-                                         (key-name-filter (symbol->string name)))))))))
+        (let* ([atom (cherry spacing)]
+               [key (picted-atom!
+                     atom
+                     (cc-superimpose (atom->fp-pict atom)
+                                     (text
+                                      (key-name-filter (symbol->string name)))))]
+               ;; key with diode group
+               [key-with-diode (let* ([d (picted-atom! (diode))]
+                                      ;; the connection
+                                      [res (*- key d)])
+                                 ;; the layout
+                                 (set-Composite-pict! res (vc-append 3 key d))
+                                 res)])
+          key-with-diode))))
 
 (struct KeyboardMatrix
   (rows))
@@ -158,7 +168,7 @@
                        [yname (string->symbol (~a "col" (add1 y)))])
                    (when key
                      (*- (pin-ref self yname)
-                         (diode)
+                         ;; (diode)
                          key (pin-ref self xname))))))))
 
 ;; TODO the rest of circuit
@@ -167,17 +177,37 @@
   #:layout (inset (Composite-pict matrix-module) 100)
   #:connect (list matrix-module))
 
+
+;; visualizing init placement
 (myvoid
  (Composite-pict matrix-module)
  (Composite-nets matrix-module)
 
+ (nplaced-atoms whole)
+ (nfree-atoms whole)
+
  (Composite-pict whole)
  ;; TODO NOW rotation of fixed-location components
  (define init-place (Composite->place-spec whole))
- ;; DEBUG
- (define place-result init-place)
- (save-file (Composite->pict whole init-place) "out.pdf"))
+ (length (collect-all-atoms whole))
+ (save-file (Composite->pict whole init-place) "out.pdf")
+ ;; well I can directly write KiCAD file
+ (call-with-output-file "out.kicad_pcb"
+   #:exists 'replace
+   (λ (out)
+     (pretty-write (Composite->kicad-pcb whole init-place)
+                   out)))
+ (call-with-output-file "out.dsn"
+   #:exists 'replace
+   (λ (out)
+     (pretty-write (Composite->dsn whole init-place)
+                   out)))
+ ;; call command line tool to do routing
+ (current-directory)
+ (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 10")
+ (system "ls"))
 
+;; placement
 (myvoid
  (define place-spec
    (Composite->place-spec whole

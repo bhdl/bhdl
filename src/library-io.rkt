@@ -289,5 +289,8 @@
 ;;
 ;; TODO the atom with pict should by default
 (define (picted-atom! atom [p (atom->fp-pict atom)])
-  (set-Atom-pict! atom p)
+  ;; I need to launder the pict becasue the footprint pict is cached. Otherwise
+  ;; all the atoms with the same footprint will have the same location when
+  ;; upon *-find function call
+  (set-Atom-pict! atom (launder p))
   atom)
