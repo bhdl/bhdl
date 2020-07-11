@@ -15,6 +15,7 @@ Pkg.add("HTTP")
 Pkg.add("JSON")
 Pkg.add("ProfileView")
 Pkg.add("PackageCompiler")
+Pkg.add("GeometricalPredicates")
 
 Pkg.rm("CuArrays")
 

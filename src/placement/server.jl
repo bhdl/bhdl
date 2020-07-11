@@ -2,6 +2,7 @@ include("bench.jl")
 include("visualize.jl")
 include("place.jl")
 
+import Random
 using HTTP
 
 # FIXME the documentation of HTTP is not very good. There are lots of
@@ -23,17 +24,20 @@ function web_server()
         jobj = JSON.parse(jstr)
         xs, ys, as, ws, hs, Es, mask, diearea, params = decode_place_spec(jobj)
         @info "running placement .."
+
+        # set seed. This should make the placement deterministic given the same
+        # hyper-parameters
+        Random.seed!(1234)
+
         solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea,
                              nsteps=params["place-nsteps"],
                              nbins=params["place-nbins"])
-        solxs, solys = simulated_annealing_legalization(
-            solxs, solys, ws, hs, mask, diearea,
+        solxs, solys, solas, conflicts = simulated_annealing_legalization(
+            solxs, solys, as, ws, hs, mask, diearea,
             ncycles=params["sa-ncycles"],
             nsteps=params["sa-nsteps"],
-            stepsize=params["sa-stepsize"])
-
-        # FIXME change as
-        solas = as
+            stepsize=params["sa-stepsize"],
+            theta_stepsize=params["sa-theta-stepsize"])
 
         # FIXME run iterations
 
@@ -54,7 +58,13 @@ function web_server()
         # UPDATE I'm using center at every locations, to be consistent for fixed locations
         # solxs = solxs .- ws ./ 2
         # solys = solys .- hs ./ 2
-        res_payload = Dict("xs"=>solxs, "ys"=>solys, "as"=>solas) |> JSON.json
+        res_payload = Dict("xs"=>solxs, "ys"=>solys,
+                           "as"=>solas,
+                           # DEBUG
+                           "ws"=>ws,
+                           "hs"=>hs,
+                           # for visualization and debug
+                           "conflicts"=>conflicts) |> JSON.json
 
         # TODO I also want to send back visualizations UPDATE probably just send
         # back the coordinates and optionally meta data during the process. The
@@ -71,22 +81,33 @@ function web_server()
     end
 end
 
-function warmup()
+function test()
     # FIXME relative path might not work
-    str = open("../../tests/warmup.json") do io
+    str = open("../../tests/fitboard.json") do io
         read(io, String)
-    end
-    jobj = JSON.parse(str)
-    xs, ys, ws, hs, Es, mask, diearea, params = decode_place_spec(jobj)
-    # place(xs, ys, ws, hs, Es, mask, diearea, vis=true)
-    @time solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea, vis=false)
-    # visualize(xs, ys, ws, hs, R)
+    end;
+    jobj = JSON.parse(str);
+    xs, ys, as, ws, hs, Es, mask, diearea, params = decode_place_spec(jobj);
+
+    solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea,
+                         nsteps=params["place-nsteps"],
+                         nbins=params["place-nbins"])
+
+    solxs2, solys2, solas = simulated_annealing_legalization(
+        solxs, solys, as, ws, hs, mask, diearea,
+        # vis=true,
+        ncycles=params["sa-ncycles"],
+        nsteps=params["sa-nsteps"],
+        stepsize=params["sa-stepsize"],
+        theta_stepsize=params["sa-theta-stepsize"],)
+
+    R = Region(xs, ys, ws, hs, diearea, 300)
+    visualize(solxs, solys, ws, hs, R)
+    visualize(solxs2, solys2, ws, hs, R)
     # visualize(solxs, solys, ws, hs, R)
 end
 
 function main()
-    # @info "starting a test run to warm the model up .."
-    # warmup()
     @info "starting server .."
     web_server()
 end

@@ -251,7 +251,7 @@
                      [(pad-spec num x y mounting-type shape (list s1 s2) dsize)
                       ;; FIXME the fp dimension and the location seems to be in
                       ;; different units
-                      `(pad ,num ,mounting-type ,shape (at ,x ,y)
+                      `(pad ,num ,mounting-type ,shape (at ,x ,y ,(* (/ a pi) 180))
                             (size ,s1 ,s2)
                             ;; FIXME optional drill
                             ;; (drill ,dsize)

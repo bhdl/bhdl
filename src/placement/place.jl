@@ -7,6 +7,9 @@ import Plots
 import CuArrays: cu, allowscalar
 allowscalar(false)
 using Flux: gpu, cpu
+using GeometricalPredicates
+
+GP = GeometricalPredicates
 
 γ = 0.5
 
@@ -342,7 +345,13 @@ function greedy_legalization(xs, ys, ws, hs, mask)
     return xs, ys
 end
 
-function cost_f(xs, ys, ws, hs, x, y, w, h)
+"""Calculate the number of overlap of the rectangle defined by (x,y,w,h) and all
+the rectangles.
+
+fasts but also deprecated because it is not easy to support angle.
+
+"""
+function cost_f_fast(xs, ys, ws, hs, x, y, w, h, R)
     x1 = x - w/2
     y1 = y - h/2
     x2 = x + w/2
@@ -357,11 +366,125 @@ function cost_f(xs, ys, ws, hs, x, y, w, h)
     return sum((x1s .< x2) .& (y1s .< y2) .& (x2s .> x1) .& (y2s .> y1))
 end
 
-function accept(xs, ys, ws, hs, x, y, i, t)
+function cost_f(xs, ys, as, ws, hs, x, y, a, w, h, R; except=[])
+    # scale everything down
+    scale = max(R.xmax - R.xmin, R.ymax - R.ymin)
+    xs = (xs .- R.xmin) ./ scale .+ 1
+    ys = (ys .- R.ymin) ./ scale .+ 1
+    ws = ws ./ scale
+    hs = hs ./ scale
+
+    x = (x - R.xmin) / scale + 1
+    y = (y - R.ymin) / scale + 1
+    w = w / scale
+    h = h / scale
+
+    # FIXME why would it happen, should the value be exact, and whether [1,2] is
+    # still needed
+    if x < 0.99 || x > 2.01
+        # FIXME magic number
+        @warn "x out of range: $x"
+        return 100
+    end
+
+    l1, l2, l3, l4 = four_corners(x, y, a, w, h)
+
+    # check for all the other rectangles
+    ct = 0
+    for i in 1:length(xs)
+        if i in except continue end
+        m1, m2, m3, m4 = four_corners(xs[i], ys[i], as[i], ws[i], hs[i])
+        # m1, m2, m3, m4 = four_corners(xs[i], ys[i], ws[i], hs[i])
+        # FIXME the four corners of the polygon will never be in polygon
+        #
+        # FIXME of course this is incorrect. It might be the case where one
+        # rectangle is inside another. Thus the corners of the larger one will
+        # never be inside the small one.
+        #
+        # maybe I'm doing double direction check
+        if overlap(l1, l2, l3, l4, m1, m2, m3, m4)
+            ct += 1
+        end
+    end
+    return ct
+end
+
+function overlap(l1, l2, l3, l4, r1, r2, r3, r4)
+    tri1 = Primitive(l1, l2, l3)
+    tri2 = Primitive(l1, l4, l3)
+
+    tri3 = Primitive(r1, r2, r3)
+    tri4 = Primitive(r1, r4, r3)
+
+    if intriangle(tri1, r1) > 0 ||
+        intriangle(tri1, r2) > 0 ||
+        intriangle(tri1, r3) > 0 ||
+        intriangle(tri1, r4) > 0 ||
+
+        intriangle(tri2, r1) > 0 ||
+        intriangle(tri2, r2) > 0 ||
+        intriangle(tri2, r3) > 0 ||
+        intriangle(tri2, r4) > 0 ||
+
+        intriangle(tri3, l1) > 0 ||
+        intriangle(tri3, l2) > 0 ||
+        intriangle(tri3, l3) > 0 ||
+        intriangle(tri3, l4) > 0 ||
+
+        intriangle(tri4, l1) > 0 ||
+        intriangle(tri4, l2) > 0 ||
+        intriangle(tri4, l3) > 0 ||
+        intriangle(tri4, l4) > 0
+
+        return true
+    end
+    return false
+end
+
+function test()
+    overlap(four_corners(786, 617, 1.25, 122, 81)...,
+            four_corners(707, 730, -0.314, 224, 81)...)
+end
+
+function four_corners(x, y, w, h)
+    # compute the 4 corners of the rectangle
+    l1 = GP.Point(x - w/2, y - h/2)
+    l2 = GP.Point(x + w/2, y - h/2)
+    l3 = GP.Point(x + w/2, y + h/2)
+    l4 = GP.Point(x - w/2, y + h/2)
+    return l1, l2, l3, l4
+end
+
+function four_corners(x, y, a, w, h)
+    r = sqrt((h/2)^2 + (w/2)^2)
+    return map([h/2, h/2, -h/2, -h/2],
+               [w/2, -w/2, -w/2, w/2]) do Δh, Δw
+                   # 1. compute theta
+                   θ = atan(Δh, Δw)
+                   x1 = x - cos(θ + a) * r
+                   y1 = y + sin(θ + a) * r
+                   GP.Point(x1, y1)
+               end
+end
+
+function test()
+    four_corners(xs[1], ys[1], as[1], ws[1], hs[1])
+    four_corners(xs[1], ys[1], ws[1], hs[1])
+    four_corners(xs[1], ys[1], 1.2, ws[1], hs[1])
+    map([1,2,3], [4,5,6]) do x, y
+        (x,y)
+    end
+end
+
+function accept(xs, ys, as, ws, hs, x, y, a, i, t, R)
     # calculate the xs[i], ys[i] conflicts with how many others
-    c0 = cost_f(xs, ys, ws, hs, xs[i], ys[i], ws[i], hs[i]) - 1
+    c0 = cost_f(xs, ys, as, ws, hs,
+                xs[i], ys[i], as[i], ws[i], hs[i],
+                R, except=[i])
     # FIXME I should remove the conflict with itself
-    c1 = cost_f(xs, ys, ws, hs, x, y, ws[i], hs[i])
+    c1 = cost_f(xs, ys, as, ws, hs,
+                x, y, a, ws[i], hs[i],
+                R, except=[i])
     if c1 < c0
         # @info "cost improves from $c0 to $c1"
         return true
@@ -383,24 +506,34 @@ end
 FIXME fixed position?
 TODO report and debug this if there are still conflicts left?
 """
-function num_conflicts(xs, ys, ws, hs)
-    ct = 0
+function compute_conflicts(xs, ys, as, ws, hs, R)
+    # conflicted items
+    items = []
     for i in 1:length(xs)
-        if cost_f(xs, ys, ws, hs, xs[i], ys[i], ws[i], hs[i]) > 1
-            ct += 1
+        c = cost_f(xs, ys, as, ws, hs,
+                   xs[i], ys[i], as[i], ws[i], hs[i],
+                   R, except=[i])
+        if c > 0
+            append!(items, i)
         end
     end
-    return ct
+    return items
 end
 
-function simulated_annealing_legalization(xs, ys, ws, hs, mask, diearea;
+function test()
+    compute_conflicts(solxs2, solys2, solas, ws, hs, R)
+end
+
+function simulated_annealing_legalization(xs, ys, as, ws, hs, mask, diearea;
                                           vis=false, ncycles=20,
-                                          nsteps=100, stepsize=50)
+                                          nsteps=100, stepsize=50,
+                                          theta_stepsize=0)
     # FIXME make a copy?
     xs = Float32.(xs)
     ys = Float32.(ys)
     ws = Float32.(ws)
     hs = Float32.(hs)
+    as = Float32.(as)
     # FIXME this is for visulization and map back to valid region
     R = Region(xs, ys, ws, hs, diearea, 300)
     # actually I can probably parallelize the SA process, by trying to move
@@ -410,21 +543,33 @@ function simulated_annealing_legalization(xs, ys, ws, hs, mask, diearea;
     for cycle in 2:ncycles+1
         t = temperature(cycle)
         for step in 1:nsteps
+            # no movable components, not meaningful, for debugging purpose
+            if isempty(findall(mask .== 1)) break end
             i = rand(findall(mask .== 1))
-            if cost_f(xs, ys, ws, hs, xs[i], ys[i], ws[i], hs[i]) == 1
+            if cost_f(xs, ys, as, ws, hs,
+                      xs[i], ys[i], as[i], ws[i], hs[i],
+                      R, except=[i]) == 0
                 continue
             end
             # i = rand(1:length(xs))
             # FIXME the scale of the movement
             x = xs[i] + stepsize * randn()
             y = ys[i] + stepsize * randn()
+            # FIXME maybe have a separate variable to control change angle or not?
+            # FIXME what should be the step size? was 50 for x,y
+            #
+            # if theta_stepsize, this is effectively not changing angle
+            a = as[i] + theta_stepsize * randn()
 
             # newxs = xs .+ randn()
             # newys = ys .+ randn()
-            if accept(xs, ys, ws, hs, x, y, i, t)
+            if accept(xs, ys, as, ws, hs,
+                      x, y, a,
+                      i, t, R)
                 # @info "cycle $cycle step $step accepted"
                 xs[i] = x
                 ys[i] = y
+                as[i] = a
             end
         end
 
@@ -436,8 +581,11 @@ function simulated_annealing_legalization(xs, ys, ws, hs, mask, diearea;
         ys[ys .+ hs ./ 2 .> R.ymax] .= (hs ./ 2 .- R.ymax)[ys .+ hs ./ 2 .> R.ymax]
 
         # print how many conflicts
-        @info "cycle $cycle, remaining conflicts: $(num_conflicts(xs, ys, ws, hs))"
+        conflicts = compute_conflicts(xs, ys, as, ws, hs, R)
+        @info "cycle $cycle, remaining conflicts: " length(conflicts)
+        # FIXME visualize the angle
         if vis visualize(xs, ys, ws, hs, R) end
     end
-    return xs, ys
+    conflicts = compute_conflicts(xs, ys, as, ws, hs, R)
+    return xs, ys, as, conflicts
 end

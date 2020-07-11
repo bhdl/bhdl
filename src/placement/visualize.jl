@@ -26,7 +26,7 @@ end
 function test_Luxor()
     @luxoremacs begin
         text("Hello world ...")
-        circle(Point(0, 0), 200, :stroke)
+        circle(Luxor.Point(0, 0), 200, :stroke)
     end
     @luxoremacs begin
         radius=80
@@ -34,7 +34,7 @@ function test_Luxor()
         setdash("dot")
         sethue("gray30")
         # create points for side effect
-        A, B = [Point(x, 0) for x in [-radius, radius]]
+        A, B = [Luxor.Point(x, 0) for x in [-radius, radius]]
         # draw a line between two points
         line(A, B, :stroke)
         # O is origin
@@ -90,7 +90,7 @@ function visualize(nodes, nets, pos)
             x = (x - xmin - xshift) * scale
             y = (y - ymin - yshift) * scale
             # @show w, h, x, y
-            box(Point(x,y), w, h, :stroke)
+            box(Luxor.Point(x,y), w, h, :stroke)
         end
     end
 end
@@ -110,18 +110,18 @@ function visualize(x, y, w, h, R)
     @luxoremacs begin
         setdash("dash")
         # the point is the center of box
-        box(Point(0,0), R.xmax * scale, R.ymax * scale, :stroke)
+        box(Luxor.Point(0,0), R.xmax * scale, R.ymax * scale, :stroke)
         setdash("solid")
         @showprogress 0.1 "drawing .." for i in 1:length(x)
             # this x y is center
-            box(Point(x[i],y[i]), w[i], h[i], :stroke)
+            box(Luxor.Point(x[i],y[i]), w[i], h[i], :stroke)
         end
     end
 end
 
 function test()
     @luxoremacs begin
-        box(Point(0,0), 100, 100, :stroke)
-        box(Point(50,50), 20, 20, :stroke)
+        box(Luxor.Point(0,0), 100, 100, :stroke)
+        box(Luxor.Point(50,50), 20, 20, :stroke)
     end
 end

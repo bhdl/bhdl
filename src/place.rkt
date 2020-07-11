@@ -22,6 +22,9 @@
          Composite->kicad-pcb
          Composite->dsn
 
+         atom->macro
+         (struct-out Macro)
+
          save-for-placement
          send-for-placement)
 
@@ -58,9 +61,11 @@
 (define (Composite->place-spec comp
                                #:place-nsteps [place-nsteps 50]
                                #:place-nbins[place-nbins 300]
-                               #:sa-ncycles [sa-ncycles 20]
-                               #:sa-nsteps [sa-nsteps 100]
-                               #:sa-stepsize [sa-stepsize 50])
+                               #:sa-ncycles [sa-ncycles 10]
+                               #:sa-nsteps [sa-nsteps 2000]
+                               #:sa-stepsize [sa-stepsize 10]
+                               ;; theta=0 means disable rotation
+                               #:sa-theta-stepsize [sa-theta-stepsize 0])
   "generate directly xs, ys, as (angle), ws (width), hs (height), mask,
 Es (Edge, i.e. netlist), diearea"
   (let* ([netlist (Composite->netlist comp)]
@@ -77,29 +82,35 @@ Es (Edge, i.e. netlist), diearea"
                      (Point (/ (pict-width diepict) 2)
                             (/ (pict-height diepict) 2)
                             0)))])
-    (let-values ([(xs ys as) (for/lists (l1 l2 l3)
-                                 ([loc locs])
-                               (match-let ([(Point x y a) loc])
-                                 (values x y a)))]
-                 [(mask) (for/list ([atom atoms]) (if (Atom-pict atom) 0 1))]
-                 [(ws hs) (for/lists (l1 l2)
-                              ([atom atoms])
-                            (values (exact->inexact (Macro-w (atom->macro atom)))
-                                    (exact->inexact (Macro-h (atom->macro atom)))))]
-                 [(Es)
-                  ;; Edge is list of nets. Each net is a list of nodes, a node is
-                  ;; (index offx offy)
-                  (for/list ([net netlist])
-                    ;; TODO weight
-                    (for/list ([pin (Net-pins net)])
-                      (let* ([atom (Pin-parent pin)]
-                             ;; FIXME pin index might be symbol
-                             [pin-index (Pin-index pin)]
-                             [macro (atom->macro atom)]
-                             [offset (hash-ref (Macro-Hlocs macro) pin-index)])
-                        (list (hash-ref Hatom=>idx atom)
-                              (exact->inexact (Point-x offset))
-                              (exact->inexact (Point-y offset))))))])
+    (let*-values ([(xs ys as) (for/lists (l1 l2 l3)
+                                  ([loc locs])
+                                (match-let ([(Point x y a) loc])
+                                  (values x y a)))]
+                  [(mask) (for/list ([atom atoms]) (if (Atom-pict atom) 0 1))]
+                  [(ws hs) (for/lists (l1 l2)
+                               ([atom atoms])
+                             (values (exact->inexact (Macro-w (atom->macro atom)))
+                                     (exact->inexact (Macro-h (atom->macro atom)))))]
+                  ;; add some margin for better placement result
+                  ;;
+                  ;; FIXME not working, the placement engine will screw out entirely
+                  #;
+                  [(ws hs) (values (map (lambda (x) (+ x 0.05)) ws)
+                                   (map (lambda (x) (+ x 0.05)) ws))]
+                  [(Es)
+                   ;; Edge is list of nets. Each net is a list of nodes, a node is
+                   ;; (index offx offy)
+                   (for/list ([net netlist])
+                     ;; TODO weight
+                     (for/list ([pin (Net-pins net)])
+                       (let* ([atom (Pin-parent pin)]
+                              ;; FIXME pin index might be symbol
+                              [pin-index (Pin-index pin)]
+                              [macro (atom->macro atom)]
+                              [offset (hash-ref (Macro-Hlocs macro) pin-index)])
+                         (list (hash-ref Hatom=>idx atom)
+                               (exact->inexact (Point-x offset))
+                               (exact->inexact (Point-y offset))))))])
       (hash 'xs xs
             'ys ys
             'as as
@@ -112,8 +123,12 @@ Es (Edge, i.e. netlist), diearea"
                                 'place-nbins place-nbins
                                 'sa-ncycles sa-ncycles
                                 'sa-nsteps sa-nsteps
-                                'sa-stepsize sa-stepsize)
-            'mask mask))))
+                                'sa-stepsize sa-stepsize
+                                'sa-theta-stepsize sa-theta-stepsize)
+            'mask mask
+            ;; initial empty conflicts. This will only be fill by the placement
+            ;; engine
+            'conflicts '()))))
 
 (define (save-for-placement specs fname)
   (let ([tmp (make-temporary-file)])
@@ -194,6 +209,7 @@ Es (Edge, i.e. netlist), diearea"
   (let* ([xs (hash-ref place-spec 'xs)]
          [ys (hash-ref place-spec 'ys)]
          [as (hash-ref place-spec 'as)]
+         [conflicts (map sub1 (hash-ref place-spec 'conflicts))]
          [atoms (collect-all-atoms comp)]
          ;; create an empty rectangle because the pict might contains extra
          ;; drawings that are intended for debugging
@@ -217,14 +233,18 @@ Es (Edge, i.e. netlist), diearea"
                          (values pin (list x y)))))])
     (let ([res (for/fold ([die die])
                    ([atom atoms]
+                    [i (in-naturals)]
                     [x xs]
                     [y ys]
                     [a as])
                  (let* ([m (atom->macro atom)]
                         [w (Macro-w m)]
-                        [h (Macro-h m)])
-                   (pin-over-cc die x y
-                                (rotate (atom->fp-pict atom) a))))])
+                        [h (Macro-h m)]
+                        [p (atom->fp-pict atom)]
+                        [p (if (member i conflicts)
+                               (frame p #:color "red")
+                               p)])
+                   (pin-over-cc die x y (rotate p a))))])
       ;; Draw airwires.  Construct graph using racket's graph library, and find
       ;; MST with distance as weights
       (let* ([g (Composite->graph comp Hpin=>xy)]

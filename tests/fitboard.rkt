@@ -157,13 +157,17 @@
                        [xname (string->symbol (~a "row" (add1 x)))]
                        [yname (string->symbol (~a "col" (add1 y)))])
                    (when key
-                     (*- (pin-ref self yname) (diode) key (pin-ref self xname))))))))
+                     (*- (pin-ref self yname)
+                         (diode)
+                         key (pin-ref self xname))))))))
 
-;; DEBUG
 ;; TODO the rest of circuit
-(define whole matrix-module)
+(define-Composite whole
+  ;; CAUTION just to declare the pict
+  #:layout (inset (Composite-pict matrix-module) 100)
+  #:connect (list matrix-module))
 
-(module+ test
+(myvoid
  (Composite-pict matrix-module)
  (Composite-nets matrix-module)
 
@@ -174,36 +178,38 @@
  (define place-result init-place)
  (save-file (Composite->pict whole init-place) "out.pdf"))
 
-(module+ test-kicad
-  (define whole matrix-module)
-  (define place-result
-    (send-for-placement
-     ;; TODO the diearea should be specified only once
-     (Composite->place-spec whole
-                            #:place-nsteps 50
-                            #:place-nbins 300
-                            ;; When cycle increases, the temperature cools down,
-                            ;; and the later cycles are not very useful to
-                            ;; remove conflicts. Thus, for this application, I
-                            ;; might consider using only the first few cycles,
-                            ;; and use a large number of steps (per cycle)
-                            #:sa-ncycles 30
-                            #:sa-nsteps 2000
-                            #:sa-stepsize 10)))
-  (save-file (Composite->pict whole place-result)
-             "out.pdf")
-  (call-with-output-file "out.kicad_pcb"
-    #:exists 'replace
-    (λ (out)
-      (pretty-write (Composite->kicad-pcb whole place-result)
-                    out)))
-  (call-with-output-file "out.dsn"
-    #:exists 'replace
-    (λ (out)
-      (pretty-write (Composite->dsn whole place-result)
-                    out)))
-  ;; call command line tool to do routing
-  (current-directory)
-  (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 5")
-  (system "ls"))
+(myvoid
+ (define place-spec
+   (Composite->place-spec whole
+                          #:place-nsteps 50
+                          #:place-nbins 300
+                          ;; When cycle increases, the temperature cools down,
+                          ;; and the later cycles are not very useful to
+                          ;; remove conflicts. Thus, for this application, I
+                          ;; might consider using only the first few cycles,
+                          ;; and use a large number of steps (per cycle)
+                          #:sa-ncycles 10
+                          #:sa-nsteps 3000
+                          #:sa-stepsize 10
+                          #:sa-theta-stepsize 0.3))
+ ;; (save-for-placement place-spec "fitboard.json")
 
+ (define place-result (send-for-placement place-spec))
+
+ (save-file (Composite->pict whole place-result)
+            "out.pdf")
+
+ (call-with-output-file "out.kicad_pcb"
+   #:exists 'replace
+   (λ (out)
+     (pretty-write (Composite->kicad-pcb whole place-result)
+                   out)))
+ (call-with-output-file "out.dsn"
+   #:exists 'replace
+   (λ (out)
+     (pretty-write (Composite->dsn whole place-result)
+                   out)))
+ ;; call command line tool to do routing
+ (current-directory)
+ (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 5")
+ (system "ls"))

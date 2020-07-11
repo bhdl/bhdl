@@ -7,35 +7,16 @@
 
 - [X] the pict shape is roughly done
 - [X] wire things up
-- [ ] pick the MCU and firmware
+- [-] pick the MCU and firmware
   - [ ] bluetooth and RF?
     - [ ] battery and (fast) charging circuit?
-- [ ] connect everything
+- [-] connect everything
 - [ ] connect LEDs?
 - [ ] case CAD co-design?
 - [ ] double-check footprint for manufacturing
 
 *** TODO Make spreadboard
 *** Make a K210 development board
-
-** STARTED [#A] better positioning
-Positioning without exposing to =pict= library, and support for rotation
-
-*** DONE rotation for fixed position
-CLOSED: [2020-07-11 Sat 02:38]
-
-Actually,the fixed position should be readily exported to KiCAD, with some fix
-of origin offset.
-
-**** DONE hide pict for positioning
-CLOSED: [2020-07-10 Fri 21:21]
-I have no choice but to do this. Rotation can not be discovered by cc-find.
-*** STARTED rotation for SA detailed placement
-
-*** STARTED deterministic placement
-**** deterministic
-**** incremental
-*** double side placement (just specify the side)
 
 ** TODO vectorized connections
 
@@ -45,6 +26,10 @@ I have no choice but to do this. Rotation can not be discovered by cc-find.
 *** semantics
 *** system
 *** evaluation and case study
+
+* Not-so-urgent issues
+** detailed placement minor issues
+Some conflicts are not counted in the placement engine.
 
 * TODO-list Summer
 
@@ -442,3 +427,28 @@ layouteditor does not work. The command line to use is
 where -mp 5 is the number of passes to run.
 
 *** TODO integrate with Youbiao's router
+
+** DONE [#A] better positioning
+CLOSED: [2020-07-11 Sat 19:09]
+Positioning without exposing to =pict= library, and support for rotation
+
+*** DONE rotation for fixed position
+CLOSED: [2020-07-11 Sat 02:38]
+
+Actually,the fixed position should be readily exported to KiCAD, with some fix
+of origin offset.
+
+**** DONE hide pict for positioning
+CLOSED: [2020-07-10 Fri 21:21]
+I have no choice but to do this. Rotation can not be discovered by cc-find.
+*** DONE rotation for SA detailed placement
+CLOSED: [2020-07-11 Sat 19:09]
+
+The SA placement seems to be problematic. It shows 4 conflicts, but there are
+are actually many conflicts. Maybe try to enlarge the w and h during placement.
+
+*** DONE deterministic placement
+CLOSED: [2020-07-11 Sat 19:09]
+**** deterministic
+**** TODO incremental
+*** TODO double side placement (just specify the side)
