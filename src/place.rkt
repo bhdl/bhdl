@@ -425,13 +425,18 @@ Es (Edge, i.e. netlist), diearea"
                [fixed-x (+ scaled-x (* r (cos fixed-θ)))]
                ;; CAUTION negative
                [fixed-y (- scaled-y (* r (sin fixed-θ)))])
-    (Point
-     ;; fixed-x-old fixed-y-old
-     fixed-x fixed-y
-     ;; (/ (- x (/ w 2)) (fp-scale))
-     ;; (/ (- y (/ h 2)) (fp-scale))
-     ;; the result angle should be calculated according to the footprint origin
-     a)))
+    (if (= r 0)
+        ;; CAUTION r might be 0, i.e. the origin is at the
+        ;; center. divide-by-zero will happen, and we need to just return the
+        ;; scaled coordinates
+        (Point scaled-x scaled-y a)
+        (Point
+            ;; fixed-x-old fixed-y-old
+            fixed-x fixed-y
+            ;; (/ (- x (/ w 2)) (fp-scale))
+            ;; (/ (- y (/ h 2)) (fp-scale))
+            ;; the result angle should be calculated according to the footprint origin
+            a))))
 
 (define (fix-atom-xy-pin atom loc offset)
   ;; this is pin offset
