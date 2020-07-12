@@ -433,9 +433,6 @@ Es (Edge, i.e. netlist), diearea"
      ;; the result angle should be calculated according to the footprint origin
      a)))
 
-(let ([r (rectangle 30 30)])
-  (cc-find (rotate r (/ pi 4)) r))
-
 (define (fix-atom-xy-pin atom loc offset)
   ;; this is pin offset
   (match-let* ([(Point x y a) loc]

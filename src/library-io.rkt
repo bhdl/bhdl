@@ -69,53 +69,25 @@
   ;; create an IC
   (IC->fp-pict+Hlocs ATmega16 'DIP))
 
-(define (IC->fp ic
-                #:package (package #f)
-                #:pin-count (pin-count #f))
-  "DEBUG"
-  (let ([spec (findf (λ (spec)
-                       (and (or (not package)
-                                (eq? package
-                                     (FpSpec-package spec)))
-                            (or (not pin-count)
-                                (= pin-count (FpSpec-num spec)))))
-                     (IC-fps ic))])
-    (or spec (error (~a "No matching footprint packaging for IC.") ))
-    (case (FpSpec-package spec)
-      [(DIP) (fp-DIP (FpSpec-num spec))]
-      [(QFN) (fp-QFN (FpSpec-num spec))]
-      [else (error (~a "Unsupported package: " package))])))
+(define (IC->fpspec ic)
+  ;; FIXME using the first available FP. TODO support selection of FP
+  (first (IC-fps ic)))
 
-(define (IC->fp-pict+Hlocs ic
-                           #:package (package #f)
-                           #:pin-count (pin-count #f))
+(define (IC->fp-pict+Hlocs ic)
   ;; generate footprint for ic
   ;; 1. get the first footprint spec that matches selection
-  (let ([spec (findf (λ (spec)
-                       (and (or (not package)
-                                (eq? package
-                                     (FpSpec-package spec)))
-                            (or (not pin-count)
-                                (= pin-count (FpSpec-num spec)))))
-                     (IC-fps ic))])
-    (or spec (error (~a "No matching footprint packaging for IC.") ))
-    (let ([fp (case (FpSpec-package spec)
-                [(DIP) (fp-DIP (FpSpec-num spec))]
-                ;; FIXME other rectangular footprints have the same pin order,
-                ;; but different size details
-                [(QFN) (fp-QFN (FpSpec-num spec))]
-                ;; TODO other types of IC packaging?
-                [else (error (~a "Unsupported package: " package))])])
-      ;; CAUTION p is scaled here
-      (let-values ([(p Hlocs) (footprint->pict+Hlocs fp)]
-                   [(pins) (FpSpec-pins spec)])
-        ;; 1. compute the new Hlocs using pin name instead of number index,
-        ;; because the number index is different across different footprint
-        ;; packagings
-        (let ([Hlocs (for/hash ([pin pins]
-                                [i (in-naturals 1)])
-                       (values pin (hash-ref Hlocs i)))])
-          (values p Hlocs))))))
+  (let ([spec (IC->fpspec ic)])
+    ;; CAUTION p is scaled here
+    (let-values ([(p Hlocs) (footprint->pict+Hlocs (FpSpec-fp spec))]
+                 [(pins) (FpSpec-pins spec)])
+      ;; 1. compute the new Hlocs using pin name instead of number index,
+      ;; because the number index is different across different footprint
+      ;; packagings
+      (let ([Hlocs (for/hash ([pin pins]
+                              [i (in-naturals 1)])
+                     (values pin (hash-ref Hlocs i)))])
+        (values p Hlocs)))))
+
 
 (module+ test
   (footprint->pict+Hlocs (fp-QFN 32)))
@@ -217,7 +189,7 @@
     ;; FIXME only IC needs to sort locs based. Other simple ones should have the
     ;; correct and consistent order
     [(ICAtom ic) (println "WARNING: DEBUG")
-                 (IC->fp ic)]
+                 (FpSpec-fp (IC->fpspec ic))]
     [(Atom _ _) (fp-pin-header
                  (length
                   (remove-duplicates

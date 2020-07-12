@@ -2,7 +2,8 @@
 
 (require (for-syntax syntax/parse)
          "utils.rkt"
-         "library.rkt")
+         "library.rkt"
+         "fp-kicad.rkt")
 
 (provide ATtiny25 ATtiny45 ATtiny85
          ATmega128
@@ -12,7 +13,13 @@
 
          ATmega16U4 ATmega32U4
 
-         ATmega8)
+         ATmega8
+
+         Arduino-Uno
+         Arduino-Nano
+         Arduino-Mini
+         Arduino-Micro
+         Arduino-MKR)
 
 (begin-for-syntax
   (define-syntax-class symbol-spec
@@ -20,22 +27,26 @@
 
   (define-splicing-syntax-class footprint-spec
     (pattern (~seq #:DIP (num pin ...))
-             #:with package #'DIP)
+             ;; #:with package #'DIP
+             #:with fp #'(fp-DIP num))
     (pattern (~seq #:QFN (num pin ...))
-             #:with package #'QFN)))
+             ;; #:with package #'QFN
+             #:with fp #'(fp-QFN num))
+    (pattern (~seq #:FP (fp pin ...)))))
 
 (define-syntax (define/IC stx)
-  (syntax-parse stx
-    [(_ (name ...)
-        ;; CAUTION currently only fixed order is implemented
-        #:datasheet url
-        #:ALTS ((alt ...) ...)
-        footprint:footprint-spec ...)
-     #`(define-alias (name ...)
-         (IC url
-             '((alt ...) ...)
-             (list (FpSpec 'footprint.package footprint.num '(footprint.pin ...))
-                   ...)))]))
+  (syntax-parse
+   stx
+   [(_ (name ...)
+       (~alt (~optional (~seq #:datasheet url) #:defaults ([url #'""]))
+             (~optional (~seq #:ALTS alts) #:defaults ([alts #'()]))
+             (~seq #:DUMMY dummy)
+             footprint:footprint-spec) ...)
+    #`(define-alias (name ...)
+        (IC url
+            'alts
+            (list (FpSpec footprint.fp '(footprint.pin ...))
+                  ...)))]))
 
 
 (define/IC (ATtiny25 ATtiny45 ATtiny85)
@@ -237,6 +248,63 @@
             PD5 PD6 PD7 PB0 PB1 PB2 PB3 PB4
             PB5 AVCC ADC6 AREF GND ADC7 PC0 PC1
             PC2 PC3 PC4 PC5 PC6 PD0 PD1 PD2))
+
+(define/IC (Arduino-Uno)
+  #:DUMMY (VIN GND3 GND2 5V1 3V3 RST1 IORF
+               RST2 GND4 MOSI SCK 5V2 GND1
+               SCL SDA AREF MISO
+               A0 A1 A2 A3 A4 A5
+               D0 D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13)
+  #:FP ((fp-Arduino 'Uno)
+        ;; These order are from kicad mod library
+        RST2 GND4 MOSI SCK 5V2 A0
+        VIN GND3 GND2 5V1 3V3 RST1 IORF
+        D0 D1 D2 D3 D4 D5 D6 D7
+        GND1 D8 D9 D10 SCL SDA AREF
+        D13 D12 D11 A1 A2 A3 A4 A5
+        MISO))
+
+;; I need separate ICs for different form factors of Arduino, because they all
+;; expose different pin outs
+(define/IC (Arduino-Nano)
+  ;; TODO I actually should unify the library of IC atom definition, the pin
+  ;; definition, and footprint specification
+  #:DUMMY (VIN GND2 RST2 5V AREF 3V3 GND1 RST1
+               A0 A1 A2 A3 A4 A5 A6 A7
+               D0 D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13)
+  #:FP ((fp-Arduino 'Nano)
+        VIN GND2 RST2 5V
+        A7 A6 A5 A4 A3 A2 A1 A0
+        AREF 3V3
+        D13 D12 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2
+        GND1 RST1
+        D0 D1))
+
+(define/IC (Arduino-Mini)
+  #:DUMMY (GND3 5V2 RX TX 5V1 RST2 GND2 VIN GND4 5V3
+                A0 A1 A2 A3 A4 A5 A6 A7
+                D0 D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13
+                L0 L1 L2)
+  #:FP ((fp-Arduino 'Mini)
+        
+        GND3 5V2 RX TX L2 D11 D12 D13 A0 A1 A2 A3 5V1 RST2 GND2 VIN D10
+        GND4 5V3 A6 A7 A5 D1 D0 L0 L1 D2 D3 D4 D5 D6 D7 D8 A4 D9))
+
+
+(define/IC (Arduino-MKR)
+  #:FP ((fp-Arduino 'MKR)
+        ;; FIXME ???
+        1 2 3 4 5 6 7 8 9 10 11 12 13 14 28 27 26 25
+        24 23 22 21 20 19 18 17 16 15))
+
+(define/IC (Arduino-Micro)
+  #:DUMMY (RST2 MOSI SCK VIN GND2 GND1 5V 3V3 RST1 SS AREF MISO
+                 A0 A1 A2 A3 A4 A5
+                 D0 D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13)
+  #:FP ((fp-Arduino 'Micro)
+        RST2 MOSI SCK A0 VIN GND2 GND1 5V 3V3 RST1 SS
+        D0 D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 AREF D13
+        D12 D11 A1 A2 A3 A4 A5 MISO))
 
 (define/IC (LM555-sym)
   #:datasheet ""

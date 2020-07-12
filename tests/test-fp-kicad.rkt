@@ -85,3 +85,12 @@
               [pcb-or-plate '(pcb plate)])
     (footprint->pict (fp-switch-keyboard spacing pcb-or-plate))))
 
+
+(module+ test
+  (footprint->pict (fp-Arduino 'Uno))
+  (footprint->pict (fp-Arduino 'Micro))
+  (footprint->pict (fp-Arduino 'Nano))
+  (footprint->pict (fp-Arduino 'MKR))
+
+  (for/list ([type '(101 Micro Mini Nano MKR Uno)])
+    (footprint->pict (fp-Arduino type))))

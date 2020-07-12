@@ -32,7 +32,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (struct FpSpec
-  (package num pins)
+  (fp pins)
   #:prefab)
 
 ;; everything should be centered around the IC data structure
@@ -46,12 +46,6 @@
   ;; this tells nothing about the fields. I really need type
   (datasheet alts fps)
   #:prefab)
-
-(module+ test
-  (define ic (IC "https://example.pdf"
-                 '((PA0 TX) (PB1))
-                 (list (FpSpec 'QFN 20 '(pa0 pa1 pa2 vcc gnd))
-                       (FpSpec 'DIP 20 '(vcc gnd pa0 pa1 pa2))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Atoms used in schematic. This wrap around IC.

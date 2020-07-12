@@ -17,6 +17,25 @@
 - [ ] double-check footprint for manufacturing
 
 *** TODO Make spreadboard
+**** DONE library
+CLOSED: [2020-07-12 Sun 14:46]
+
+load and adapt all the libraries:
+- Uno R3
+- Nano
+- Pro mini
+- sparkfun pro micro
+- MKR
+
+I'll define the Arduinos as IC.
+
+Headers:
+- jump headers: 2x3 or two 1x3 group
+- external headers: 1x6 1x8 1x10
+
+**** connections
+**** layout
+
 *** Make a K210 development board
 
 ** TODO vectorized connections
@@ -31,6 +50,9 @@
 * Not-so-urgent issues
 ** detailed placement minor issues
 Some conflicts are not counted in the placement engine.
+
+** place on back side
+** native library management (instead of adapting KiCAD libraries)
 
 * TODO-list Summer
 
