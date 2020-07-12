@@ -21,6 +21,23 @@
          hb-append
          htl-append
          hbl-append
+
+         lt-superimpose
+         lb-superimpose
+         lc-superimpose
+         ltl-superimpose
+         lbl-superimpose
+         rt-superimpose
+         rb-superimpose
+         rc-superimpose
+         rtl-superimpose
+         rbl-superimpose
+         ct-superimpose
+         cb-superimpose
+         cc-superimpose
+         ctl-superimpose
+         cbl-superimpose
+
          rotate
          default-append-spacing)
 
@@ -67,6 +84,38 @@
 (wrap-*-append hb-append)
 (wrap-*-append htl-append)
 (wrap-*-append hbl-append)
+
+(define-for-syntax (syntax-add-prefix prefix stx)
+  (datum->syntax
+   stx
+   (string->symbol
+    (string-append prefix
+                   (symbol->string
+                    (syntax->datum stx))))))
+
+(define-syntax (wrap-*-superimpose stx)
+  (syntax-parse
+   stx
+   [(_ name)
+    (with-syntax ([pict:name (syntax-add-prefix "pict:" #'name)])
+      #'(define (name . args)
+          (pict:name (map maybe-atom->pict args) ..)))]))
+
+(wrap-*-superimpose lt-superimpose)
+(wrap-*-superimpose lb-superimpose)
+(wrap-*-superimpose lc-superimpose)
+(wrap-*-superimpose ltl-superimpose)
+(wrap-*-superimpose lbl-superimpose)
+(wrap-*-superimpose rt-superimpose)
+(wrap-*-superimpose rb-superimpose)
+(wrap-*-superimpose rc-superimpose)
+(wrap-*-superimpose rtl-superimpose)
+(wrap-*-superimpose rbl-superimpose)
+(wrap-*-superimpose ct-superimpose)
+(wrap-*-superimpose cb-superimpose)
+(wrap-*-superimpose cc-superimpose)
+(wrap-*-superimpose ctl-superimpose)
+(wrap-*-superimpose cbl-superimpose)
 
 (define (rotate p degree)
   (pict:rotate (maybe-atom->pict p) degree))
