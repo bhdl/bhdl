@@ -83,14 +83,20 @@
       ;; 1. compute the new Hlocs using pin name instead of number index,
       ;; because the number index is different across different footprint
       ;; packagings
+      ;;
+      ;; UPDATE but actually many footprint has already the pin name as index.
       (let ([Hlocs (for/hash ([pin pins]
                               [i (in-naturals 1)])
+                     ;; FIXME the pin here may duplicate, e.g. there may be
+                     ;; multiple 5V and GND, and they actually maps to multiple
+                     ;; connected pins of the chip
                      (values pin (hash-ref Hlocs i)))])
         (values p Hlocs)))))
 
 
 (module+ test
-  (footprint->pict+Hlocs (fp-QFN 32)))
+  (footprint->pict+Hlocs (fp-QFN 32))
+  (footprint->pict+Hlocs (FpSpec-fp (IC->fpspec Arduino-Uno))))
 
 (define (IC->fp-pict ic
                      ;; FIXME duplication
@@ -120,11 +126,20 @@
        ;; 1. scale the picture
        (scale p (fp-scale))
        ;; 2. offset and scale the loc
-       (for/hash ([pad (footprint-pads fp)])
-         (values (pad-spec-num pad)
-                 (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))
-                        (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale))
-                        0)))))))
+       (for/hash ([pad (footprint-pads fp)]
+                  [i (in-naturals 1)])
+         (values
+          ;; FIXME instead of the num field of pad-spec, I'm using the index,
+          ;; i.e. the order of pads in kicad_mod file matters. The index
+          ;; increases from 1 in kicad's official footprint library, so that is
+          ;; ok. But sparkfun's and the Arduino library used symbols all the
+          ;; way, and to keep them consistent is the main goal here.
+          ;;
+          ;; (pad-spec-num pad)
+          i
+          (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))
+                 (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale))
+                 0)))))))
 
 (define footprint->pict+Hlocs
   (let ([cache (make-hash)])
@@ -193,7 +208,8 @@
     [(Atom _ _) (fp-pin-header
                  (length
                   (remove-duplicates
-                   (hash-values (Atom-pinhash atom)))))]))
+                   (hash-values (Atom-pinhash atom)))))]
+    [else (error "Unsupported atom for atom->fp")]))
 
 (define (atom->fp-sexp atom x y a ID Hpin=>net Hnet=>index)
   "Generate FP raw kicad sexp."

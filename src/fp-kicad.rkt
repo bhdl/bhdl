@@ -35,7 +35,7 @@
                                   (or/c 'pcb 'plate)
                                   footprint?)]
 
-          [fp-Arduino (-> (or/c 101 'Micro 'Mini 'Nano 'MKR 'Uno) footprint?)]
+          [fp-Arduino (-> (or/c 'Micro 'Mini 'Nano 'MKR 'Uno 'Uno-ICSP) footprint?)]
 
           ;; direct footprints
           [fp-crystal footprint?]
@@ -453,19 +453,30 @@
 ;; https://github.com/forrestbao/arduino-kicad-library
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (define libpath-arduino (expand-user-path "~/git/reading/arduino-kicad-library/"))
+(define libpath-sparkfun
+  (expand-user-path "~/git/reading/SparkFun-KiCad-Libraries/Footprints/"))
 
 (define (fp-Arduino type)
   (case type
-    [(101)
-     (kicad-helper libpath-arduino "Arduino.pretty/" "Arduino_101_Shield.kicad_mod")]
+    ;; sparkfun boards
+    [(Uno)
+     (kicad-helper libpath-sparkfun "Boards.pretty/"
+                   "UNO_R3_SHIELD.kicad_mod")]
+    [(Uno-ICSP)
+     (kicad-helper libpath-sparkfun "Boards.pretty/"
+                   "UNO_R3_SHIELD_ICSP.kicad_mod")]
     [(Micro)
-     (kicad-helper libpath-arduino "Arduino.pretty/" "Arduino_Micro_Socket.kicad_mod")]
+     (kicad-helper libpath-sparkfun "Boards.pretty/"
+                   "SPARKFUN_PRO_MICRO.kicad_mod")]
     [(Mini)
-     (kicad-helper libpath-arduino "Arduino.pretty/" "Arduino_Mini_Socket.kicad_mod")]
+     (kicad-helper libpath-sparkfun "Boards.pretty/"
+                   "ARDUINO_PRO_MINI.kicad_mod")]
+    ;; Arduino boards
     [(MKR)
      (kicad-helper libpath-arduino "Arduino.pretty/" "Arduino_MKR.kicad_mod")]
     [(Nano)
      (kicad-helper libpath-arduino "Arduino.pretty/" "Arduino_Nano_Socket.kicad_mod")]
-    [(Uno)
-     (kicad-helper libpath-arduino "Arduino.pretty/" "Arduino_Uno_Shield.kicad_mod")]
     [else (error "Unsupported Arduino form factor.")]))
+
+
+

@@ -16,6 +16,7 @@
          ATmega8
 
          Arduino-Uno
+         Arduino-Uno-ICSP
          Arduino-Nano
          Arduino-Mini
          Arduino-Micro
@@ -45,8 +46,11 @@
     #`(define-alias (name ...)
         (IC url
             'alts
-            (list (FpSpec footprint.fp '(footprint.pin ...))
-                  ...)))]))
+            (list
+             ;; TODO FIXME check the number of footprint pads and the number of
+             ;; pins match
+             (FpSpec footprint.fp '(footprint.pin ...))
+             ...)))]))
 
 
 (define/IC (ATtiny25 ATtiny45 ATtiny85)
@@ -249,20 +253,50 @@
             PB5 AVCC ADC6 AREF GND ADC7 PC0 PC1
             PC2 PC3 PC4 PC5 PC6 PD0 PD1 PD2))
 
+;; CAUTION Uno Mini Micro are from Sparkfun library
+
+(define/IC (Arduino-Uno-ICSP)
+  ;; FIXME the names of pads are different!
+  #:FP ((fp-Arduino 'Uno-ICSP)
+        3V3
+        ;; FIXME are they the same? 5V VCC VIN
+        5V VCC
+        A0 A1 A2 A3 A4 A5 AREF
+        D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13
+        GND GND GND GND
+        ;; FIXME is this AREF?
+        IOREF
+        MISO MOSI
+        NC RESET RESET
+        RX SCK SCL SDA TX VIN))
+
 (define/IC (Arduino-Uno)
-  #:DUMMY (VIN GND3 GND2 5V1 3V3 RST1 IORF
-               RST2 GND4 MOSI SCK 5V2 GND1
-               SCL SDA AREF MISO
-               A0 A1 A2 A3 A4 A5
-               D0 D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13)
   #:FP ((fp-Arduino 'Uno)
-        ;; These order are from kicad mod library
-        RST2 GND4 MOSI SCK 5V2 A0
-        VIN GND3 GND2 5V1 3V3 RST1 IORF
-        D0 D1 D2 D3 D4 D5 D6 D7
-        GND1 D8 D9 D10 SCL SDA AREF
-        D13 D12 D11 A1 A2 A3 A4 A5
-        MISO))
+        3V3 5V
+        A0 A1 A2 A3 A4 A5 AREF
+        D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13
+        GND GND GND
+        IOREF
+        NC RESET
+        RX SCL SDA TX VIN))
+
+(define/IC (Arduino-Micro)
+  #:FP ((fp-Arduino 'Micro)
+        TX RX GND GND
+        D2 D3 D4 D5 D6 D7
+        A3 D8 VCC D9 RESET D10 GND D11
+        ;; FIXME RAW seems to be VIN
+        VIN
+        D12 D13 A0 A1 A2))
+
+(define/IC (Arduino-Mini)
+  #:FP ((fp-Arduino 'Mini)
+        TX RX RESET GND
+        D2 D3 D4 D5 D6 D7
+        A3 D8 VCC D9 RST D10 GND D11 VIN
+        A4 D12 A5 D13 A6 A0 A7 A1 A2))
+
+;; CAUTION Nano and MKR are from Arduino library
 
 ;; I need separate ICs for different form factors of Arduino, because they all
 ;; expose different pin outs
@@ -273,38 +307,24 @@
                A0 A1 A2 A3 A4 A5 A6 A7
                D0 D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13)
   #:FP ((fp-Arduino 'Nano)
-        VIN GND2 RST2 5V
+        VIN GND RESET 5V
         A7 A6 A5 A4 A3 A2 A1 A0
         AREF 3V3
         D13 D12 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2
-        GND1 RST1
+        GND RESET
         D0 D1))
 
-(define/IC (Arduino-Mini)
-  #:DUMMY (GND3 5V2 RX TX 5V1 RST2 GND2 VIN GND4 5V3
-                A0 A1 A2 A3 A4 A5 A6 A7
-                D0 D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13
-                L0 L1 L2)
-  #:FP ((fp-Arduino 'Mini)
-        
-        GND3 5V2 RX TX L2 D11 D12 D13 A0 A1 A2 A3 5V1 RST2 GND2 VIN D10
-        GND4 5V3 A6 A7 A5 D1 D0 L0 L1 D2 D3 D4 D5 D6 D7 D8 A4 D9))
-
-
 (define/IC (Arduino-MKR)
+  #:ALTS ([MOSI D8]
+          [MISO D10]
+          [SCK D9]
+          [SDA D11]
+          [SCL D12])
   #:FP ((fp-Arduino 'MKR)
-        ;; FIXME ???
-        1 2 3 4 5 6 7 8 9 10 11 12 13 14 28 27 26 25
-        24 23 22 21 20 19 18 17 16 15))
+        AREF A0 A1 A2 A3 A4 A5 A6 D0
+        D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12
+        D13 D14 RESET GND 3V3 VIN 5V))
 
-(define/IC (Arduino-Micro)
-  #:DUMMY (RST2 MOSI SCK VIN GND2 GND1 5V 3V3 RST1 SS AREF MISO
-                 A0 A1 A2 A3 A4 A5
-                 D0 D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13)
-  #:FP ((fp-Arduino 'Micro)
-        RST2 MOSI SCK A0 VIN GND2 GND1 5V 3V3 RST1 SS
-        D0 D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 AREF D13
-        D12 D11 A1 A2 A3 A4 A5 MISO))
 
 (define/IC (LM555-sym)
   #:datasheet ""
