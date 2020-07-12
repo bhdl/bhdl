@@ -36,6 +36,7 @@
 
          *-
          *<
+         *=
 
          pin-ref)
 
@@ -287,6 +288,42 @@
     [(_ node:node-or-weight ...)
      ;; TODO add #:weight
      #'(*--proc (list node.res ...))]))
+
+(define (*=-proc lst-of-nodepins)
+  (let ([res
+         ;; FIXME this composite has no external pins. In fact, it should have
+         ;; the same numbr of external pins as the lenght of the "vector"
+         (create-simple-Composite)])
+
+    ;; construct net
+    ;;
+    ;; get the length of the vector
+    (let ([len (length (first lst-of-nodepins))])
+      (apply hook-proc! res
+             (for/list ([i (range len)])
+               (Net (filter-not
+                     void?
+                     (for/list ([nodepins lst-of-nodepins])
+                       (list-ref nodepins i)))
+                    1))))
+    res))
+
+(define (node-pins->nodepins node pins)
+  (for/list ([pin pins])
+    (when (not (eq? pin '-))
+      (pin-ref node pin))))
+
+(define-syntax (*= stx)
+  "vectorized connection"
+  (syntax-parse
+   stx
+   [(_ (~alt (node [pin ...])
+             ([nodepin:dot ...]))
+       ...)
+    #'(*=-proc (list (node-pins->nodepins node '(pin ...))
+                     ...
+                     (list (pin-ref nodepin.lhs 'nodepin.rhs) ...)
+                     ...))]))
 
 (define (*<-proc lst)
   (let ([res (create-simple-Composite 1 2)])
