@@ -1,25 +1,7 @@
-#lang s-exp "../src/splicing.rkt"
+#lang s-exp bhdl/splicing
 
-(require "../src/sch.rkt"
-         "../src/library.rkt"
-         "../src/library-IC.rkt"
-         "../src/utils.rkt"
-         "../src/pict-utils.rkt"
-         "../src/common.rkt"
-
-         "../src/place.rkt"
-
-         "../src/fp-kicad.rkt"
-         "../src/library-io.rkt"
-
-         "../src/atom-pict-wrapper.rkt"
-         (only-in pict
-                  rectangle
-                  ghost)
-
-         json
-         (for-syntax syntax/parse
-                     racket/string))
+(require bhdl
+         (prefix-in pict: pict))
 
 (define uno1 (picted-atom! (make-IC-atom Arduino-Uno)))
 (define uno2 (picted-atom! (make-IC-atom Arduino-Uno)))
@@ -33,7 +15,7 @@
 
 (define (add-ghost-top p sep)
   "Add some space on top of picture"
-  (vc-append (ghost (rectangle 1 sep)) p))
+  (vc-append (pict:ghost (pict:rectangle 1 sep)) p))
 
 (define-Composite whole
   ;; FIXME inset a little bit
@@ -115,6 +97,9 @@
 
 
 (module+ test
+  (make-directory* "/tmp/bhdl/")
+  (current-directory "/tmp/bhdl/")
+
   (Composite-pict whole)
 
   (define init-place (Composite->place-spec whole))
@@ -125,22 +110,21 @@
   (hash-ref init-place 'xs)
 
   ;; generate
-  (save-file (Composite->pict whole init-place) "../out/out.pdf")
+  (save-file (Composite->pict whole init-place) "out.pdf")
   ;; well I can directly write KiCAD file
-  (call-with-output-file "../out/out.kicad_pcb"
+  (call-with-output-file "out.kicad_pcb"
     #:exists 'replace
     (λ (out)
       (pretty-write (Composite->kicad-pcb whole init-place)
                     out)))
-  (call-with-output-file "../out/out.dsn"
+  (call-with-output-file "out.dsn"
     #:exists 'replace
     (λ (out)
       (pretty-write (Composite->dsn whole init-place)
                     out)))
   ;; call command line tool to do routing
   (current-directory)
-  (parameterize ([current-directory "../out/"])
-    ;; spreadboard is taking too much time to route, consider reduce the number
-    ;; of passes
-    (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 10"))
+  ;; spreadboard is taking too much time to route, consider reduce the number
+  ;; of passes
+  (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 5")
   (system "ls"))

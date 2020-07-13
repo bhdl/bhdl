@@ -8,8 +8,8 @@
 ;; TODO implement #%dot semantics, probably in sch.rkt
 #;
 (define-syntax-rule (#%dot obj-expr method-id)
-  (let ([obj obj-expr])
-    (lambda args (send/apply obj method-id args))))
+(let ([obj obj-expr])
+(lambda args (send/apply obj method-id args))))
 
 (require (for-syntax syntax/parse))
 

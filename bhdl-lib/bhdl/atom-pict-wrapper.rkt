@@ -1,4 +1,4 @@
-#lang s-exp "../src/splicing.rkt"
+#lang s-exp "splicing.rkt"
 
 (require (for-syntax syntax/parse
                      racket/string

@@ -1,17 +1,7 @@
 #lang racket
 
-(require "../src/place.rkt"
-         "../src/sch.rkt"
-         "../src/library.rkt"
-         "../src/library-IC.rkt"
-         "../src/utils.rkt"
-         "../src/pict-utils.rkt"
-         "../src/common.rkt"
-
-         ;; DEBUG
-         "../src/fp-kicad.rkt"
-         "../src/library-io.rkt"
-         pict
+(require bhdl
+         (prefix-in pict: pict)
          json)
 
 (define global
@@ -114,8 +104,8 @@
                      ;;
                      ;; using frame purely for
                      ;; visualization for debugging
-                     (frame
-                      (ghost (footprint->pict
+                     (pict:frame
+                      (pict:ghost (footprint->pict
                               (fp-switch-keyboard 1 'pcb))))))]
            [one-pict (compose-pipe pict-rows
                                    #:.> (λ (x) (apply hc-append 30 x))
@@ -204,7 +194,7 @@
 
 (define-Composite whole
   ;; CAUTION just to declare the pict
-  #:layout (inset (hb-append -100
+  #:layout (pict:inset (hb-append -100
                            (Atom-pict ic)
                            (Composite-pict matrix-module)
                            (Atom-pict usb1)) 200)
@@ -218,30 +208,34 @@
   (Composite-pict ic-module)
   (Composite-pict whole)
 
-  (cc-find (inset (Composite-pict whole) 200)
+  (pict:cc-find (pict:inset (Composite-pict whole) 200)
            (Composite-pict whole))
 
   (collect-all-atoms whole)
   (Composite-nets whole)
-  (pict-height (footprint->pict (fp-switch-keyboard 1 'pcb)))
   (define init-place (Composite->place-spec whole))
 
-  ;; TODO die-area should be inside place spec
-  (pict-height (Composite-pict whole))
-  (Composite->pict whole init-place)
+  (nplaced-atoms whole)
+  (nfree-atoms whole)
 
-  ;; there seems to be a little off, i.e. fixed xs and ys changed a little
-  (make-directory* "/tmp/rackematic/out/")
-  (save-for-placement (Composite->place-spec whole)
-                      "/tmp/rackematic/out/gh60.json")
+  ;; FIXME It is broken, the cc-find is failing.
+  ;;
+  ;; (Composite->pict whole init-place)
 
-  (save-file (Composite->pict whole init-place)
-             "gh60-init.pdf")
+  ;; ;; there seems to be a little off, i.e. fixed xs and ys changed a little
+  ;; (make-directory* "/tmp/rackematic/out/")
+  ;; (current-directory "/tmp/rackematic/out/")
+  ;; (save-for-placement (Composite->place-spec whole)
+  ;;                     "/tmp/rackematic/out/gh60.json")
 
-  (collect-all-atoms ic-module)
-  (collect-all-atoms matrix-module)
-  (Composite-pinhash power-module)
-  (collect-all-atoms power-module))
+  ;; (save-file (Composite->pict whole init-place)
+  ;;            "gh60-init.pdf")
+
+  ;; (collect-all-atoms ic-module)
+  ;; (collect-all-atoms matrix-module)
+  ;; (Composite-pinhash power-module)
+  ;; (collect-all-atoms power-module)
+  )
 
 (module+ test-place
   (define place-result

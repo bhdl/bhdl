@@ -207,3 +207,12 @@ same rank
   (syntax-parse stx
     [(_ TODO ...) #'(void)]))
 
+;; DEBUG
+(define-syntax (show stx)
+  (syntax-parse
+   stx
+   [(_ v)
+    #'(begin
+        (display (~a 'v " = "))
+        (println v))]))
+

@@ -1,10 +1,7 @@
 #lang racket
 
-(require "../src/fp-kicad.rkt"
-         "../src/gerber.rkt"
-         "../src/fp.rkt"
-         "../src/library-io.rkt"
-         pict)
+(require bhdl
+         (prefix-in pict: pict))
 
 (module+ test
   (for/list ([ct '(1 2 3 4 6 8)])
@@ -42,7 +39,7 @@
   (footprint->pict fp-crystal)
   (footprint->pict fp-diode)
   ;; this is huge
-  (scale (footprint->pict fp-1602) 0.2))
+  (pict:scale (footprint->pict fp-1602) 0.2))
 
 (module+ test
   ;; (footprint->pict (fp-mounting-hole 2))
@@ -51,7 +48,6 @@
     (footprint->pict (fp-mounting-hole m))))
 
 (module+ test
-  (footprint-lines (fp-QFN 12))
   (footprint->pict (fp-QFN 12))
   (for/list ([ct '(12 16 20 24 28 32 44 72)])
     (footprint->pict (fp-QFN ct))))
@@ -80,7 +76,6 @@
 
 
 (module+ test
-  (pict-height (footprint->pict (fp-switch-keyboard 1 'pcb)))
   (for*/list ([spacing '(1 1.25 1.5 1.75 2 2.25 2.75 6.25)]
               [pcb-or-plate '(pcb plate)])
     (footprint->pict (fp-switch-keyboard spacing pcb-or-plate))))
@@ -88,9 +83,10 @@
 
 (module+ test
   (footprint->pict (fp-Arduino 'Uno))
+  (footprint->pict (fp-Arduino 'Uno-ICSP))
   (footprint->pict (fp-Arduino 'Micro))
   (footprint->pict (fp-Arduino 'Nano))
   (footprint->pict (fp-Arduino 'MKR))
 
-  (for/list ([type '(101 Micro Mini Nano MKR Uno)])
+  (for/list ([type '(Micro Mini Nano MKR Uno Uno-ICSP)])
     (footprint->pict (fp-Arduino type))))

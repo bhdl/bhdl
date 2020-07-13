@@ -16,3 +16,6 @@ _minted-*
 fp-info-cache
 
 *.json
+*.kicad_pcb-bak
+*.ses
+compiled/

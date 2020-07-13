@@ -10,8 +10,7 @@
          "common.rkt"
          ;; FIXME dependency
          "sch.rkt"
-         pict
-         uuid)
+         pict)
 
 (provide IC->fp-pict
          IC->fp-pict+Hlocs

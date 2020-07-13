@@ -1,31 +1,10 @@
 ;; #lang racket
-#lang s-exp "../src/splicing.rkt"
+;; #lang s-exp "bhdl/splicing.rkt"
+;; #lang bhdl
+#lang s-exp bhdl/splicing
 
-(require "../src/sch.rkt"
-         "../src/library.rkt"
-         "../src/library-IC.rkt"
-         "../src/utils.rkt"
-         "../src/pict-utils.rkt"
-         "../src/common.rkt"
-
-         "../src/place.rkt"
-
-         "../src/fp-kicad.rkt"
-         "../src/library-io.rkt"
-
-         (except-in pict
-                    rotate
-                    vl-append
-                    vc-append
-                    vr-append
-                    ht-append
-                    hc-append
-                    hb-append
-                    htl-append
-                    hbl-append)
-
-         "../src/atom-pict-wrapper.rkt"
-
+(require bhdl
+         (prefix-in pict: pict)
          json
          (for-syntax syntax/parse
                      racket/string))
@@ -53,7 +32,7 @@
                [key (picted-atom!
                      atom
                      (cc-superimpose (atom->fp-pict atom)
-                                     (text
+                                     (pict:text
                                       (key-name-filter (symbol->string name)))))]
                ;; key with diode group
                [key-with-diode (let* ([d (picted-atom! (diode))]
@@ -120,7 +99,7 @@
                              (hb-append (reverse (cons arg args)) ..))
                            (- pi))])])
     (let* ([padding (λ (unit)
-                      (ghost (rectangle 10 unit)))])
+                      (pict:ghost (pict:rectangle 10 unit)))])
       (parameterize ([default-append-spacing 20])
         (rotate (hb-append (vr-append col1 ..)
                            (vr-append col2 .. (padding 30))
@@ -174,72 +153,76 @@
 ;; TODO the rest of circuit
 (define-Composite whole
   ;; CAUTION just to declare the pict
-  #:layout (inset (Composite-pict matrix-module) 100)
+  #:layout (pict:inset (Composite-pict matrix-module) 100)
   #:connect (list matrix-module))
 
 
 ;; visualizing init placement
-(myvoid
- (Composite-pict matrix-module)
- (Composite-nets matrix-module)
+(module+ test
+  (make-directory* "/tmp/bhdl/")
+  (current-directory "/tmp/bhdl/")
 
- (nplaced-atoms whole)
- (nfree-atoms whole)
+  (Composite-pict matrix-module)
+  (Composite-nets matrix-module)
 
- (Composite-pict whole)
- ;; TODO NOW rotation of fixed-location components
- (define init-place (Composite->place-spec whole))
- (length (collect-all-atoms whole))
- (save-file (Composite->pict whole init-place) "out.pdf")
- ;; well I can directly write KiCAD file
- (call-with-output-file "out.kicad_pcb"
-   #:exists 'replace
-   (λ (out)
-     (pretty-write (Composite->kicad-pcb whole init-place)
-                   out)))
- (call-with-output-file "out.dsn"
-   #:exists 'replace
-   (λ (out)
-     (pretty-write (Composite->dsn whole init-place)
-                   out)))
- ;; call command line tool to do routing
- (current-directory)
- (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 10")
- (system "ls"))
+  (nplaced-atoms whole)
+  (nfree-atoms whole)
+
+  (Composite-pict whole)
+  ;; TODO NOW rotation of fixed-location components
+  (define init-place (Composite->place-spec whole))
+  (length (collect-all-atoms whole))
+
+  (save-file (Composite->pict whole init-place) "out.pdf")
+  ;; well I can directly write KiCAD file
+  (call-with-output-file "out.kicad_pcb"
+    #:exists 'replace
+    (λ (out)
+      (pretty-write (Composite->kicad-pcb whole init-place)
+                    out)))
+  (call-with-output-file "out.dsn"
+    #:exists 'replace
+    (λ (out)
+      (pretty-write (Composite->dsn whole init-place)
+                    out)))
+  ;; call command line tool to do routing
+  (current-directory)
+  (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 10")
+  (system "ls"))
 
 ;; placement
-(myvoid
- (define place-spec
-   (Composite->place-spec whole
-                          #:place-nsteps 50
-                          #:place-nbins 300
-                          ;; When cycle increases, the temperature cools down,
-                          ;; and the later cycles are not very useful to
-                          ;; remove conflicts. Thus, for this application, I
-                          ;; might consider using only the first few cycles,
-                          ;; and use a large number of steps (per cycle)
-                          #:sa-ncycles 10
-                          #:sa-nsteps 3000
-                          #:sa-stepsize 10
-                          #:sa-theta-stepsize 0.3))
- ;; (save-for-placement place-spec "fitboard.json")
+(module+ test-placement
+  (define place-spec
+    (Composite->place-spec whole
+                           #:place-nsteps 50
+                           #:place-nbins 300
+                           ;; When cycle increases, the temperature cools down,
+                           ;; and the later cycles are not very useful to
+                           ;; remove conflicts. Thus, for this application, I
+                           ;; might consider using only the first few cycles,
+                           ;; and use a large number of steps (per cycle)
+                           #:sa-ncycles 10
+                           #:sa-nsteps 3000
+                           #:sa-stepsize 10
+                           #:sa-theta-stepsize 0.3))
+  ;; (save-for-placement place-spec "fitboard.json")
 
- (define place-result (send-for-placement place-spec))
+  (define place-result (send-for-placement place-spec))
 
- (save-file (Composite->pict whole place-result)
-            "out.pdf")
+  (save-file (Composite->pict whole place-result)
+             "out.pdf")
 
- (call-with-output-file "out.kicad_pcb"
-   #:exists 'replace
-   (λ (out)
-     (pretty-write (Composite->kicad-pcb whole place-result)
-                   out)))
- (call-with-output-file "out.dsn"
-   #:exists 'replace
-   (λ (out)
-     (pretty-write (Composite->dsn whole place-result)
-                   out)))
- ;; call command line tool to do routing
- (current-directory)
- (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 5")
- (system "ls"))
+  (call-with-output-file "out.kicad_pcb"
+    #:exists 'replace
+    (λ (out)
+      (pretty-write (Composite->kicad-pcb whole place-result)
+                    out)))
+  (call-with-output-file "out.dsn"
+    #:exists 'replace
+    (λ (out)
+      (pretty-write (Composite->dsn whole place-result)
+                    out)))
+  ;; call command line tool to do routing
+  (current-directory)
+  (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 5")
+  (system "ls"))

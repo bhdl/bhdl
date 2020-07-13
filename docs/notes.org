@@ -15,6 +15,9 @@
 - [ ] connect LEDs?
 - [ ] case CAD co-design?
 - [ ] double-check footprint for manufacturing
+- stablizer and other mouting holes
+- Kahl hot swappable socket (which might have to go back side of the PCB, and
+  must align with the switch socket)
 
 *** TODO Make spreadboard
 **** DONE library
