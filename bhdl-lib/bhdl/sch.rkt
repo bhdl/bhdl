@@ -37,6 +37,7 @@
          *-
          *<
          *=
+         *+
 
          pin-ref)
 
@@ -237,6 +238,14 @@
                           1)
                      ...)
          comp)]))
+
+;; FIXME test it
+;; FIXME define and use *+-proc
+(define-syntax (*+ stx)
+  (syntax-parse
+   stx
+   ([_ ([node:dot ...] ...)]
+    #'(hook #:pins () (node ...) ...))))
 
 (define-syntax (hook! stx)
   (syntax-parse stx
