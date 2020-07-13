@@ -8,18 +8,17 @@ anlytical placer (ePlace) and simulated annealing based detailed placer.
 
 * Install
 
-First, install [[https://racket-lang.org/][racket]]. Then, install some racket packages (let me know if there
-are more missing packages):
+
 
 ** The BHDL library
-Install the package directly via:
+First, install [[https://racket-lang.org/][racket]]. Install the BHDL directly as a racket package:
 
 #+begin_example
 raco pkg install git://github.com/lihebi/bhdl/?path=bhdl-lib
 #+end_example
 
 ** KiCAD footprint libraries
-You will then download the kicad library (TODO).
+You will then download the kicad library.
 
 - https://github.com/KiCad/kicad-footprints
 - https://github.com/forrestbao/arduino-kicad-library
