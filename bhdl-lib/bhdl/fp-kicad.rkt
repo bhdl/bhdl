@@ -11,7 +11,8 @@
          racket/contract
          racket/draw)
 
-(provide (contract-out
+(provide kicad-footprint-paths
+         (contract-out
           ;; constructors
           [fp-resistor ((or/c "0603" "0805" "THT") . -> . footprint?)]
           [fp-capacitor ((or/c "0603" "0805") . -> . footprint?)]
@@ -95,34 +96,56 @@
                         (filter pad-spec? specs))])
         (footprint line-specs pad-specs)))))
 
-(define (kicad-helper libpath . lst)
-  (read-kicad-mod
-   (apply build-path libpath lst)))
+;; FIXME actually use this
+;;
+;; (kicad-footprint-paths
+;;  '("/path/to/kicad-footprints"
+;;    "/path/to/arduino-kicad-library/"
+;;    "/path/to/SparkFun-KiCad-Libraries/Footprints/"))
+(define kicad-footprint-paths
+  (make-parameter #f))
+
+(define (load-kicad-footprint-paths)
+  (when (not (kicad-footprint-paths))
+    (kicad-footprint-paths
+     (string-split
+      (or (getenv "BHDL_KICAD_FOOTPRINT_PATH")
+          ;; TODO well, I could probably just download for user
+          (error "BHDL: env variable BHDL_KICAD_FOOTPRINT_PATH is not set"))
+      ":")))
+  (kicad-footprint-paths))
+
+(define (kicad-helper . lst)
+  ;; libpath is a list of path
+  ;;
+  ;; FIXME the first match will be returned. This is problematic when different
+  ;; path contains same name
+  (or (for/or ([d (load-kicad-footprint-paths)])
+        (let ([p (expand-user-path (apply build-path d lst))])
+          (if (file-exists? p)
+              (read-kicad-mod p)
+              #f)))
+      (error "Cannot find the kicad file for: " lst)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; KiCAD official lib
 ;; https://github.com/KiCad/kicad-footprints
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TODO allow user configuration
-(define libpath-kicad (expand-user-path "~/git/reading/kicad-footprints/"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; small items: resistors, capacitors, switches
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define fp-resistor-0603
-  (kicad-helper libpath-kicad
-                "Resistor_SMD.pretty/"
+  (kicad-helper "Resistor_SMD.pretty/"
                 "R_0603_1608Metric.kicad_mod"))
 (define fp-resistor-0805
-  (kicad-helper libpath-kicad
-                "Resistor_SMD.pretty/"
+  (kicad-helper "Resistor_SMD.pretty/"
                 "R_0805_2012Metric.kicad_mod"))
 ;; this is one of vertical mounting. I'm only using SMD for now
 (define fp-resistor-THT
-  (kicad-helper libpath-kicad
-                "Resistor_THT.pretty/"
+  (kicad-helper "Resistor_THT.pretty/"
                 "R_Axial_DIN0204_L3.6mm_D1.6mm_P2.54mm_Vertical.kicad_mod"))
 
 (define (fp-resistor type)
@@ -134,12 +157,10 @@
 ;; FIXME This seems to be the same as resistor's. Then I'll define
 ;; only one.
 (define fp-capacitor-0603
-  (kicad-helper libpath-kicad
-                "Capacitor_SMD.pretty/"
+  (kicad-helper "Capacitor_SMD.pretty/"
                 "C_0603_1608Metric.kicad_mod"))
 (define fp-capacitor-0805
-  (kicad-helper libpath-kicad
-                "Capacitor_SMD.pretty/"
+  (kicad-helper "Capacitor_SMD.pretty/"
                 "C_0805_2012Metric.kicad_mod"))
 
 (define (fp-capacitor type)
@@ -149,13 +170,11 @@
 
 ;; (footprint->pict (kicad-pin-header 4))
 (define fp-crystal
-  (kicad-helper libpath-kicad
-                "Crystal.pretty/"
+  (kicad-helper "Crystal.pretty/"
                 "Resonator-2Pin_W10.0mm_H5.0mm.kicad_mod"))
 
 (define fp-diode
-  (kicad-helper libpath-kicad
-                "Diode_THT.pretty/"
+  (kicad-helper "Diode_THT.pretty/"
                 "D_DO-35_SOD27_P7.62mm_Horizontal.kicad_mod"))
 
 ;; only THT, SPST, slide switches
@@ -167,33 +186,28 @@
                   [(4) 12.34]
                   [(6) 17.42]
                   [(8) 22.5])])
-    (kicad-helper libpath-kicad
-                  "Button_Switch_THT.pretty/"
+    (kicad-helper "Button_Switch_THT.pretty/"
                   (~a "SW_DIP_SPSTx"
                       (~r ct #:min-width 2 #:pad-string "0")
                       "_Slide_9.78x"
                       height
                       "mm_W7.62mm_P2.54mm.kicad_mod"))))
 
-(define fp-sw-push (kicad-helper libpath-kicad
-                                 "Button_Switch_THT.pretty/"
+(define fp-sw-push (kicad-helper "Button_Switch_THT.pretty/"
                                  "SW_PUSH_6mm.kicad_mod"))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; connectors
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(define fp-jack-audio (kicad-helper libpath-kicad
-                                    "Connector_Audio.pretty/"
+(define fp-jack-audio (kicad-helper "Connector_Audio.pretty/"
                                     "Jack_3.5mm_PJ311_Horizontal.kicad_mod"))
-(define fp-jack-barrel (kicad-helper libpath-kicad
-                                     "Connector_BarrelJack.pretty/"
+(define fp-jack-barrel (kicad-helper "Connector_BarrelJack.pretty/"
                                      "BarrelJack_Horizontal.kicad_mod"))
 
 (define (fp-pin-header ct)
   ;; available ct: 1,2,3,4,5,6,7,8
-  (kicad-helper libpath-kicad
-                "Connector_PinHeader_2.54mm.pretty/"
+  (kicad-helper "Connector_PinHeader_2.54mm.pretty/"
                 (~a "PinHeader_1x"
                     (~r ct #:min-width 2 #:pad-string "0")
                     "_P2.54mm_Vertical.kicad_mod")))
@@ -211,38 +225,30 @@
     [else (error (~a "Unsupported usb type: " type))]))
 
 (define fp-usb-c-male
-  (kicad-helper libpath-kicad
-                "Connector_USB.pretty/"
+  (kicad-helper "Connector_USB.pretty/"
                 "USB_C_Plug_Molex_105444.kicad_mod"))
 (define fp-usb-c-female
-  (kicad-helper libpath-kicad
-                "Connector_USB.pretty/"
+  (kicad-helper "Connector_USB.pretty/"
                 "USB_C_Receptacle_Palconn_UTC16-G.kicad_mod"))
 ;; FIXME usb3 different?
 (define fp-usb-a-male
-  (kicad-helper libpath-kicad
-                "Connector_USB.pretty/"
+  (kicad-helper "Connector_USB.pretty/"
                 "USB_A_CNCTech_1001-011-01101_Horizontal.kicad_mod"))
 (define fp-usb-a-female
-  (kicad-helper libpath-kicad
-                "Connector_USB.pretty/"
+  (kicad-helper "Connector_USB.pretty/"
                 "USB_A_Molex_105057_Vertical.kicad_mod"))
 ;; FIXME male or female, type and manufacture
 (define fp-usb-micro-male
-  (kicad-helper libpath-kicad
-                "Connector_USB.pretty/"
+  (kicad-helper "Connector_USB.pretty/"
                 "USB_Micro-B_Wuerth_629105150521.kicad_mod"))
 (define fp-usb-micro-female
-  (kicad-helper libpath-kicad
-                "Connector_USB.pretty/"
+  (kicad-helper "Connector_USB.pretty/"
                 "USB_Micro-B_Molex-105133-0001.kicad_mod"))
 (define fp-usb-mini-male
-  (kicad-helper libpath-kicad
-                "Connector_USB.pretty/"
+  (kicad-helper "Connector_USB.pretty/"
                 "USB_Mini-B_Tensility_54-00023_Vertical.kicad_mod"))
 (define fp-usb-mini-female
-  (kicad-helper libpath-kicad
-                "Connector_USB.pretty/"
+  (kicad-helper "Connector_USB.pretty/"
                 "USB_Mini-B_Lumberg_2486_01_Horizontal.kicad_mod"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -250,8 +256,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define fp-1602
-  (kicad-helper libpath-kicad
-                "Display.pretty/"
+  (kicad-helper "Display.pretty/"
                 "LCD-016N002L.kicad_mod"))
 
 
@@ -263,8 +268,7 @@
   ;; MountingHole_5.3mm_M5.kicad_mod
   ;; MountingHole_6.4mm_M6.kicad_mod
   ;; MountingHole_8.4mm_M8.kicad_mod
-  (kicad-helper libpath-kicad
-                "MountingHole.pretty/"
+  (kicad-helper "MountingHole.pretty/"
                 (~a "MountingHole_"
                     (case m
                       [(2) 2.2]
@@ -283,8 +287,7 @@
   ;; SW_Cherry_MX_1.00u_Plate.kicad_mod
   ;; SW_Cherry_MX_1.25u_PCB.kicad_mod
   ;; SW_Cherry_MX_1.25u_Plate.kicad_mod
-  (kicad-helper libpath-kicad
-                "Button_Switch_Keyboard.pretty/"
+  (kicad-helper "Button_Switch_Keyboard.pretty/"
                 (~a "SW_Cherry_MX_"
                     (~r spacing #:precision '(= 2))
                     "u_"
@@ -318,8 +321,7 @@
                 [(44) '(7 5.15)]
                 [(64) '(9 4.7)]
                 [(72) '(10 6)])])
-    (let ([fp (kicad-helper libpath-kicad
-                            "Package_DFN_QFN.pretty/"
+    (let ([fp (kicad-helper "Package_DFN_QFN.pretty/"
                             (~a "QFN-" ct "-1EP_"
                                 (first data) "x" (first data)
                                 "mm_P0.5mm_EP"
@@ -350,8 +352,7 @@
                 [(112) '(20 20 0.65)]
                 [(144) '(28 28 0.65)]
                 [(256) '(28 28 0.4)])])
-    (kicad-helper libpath-kicad
-                  "Package_QFP.pretty/"
+    (kicad-helper "Package_QFP.pretty/"
                   (~a "PQFP-" ct "_"
                       (first data) "x" (second data)
                       "mm_P" (third data) "mm.kicad_mod"))))
@@ -384,8 +385,7 @@
                 [(128) '(14 0.4)]
                 [(144) '(20 0.5)]
                 [(176) '(24 0.5)])])
-    (kicad-helper libpath-kicad
-                  "Package_QFP.pretty/"
+    (kicad-helper "Package_QFP.pretty/"
                   (~a "TQFP-" ct "_"
                       (first data) "x" (first data)
                       "mm_P" (second data) "mm.kicad_mod"))))
@@ -403,8 +403,7 @@
                   7.62]
                  [(40 42 48 64)
                   15.24])])
-    (kicad-helper libpath-kicad
-                  "Package_DIP.pretty/"
+    (kicad-helper "Package_DIP.pretty/"
                   (~a "DIP-" ct "_W" width "mm.kicad_mod"))))
 
 
@@ -416,8 +415,7 @@
   ;; SOIC-20W_7.5x12.8mm_P1.27mm.kicad_mod
   ;; SOIC-24W_7.5x15.4mm_P1.27mm.kicad_mod
   ;; SOIC-28W_7.5x17.9mm_P1.27mm.kicad_mod
-  (kicad-helper libpath-kicad
-                "Package_SO.pretty/"
+  (kicad-helper "Package_SO.pretty/"
                 (~a "SOIC-" ct "W_7.5x"
                     (case ct
                       [(16) 10.3]
@@ -442,8 +440,7 @@
                 [(38) '(6.1 12.5 0.65)]
                 [(48) '(6.1 12.5 0.5)]
                 [(56) '(6.1 14 0.5)])])
-    (kicad-helper libpath-kicad
-                  "Package_SO.pretty/"
+    (kicad-helper "Package_SO.pretty/"
                   (~a "TSSOP-" ct "_"
                       (first data) "x" (second data)
                       "mm_P" (third data) "mm.kicad_mod"))))
@@ -451,31 +448,29 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Arduino lib
 ;; https://github.com/forrestbao/arduino-kicad-library
+;; https://github.com/sparkfun/SparkFun-KiCad-Libraries
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(define libpath-arduino (expand-user-path "~/git/reading/arduino-kicad-library/"))
-(define libpath-sparkfun
-  (expand-user-path "~/git/reading/SparkFun-KiCad-Libraries/Footprints/"))
 
 (define (fp-Arduino type)
   (case type
     ;; sparkfun boards
     [(Uno)
-     (kicad-helper libpath-sparkfun "Boards.pretty/"
+     (kicad-helper "Boards.pretty/"
                    "UNO_R3_SHIELD.kicad_mod")]
     [(Uno-ICSP)
-     (kicad-helper libpath-sparkfun "Boards.pretty/"
+     (kicad-helper "Boards.pretty/"
                    "UNO_R3_SHIELD_ICSP.kicad_mod")]
     [(Micro)
-     (kicad-helper libpath-sparkfun "Boards.pretty/"
+     (kicad-helper "Boards.pretty/"
                    "SPARKFUN_PRO_MICRO.kicad_mod")]
     [(Mini)
-     (kicad-helper libpath-sparkfun "Boards.pretty/"
+     (kicad-helper "Boards.pretty/"
                    "ARDUINO_PRO_MINI.kicad_mod")]
     ;; Arduino boards
     [(MKR)
-     (kicad-helper libpath-arduino "Arduino.pretty/" "Arduino_MKR.kicad_mod")]
+     (kicad-helper "Arduino.pretty/" "Arduino_MKR.kicad_mod")]
     [(Nano)
-     (kicad-helper libpath-arduino "Arduino.pretty/" "Arduino_Nano_Socket.kicad_mod")]
+     (kicad-helper "Arduino.pretty/" "Arduino_Nano_Socket.kicad_mod")]
     [else (error "Unsupported Arduino form factor.")]))
 
 
