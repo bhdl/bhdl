@@ -52,7 +52,7 @@
   ;; index: it is the #index pin of the parent
   (parent index)
   #:methods gen:custom-write
-  [(define (write-proc pin port mode) eq?
+  [(define (write-proc pin port mode)
      (write-string (~a "#<Pin-"
                        (eq-hash-code (Pin-parent pin)) "-"
                        (Pin-index pin) ">")
