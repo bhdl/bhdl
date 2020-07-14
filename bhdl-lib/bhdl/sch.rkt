@@ -9,6 +9,7 @@
          racket/set
          rackunit
          "utils.rkt"
+         "pict-utils.rkt"
          pict
          racket/draw)
 
@@ -33,6 +34,7 @@
          combine-Composites-1
 
          define-Composite
+         make-Composite
 
          *-
          *<
@@ -99,32 +101,34 @@
                     (Pin res 'pin))
          ...
          res)]))
-
 (define-syntax (define-Composite stx)
-  (syntax-parse stx
-    [(_ name (~alt
-              (~optional (~seq #:external-pins (ext-pin ...))
-                         #:defaults ([(ext-pin 1) null]))
-              (~optional (~seq #:layout p-name))
-              (~optional (~seq #:where where-clause)
-                         #:defaults ([where-clause #'()]))
-              (~seq #:vars (var-clause ...))
-              (~seq #:connect connect-clause)
-              (~seq #:hooks (hook-clause ...))) ...)
-     (with-syntax ([self (datum->syntax stx 'self)])
-       #`(define name
-           (let ([self (create-simple-Composite ext-pin ...)])
-             (let* (var-clause ... ...)
-               #,(if (attribute p-name)
-                     #'(set-Composite-pict! self p-name)
-                     #'(void))
+  (syntax-parse
+   stx
+   [(_ name rst ...)
+    #'(define name (make-Composite rst ...))]))
 
-               ;; do the hooks
-               (hook! self hook-clause ...) ...
-               ;; do the connections
-               (combine-Composites-1
-                (flatten (list self
-                               connect-clause ...)))))))]))
+(define-syntax (make-Composite stx)
+  (syntax-parse stx
+    [(_ (~alt
+         (~optional (~seq #:external-pins (ext-pin ...))
+                    #:defaults ([(ext-pin 1) null]))
+         (~optional (~seq #:layout p-name))
+         (~optional (~seq #:where where-clause)
+                    #:defaults ([where-clause #'()]))
+         (~seq #:vars (var-clause ...))
+         (~seq #:connect connect-clause)) ...)
+     (with-syntax ([self (datum->syntax stx 'self)])
+       #`(let ([self (create-simple-Composite ext-pin ...)])
+           (let* (var-clause ... ...)
+             #,(if (attribute p-name)
+                   #'(set-Composite-pict! self p-name)
+                   #'(void))
+             ;; do the connections
+             (combine-Composites-1
+              (flatten (list self
+                             connect-clause ...))))))]))
+
+
 
 (define (combine-Composites lst)
   "This function effectively merge separated Composite into one."
@@ -447,13 +451,19 @@ res: already in this set."
   "The atoms that are placed to locations."
   (length (filter
            identity
-           (map Atom-pict (collect-all-atoms comp)))))
+           (map (lambda (atom)
+                  (maybe-find cc-find (Composite-pict comp)
+                              (Atom-pict atom)))
+                (collect-all-atoms comp)))))
 
 (define (nfree-atoms comp)
   "The atoms that are NOT placed to fixed locations."
   (length (filter-not
            identity
-           (map Atom-pict (collect-all-atoms comp)))))
+           (map (lambda (atom)
+                  (maybe-find cc-find (Composite-pict comp)
+                              (Atom-pict atom)))
+                (collect-all-atoms comp)))))
 
 
 (module+ test

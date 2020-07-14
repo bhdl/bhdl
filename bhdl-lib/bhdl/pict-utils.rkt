@@ -11,6 +11,7 @@
 
          sincos->theta
          angle-find
+         maybe-find
 
          save-file)
 
@@ -145,9 +146,19 @@
             (let-values ([(Δa) (loop (cdr l))])
               (single-pict-angle (car l) (cadr l) Δa))))))
 
+(define (maybe-find find-fn base p)
+  "Return find value, or #f if not found. FIXME performance"
+  ;; FIXME make sure it is find-XX: not found problem
+  (with-handlers ([exn:fail? (lambda (exn) #f)])
+    (find-fn base p)))
+
 (module+ test
   ;; (require pict)
   (define r (rectangle 20 30))
+
+  (maybe-find cc-find (circle 10) r)
+  (maybe-find angle-find (circle 10) r)
+
   (pict-convertible? r)
   (pict-children r)
   (angle-find (rotate (hc-append (rotate r (- (/ 3.14 5))) (circle 100))

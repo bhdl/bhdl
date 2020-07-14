@@ -1,13 +1,12 @@
 #lang racket
 
 (require racket/contract
-         "sch.rkt")
+         pict
+         "sch.rkt"
+         "library-base.rkt"
+         "library-io.rkt")
 
-(provide (struct-out IC)
-         (struct-out FpSpec)
-         (struct-out Connector)
-         
-         ;; create components to use in sch.rkt
+(provide ;; create components to use in sch.rkt
          make-IC-atom
          R C connector
          led diode fuse crystal
@@ -15,69 +14,24 @@
          usb
 
          ;; HACK this should not have been exposed
-         make-simple-atom
-
-         ;; FIXME not sure if these needs to be provided
-         (struct-out Resistor)
-         (struct-out Capacitor)
-         (struct-out ICAtom)
-         (struct-out Diode)
-         (struct-out CherrySwitch)
-         (struct-out LED)
-         (struct-out Fuse)
-         (struct-out USB))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; IC definition, for symbol and footprint
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(struct FpSpec
-  (fp pins)
-  #:prefab)
-
-;; everything should be centered around the IC data structure
-;;
-;; 1. alts
-;;
-;; 2. orients: this determines the pin place of the symbol
-;;
-;; 3. fps: this determines the exact footprint of different packaging
-(struct IC
-  ;; this tells nothing about the fields. I really need type
-  (datasheet alts fps)
-  #:prefab)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Atoms used in schematic. This wrap around IC.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-(struct Resistor
-  (value)
-  #:super struct:Atom)
-
-(struct Capacitor
-  (value)
-  #:super struct:Atom)
-
-(struct LED
-  (color)
-  #:super struct:Atom)
-
-(struct Diode ()
-  #:super struct:Atom)
-
-(struct Fuse
-  (value)
-  #:super struct:Atom)
+         make-simple-atom)
 
 (define (make-simple-atom proc degree . rst)
   (let ([res (apply proc (make-hash) rst)])
     (for ([i (map add1 (range degree))])
       ;; FIXME use number as pin name
       ;; FIXME start from 1
-      (hash-set! (Atom-pinhash res) i (Pin res i)))
+      (hash-set! (Atom-pinhash res) i (Pin res i))
+      (set-default-pict! res))
     res))
+
+;; FIXME this is error-prone, because I need to remember call this after
+;; creating an Atom
+(define (set-default-pict! atom)
+  ;; I need to launder the pict becasue the footprint pict is cached. Otherwise
+  ;; all the atoms with the same footprint will have the same location when upon
+  ;; *-find function call
+  (set-Atom-pict! atom (launder (atom->fp-pict atom))))
 
 (define (R value)
   (make-simple-atom Resistor 2 value))
@@ -103,24 +57,15 @@
 (define (switch)
   (make-simple-atom Atom 2))
 
-(struct CherrySwitch (spacing)
-  #:super struct:Atom)
-
 (define (cherry [spacing 1])
   (make-simple-atom CherrySwitch 2 spacing))
-
-(struct Connector
-  (num)
-  #:super struct:Atom)
 
 (define (connector num)
   (let ([comp (Connector (make-hash) num)])
     (for ([i (in-range num)])
       (hash-set! (Atom-pinhash comp) (add1 i) (Pin comp (add1 i))))
+    (set-default-pict! comp)
     comp))
-
-(struct USB (type)
-  #:super struct:Atom)
 
 (define (usb type)
   ;; I'll need the pin name to pin number mapping
@@ -155,11 +100,8 @@
         (let ([p (Pin res (car pair))])
           (hash-set! (Atom-pinhash res) (car pair) p)
           (hash-set! (Atom-pinhash res) (cdr pair) p)))
+      (set-default-pict! res)
       res)))
-
-(struct ICAtom
-  (ic)
-  #:super struct:Atom)
 
 (define (make-IC-atom ic)
   ;; For all the pins, create Pin.
@@ -189,4 +131,5 @@
             ;; set the index to point to the same pin as well
             (hash-set! (Atom-pinhash comp) index p)))
         ;; return the created Atom instance
+        (set-default-pict! comp)
         comp))))

@@ -1,7 +1,7 @@
 #lang racket
 
 (require "library-IC.rkt"
-         "library.rkt"
+         "library-base.rkt"
          "fp.rkt"
          "fp-kicad.rkt"
          "gerber.rkt"
@@ -24,7 +24,6 @@
          atom->fp-pict+Hlocs
          atom->fp-pict
          atom->fp
-         picted-atom!
 
          atom->fp-sexp
 
@@ -268,16 +267,3 @@
 
 (define (atom->fp-pict atom)
   (let-values ([(p locs) (atom->fp-pict+Hlocs atom)]) p))
-
-
-;; CAUTION FIXME there is no functional way to do this, because I do not want to
-;; create extra pins. Also, Atom is marked with #:auto fields, and that is not
-;; copiable in the sense of struct-copy
-;;
-;; TODO the atom with pict should by default
-(define (picted-atom! atom [p (atom->fp-pict atom)])
-  ;; I need to launder the pict becasue the footprint pict is cached. Otherwise
-  ;; all the atoms with the same footprint will have the same location when
-  ;; upon *-find function call
-  (set-Atom-pict! atom (launder p))
-  atom)

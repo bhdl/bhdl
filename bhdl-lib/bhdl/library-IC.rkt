@@ -2,7 +2,7 @@
 
 (require (for-syntax syntax/parse)
          "utils.rkt"
-         "library.rkt"
+         "library-base.rkt"
          "fp-kicad.rkt")
 
 (provide ATtiny25 ATtiny45 ATtiny85

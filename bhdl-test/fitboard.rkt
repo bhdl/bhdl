@@ -29,18 +29,17 @@
     (if (= spacing 0)
         #f
         (let* ([atom (cherry spacing)]
-               [key (picted-atom!
-                     atom
-                     (cc-superimpose (atom->fp-pict atom)
-                                     (pict:text
-                                      (key-name-filter (symbol->string name)))))]
+               [pict-with-name (cc-superimpose (atom->fp-pict atom)
+                                               (pict:text
+                                                (key-name-filter
+                                                 (symbol->string name))))]
+               ;; FIXME more functional way to do this?
+               [atom (begin (set-Atom-pict! atom pict-with-name)
+                            atom)]
                ;; key with diode group
-               [key-with-diode (let* ([d (picted-atom! (diode))]
-                                      ;; the connection
-                                      [res (*- key d)])
-                                 ;; the layout
-                                 (set-Composite-pict! res (vc-append 3 key d))
-                                 res)])
+               [key-with-diode (make-Composite #:vars ([d (diode)])
+                                               #:connect (*- key d)
+                                               #:layout (vc-append 3 key d))])
           key-with-diode))))
 
 (struct KeyboardMatrix
