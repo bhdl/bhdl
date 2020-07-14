@@ -17,6 +17,18 @@ First, install [[https://racket-lang.org/][racket]]. Install the BHDL directly a
 raco pkg install git://github.com/lihebi/bhdl/?path=bhdl-lib
 #+end_example
 
+For development purpose, you might want to clone the repo and install the cloned
+local package. This is known as "linking":
+
+#+begin_example
+cd bhdl-lib
+raco pkg install
+#+end_example
+
+This will place a link between the installed packages and this local
+directory. Everytime this local code is modified, the update is immediately
+available for the package =bhdl=.
+
 ** KiCAD footprint libraries
 You will then download the kicad library.
 
@@ -64,7 +76,7 @@ The following two boards are available for tests:
 
 There are three ways to run the code.
 
-First, you can also run in command line. Run the top-level script:
+First, you can run in command line. Run the top-level script:
 
 #+begin_example
 racket fitboard.rkt
