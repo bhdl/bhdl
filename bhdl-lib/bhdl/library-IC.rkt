@@ -5,7 +5,9 @@
          "library-base.rkt"
          "fp-kicad.rkt")
 
-(provide ATtiny25 ATtiny45 ATtiny85
+(provide define/IC
+
+         ATtiny25 ATtiny45 ATtiny85
          ATmega128
          ATmega16
          ATmega48 ATmega88 ATmega168 ATmega328
