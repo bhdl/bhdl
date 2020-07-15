@@ -197,9 +197,6 @@ Es (Edge, i.e. netlist), diearea"
                     [(list x2 y2) (hash-ref Hpin=>xy pin2)])
           (add-edge! g pin1 pin2 (sqrt (+ (expt (- x1 x2) 2) (expt (- y1 y2) 2))))))))
   (get-vertices g)
-  (edge-weight g
-               (first (first (get-edges g)))
-               (second (first (get-edges g))))
   ;; to run MST outside
   ;; (min-st-kruskal g)
   g)
