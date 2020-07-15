@@ -13,9 +13,7 @@
          pict
          racket/draw)
 
-(provide hook
-         hook!
-         collect-all-composites
+(provide collect-all-composites
          collect-all-atoms
          collect-all-pins
          Composite->netlist
@@ -40,6 +38,12 @@
          *<
          *=
          *+
+
+         ;; DEBUG
+         *--proc
+         *<-proc
+         *=-proc
+         *+-proc
 
          pin-ref)
 
@@ -177,6 +181,8 @@
   
   ;; 'a 'b
   (parse-dot #'a.b)
+  ;; => '(a b)
+  ;;
   ;; 'a 1
   (parse-dot #'a.1)
   ;; TODO use this 
@@ -225,40 +231,21 @@
     (append (Composite-nets comp)
             nets))))
 
-(define-syntax (hook stx)
-  (syntax-parse stx
-    ;; #:datum-literals (comp)
-    [(_ #:pins (pin ...) (net:dot ...) ...)
-     #`(let ([comp (create-simple-Composite pin ...)])
-         ;; create connections
-         (hook-proc! comp
-                     (Net (list (pin-ref
-                                 ;; this is a trick to bring the newly bound
-                                 ;; variable "comp" into the scope for
-                                 ;; replacing 'self
-                                 (replace-self net.lhs comp)
-                                 'net.rhs)
-                                ...)
-                          1)
-                     ...)
-         comp)]))
-
 ;; FIXME test it
 ;; FIXME define and use *+-proc
 (define-syntax (*+ stx)
   (syntax-parse
    stx
    ([_ ([node:dot ...] ...)]
-    #'(hook #:pins () (node ...) ...))))
+    #'(*+-proc (list (list (pin-ref node.lhs
+                                    ;; CAUTION need quote rhs
+                                    'node.rhs) ...) ...)))))
 
-(define-syntax (hook! stx)
-  (syntax-parse stx
-    [(_ comp (net:dot ...) ...)
-     #'(hook-proc! comp
-                   (Net (list (pin-ref net.lhs 'net.rhs)
-                              ...)
-                        1)
-                   ...)]))
+(define (*+-proc lsts)
+  (let ([res (create-simple-Composite)])
+    (for ([lst lsts])
+      (hook-proc! res (Net lst 1)))
+    res))
 
 (define (*--proc lst)
   (let ([item-1 (first lst)]
@@ -289,16 +276,9 @@
                          1))
     res))
 
-(begin-for-syntax
-  (define-splicing-syntax-class node-or-weight
-    (pattern (~seq #:weight w node:maybe-dot)
-             #:with res #'(list w node.res))
-    (pattern (~seq node:maybe-dot)
-             #:with res #'node.res)))
-
 (define-syntax (*- stx)
   (syntax-parse stx
-    [(_ node:node-or-weight ...)
+    [(_ node:maybe-dot ...)
      ;; TODO add #:weight
      #'(*--proc (list node.res ...))]))
 
