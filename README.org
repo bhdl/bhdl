@@ -216,8 +216,8 @@ a.2 -- b.3
 
 ** Component library
 
-*** small components
-We provide the following functions to create regular electronic components:
+*** Discrete components
+We provide the following functions to create regular electronic components (in [[file:bhdl-lib/bhdl/library.rkt]]):
 
 #+BEGIN_SRC lisp
 (R value) ; resistor
@@ -237,9 +237,8 @@ We provide the following functions to create regular electronic components:
 #+END_SRC
 
 *** IC components
-We read the kicad footprint libraries (TODO), thus can readily supports the rich
-kicad library outthere. These components are called ICs, though there are also
-IC-like components like Arduino. The IC instance is created by:
+Besides discrete components, we also provide IC components in [[file:/bhdl-lib/bhdl/library-IC.rkt]]
+Some IC-like components like Arduino are also included. The IC instance is created by:
 
 #+BEGIN_SRC lisp
 (make-IC-atom ATmega128)
