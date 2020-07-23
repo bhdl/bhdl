@@ -37,9 +37,10 @@
                [atom (begin (set-Atom-pict! atom pict-with-name)
                             atom)]
                ;; key with diode group
-               [key-with-diode (make-Composite #:vars ([d (diode)])
-                                               #:connect (*- key d)
-                                               #:layout (vc-append 3 key d))])
+               [key-with-diode (make-Composite #:external-pins (p1 p2)
+                                               #:vars ([d (diode)])
+                                               #:connect (*- atom d)
+                                               #:layout (vc-append 3 atom d))])
           key-with-diode))))
 
 (struct KeyboardMatrix
