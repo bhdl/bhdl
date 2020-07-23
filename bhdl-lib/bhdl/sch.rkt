@@ -5,6 +5,8 @@
                      racket/list
                      racket/match)
          syntax/parse/define
+         racket/stxparam
+
          racket/list
          racket/set
          rackunit
@@ -33,11 +35,13 @@
 
          define-Composite
          make-Composite
+         self
 
          *-
          *<
          *=
          *+
+
 
          ;; DEBUG
          *--proc
@@ -111,6 +115,10 @@
    [(_ name rst ...)
     #'(define name (make-Composite rst ...))]))
 
+(define-syntax-parameter self
+  (lambda (stx)
+    (raise-syntax-error (syntax-e stx) "can only be used inside make-Composite")))
+
 (define-syntax (make-Composite stx)
   (syntax-parse stx
     [(_ (~alt
@@ -121,17 +129,17 @@
                     #:defaults ([where-clause #'()]))
          (~seq #:vars (var-clause ...))
          (~seq #:connect connect-clause)) ...)
-     (with-syntax ([self (datum->syntax stx 'self)])
-       #`(let ([self (create-simple-Composite ext-pin ...)])
+     #`(let ([self-obj (create-simple-Composite ext-pin ...)])
+         (syntax-parameterize ([self (make-rename-transformer #'self-obj)])
            (let* (var-clause ... ...)
              #,(if (attribute p-name)
-                   #'(set-Composite-pict! self p-name)
+                   #'(set-Composite-pict! self-obj p-name)
                    #'(void))
              ;; do the connections
              (combine-Composites-1
-              (flatten (list self
-                             connect-clause ...))))))]))
-
+              (flatten (list
+                        self-obj
+                        connect-clause ...))))))]))
 
 
 (define (combine-Composites lst)
@@ -173,45 +181,37 @@
                      " Probably the variable is undefined."))]))
 
 (begin-for-syntax
-  (define (parse-dot stx)
-    (match-let ([(list l r) (string-split (symbol->string (syntax-e stx)) ".")])
-      (let ([l (string->symbol l)]
-            [r (or (string->number r) (string->symbol r))])
-        (list l r))))
-  
-  ;; 'a 'b
-  (parse-dot #'a.b)
-  ;; => '(a b)
-  ;;
-  ;; 'a 1
-  (parse-dot #'a.1)
-  ;; TODO use this 
-  (define (parse-maybe-dot stx)
-    "Return lhs rhs if there is a dot, else, return itself and (void)"
-    (let ([s (symbol->string (syntax-e stx))])
-      (if (string-contains? s ".")
-          (match-let ([(list l r) (string-split s ".")])
-            (let ([l (string->symbol l)]
-                  [r (or (string->number r) (string->symbol r))])
-              (datum->syntax stx (list 'pin-ref l (list 'quote r)))))
-          (datum->syntax stx stx))))
-  (parse-maybe-dot #'ab)
-  (parse-maybe-dot #'ab.cd))
+ (define (parse-dot stx)
+   (match-let ([(list l r) (string-split (symbol->string (syntax-e stx)) ".")])
+     (let ([l (string->symbol l)]
+           [r (or (string->number r) (string->symbol r))])
+       (datum->syntax stx (list l r)))))
 
-(define-syntax (replace-self stx)
-  (syntax-parse stx
-    [(_ x rep)
-     (if (eq? (syntax-e #'x) 'self)
-         #'rep
-         #'x)]))
+ ;; 'a 'b
+ (parse-dot #'a.b)
+ ;; => '(a b)
+ ;;
+ ;; 'a 1
+ (parse-dot #'a.1)
+ ;; TODO use this 
+ (define (parse-maybe-dot stx)
+   "Return lhs rhs if there is a dot, else, return itself and (void)"
+   (let ([s (symbol->string (syntax-e stx))])
+     (cond
+      [(string-contains? s ".") (match-let ([(list l r) (string-split s ".")])
+                                  (let ([l (string->symbol l)]
+                                        [r (or (string->number r) (string->symbol r))])
+                                    (datum->syntax
+                                     stx (list 'pin-ref l (list 'quote r)))))]
+      [else stx])))
+ (parse-maybe-dot #'ab)
+ (parse-maybe-dot #'ab.cd))
 
 (begin-for-syntax
   (define-syntax-class dot
     #:description "dot"
     (pattern x
-             #:with (lhs rhs)
-             (datum->syntax
-              #'x (parse-dot #'x))))
+             #:with (lhs rhs) (parse-dot #'x)))
   (define-syntax-class maybe-dot
     #:description "maybe-dot"
     ;; if it is a list, do nothing
@@ -219,9 +219,7 @@
              #:with res #'(x ...))
     ;; otherwise, it must be an id. check to see if it has a dot
     (pattern y:id
-             #:with res
-             (datum->syntax
-              #'y (parse-maybe-dot #'y)))))
+             #:with res (parse-maybe-dot #'y))))
 
 (define (hook-proc! comp . nets)
   ;; FIXME constract for nets to be instance of Net
