@@ -9,15 +9,39 @@
 - [X] wire things up
 - [X] write a version to place diode at fixed location
 - [-] pick the MCU and firmware
-  - [ ] bluetooth and RF?
-    - [ ] battery and (fast) charging circuit?
+  - [X] bluetooth and RF?
+  - [ ] battery and (fast) charging circuit?
+- [ ] stablizer and other mouting holes
+- [ ] Kahl hot swappable socket (which might have to go back side of the PCB,
+  and must align with the switch socket)
 - [-] connect everything
 - [ ] connect LEDs?
 - [ ] case CAD co-design?
 - [ ] double-check footprint for manufacturing
-- stablizer and other mouting holes
-- Kahl hot swappable socket (which might have to go back side of the PCB, and
-  must align with the switch socket)
+
+*** cite:gd32vf103xxxx-datasheet
+- user manual: cite:gd32vf103xxxx-manual
+
+All voltage must be 3.3V for GD32VF103
+
+VDD                     ; external voltage range
+VDDA                    ; external analog supply voltage
+VBAT                    ; external battery voltage
+VIN                     ; input voltage, this is 5V tolerant
+NRST                    ; external reset
+
+;; Historically,
+;; In BJT, Vcc means collector, Vee stands for emitter
+;; In FET, Vdd means drain, Vss stands for source
+;; Now, Vcc=Vdd=, Vee=Vss
+
+*** cite:esp32-wrover-e
+
+*** Mechanical Keyboard Switches Kailh PCB Socket
+- [[https://www.kailhswitch.com/mechanical-keyboard-switches/box-switches/mechanical-keyboard-switches-kailh-pcb-socket.html][offical product link]]
+- [[https://www.kailhswitch.com/uploads/201815927/PG151101S11.pdf][datasheet]]
+
+CPG151101S11
 
 *** TODO Make spreadboard
 **** DONE library
@@ -56,6 +80,25 @@ Some conflicts are not counted in the placement engine.
 
 ** place on back side
 ** native library management (instead of adapting KiCAD libraries)
+
+* TMP
+** jackfirth's repos
+https://github.com/jackfirth/
+
+*** TODO consider using Transducers
+(https://docs.racket-lang.org/rebellion/Transducers.html)
+
+*** TODO so it Enum_Types and all other types
+https://docs.racket-lang.org/rebellion/Enum_Types.html
+
+*** TODO and lens!!!! https://docs.racket-lang.org/lens/index.html
+
+*** TODO the Multidicts library also seems interesting
+https://docs.racket-lang.org/rebellion/Multidicts.html
+
+*** TODO Record_Types is also interesting, it forces the instantiation to supply
+keywords https://docs.racket-lang.org/rebellion/Record_Types.html
+
 
 * TODO-list Summer
 

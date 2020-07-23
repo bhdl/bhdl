@@ -90,3 +90,11 @@
 
   (for/list ([type '(Micro Mini Nano MKR Uno Uno-ICSP)])
     (footprint->pict (fp-Arduino type))))
+
+(module+ test
+  (pict:frame (footprint->pict fp-esp32-wrover-e)))
+
+(module+ test
+  (footprint->pict (fp-LQFP 36))
+  (footprint->pict (fp-LQFP 44))
+  (pict:scale (footprint->pict (fp-LQFP 48)) 10))
