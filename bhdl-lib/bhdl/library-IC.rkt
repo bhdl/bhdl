@@ -17,6 +17,9 @@
 
          ATmega8
 
+         GD32VF103CBT6
+         ESP32-WROVER-E
+
          Arduino-Uno
          Arduino-Uno-ICSP
          Arduino-Nano
@@ -35,6 +38,8 @@
     (pattern (~seq #:QFN (num pin ...))
              ;; #:with package #'QFN
              #:with fp #'(fp-QFN num))
+    (pattern (~seq #:LQFP (num pin ...))
+             #:with fp #'(fp-LQFP num))
     (pattern (~seq #:FP (fp pin ...)))))
 
 (define-syntax (define/IC stx)
@@ -254,6 +259,35 @@
             PD5 PD6 PD7 PB0 PB1 PB2 PB3 PB4
             PB5 AVCC ADC6 AREF GND ADC7 PC0 PC1
             PC2 PC3 PC4 PC5 PC6 PD0 PD1 PD2))
+
+(define/IC (GD32VF103CBT6)
+  #:ALTS ([PC13 TAMPER RTC]
+          [PC14 OSC32IN OSC32out]
+          [PD0 OSCIN]
+          [PD1 OSCOUT]
+          [PA11 USBD-]
+          [PA12 USBD+]
+          [PA10 UART0_RX]
+          [PA9 UART0_TX USB_VBUS]
+          [PB12 SPI1_CS]
+          [PB14 SPI1_MISO]
+          [PB13 SPI1_SCLK]
+          [PB15 SPI1_MOSI]
+
+          [PB2 BOOT1])
+  #:LQFP (48 VBAT PC13 PC14 PC15 PD0 PD1 NRST VSSA VDDA PA0 PA1 PA2
+             PA3 PA4 PA5 PA6 PA7 PB0 PB1 PB2 PB10 PB11 VSS1 VDD1
+             PB12 PB13 PB14 PB15 PA8 PA9 PA10 PA11 PA12 PA13 VSS2 VDD2
+             PA14 PA15 PB3 PB4 PB5 PB6 PB7 BOOT0 PB8 PB9 VSS3 VDD3))
+
+(define/IC (ESP32-WROVER-E)
+  #:FP (fp-esp32-wrover-e
+
+        GND 3V3 EN SENSOR-VP SENSOR-VN
+        IO34 IO35 IO32 IO33 IO25 IO26 IO27 IO14 IO12 GND IO13 NC NC NC
+
+        NC NC NC
+        IO15 IO2 IO0 IO4 IO16 IO17 IO5 IO18 IO19 NC IO21 RXD0 TXD0 IO22 IO23 GND))
 
 ;; CAUTION Uno Mini Micro are from Sparkfun library
 
