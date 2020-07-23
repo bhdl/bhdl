@@ -85,12 +85,13 @@
     (let-values ([(dx dy) (values (first (second cur-aperture))
                                   (second (second cur-aperture)))])
       ;; (println (~a x y dx dy #:separator " "))
-      
       (send dc draw-rectangle
             (- x (/ dx 2))
             (- y (/ dy 2))
             dx
-            dy)))
+            dy)
+      ;; update bounding box
+      (update-bounding-box x y (/ dx 2) (/ dy 2))))
 
   (define (flash-ellipse dc x y)
     (let-values ([(dx dy) (values (first (second cur-aperture))
@@ -99,7 +100,8 @@
             (- x (/ dx 2))
             (- y (/ dy 2))
             dx
-            dy)))
+            dy)
+      (update-bounding-box x y (/ dx 2) (/ dy 2))))
 
   (define-values (update-bounding-box get-bounding-box)
     (let-values ([(xmax xmin ymax ymin) (values 0 0 0 0)])
@@ -144,6 +146,8 @@
            ;; flash current aperture
            [(3) (let-values ([(dx dy) (values (first (second cur-aperture))
                                               (second (second cur-aperture)))])
+                  ;; I should consider the width and height of the pad. This is
+                  ;; done in the flash function.
                   (update-bounding-box (xx x) (yy y)))
                 (case (first cur-aperture)
                   [("R") (flash-rectangle dc (xx x) (yy y))]
