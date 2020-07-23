@@ -30,6 +30,7 @@
           [fp-TQFP (-> (or/c 32 44 48 64 80 100 120 128 144 176) footprint?)]
           [fp-DIP (-> (or/c 4 6 8 10 12 14 16 18 20 22 24 28 32
                             40 42 48 64) footprint?)]
+          [fp-LQFP (-> (or/c 36 44 48) footprint?)]
           [fp-SOIC (-> (or/c 16 18 20 24 28) footprint?)]
           [fp-TSSOP (-> (or/c 8 14 16 20 24 28
                               30 32 38 48 56) footprint?)]
@@ -463,6 +464,40 @@
                       (first data) "x" (second data)
                       "mm_P" (third data) "mm.kicad_mod"))))
 
+(define (fp-LQFP ct)
+  ;; LQFP-32_5x5mm_P0.5mm.kicad_mod
+  ;; LQFP-32_7x7mm_P0.8mm.kicad_mod
+  ;; LQFP-36_7x7mm_P0.65mm.kicad_mod
+  ;; LQFP-44_10x10mm_P0.8mm.kicad_mod
+  ;; LQFP-48_7x7mm_P0.5mm.kicad_mod
+  ;; LQFP-52_10x10mm_P0.65mm.kicad_mod
+  ;; LQFP-52_14x14mm_P1mm.kicad_mod
+  ;; LQFP-64_10x10mm_P0.5mm.kicad_mod
+  ;; LQFP-64_14x14mm_P0.8mm.kicad_mod
+  ;; LQFP-64_7x7mm_P0.4mm.kicad_mod
+  ;; LQFP-80_10x10mm_P0.4mm.kicad_mod
+  ;; LQFP-80_12x12mm_P0.5mm.kicad_mod
+  ;; LQFP-80_14x14mm_P0.65mm.kicad_mod
+  ;; LQFP-100_14x14mm_P0.5mm.kicad_mod
+  ;; LQFP-128_14x14mm_P0.4mm.kicad_mod
+  ;; LQFP-128_14x20mm_P0.5mm.kicad_mod
+  ;; LQFP-144_20x20mm_P0.5mm.kicad_mod
+  ;; LQFP-160_24x24mm_P0.5mm.kicad_mod
+  ;; LQFP-176_20x20mm_P0.4mm.kicad_mod
+  ;; LQFP-176_24x24mm_P0.5mm.kicad_mod
+  ;; LQFP-208_28x28mm_P0.5mm.kicad_mod
+  ;; LQFP-216_24x24mm_P0.4mm.kicad_mod
+  (match-let ([(list width pitch)
+               (case ct
+                 ;; FIXME not all of them
+                 ;; FIXME there can be multiple footprints for a ct
+                 [(36) '(7 0.65)]
+                 [(44) '(10 0.8)]
+                 [(48) '(7 0.5)])])
+    (kicad-helper "Package_QFP.pretty/"
+                  (~a "LQFP-" ct "_" width "x" width
+                      "mm_P" pitch "mm.kicad_mod"))))
+
 (define (fp-TQFP ct)
   ;;TQFP-32_7x7mm_P0.8mm.kicad_mod
   ;;TQFP-44_10x10mm_P0.8mm.kicad_mod
@@ -578,6 +613,4 @@
     [(Nano)
      (kicad-helper "Arduino.pretty/" "Arduino_Nano_Socket.kicad_mod")]
     [else (error "Unsupported Arduino form factor.")]))
-
-
 
