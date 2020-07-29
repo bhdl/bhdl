@@ -19,14 +19,14 @@
            [jumper-mkr-SCK (connector 3)]        ;J6
            [jumper-mkr-SDA (connector 3)]        ;J8
            [jumper-mkr-SCL (connector 3)]        ;J9
-           [uno1 (make-IC-atom Arduino-Uno)]
-           [uno2 (make-IC-atom Arduino-Uno)]
-           [uno3 (make-IC-atom Arduino-Uno-ICSP)]
-           [uno4 (make-IC-atom Arduino-Uno-ICSP)]
-           [micro (make-IC-atom Arduino-Micro)]
-           [mini (make-IC-atom Arduino-Mini)]
-           [nano (make-IC-atom Arduino-Nano)]
-           [mkr (make-IC-atom Arduino-MKR)])
+           [uno1 (Arduino-Uno)]
+           [uno2 (Arduino-Uno)]
+           [uno3 (Arduino-Uno-ICSP)]
+           [uno4 (Arduino-Uno-ICSP)]
+           [micro (Arduino-Micro)]
+           [mini (Arduino-Mini)]
+           [nano (Arduino-Nano)]
+           [mkr (Arduino-MKR)])
    ;; The bunch of connections across all Arduinos
    #:connect
    (*=
@@ -93,36 +93,7 @@
                (ht-append 20 g1 g2)
                (ht-append 20 g3 g4)))))
 
-
 (module+ test
   (make-directory* "/tmp/bhdl/")
-  (current-directory "/tmp/bhdl/")
-
-  (Composite-pict whole)
-
-  (define init-place (Composite->place-spec whole))
-  (Composite->pict whole init-place)
-
-  (nplaced-atoms whole)
-  (nfree-atoms whole)
-  (hash-ref init-place 'xs)
-
-  ;; generate
-  (save-file (Composite->pict whole init-place) "out.pdf")
-  ;; well I can directly write KiCAD file
-  (call-with-output-file "out.kicad_pcb"
-    #:exists 'replace
-    (λ (out)
-      (pretty-write (Composite->kicad-pcb whole init-place)
-                    out)))
-  (call-with-output-file "out.dsn"
-    #:exists 'replace
-    (λ (out)
-      (pretty-write (Composite->dsn whole init-place)
-                    out)))
-  ;; call command line tool to do routing
-  (current-directory)
-  ;; spreadboard is taking too much time to route, consider reduce the number
-  ;; of passes
-  (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 5")
-  (system "ls"))
+  (parameterize ([current-directory "/tmp/bhdl/"])
+    (circuit-export whole #:auto-place #f #:formats '(kicad pdf dsn))))
