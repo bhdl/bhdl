@@ -1,9 +1,13 @@
-#lang racket
+#lang s-exp "../splicing.rkt"
 
 (require (for-syntax syntax/parse)
          rackunit)
 
 (provide myvoid
+         show
+         warn
+         debug
+
          define-alias
          compose-pipe
          group-by-2
@@ -221,6 +225,12 @@ same rank
     #'(begin
         (display (~a 'v " = "))
         (println v))]))
+
+(define (warn . args)
+  (displayln (~a #:separator " " "WARNING: " args ..)))
+
+(define (debug . args)
+  (displayln (~a #:separator " " "DEBUG: " args ..)))
 
 
 (define (hash-ref-ref hash . keys)
