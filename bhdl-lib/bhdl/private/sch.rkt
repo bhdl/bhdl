@@ -351,9 +351,12 @@ res: already in this set."
   (let ([merged-lsts (let* ([lsts (map Net-pins nets)]
                             [merged (my-merge lsts)])
                        ;; filter 1. only Atoms 2. net size at least two
-                       (filter (λ (x) (> (length x) 1))
-                               (for/list ([l merged])
-                                 (filter (λ (pin) (Atom? (Pin-parent pin))) l))))]
+                       ;;
+                       ;; UPDATE I don't want to filter 1-size net, otherwise I
+                       ;; would lost reference to some components
+                       (for/list ([l merged])
+                         (filter (λ (pin) (Atom? (Pin-parent pin)))
+                                 l)))]
         [H (for*/hash ([net nets]
                        [pin (Net-pins net)])
              (values pin net))])
