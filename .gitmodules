@@ -1,0 +1,3 @@
+[submodule "bhdl-footprints"]
+	path = bhdl-footprints
+	url = https://github.com/lihebi/bhdl-footprints
