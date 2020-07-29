@@ -15,17 +15,8 @@
              racket/string))
 
 (define global
-  (make-Composite
+  (make-circuit
    #:external-pins (GND 3V3 5V USB5V)))
-
-(define (sw spacing)
-  (footprint->pict
-   (fp-switch-keyboard spacing 'pcb)))
-
-(module+ test
-  (fp-switch-keyboard 1 'pcb)
-  (sw 1)
-  (sw 1.5))
 
 (define (key-name-filter name)
   (if (string-prefix? name "k")
@@ -46,7 +37,7 @@
                [atom (begin (set-Atom-pict! atom pict-with-name)
                             atom)]
                ;; key with diode group
-               [key-with-diode (make-Composite #:external-pins (p1 p2)
+               [key-with-diode (make-circuit #:external-pins (p1 p2)
                                                #:vars ([d (Diode)])
                                                #:connect (*- atom d)
                                                #:layout (vc-append 3 atom d))])
@@ -132,7 +123,7 @@
 ;; 3. possibly mixing the two?
 
 (define matrix-module
-  (make-Composite
+  (make-circuit
    ;; FIXME these should be row[5] col[14], or get from matrix
    #:external-pins (row1 row2 row3 row4 row5
                          col1 col2 col3 col4 col5 col6 col7
@@ -166,14 +157,16 @@
 (define gd32 (GD32VF103CBT6))
 
 (define gd32-module
-  (make-Composite
+  (make-circuit
    ;; TODO signals to use in this circuit
    ;; #:signal ([GND 3V3])
    #:vars ([x2 (Crystal-2)]
            [x4 (Crystal-4)]
            [reg (ME6211C)]
            [usb (USB-C-16)]
-           [rgb (TJ-S1615CY)]
+           ;; [rgb (TJ-S1615CY)]
+           ;; I probably want to use 3 leds in a row?
+           [rgb (WS2812B)]
 
            [btn-boot (SKRPACE010)]
            [btn-reset (SKRPACE010)])
@@ -230,12 +223,16 @@
               ;; (*- gd32.VBAT (R 'NC) global.3V3)
 
               ;; LED TODO placement
-              (*- global.3V3 (R '2k) (LED 'red) global.GND)
-              (*- global.3V3 rgb.VIN)
+              ;; (*- global.3V3 (R '2k) (LED 'red) global.GND)
+              ;; (*- global.3V3 rgb.VIN)
               ;; FIXME the GPIO to use
-              (*- rgb.R (R '4k7) gd32.PC13)
-              (*- rgb.G (R '4k7) gd32.PA1)
-              (*- rgb.B (R '4k7) gd32.PA2)
+              ;; (*- rgb.R (R '4k7) gd32.PC13)
+              ;; (*- rgb.G (R '4k7) gd32.PA1)
+              ;; (*- rgb.B (R '4k7) gd32.PA2)
+              ;;
+              ;; UPDATE using the ws2812
+              (*- rgb.VDD global.5V (C '100nf) rgb.VSS global.GND)
+              (*- rgb.DI gd32.PC13)
 
               ;; buttons
               ;;
@@ -250,7 +247,7 @@
 (define esp32 (ESP32-WROVER-E))
 
 (define esp32-module
-  (make-Composite
+  (make-circuit
    #:vars ([usb (USB-C-16)]
            [cp2102n (CP2102N)]
            ;; FIXME BJT and pin name and order
@@ -331,88 +328,32 @@
               )))
 
 ;; TODO the rest of circuit
-(define-Composite whole
-  ;; CAUTION just to declare the pict
-  #:layout (pict:inset (Composite-pict matrix-module) 100)
-  #:connect (list matrix-module esp32-module gd32-module
-                  ;; connect matrix module with gd32 module
-                  (*= (matrix-module [row1 row2 row3 row4 row5])
-                      (gd32 [PA0 PA1 PA2 PA3 PA4]))
-                  (*= (matrix-module [col1 col2 col3 col4 col5 col6 col7
-                                           col8 col9 col10 col11 col12 col13 col14])
-                      (gd32 [PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7 PB8 PB9 PB10 PB11
-                                 PA5 PA6]))
-                  ;; connect esp32 and gd32 via SPI
-                  (*= (gd32 [SPI1_CS SPI1_SCLK SPI1_MISO SPI1_MOSI])
-                      (esp32 [VSPICS0 VSPICLK VSPIMISO VSPIMOSI]))))
+(define fitboard
+  (make-circuit
+   ;; CAUTION just to declare the pict
+   #:layout (inset matrix-module 100)
+   #:connect (list matrix-module esp32-module gd32-module
+                   ;; connect matrix module with gd32 module
+                   (*= (matrix-module [row1 row2 row3 row4 row5])
+                       (gd32 [PA0 PA1 PA2 PA3 PA4]))
+                   (*= (matrix-module [col1 col2 col3 col4 col5 col6 col7
+                                            col8 col9 col10 col11 col12 col13 col14])
+                       (gd32 [PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7 PB8 PB9 PB10 PB11
+                                  PA5 PA6]))
+                   ;; connect esp32 and gd32 via SPI
+                   (*= (gd32 [SPI1_CS SPI1_SCLK SPI1_MISO SPI1_MOSI])
+                       (esp32 [VSPICS0 VSPICLK VSPIMISO VSPIMOSI])))))
 
 
 ;; visualizing init placement
 (module+ test
   (make-directory* "/tmp/bhdl/")
-  (current-directory "/tmp/bhdl/")
+  (parameterize ([current-directory "/tmp/bhdl/"])
+    (circuit-export fitboard #:auto-place #f #:formats '(kicad pdf dsn)))
+  ;; (parameterize ([current-directory "/tmp/bhdl/"])
+  ;;   (circuit-export fitboard #:auto-place #t #:formats '(kicad pdf dsn ses)))
+  (void))
 
-  (Composite-pict matrix-module)
-  (Composite-nets matrix-module)
-
-  (nplaced-atoms whole)
-  (nfree-atoms whole)
-
-  (Composite-pict whole)
-  ;; TODO NOW rotation of fixed-location components
-  (define init-place (Composite->place-spec whole))
-  (length (collect-all-atoms whole))
-
-  (save-file (Composite->pict whole init-place) "out.pdf")
-  ;; well I can directly write KiCAD file
-  (call-with-output-file "out.kicad_pcb"
-    #:exists 'replace
-    (λ (out)
-      (pretty-write (Composite->kicad-pcb whole init-place)
-                    out)))
-  (call-with-output-file "out.dsn"
-    #:exists 'replace
-    (λ (out)
-      (pretty-write (Composite->dsn whole init-place)
-                    out)))
-  ;; call command line tool to do routing
-  (current-directory)
-  (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 10")
-  (system "ls"))
-
-;; placement
-(module+ test-placement
-  (define place-spec
-    (Composite->place-spec whole
-                           #:place-nsteps 50
-                           #:place-nbins 300
-                           ;; When cycle increases, the temperature cools down,
-                           ;; and the later cycles are not very useful to
-                           ;; remove conflicts. Thus, for this application, I
-                           ;; might consider using only the first few cycles,
-                           ;; and use a large number of steps (per cycle)
-                           #:sa-ncycles 10
-                           #:sa-nsteps 3000
-                           #:sa-stepsize 10
-                           #:sa-theta-stepsize 0.3))
-  ;; (save-for-placement place-spec "fitboard.json")
-
-  (define place-result (send-for-placement place-spec))
-
-  (save-file (Composite->pict whole place-result)
-             "out.pdf")
-
-  (call-with-output-file "out.kicad_pcb"
-    #:exists 'replace
-    (λ (out)
-      (pretty-write (Composite->kicad-pcb whole place-result)
-                    out)))
-  (call-with-output-file "out.dsn"
-    #:exists 'replace
-    (λ (out)
-      (pretty-write (Composite->dsn whole place-result)
-                    out)))
-  ;; call command line tool to do routing
-  (current-directory)
-  (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 5")
-  (system "ls"))
+(module+ debug
+  (define place-spec (Composite->place-spec fitboard))
+  (Composite->pict fitboard place-spec))

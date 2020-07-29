@@ -25,7 +25,9 @@
          (struct-out Macro)
 
          save-for-placement
-         send-for-placement)
+         send-for-placement
+
+         circuit-export)
 
 (struct Macro
   (w h
@@ -665,3 +667,49 @@ Es (Edge, i.e. netlist), diearea"
                                           (hash-ref Hatom=>index (Pin-parent pin))
                                           "-"
                                           (Pin-index pin)))))))))))
+
+(define (circuit-export
+         circuit
+         ;; CAUTION auto-place requires backend placement engine running
+         ;; and takes time
+         #:auto-place [auto-place #f]
+         ;; formats is a list of symbols from '(kicad pdf dsn ses)
+         ;;
+         ;; CAUTION ses requires freerouting.jar and takes time
+         #:formats [formats '(pdf kicad dsn)])
+  (let* ([place-spec (Composite->place-spec
+                      circuit
+                      #:place-nsteps 50
+                      #:place-nbins 300
+                      ;; When cycle increases, the temperature cools down,
+                      ;; and the later cycles are not very useful to
+                      ;; remove conflicts. Thus, for this application, I
+                      ;; might consider using only the first few cycles,
+                      ;; and use a large number of steps (per cycle)
+                      #:sa-ncycles 10
+                      #:sa-nsteps 3000
+                      #:sa-stepsize 10
+                      #:sa-theta-stepsize 0.3)]
+         [place-result (if auto-place
+                           (send-for-placement place-spec)
+                           place-spec)])
+    (when (member 'kicad formats)
+      (call-with-output-file "out.kicad_pcb"
+        #:exists 'replace
+        (λ (out)
+          (pretty-write
+           (Composite->kicad-pcb circuit place-result)
+           out))))
+    (when (member 'pdf formats)
+      (save-file
+       (Composite->pict circuit place-result)
+       "out.pdf"))
+    (when (member 'dsn formats)
+      (call-with-output-file "out.dsn"
+        #:exists 'replace
+        (λ (out)
+          (pretty-write
+           (Composite->dsn circuit place-result)
+           out))))
+    (when (member 'ses formats)
+      (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 10"))))

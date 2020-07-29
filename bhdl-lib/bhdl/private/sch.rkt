@@ -33,8 +33,7 @@
          combine-Composites
          combine-Composites-1
 
-         define-Composite
-         make-Composite
+         make-circuit
          self
 
          *-
@@ -113,17 +112,11 @@
              (hash-set! (Composite-pinhash res) i p)))
          res)]))
 
-(define-syntax (define-Composite stx)
-  (syntax-parse
-   stx
-   [(_ name rst ...)
-    #'(define name (make-Composite rst ...))]))
-
 (define-syntax-parameter self
   (lambda (stx)
-    (raise-syntax-error (syntax-e stx) "can only be used inside make-Composite")))
+    (raise-syntax-error (syntax-e stx) "can only be used inside make-circuit")))
 
-(define-syntax (make-Composite stx)
+(define-syntax (make-circuit stx)
   (syntax-parse stx
     [(_ (~alt
          (~optional (~seq #:external-pins (ext-pin ...))

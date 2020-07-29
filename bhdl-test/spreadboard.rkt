@@ -8,7 +8,7 @@
   (vc-append (pict:ghost (pict:rectangle 1 sep)) p))
 
 (define whole
-  (make-Composite
+  (make-circuit
    ;; FIXME inset a little bit
    #:vars ([jumper-mini-nano-SCL (connector 3)]  ;j3
            [jumper-mini-nano-SDA (connector 3)]  ;j4

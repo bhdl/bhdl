@@ -38,6 +38,7 @@
          ctl-superimpose
          cbl-superimpose
 
+         inset
          rotate
          ;; TODO pin-over
          default-append-spacing)
@@ -120,3 +121,6 @@
 
 (define (rotate p degree)
   (pict:rotate (maybe-atom->pict p) degree))
+
+(define (inset p . amts)
+  (pict:inset (maybe-atom->pict p) amts ..))

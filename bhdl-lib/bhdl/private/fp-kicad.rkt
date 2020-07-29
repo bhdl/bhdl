@@ -56,7 +56,8 @@
          fp-crystal
          fp-diode
          fp-smd-2520
-         fp-smd-2012-2p)
+         fp-smd-2012-2p
+         fp-WS2812B)
 
 (define (read-kicad-mod fname)
   "Read a kicad mod file, parse it, and return a footprint object."
@@ -548,3 +549,6 @@
 (define fp-smd-2012-2p
   (kicad-helper "Crystal.pretty"
                 "Crystal_SMD_2012-2Pin_2.0x1.2mm.kicad_mod"))
+
+(define fp-WS2812B
+  (kicad-helper "LED_SMD.pretty" "LED_WS2812B_PLCC4_5.0x5.0mm_P3.2mm.kicad_mod"))

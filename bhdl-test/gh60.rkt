@@ -116,11 +116,11 @@
                                     ;; of switches
                                     #:.*> (λ (name p)
                                             ;; assign locations
-                                            (picted-atom! (cherry) p)))]))
+                                            (cherry)))]))
 
 ;; Declare here so that I can access the pict and assign locations for them
-(define ic (picted-atom! (make-IC-atom ATmega32U4)))
-(define usb1 (picted-atom! (usb 'a-male)))
+(define ic (make-IC-atom ATmega32U4))
+(define usb1 (usb 'a-male))
 
 (define-Composite ic-module
   #:external-pins ()

@@ -54,6 +54,7 @@
          TJ-S1615CY
          SKRPACE010
          Switch
+         WS2812B
 
          (struct-out ICAtom))
 
@@ -524,6 +525,10 @@
 ;;   #:FP ((easyeda "LED-ARRAY-SMD_6P-L5.0-W5.0-TL-RD_2020-07-29_00-38-15.json")
 ;;         B- R- G- G+ R+ B+))
 
+(define/IC (WS2812B)
+  #:FP (fp-WS2812B
+        VDD DO VSS DI))
+
 
 ;; Manufacturer	ALPS Electric
 ;; Mfr.Part #	SKRPACE010
@@ -537,7 +542,7 @@
         B1 B2))
 
 (define (Switch)
-  (make-Composite
+  (make-circuit
    #:vars ([it (SKRPACE010)])
    #:external-pins (1 2)
    #:connect (list (*- self.1 it.A1)
