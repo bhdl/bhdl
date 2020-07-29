@@ -90,12 +90,17 @@
                     stx (map (lambda (x)
                                (string->symbol
                                 (string-append "IC:" (symbol->string x))))
-                             (syntax->datum #'(name ...))))])
+                             (syntax->datum #'(name ...))))]
+                  [IC-name-str
+                   (datum->syntax
+                    stx (apply string-append
+                               (map symbol->string
+                                    (syntax->datum #'(name ...)))))])
       #`(begin
           (define-alias
             (IC-name ...)
-            ;; (name ...)
-            (IC url
+            (IC IC-name-str
+                url
                 'alts
                 (list
                  ;; TODO FIXME check the number of footprint pads and the number of
@@ -106,7 +111,7 @@
           ;; TODO actually use the attrs
           (define (name . attrs)
             ;; FIXME this requires definition of make-IC-atom
-           (make-IC-atom IC-name))
+            (make-IC-atom IC-name))
           ...
           ))]))
 

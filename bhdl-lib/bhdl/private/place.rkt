@@ -4,6 +4,7 @@
          "common.rkt"
          "utils.rkt"
          "pict-utils.rkt"
+         "library-base.rkt"
          "library-io.rkt"
          ;; for padstack-id
          "fp-base.rkt"
@@ -400,7 +401,12 @@ Es (Edge, i.e. netlist), diearea"
       (clearance 50.8 (type smd_smd))))))
 
 (define (atom->ID atom Hatom=>index)
-  (~a "ATOM" (hash-ref Hatom=>index atom)))
+  ;; UPDATE using some meaningful name instead of "ATOM"
+  ;;
+  ;; FIXME assuming all atoms are ICAtom
+  (~a (IC-name (ICAtom-ic atom))
+      ;; "ATOM"
+      (hash-ref Hatom=>index atom)))
 
 (define (fix-atom-xy atom loc)
   ;; this is origin offset
