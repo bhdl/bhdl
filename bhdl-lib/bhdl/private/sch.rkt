@@ -106,7 +106,7 @@
          (for ([pname '(pin ...)]
                ;; FIXME the pins may contain numbers
                [i (in-naturals 1)])
-           (let ([p (Pin res 'pname)])
+           (let ([p (Pin res pname)])
              (hash-set! (Composite-pinhash res) pname p)
              ;; also assign numbers
              (hash-set! (Composite-pinhash res) i p)))
