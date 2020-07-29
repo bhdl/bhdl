@@ -1,16 +1,43 @@
 #+TITLE: Implementation Notes
 
-* MEGA TODO list
+* For Arxiv and first release, July
 ** TODO better library management
 ** TODO better surface language
+
 ** TODO fitboard
-**** STARTED stablizer and other mouting holes
-**** STARTED Kahl hot swappable socket
+
+- [X] the pict shape is roughly done
+- [X] wire things up
+- [X] write a version to place diode at fixed location
+- [-] pick the MCU and firmware
+  - [X] bluetooth and RF?
+  - [ ] battery and (fast) charging circuit?
+- [X] connect everything
+- [-] connect LEDs?
+- [-] case CAD co-design?
+*** STARTED stablizer and other mouting holes
+*** STARTED Kahl hot swappable socket
 which might have to go back side of the PCB, and must align with the switch
 socket
-**** STARTED the auto-placer seems to be buggy
-**** STARTED double-check footprint for manufacturing
+
+Mechanical Keyboard Switches Kailh PCB Socket
+- [[https://www.kailhswitch.com/mechanical-keyboard-switches/box-switches/mechanical-keyboard-switches-kailh-pcb-socket.html][offical product link]]
+- [[https://www.kailhswitch.com/uploads/201815927/PG151101S11.pdf][datasheet]]
+- CPG151101S11
+
+*** STARTED double-check footprint for manufacturing
+
+*** CANCELED pin headers for GD32 and ESP32 for debugging
+CLOSED: [2020-07-30 Thu 01:18]
+*** CANCELED other pins for debugging?
+CLOSED: [2020-07-30 Thu 01:18]
+
 ** TODO paper writing
+
+*** syntax
+*** semantics
+*** system
+*** evaluation and case study
 
 * Better surface
 ** TODO layout language
@@ -39,14 +66,16 @@ KiCAD or EasyEDA.
 I should not distinct between ICs and regular components like resistors. The
 definition of a component should declare what are the available footprints.
 
-** STARTED Allow assigning of footprints during component creation
-
-- support multiple footprints
-- support assiging footprint
+** STARTED library-IC support value
 - support values for different component.
   - The regular components may have values, e.g. resistance and tolerance
   - connectors are even more tricky: the footprints are different with different
     pin counts
+
+** STARTED Allow assigning of footprints during component creation
+
+- [X] support multiple footprints
+- support assiging footprint
 
 ** DONE unify Composite and Atom into Circuit
 CLOSED: [2020-07-29 Wed 23:44]
@@ -104,73 +133,6 @@ NRST                    ; external reset
 - cite:esp32-tech-ref
 - cite:esp32-datasheet
 
-* For Arxiv and first release, July
-
-** STARTED Make it happends
-*** TODO Make the HBkb
-
-- [X] the pict shape is roughly done
-- [X] wire things up
-- [X] write a version to place diode at fixed location
-- [-] pick the MCU and firmware
-  - [X] bluetooth and RF?
-  - [ ] battery and (fast) charging circuit?
-- [X] connect everything
-- [-] connect LEDs?
-- [-] case CAD co-design?
-**** STARTED stablizer and other mouting holes
-**** STARTED Kahl hot swappable socket
-which might have to go back side of the PCB, and must align with the switch
-socket
-**** STARTED double-check footprint for manufacturing
-
-**** CANCELED pin headers for GD32 and ESP32 for debugging
-CLOSED: [2020-07-30 Thu 01:18]
-**** CANCELED other pins for debugging?
-CLOSED: [2020-07-30 Thu 01:18]
-
-
-*** Mechanical Keyboard Switches Kailh PCB Socket
-- [[https://www.kailhswitch.com/mechanical-keyboard-switches/box-switches/mechanical-keyboard-switches-kailh-pcb-socket.html][offical product link]]
-- [[https://www.kailhswitch.com/uploads/201815927/PG151101S11.pdf][datasheet]]
-
-CPG151101S11
-
-*** DONE Make spreadboard
-CLOSED: [2020-07-30 Thu 01:20]
-**** DONE library
-CLOSED: [2020-07-12 Sun 14:46]
-
-load and adapt all the libraries:
-- Uno R3
-- Nano
-- Pro mini
-- sparkfun pro micro
-- MKR
-
-I'll define the Arduinos as IC.
-
-Headers:
-- jump headers: 2x3 or two 1x3 group
-- external headers: 1x6 1x8 1x10
-
-**** DONE connections
-CLOSED: [2020-07-30 Thu 01:20]
-**** DONE layout
-CLOSED: [2020-07-30 Thu 01:20]
-
-*** CANCELED Make a K210 development board
-CLOSED: [2020-07-30 Thu 01:20]
-
-** DONE vectorized connections
-CLOSED: [2020-07-30 Thu 01:20]
-
-** TODO paper writing
-
-*** syntax
-*** semantics
-*** system
-*** evaluation and case study
 
 * Not-so-urgent issues
 ** detailed placement minor issues
@@ -178,45 +140,7 @@ Some conflicts are not counted in the placement engine.
 
 ** place on back side
 ** native library management (instead of adapting KiCAD libraries)
-
-* TMP
-** jackfirth's repos
-https://github.com/jackfirth/
-
-*** TODO consider using Transducers
-(https://docs.racket-lang.org/rebellion/Transducers.html)
-
-*** TODO so it Enum_Types and all other types
-https://docs.racket-lang.org/rebellion/Enum_Types.html
-
-*** TODO and lens!!!! https://docs.racket-lang.org/lens/index.html
-
-*** TODO the Multidicts library also seems interesting
-https://docs.racket-lang.org/rebellion/Multidicts.html
-
-*** TODO Record_Types is also interesting, it forces the instantiation to supply
-keywords https://docs.racket-lang.org/rebellion/Record_Types.html
-
-
-* TODO-list Summer
-
-** STARTED [#A] better schematic and footprint libraries
-SCHEDULED: <2020-06-30 Tue>
-
-** TODO [#A] write some boards
-SCHEDULED: <2020-06-30 Tue>
-
-- [X] arduino uno
-- [ ] lichee nano
-- [X] gh60: https://github.com/komar007/gh60
-- [ ] pyboard
-- [ ] linux business card
-- [ ] spreadboard
-- [ ] a K210 board
-
-*** other
-- [ ] ergonomic (hebi) keyboard
-
+** TODO Visual programming
 ** STARTED [#A] software library
 - vectorized connections
 - frequently used components
@@ -224,10 +148,25 @@ SCHEDULED: <2020-06-30 Tue>
   - ICSP header
   - USB connector
 
-** TODO remove verbose syntax
 
-* TODO-list Visual programming
-** TODO Visual programming
+* TODO-list Summer
+
+** DONE [#A] better schematic and footprint libraries
+CLOSED: [2020-07-30 Thu 01:41] SCHEDULED: <2020-06-30 Tue>
+
+** [#A] write some boards
+SCHEDULED: <2020-06-30 Tue>
+
+- [X] arduino uno
+- [ ] lichee nano
+- [X] gh60: https://github.com/komar007/gh60
+- [ ] pyboard
+- [ ] linux business card
+- [X] spreadboard
+- [ ] a K210 board
+
+*** other
+- [X] ergonomic (hebi) keyboard
 
 * Reference
 ** JITX HN discussion
@@ -265,11 +204,6 @@ looks like this[1], so gerbers are all I need to be happy.
 * TODO-list
 
 ** TODO save plot during placement
-
-** STARTED assign footprints
-and probably mix the two syntaxes?
-
-** TODO vectorized connections
 
 ** research problems
 
@@ -619,3 +553,34 @@ CLOSED: [2020-07-11 Sat 19:09]
 **** deterministic
 **** TODO incremental
 *** TODO double side placement (just specify the side)
+
+** Make it happends
+
+*** DONE Make spreadboard
+CLOSED: [2020-07-30 Thu 01:20]
+**** DONE library
+CLOSED: [2020-07-12 Sun 14:46]
+
+load and adapt all the libraries:
+- Uno R3
+- Nano
+- Pro mini
+- sparkfun pro micro
+- MKR
+
+I'll define the Arduinos as IC.
+
+Headers:
+- jump headers: 2x3 or two 1x3 group
+- external headers: 1x6 1x8 1x10
+
+**** DONE connections
+CLOSED: [2020-07-30 Thu 01:20]
+**** DONE layout
+CLOSED: [2020-07-30 Thu 01:20]
+
+*** CANCELED Make a K210 development board
+CLOSED: [2020-07-30 Thu 01:20]
+
+** DONE vectorized connections
+CLOSED: [2020-07-30 Thu 01:20]
