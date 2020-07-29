@@ -1,6 +1,6 @@
 #lang racket
 
-(require "fp.rkt"
+(require "fp-base.rkt"
          "fp-kicad.rkt"
          "fp-easyeda.rkt"
          "gerber.rkt"
@@ -9,7 +9,7 @@
          "common.rkt"
          ;; FIXME dependency
          "sch.rkt"
-         "library.rkt"
+         "library-base.rkt"
          pict)
 
 (provide IC->fp-pict

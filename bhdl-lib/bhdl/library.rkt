@@ -1,37 +1,21 @@
 #lang racket
 
-(require (for-syntax syntax/parse)
-         "utils.rkt"
-         "sch.rkt"
-         racket/contract
-         pict)
+(require "private/library-base.rkt"
+         "private/library-IC.rkt"
+         "private/library-io.rkt"
+         ;; FIXME I'm enclosing fp and gerber into library.rkt umbrella
+         "private/fp-base.rkt"
+         "private/fp-easyeda.rkt"
+         "private/fp-kicad.rkt"
+         ;; FIXME probably not provide these
+         "private/gerber.rkt"
+         "private/gerber-viewer.rkt")
 
-(provide (struct-out IC)
-         (struct-out FpSpec)
-         (struct-out ICAtom))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; IC definition, for symbol and footprint
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(struct FpSpec
-  (fp pins)
-  #:prefab)
-
-;; everything should be centered around the IC data structure
-;;
-;; 1. alts
-;;
-;; 2. orients: this determines the pin place of the symbol
-;;
-;; 3. fps: this determines the exact footprint of different packaging
-(struct IC
-  ;; this tells nothing about the fields. I really need type
-  (datasheet alts fps)
-  #:prefab)
-
-
-(struct ICAtom
-  (ic)
-  #:super struct:Atom)
-
+(provide (all-from-out "private/library-base.rkt")
+         (all-from-out "private/library-IC.rkt")
+         (all-from-out "private/library-io.rkt")
+         (all-from-out "private/fp-base.rkt")
+         (all-from-out "private/fp-easyeda.rkt")
+         (all-from-out "private/fp-kicad.rkt")
+         (all-from-out "private/gerber.rkt")
+         (all-from-out "private/gerber-viewer.rkt"))

@@ -1,7 +1,7 @@
 #lang racket
 
 (require (for-syntax syntax/parse)
-         "library.rkt"
+         "library-base.rkt"
          "fp-kicad.rkt"
          "fp-easyeda.rkt"
          "sch.rkt"

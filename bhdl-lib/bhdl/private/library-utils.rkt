@@ -3,7 +3,7 @@
 (require (for-syntax syntax/parse)
          "utils.rkt"
          "sch.rkt"
-         "library.rkt"
+         "library-base.rkt"
          "library-io.rkt"
          racket/contract
          pict)

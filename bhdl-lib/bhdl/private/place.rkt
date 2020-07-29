@@ -2,12 +2,11 @@
 
 (require "sch.rkt"
          "common.rkt"
-         "library-io.rkt"
          "utils.rkt"
          "pict-utils.rkt"
          "library-io.rkt"
          ;; for padstack-id
-         "fp.rkt"
+         "fp-base.rkt"
          ;; https://docs.racket-lang.org/json/index.html
          json
          graph
@@ -45,7 +44,7 @@
 
 (module+ test
   (require "library-IC.rkt")
-  (require "library.rkt")
+  (require "library-base.rkt")
   (atom->fp-pict+Hlocs (ATmega8U2))
   (atom->macro (ATmega8U2))
   (atom->macro (ATtiny25)))

@@ -1,28 +1,15 @@
 #lang racket
 
-(require "sch.rkt"
+(require "private/sch.rkt"
          "library.rkt"
-         "library-IC.rkt"
-         "utils.rkt"
-         "pict-utils.rkt"
-         "common.rkt"
+         "private/place.rkt"
+         "private/atom-pict-wrapper.rkt"
+         "private/utils.rkt"
+         "private/pict-utils.rkt")
 
-         "place.rkt"
-
-         "fp-kicad.rkt"
-         "fp-easyeda.rkt"
-         "library-io.rkt"
-
-         "atom-pict-wrapper.rkt")
-
-(provide (all-from-out "sch.rkt")
-         (all-from-out "utils.rkt")
-         (all-from-out "pict-utils.rkt")
-         (all-from-out "fp-kicad.rkt")
-         (all-from-out "fp-easyeda.rkt")
+(provide (all-from-out "private/sch.rkt")
          (all-from-out "library.rkt")
-         (all-from-out "library-IC.rkt")
-         (all-from-out "library-io.rkt")
-         (all-from-out "place.rkt")
-         (all-from-out "atom-pict-wrapper.rkt"))
-
+         (all-from-out "private/place.rkt")
+         (all-from-out "private/atom-pict-wrapper.rkt")
+         (all-from-out "private/utils.rkt")
+         (all-from-out "private/pict-utils.rkt"))
