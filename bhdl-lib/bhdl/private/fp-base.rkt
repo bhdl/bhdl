@@ -9,7 +9,9 @@
 
 (provide (struct-out footprint)
          (struct-out line-spec)
-         (struct-out pad-spec))
+         (struct-out pad-spec)
+
+         bhdl-footprints-path)
 
 (struct footprint
   ;; line will have start (x,y), end (x,y), width
@@ -31,3 +33,6 @@
    dsize)
   #:prefab)
 
+
+(define bhdl-footprints-path
+  (make-parameter (expand-user-path "~/git/bhdl/bhdl-footprints")))

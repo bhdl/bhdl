@@ -461,16 +461,16 @@
 ;; Mfr.Part #	TYPE-C 6P
 ;; LCSC Part #	C456012
 ;; Package	SMD
-;; (define/IC (USB-C-6)
-;;   ;; 6pin usb type c
-;;   #:ALTS ([A5 CC1]
-;;           [B5 CC2]
-;;           [A9 VBUS]
-;;           [B9 VBUS]
-;;           [A12 GND]
-;;           [B12 GND])
-;;   #:FP (fp-usb-c-6
-;;         B12 B9 A5 B5 A9 A12))
+(define/IC (USB-C-6)
+  ;; 6pin usb type c
+  #:ALTS ([A5 CC1]
+          [B5 CC2]
+          [A9 VBUS]
+          [B9 VBUS]
+          [A12 GND]
+          [B12 GND])
+  #:FP ((lcsc->fp "C456012")
+        B12 B9 A5 B5 A9 A12))
 
 
 ;; Manufacturer	SHOU HAN
@@ -491,13 +491,11 @@
           [B6 D+2]
           [B7 D-2]
           [B8 SBU2])
-  #:FP (fp-usb-c-16
+  #:FP ((lcsc->fp "C393939")
         A1 A4 A12 A9 B5 B8 B6 A7 A6 B7 A5 A8
         ;; FIXME what are these pads
         ;; FIXME this will conflict with numbers
         P4 P3 P2 P1))
-
-
 
 ;; TODO This is 6 pin
 ;;
