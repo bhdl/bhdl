@@ -5,7 +5,10 @@
 
 (provide myvoid
          define-alias
-         compose-pipe)
+         compose-pipe
+         group-by-2
+         group-by-index
+         hash-ref-ref)
 
 (define-syntax-rule (myvoid stx ...)
   (void))
@@ -219,3 +222,24 @@ same rank
         (display (~a 'v " = "))
         (println v))]))
 
+
+(define (hash-ref-ref hash . keys)
+  (for/fold ([acc hash])
+      ([key keys])
+    (hash-ref acc key)))
+
+(define (group-by-index key lst)
+  "Group lst by key(index)."
+  (map (lambda (x) (map car x))
+       (group-by (lambda (p)
+                   (key (cdr p)))
+                 (for/list ([x lst]
+                            [i (in-naturals)])
+                   (cons x i)))))
+
+(define (group-by-2 lst)
+  "group every 2 items"
+  (group-by-index (lambda (idx) (floor (/ idx 2))) lst))
+
+(module+ test
+  (group-by-2 '(1 2 3 4 5 6)))

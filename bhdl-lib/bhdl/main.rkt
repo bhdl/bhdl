@@ -10,6 +10,7 @@
          "place.rkt"
 
          "fp-kicad.rkt"
+         "fp-easyeda.rkt"
          "library-io.rkt"
 
          "atom-pict-wrapper.rkt")
@@ -18,6 +19,7 @@
          (all-from-out "utils.rkt")
          (all-from-out "pict-utils.rkt")
          (all-from-out "fp-kicad.rkt")
+         (all-from-out "fp-easyeda.rkt")
          (all-from-out "library.rkt")
          (all-from-out "library-IC.rkt")
          (all-from-out "library-io.rkt")

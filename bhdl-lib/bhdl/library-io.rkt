@@ -2,6 +2,7 @@
 
 (require "fp.rkt"
          "fp-kicad.rkt"
+         "fp-easyeda.rkt"
          "gerber.rkt"
          "gerber-viewer.rkt"
          "pict-utils.rkt"

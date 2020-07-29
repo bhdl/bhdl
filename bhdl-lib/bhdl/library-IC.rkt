@@ -3,6 +3,7 @@
 (require (for-syntax syntax/parse)
          "library.rkt"
          "fp-kicad.rkt"
+         "fp-easyeda.rkt"
          "sch.rkt"
          "utils.rkt"
          "library-utils.rkt"
@@ -515,10 +516,13 @@
 ;; Mfr.Part #	TJ-S5050UG2W5TLCBRG-A5
 ;; LCSC Part #	C440459
 ;; Package	SMD,5x5mm
-(define/IC (LED-5050)
-  ;; FIXME using easyeda filename or URL
-  #:FP ((easyeda "LED-ARRAY-SMD_6P-L5.0-W5.0-TL-RD_2020-07-29_00-38-15.json")
-        B- R- G- G+ R+ B+))
+;;
+;; TODO
+;;
+;; (define/IC (LED-5050)
+;;   ;; FIXME using easyeda filename or URL
+;;   #:FP ((easyeda "LED-ARRAY-SMD_6P-L5.0-W5.0-TL-RD_2020-07-29_00-38-15.json")
+;;         B- R- G- G+ R+ B+))
 
 
 ;; Manufacturer	ALPS Electric
