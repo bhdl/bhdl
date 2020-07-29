@@ -94,6 +94,9 @@
   "compose-pipe is a syntax sugar for writing piping style code. It solves 2
 problems.
 
+TODO consider using Transducers
+(https://docs.racket-lang.org/rebellion/Transducers.html)
+
 1. In lisp, when you write maps or apply functions, the sequence of functions
 are written from inside out. This is counter-intuitive.
 

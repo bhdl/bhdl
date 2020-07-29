@@ -1,8 +1,6 @@
 #lang racket
 
-(require "library-IC.rkt"
-         "library-base.rkt"
-         "fp.rkt"
+(require "fp.rkt"
          "fp-kicad.rkt"
          "gerber.rkt"
          "gerber-viewer.rkt"
@@ -10,6 +8,7 @@
          "common.rkt"
          ;; FIXME dependency
          "sch.rkt"
+         "library.rkt"
          pict)
 
 (provide IC->fp-pict
@@ -55,18 +54,6 @@
 ;; IC -> footprint
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(module+ test-coordinates
-  ;; test whether the coordinates system, i.e. centered.
-  ;;
-  ;; 1. the locations of pads should be the center of the pads
-  ;;    - however, the pict library is by corner
-  ;;
-  ;; 2. In julia placement engine, the Luxor.jl library uses center to draw
-  ;; boxes
-  ;;
-  ;; create an IC
-  (IC->fp-pict+Hlocs ATmega16 'DIP))
-
 (define (IC->fpspec ic)
   ;; FIXME using the first available FP. TODO support selection of FP
   (first (IC-fps ic)))
@@ -91,10 +78,6 @@
                      (values pin (hash-ref Hlocs i)))])
         (values p Hlocs)))))
 
-
-(module+ test
-  (footprint->pict+Hlocs (fp-QFN 32))
-  (footprint->pict+Hlocs (FpSpec-fp (IC->fpspec Arduino-Uno))))
 
 (define (IC->fp-pict ic
                      ;; FIXME duplication
@@ -188,26 +171,7 @@
       (footprint->pict+Hlocs (atom->fp atom))))
 
 (define (atom->fp atom)
-  (match atom
-    ;; FIXME fixed footprint packaging
-    [(Resistor _) (fp-resistor "0603")]
-    [(Capacitor _) (fp-capacitor "0603")]
-    [(Diode) fp-diode]
-    [(LED _) fp-diode]
-    ;; TODO different size switches
-    [(CherrySwitch spacing) (fp-switch-keyboard spacing 'pcb)]
-    [(USB type) (fp-usb type)]
-    ;; FIXME pin header? Double column?
-    [(Connector num) (fp-pin-header num)]
-    ;; FIXME only IC needs to sort locs based. Other simple ones should have the
-    ;; correct and consistent order
-    [(ICAtom ic) (println "WARNING: DEBUG")
-                 (FpSpec-fp (IC->fpspec ic))]
-    [(Atom _ _) (fp-pin-header
-                 (length
-                  (remove-duplicates
-                   (hash-values (Atom-pinhash atom)))))]
-    [else (error "Unsupported atom for atom->fp")]))
+  (FpSpec-fp (IC->fpspec (ICAtom-ic atom))))
 
 (define (atom->fp-sexp atom x y a ID Hpin=>net Hnet=>index)
   "Generate FP raw kicad sexp."

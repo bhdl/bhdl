@@ -1,13 +1,14 @@
 #lang racket
 
 (require (for-syntax syntax/parse)
+         "library.rkt"
+         "fp-kicad.rkt"
+         "sch.rkt"
          "utils.rkt"
-         "library-base.rkt"
-         "fp-kicad.rkt")
+         "library-utils.rkt"
+         pict)
 
-(provide define/IC
-
-         ATtiny25 ATtiny45 ATtiny85
+(provide ATtiny25 ATtiny45 ATtiny85
          ATmega128
          ATmega16
          ATmega48 ATmega88 ATmega168 ATmega328
@@ -17,6 +18,21 @@
 
          ATmega8
 
+         Resistor R
+         Capacitor C
+         Fuse
+         Cherry
+         LED
+         Diode
+         FerriteBead
+         PinHeader
+         Crystal-2
+         Crystal-4
+
+         CP2102N
+         Transistor
+         AMS1117-3.3
+
          GD32VF103CBT6
          ESP32-WROVER-E
 
@@ -25,7 +41,21 @@
          Arduino-Nano
          Arduino-Mini
          Arduino-Micro
-         Arduino-MKR)
+         Arduino-MKR
+
+         ;; FIXME correct hierarchical library, or meaningful names
+         SS8050-G
+         ME6211C
+
+         ;; USB-Type-C
+         USB-C-16
+
+         TJ-S1615CY
+         SKRPACE010
+         Switch
+
+         (struct-out ICAtom))
+
 
 (begin-for-syntax
   (define-syntax-class symbol-spec
@@ -42,6 +72,7 @@
              #:with fp #'(fp-LQFP num))
     (pattern (~seq #:FP (fp pin ...)))))
 
+
 (define-syntax (define/IC stx)
   (syntax-parse
    stx
@@ -50,15 +81,90 @@
              (~optional (~seq #:ALTS alts) #:defaults ([alts #'()]))
              (~seq #:DUMMY dummy)
              footprint:footprint-spec) ...)
-    #`(define-alias (name ...)
-        (IC url
-            'alts
-            (list
-             ;; TODO FIXME check the number of footprint pads and the number of
-             ;; pins match
-             (FpSpec footprint.fp '(footprint.pin ...))
-             ...)))]))
+    ;; construct IC:name
+    ;; define name as function for creating the component
+    (with-syntax ([(IC-name ...)
+                   (datum->syntax
+                    stx (map (lambda (x)
+                               (string->symbol
+                                (string-append "IC:" (symbol->string x))))
+                             (syntax->datum #'(name ...))))])
+      #`(begin
+          (define-alias
+            (IC-name ...)
+            ;; (name ...)
+            (IC url
+                'alts
+                (list
+                 ;; TODO FIXME check the number of footprint pads and the number of
+                 ;; pins match
+                 (FpSpec footprint.fp '(footprint.pin ...))
+                 ...)))
+          ;; TODO make attrs with keyword arguments and get them spliced
+          ;; TODO actually use the attrs
+          (define (name . attrs)
+            ;; FIXME this requires definition of make-IC-atom
+           (make-IC-atom IC-name))
+          ...
+          ))]))
 
+;; Maybe the name of the IC should act like (struct XXX) and use (struct-out
+;; XXX) to export. The usage would be (XXX value) to create an instance.
+;;
+;; I'm going to see how struct is implemented
+;;
+(define/IC (Resistor R)
+  #:FP ((fp-resistor "0603")
+        1 2))
+
+(define/IC (Capacitor C)
+  #:FP ((fp-capacitor "0603")
+        1 2))
+
+(define/IC (Fuse)
+  #:FP ((fp-fuse "1206")
+        1 2))
+
+(define/IC (Cherry)
+  ;; FIXME spacing as parameter
+  #:FP ((fp-switch-keyboard 1 'pcb)
+        1 2))
+
+(define/IC (LED)
+  #:FP (fp-diode
+        1 2))
+
+(define/IC (Diode)
+  #:FP (fp-diode
+        1 2))
+
+(define/IC (FerriteBead)
+  #:FP ((fp-resistor "0603")
+        1 2))
+
+
+;; Manufacturer	YL(Failong Crystal)
+;; Mfr.Part #	2S40000063
+;; LCSC Part #	C431154
+;; Package	SMD-2520
+(define/IC (Crystal-4)
+  #:FP (fp-smd-2520
+        XIN GND XOUT GND))
+
+;; Manufacturer	RIVER
+;; Mfr.Part #	TFX-03C-32.768KJ42521
+;; LCSC Part #	C515344
+;; Package	SMD-2012-2P
+;;
+;; TODO 32.768k
+(define/IC (Crystal-2)
+  #:FP (fp-smd-2012-2p
+        1 2))
+
+(define/IC (PinHeader)
+  ;; FIXME num of pins, and since the pin varies, we need some new design
+  #:FP ((fp-pin-header 2)
+        1 2))
 
 (define/IC (ATtiny25 ATtiny45 ATtiny85)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf"
@@ -225,7 +331,6 @@
             GND AVCC PD4 PD6 PD7 PB4 PB5 PB6 PC6 PC7 PE2
             VCC GND PF7 PF6 PF5 PF4 PF1 PF0 AREF GND AVCC))
 
-
 (define/IC (ATmega8)
   #:datasheet "https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2486-8-bit-AVR-microcontroller-ATmega8_L_datasheet.pdf"
   #:ALTS ([PD0 RXD]
@@ -280,7 +385,186 @@
              PB12 PB13 PB14 PB15 PA8 PA9 PA10 PA11 PA12 PA13 VSS2 VDD2
              PA14 PA15 PB3 PB4 PB5 PB6 PB7 BOOT0 PB8 PB9 VSS3 VDD3))
 
+(define/IC (AMS1117-3.3)
+  ;; SOT-223
+  ;; FIXME the 223 is not the pin count
+  #:FP (fp-SOT-223
+        GND VOUT VIN VOUT))
+
+(define/IC (CP2102N)
+  #:datasheet "https://www.silabs.com/documents/public/data-sheets/cp2102n-datasheet.pdf"
+  
+  ;; Manufacturer	SILICON LABS
+  ;; Mfr.Part #	CP2102N-A01-GQFN28R
+  ;; LCSC Part #	C428937
+  ;; Package	QFN-28
+  #:QFN (28 DCD RI GND D+ D- VDD VREGIN VBUS
+            ;; FIXME RSTb?
+            RSTb
+            ;; FIXME special handle for NC?
+            NC
+            SUSPENDb SUSPEND CHREN CHR1
+
+            CHR0 GPIO3 GPIO2 GPIO1 GPIO0 GPIO6 GPIO5 GPIO4
+            CTS RTS RXD TXD DSR DTR
+            ;; FIXME this is pin 29, the pad
+            ;; EP
+            ))
+
+(define/IC (SS8050-G)
+  ;; SOT-23 Plastic-Encapsulate Transistors
+
+  ;; Manufacturer	Changjiang Electronics Tech (CJ)
+  ;; Mfr.Part #	SS8050-G
+  ;; LCSC Part #	C164885
+  ;; Package	SOT-23(SOT-23-3)
+  #:FP (fp-SOT-23
+        ;; left bottom top
+        B E C))
+
+;; ME6211C33 ??
+;; ME6211C33M5G-N
+;; LCSC Part #	C82942 SOT-23-5
+(define/IC (ME6211C)
+  ;; SOT-23-5
+  #:FP (fp-SOT-23-5
+
+        VIN VSS CE NC VOUT))
+
+(define/IC (USB-Type-C)
+  ;; FIXME CAUTION the GND pins (A1 A12 might not be physically connected
+  #:ALTS ([A1 A12 B1 B12 GND]
+          [A4 A9 B9 B4 VBUS]
+          [A5 CC1]
+          [B5 CC2]
+          [A6 D+1]
+          [B6 D+2]
+          [A7 D-1]
+          [B7 D-2]
+
+          [A8 SBU1]
+          [B8 SBU2])
+  #:FP ((fp-usb 'c-female)
+
+        ;; FIXME 4 more pads?
+        A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 A12
+        B1 B2 B3 B4 B5 B6 B7 B8 B9 B10 B11 B12))
+
+;; Manufacturer	SHOU HAN
+;; Mfr.Part #	TYPE-C 6P
+;; LCSC Part #	C456012
+;; Package	SMD
+;; (define/IC (USB-C-6)
+;;   ;; 6pin usb type c
+;;   #:ALTS ([A5 CC1]
+;;           [B5 CC2]
+;;           [A9 VBUS]
+;;           [B9 VBUS]
+;;           [A12 GND]
+;;           [B12 GND])
+;;   #:FP (fp-usb-c-6
+;;         B12 B9 A5 B5 A9 A12))
+
+
+;; Manufacturer	SHOU HAN
+;; Mfr.Part #	TYPE-C16PIN
+;; LCSC Part #	C393939
+;; Package	SMD
+(define/IC (USB-C-16)
+  #:ALTS ([A1 B12 GND]
+          [A4 B9 VBUS]
+          [B1 A12 GND]
+          [B4 A9 VBUS]
+          [A5 CC1]
+          [A6 D+1]
+          [A7 D-1]
+          [A8 SBU1]
+
+          [B5 CC2]
+          [B6 D+2]
+          [B7 D-2]
+          [B8 SBU2])
+  #:FP (fp-usb-c-16
+        A1 A4 A12 A9 B5 B8 B6 A7 A6 B7 A5 A8
+        ;; FIXME what are these pads
+        ;; FIXME this will conflict with numbers
+        P4 P3 P2 P1))
+
+
+
+;; TODO This is 6 pin
+;;
+;; Manufacturer	TOGIALED
+;; Mfr.Part #	TJ-S1615SW6TCGLC6FRGB-A5
+;; LCSC Part #	C601685
+
+;; This is 4 pin, so use this
+;;
+;; Manufacturer	TOGIALED
+;; Mfr.Part #	TJ-S1615CY6TGLCCYRGB-A5
+;; LCSC Part #	C601683
+;; Package	SMD,1.6x1.5x0.6mm
+(define/IC (TJ-S1615CY)
+  #:FP (fp-dummy
+        ;; (fp-smd1615)
+
+        VIN B G R))
+
+;; There's no footprint available. Thus I'm using this:
+;;
+;; Mfr.Part #	TJ-S5050UG2W5TLCBRG-A5
+;; LCSC Part #	C440459
+;; Package	SMD,5x5mm
+(define/IC (LED-5050)
+  ;; FIXME using easyeda filename or URL
+  #:FP ((easyeda "LED-ARRAY-SMD_6P-L5.0-W5.0-TL-RD_2020-07-29_00-38-15.json")
+        B- R- G- G+ R+ B+))
+
+
+;; Manufacturer	ALPS Electric
+;; Mfr.Part #	SKRPACE010
+;; LCSC Part #	C139797
+
+(define/IC (SKRPACE010)
+  #:FP (fp-SKRPACE010
+        ;; 1 2
+        A1 A2
+        ;; 3 4
+        B1 B2))
+
+(define (Switch)
+  (make-Composite
+   #:vars ([it (SKRPACE010)])
+   #:external-pins (1 2)
+   #:connect (list (*- self.1 it.A1)
+                   (*- self.2 it.B1))))
+
+;; Manufacturer	Changjiang Electronics Tech (CJ)
+;; Mfr.Part #	DTC143ECA
+;; LCSC Part #	C13871
+;; Package	SOT-23(SOT-23-3)
+(define/IC (Transistor)
+  #:FP (fp-SOT-23
+        IN GND OUT))
+
 (define/IC (ESP32-WROVER-E)
+  ;; ESP32 has 4xSPI ..
+  ;; SPI* is SPI01
+  ;; HSPI* is SPI2
+  ;; VSPI* is SPI3
+  ;;
+  ;; In master mode:
+  ;; SPID = MOSI = data out
+  ;; SPIQ = MISO = data in
+  #:ALTS ([IO5 VSPICS0]
+          [IO18 VSPICLK]
+          [IO19 VSPIQ VSPIMISO]
+          [IO23 VSPID VSPIMOSI]
+
+          [IO14 HSPICLK]
+          [IO12 HSPIQ HSPIMISO]
+          [IO13 HSPID HSPIMOSI]
+          [IO15 HSPICS0])
   #:FP (fp-esp32-wrover-e
 
         GND 3V3 EN SENSOR-VP SENSOR-VN

@@ -17,6 +17,7 @@
           ;; constructors
           [fp-resistor ((or/c "0603" "0805" "THT") . -> . footprint?)]
           [fp-capacitor ((or/c "0603" "0805") . -> . footprint?)]
+          [fp-fuse ((or/c "1206") . -> . footprint?)]
           [fp-sw-spst (-> (or/c 1 2 3 4 6 8) footprint?)]
           [fp-pin-header (-> (or/c 1 2 3 4 5 6 7 8) footprint?)]
           [fp-usb (-> (or/c 'a-male 'a-female
@@ -41,13 +42,26 @@
           [fp-Arduino (-> (or/c 'Micro 'Mini 'Nano 'MKR 'Uno 'Uno-ICSP) footprint?)]
 
           ;; direct footprints
-          [fp-crystal footprint?]
-          [fp-diode footprint?]
-          [fp-sw-push footprint?]
-          [fp-jack-audio footprint?]
-          [fp-jack-barrel footprint?]
-          [fp-1602 footprint?]
-          [fp-esp32-wrover-e footprint?]))
+          [fp-dummy footprint?])
+
+         fp-usb-c-16
+
+         fp-sw-push
+         fp-jack-audio
+         fp-jack-barrel
+         fp-1602
+         fp-esp32-wrover-e
+
+         fp-SOT-23
+         fp-SOT-223
+         fp-SOT-23-5
+
+         fp-crystal
+         fp-diode
+         fp-smd-2520
+         fp-smd-2012-2p
+
+         fp-SKRPACE010)
 
 (define (hash-ref-ref hash . keys)
   (for/fold ([acc hash])
@@ -104,7 +118,10 @@
   (* 25.4 (/ (* x 10) 1000)))
 
 (define (parse-track str)
-  (match-let ([(list _ stroke layer net points ID _)
+  (match-let ([(list _ stroke layer net points ID
+                     ;; the last field seems to be optional, HACK using ID
+                     ;; ... to handle the optional value
+                     ...)
                (string-split str "~")])
     (let ([points (group-by-2 (string-split points))])
       (for/list ([a points]
@@ -137,6 +154,7 @@
 (module+ test
   (parse-track "TRACK~1~3~S$216~4035.4331 2925.5906 3964.5669 2925.5906~gge219~0")
   (parse-track "TRACK~1~3~S$222~3970 2950 4010 2950 4010 2970 4030 2970 4030 3045 3970 3045 3970 2950~gge221~0")
+  (parse-track "TRACK~1~3~S$39~3998 2996 4002 2996~gge38~")
   (parse-pad "PAD~RECT~3964.567~2955~3.5433~7.874~1~~1~0~3960.6299 2956.7717 3960.6299 2953.2283 3968.5039 2953.2283 3968.5039 2956.7717~90~gge5~0~~Y~0~~~3964.567,2955"))
 
 
@@ -146,6 +164,9 @@
   ;;
   ;; TODO remove hard-coded path
   (read-easycad (expand-user-path "~/git/bhdl/bhdl-lib/bhdl/easyeda/WIFIM-SMD_ESP32-WROVER_2020-07-23_13-18-22.json")))
+
+(define fp-SKRPACE010
+  (read-easycad (expand-user-path "~/git/bhdl/bhdl-lib/bhdl/easyeda/KEY-SMD_4P-L4.2-W3.2-P2.20-LS4.6_2020-07-28_23-08-45.json")))
 
 (module+ test
   (define fname "easyeda/WIFIM-SMD_ESP32-WROVER_2020-07-23_13-18-22.json")
@@ -261,6 +282,14 @@
     [("0805") fp-resistor-0805]
     [("THT") fp-resistor-THT]))
 
+(define fp-fuse-1206
+  (kicad-helper "Fuse.pretty" "Fuse_1206_3216Metric.kicad_mod"))
+
+(define (fp-fuse type)
+  (case type
+    [("1206") fp-fuse-1206]
+    [else (error "fp-fuse: " type)]))
+
 ;; FIXME This seems to be the same as resistor's. Then I'll define
 ;; only one.
 (define fp-capacitor-0603
@@ -319,6 +348,10 @@
                     (~r ct #:min-width 2 #:pad-string "0")
                     "_P2.54mm_Vertical.kicad_mod")))
 
+(define fp-usb-c-16
+  (read-easycad (expand-user-path "~/git/bhdl/bhdl-lib/bhdl/easyeda/USB-C-SMD_TYPE-C16PIN_2020-07-28_23-37-02.json")))
+
+;; CAUTION FIXME DEPRECATED
 (define (fp-usb type)
   (case type
     [(c-male) fp-usb-c-male]
@@ -337,6 +370,7 @@
 (define fp-usb-c-female
   (kicad-helper "Connector_USB.pretty/"
                 "USB_C_Receptacle_Palconn_UTC16-G.kicad_mod"))
+
 ;; FIXME usb3 different?
 (define fp-usb-a-male
   (kicad-helper "Connector_USB.pretty/"
@@ -366,6 +400,8 @@
   (kicad-helper "Display.pretty/"
                 "LCD-016N002L.kicad_mod"))
 
+;; CAUTION FIXME this is completely a dummy fp to ease development placeholders
+(define fp-dummy fp-1602)
 
 (define (fp-mounting-hole m)
   ;; MountingHole_2.2mm_M2.kicad_mod
@@ -586,6 +622,16 @@
                       (first data) "x" (second data)
                       "mm_P" (third data) "mm.kicad_mod"))))
 
+(define fp-SOT-23
+  (kicad-helper "Package_TO_SOT_SMD.pretty" "SOT-23.kicad_mod"))
+
+(define fp-SOT-223
+  (kicad-helper "Package_TO_SOT_SMD.pretty" "SOT-223.kicad_mod"))
+
+(define fp-SOT-23-5
+  (kicad-helper "Package_TO_SOT_SMD.pretty" "SOT-23-5.kicad_mod"))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Arduino lib
 ;; https://github.com/forrestbao/arduino-kicad-library
@@ -614,3 +660,10 @@
      (kicad-helper "Arduino.pretty/" "Arduino_Nano_Socket.kicad_mod")]
     [else (error "Unsupported Arduino form factor.")]))
 
+
+(define fp-smd-2520
+  (kicad-helper "Crystal.pretty"
+                "Crystal_SMD_2520-4Pin_2.5x2.0mm.kicad_mod"))
+(define fp-smd-2012-2p
+  (kicad-helper "Crystal.pretty"
+                "Crystal_SMD_2012-2Pin_2.0x1.2mm.kicad_mod"))

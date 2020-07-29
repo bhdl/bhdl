@@ -46,9 +46,9 @@
 (module+ test
   (require "library-IC.rkt")
   (require "library.rkt")
-  (atom->fp-pict+Hlocs (make-IC-atom ATmega8U2))
-  (atom->macro (make-IC-atom ATmega8U2))
-  (atom->macro (make-IC-atom ATtiny25)))
+  (atom->fp-pict+Hlocs (ATmega8U2))
+  (atom->macro (ATmega8U2))
+  (atom->macro (ATtiny25)))
 
 (define (annotate-atoms atoms)
   "Return hash table from (atom . 1-based-index)"
