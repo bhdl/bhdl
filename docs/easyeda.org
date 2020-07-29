@@ -1,0 +1,146 @@
+#+TITLE: EasyEDA format
+
+EasyEDA seems to have much more libraries than KiCAD. And the format is JSON,
+should be as easy to read.
+
+- The PCB format:
+  https://docs.easyeda.com/en/DocumentFormat/3-EasyEDA-PCB-File-Format/index.html
+- The foramt:
+  https://docs.easyeda.com/en/DocumentFormat/0-EasyEDA-File-Format-Index/index.html
+- another index page containing all of them:
+  https://docs.easyeda.com/en/DocumentFormat/EasyEDA-Document-Format/index.html
+
+The format is not that good. The position and share/size information is embedded
+in string.
+
+I need to figure out the following:
+- [ ] download the EasyEDA source file via link.
+  - It does not seem to be downloadable
+    - the component: https://easyeda.com/component/9b034bde0b6b4a3b83b29f5689149a9b
+    - the link in download: blob:https://easyeda.com/481312fe-8993-4190-a413-ca3b20d3695f
+    - I have to open the part in EasyEDA designer and export in source. This
+      cannot be automated easily
+    - one more thing, this part is created from a KiCAD library. It should be
+      the user is creating the part using a KiCAD library.
+- [ ] save a copy repo
+- [ ] license
+
+It looks like the unit of the numbers (x, y, width) is 10mil.
+
+1mil = 1/1000 inch = 25.4 /1000 mm
+
+** canvas
+#+begin_example
+"canvas": "CA~1000~1000~#000000~yes~#FFFFFF~1~1000~1000~line~1~mil~1~45~visible~0.1~400~300~0~yes"
+#+end_example
+
+
+- command: CA
+- view box width: 2400(24000 mil), View Box Width / Canvas width = scaleX = 2
+- view box height: 2400(24000 mil),View Box Height / Canvas Height = scaleY = 2
+- back ground: #000000
+- grid visible: yes/none
+- grid color: #FFFFFF
+- grid size: 10(100 mil)
+- canvas width: 1200 (12000 mil)
+- canvas height: 1200 (12000 mil)
+- grid style: line/dot
+- snap size: 1 (10 mil)
+- unit: mil(inch, mil, mm)
+- routing width: 1 (10mil)
+- routing angle: 45 degree( 45 90 free)
+- copper area: visible/invisible
+- ALT snap size: 0.5 ( 5 mil Snap Size when pressing the ALT Key)
+- origin x position
+- origin y position
+
+** color
+"#000000~#FFFFFF~#FFFFFF~#000000~#FFFFFF"
+Format:
+
+future use: #000000
+future use: #FFFFFF
+future use: #FFFFFF
+hole Color: #000000
+DRC error: #FFFFFF
+
+** DRC Rule
+#+begin_example
+"DRCRULE":{
+	"trackWidth":0.7,
+	"track2Track":0.7,
+	"pad2Pad":0.8,
+	"track2Pad":0.8,
+	"hole2Hole":1,
+	"holeSize":1.6
+}
+#+end_example
+
+- trackWidth: 0.7 (7 mil) track width
+- track2Track: 0.7 (7 mil) track to track distance
+- pad2Pad: 0.8(8 mil) pad to pad distance
+- track2Pad: 0.8(8 mil) track to pad distance
+- hole2Hole: 1(10 mil) hole to hole distance
+- holeSize: 1.6(16 mil) hole diameter
+
+This is a simple DRC, more later.
+
+** Shapes
+The shape is an array. EasyEDA store various shape in this field, they are different with a command which locate at the begin of the string.
+
+"shape":[
+    "TRACK~1~1~S$19~311 175 351 175 352 174~gge18",
+    "PAD~ELLIPSE~329~185~6~6~11~~1~1.8~~0~gge20",
+    "VIA~329~202~3.2~~0.8~gge23",
+    "COPPERAREA~2px~1~GND~349 247 492 261 457 314 339 329~1~solid~gge27~spoke~none~[]",
+    "SOLIDREGION~1~~350 146 483 146 447 228 371 220~solid~gge26"
+]
+
+*** TRACK
+"TRACK~1~1~S$8~311 175 351 175 352 174~gge18"
+Format:
+Check Polyline element of SVG out.
+
+- command: TRACK
+- stroke Width: 1 (10 mil)
+- layer id: 1 (TopLayer)
+- net: “S$8”
+- points: 311 175 351 175 352 174
+- id : gge18
+- locked: null
+
+*** PAD
+"PAD~OVAL~814~371~6~16~11~~1~1.8~814 366 814 376~0~gge5~11~814 374.7 814 367.3~N"
+Format:
+
+- command: PAD
+- shape: ELLIPSE/RECT/OVAL/POLYGON
+- center x: 814
+- center y: 371
+- width: 6 (60 mil)
+- height: 16 (160 mil)
+- layer id: 11 (All)
+- net: ‘’
+- [X] number: 1
+  - (HEBI: the numbering seems to be the pad number, and seems to be increasing)
+- hole radius: 1.8 (18 mil)
+- points: ‘’ (ELLIPSE = ‘’, RECT = outline points)
+- rotation: 0 [0 - 360]
+- id: gge19
+- Hole(Length): 11 (110mil)
+- Hole Points: 814 374.7 814 367.3 // slot hole from to point
+- Plated:Y/N
+- locked:null
+
+"PAD~RECT~425.984~280~11.811~9.842~2~~1~0~420.0785 275.079 431.8895 275.079 431.8895 284.921 420.0785 284.921~0~rep22~0~~Y~~~~425.984,280",
+
+*** HOLE
+"HOLE~284~255~4~gge5"
+Format:
+
+command: HOLE
+center x: 284
+center y: 255
+diameter: 4
+id: gge5
+locked:null
