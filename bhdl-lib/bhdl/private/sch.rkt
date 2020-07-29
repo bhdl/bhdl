@@ -159,9 +159,7 @@
 ;; two-node net
 ;; FIXME well, it is not necessarily two-node nets
 (struct Net
-  (pins weight))
-
-
+  (pins))
 
 ;; well, this is a generic method for either Atom or Composite TODO stable
 ;; interface
@@ -239,7 +237,7 @@
 (define (*+-proc lsts)
   (let ([res (create-simple-Composite)])
     (for ([lst lsts])
-      (hook-proc! res (Net lst 1)))
+      (hook-proc! res (Net lst)))
     res))
 
 (define (*--proc lst)
@@ -248,27 +246,15 @@
         [res (create-simple-Composite 1 2)])
     ;; connect res.2 with first.1
     (hook-proc! res (Net (list (pin-ref res 1)
-                               (pin-ref item-1 1))
-                         1))
+                               (pin-ref item-1 1))))
     (for/fold ([prev (first lst)])
-              ([cur (rest lst)])
-      ;; if cur is a list
-      (match cur
-        [(list weight node)
-         (hook-proc! res (Net (list (pin-ref prev 2)
-                                    (pin-ref node 1))
-                              weight))
-         node]
-        [node
-         (hook-proc! res (Net (list (pin-ref prev 2)
-                                    (pin-ref cur 1))
-                              1))
-         node])
-      )
+        ([cur (rest lst)])
+      (hook-proc! res (Net (list (pin-ref prev 2)
+                                 (pin-ref cur 1))))
+      cur)
     ;; end
     (hook-proc! res (Net (list (pin-ref item-n 2)
-                               (pin-ref res 2))
-                         1))
+                               (pin-ref res 2))))
     res))
 
 (define-syntax (*- stx)
@@ -292,8 +278,7 @@
                (Net (filter-not
                      void?
                      (for/list ([nodepins lst-of-nodepins])
-                       (list-ref nodepins i)))
-                    1))))
+                       (list-ref nodepins i)))))))
     res))
 
 (define (node-pins->nodepins node pins)
@@ -318,11 +303,9 @@
     (for ([item lst])
       (hook-proc! res
                   (Net (list (pin-ref res 1)
-                             (pin-ref item 1))
-                       1)
+                             (pin-ref item 1)))
                   (Net (list (pin-ref res 2)
-                             (pin-ref item 2))
-                       1)))
+                             (pin-ref item 2)))))
     res))
 
 (define-syntax (*< stx)
@@ -375,10 +358,7 @@ res: already in this set."
                        [pin (Net-pins net)])
              (values pin net))])
     (for/list ([pins merged-lsts])
-      (Net pins
-           ;; FIXME I'm simply using the first available weight. It is not
-           ;; necessary to filter the non-1 weights, I'm simply not allowing it.
-           (Net-weight (hash-ref H (first pins)))))))
+      (Net pins))))
 
 (define (collect-all-composites-helper todo done)
   "return all Composites this composite has reach to, except known-composites"
