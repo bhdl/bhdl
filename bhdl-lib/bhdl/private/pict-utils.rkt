@@ -150,7 +150,15 @@
   "Return find value, or #f if not found. FIXME performance"
   ;; FIXME make sure it is find-XX: not found problem
   (with-handlers ([exn:fail? (lambda (exn) #f)])
-    (find-fn base p)))
+    ;; FIXME this might return different number of values. Thus, I'm converting
+    ;; this to a list, so that we can test whether the return is #f or not,
+    ;; because most functions do not work with multiple values
+    (call-with-values (lambda () (find-fn base p))
+      (lambda lst
+        ;; if returned no value, this is empty list
+        ;; if returned a single value, this is a list of 1 item
+        ;; if returned multiple values, this is a list of those values
+        lst))))
 
 (module+ test
   ;; (require pict)

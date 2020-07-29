@@ -75,15 +75,15 @@ Es (Edge, i.e. netlist), diearea"
          [Hatom=>idx (annotate-atoms atoms)]
          [diepict (Composite-pict comp)]
          [locs (for/list ([atom atoms])
-                 (let-values
-                     ([(x y) (or (maybe-find cc-find diepict
-                                             (Atom-pict atom))
-                                 ;; initially place to middle, for better
-                                 ;; visualization
-                                 (values (/ (pict-width diepict) 2)
-                                         (/ (pict-height diepict) 2)))]
-                      [(a) (or (maybe-find angle-find diepict (Atom-pict atom))
-                               0)])
+                 (match-let
+                     ([(list x y) (or (maybe-find cc-find diepict
+                                                  (Atom-pict atom))
+                                      ;; initially place to middle, for better
+                                      ;; visualization
+                                      (list (/ (pict-width diepict) 2)
+                                            (/ (pict-height diepict) 2)))]
+                      [(list a) (or (maybe-find angle-find diepict (Atom-pict atom))
+                                    (list 0))])
                    (Point x y a)))])
     (let*-values ([(xs ys as) (for/lists (l1 l2 l3)
                                   ([loc locs])
