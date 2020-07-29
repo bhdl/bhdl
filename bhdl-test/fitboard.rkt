@@ -349,11 +349,21 @@
 (module+ test
   (make-directory* "/tmp/bhdl/")
   (parameterize ([current-directory "/tmp/bhdl/"])
+    ;; TODO NOW HEBI enable auto-place
     (circuit-export fitboard #:auto-place #f #:formats '(kicad pdf dsn)))
   ;; (parameterize ([current-directory "/tmp/bhdl/"])
   ;;   (circuit-export fitboard #:auto-place #t #:formats '(kicad pdf dsn ses)))
   (void))
 
 (module+ debug
+  (IC-name (ICAtom-ic (Diode)))
+  (map Atom-pict (collect-all-atoms fitboard))
   (define place-spec (Composite->place-spec fitboard))
-  (Composite->pict fitboard place-spec))
+  (Composite->pict fitboard place-spec)
+  ;; FIXME why the keys are not shown?
+  (nplaced-atoms matrix-module)
+  (nfree-atoms matrix-module)
+  (nplaced-atoms fitboard)
+  (nfree-atoms fitboard)
+  (collect-all-atoms matrix-module)
+  (Composite->pict matrix-module (Composite->place-spec matrix-module)))

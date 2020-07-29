@@ -120,6 +120,7 @@
   (syntax-parse stx
     [(_ (~alt
          (~optional (~seq #:external-pins (ext-pin ...))
+                    ;; FIXME probably default to 2 external pins?
                     #:defaults ([(ext-pin 1) null]))
          (~optional (~seq #:layout p-name))
          (~optional (~seq #:where where-clause)
@@ -141,8 +142,6 @@
 
 (define (combine-Composites lst)
   "This function effectively merge separated Composite into one."
-  ;; 1. add all connections
-  ;; 2. TODO external pins?
   (let ([res (create-simple-Composite)])
     (set-Composite-nets!
      res
@@ -370,6 +369,7 @@ res: already in this set."
             [todo (set-rest todo)])
         (let* ([new-comps (list->seteq
                            (filter Composite?
+                                   ;; get the nets, and find the parent of the pins
                                    (for*/list ([net (Composite-nets item)]
                                                [pin (Net-pins net)])
                                      (Pin-parent pin))))]

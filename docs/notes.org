@@ -1,25 +1,90 @@
 #+TITLE: Implementation Notes
 
-* For Arxiv and first release, July
+* MEGA TODO list
+** TODO better library management
+** TODO better surface language
+** TODO fitboard
+**** STARTED stablizer and other mouting holes
+**** STARTED Kahl hot swappable socket
+which might have to go back side of the PCB, and must align with the switch
+socket
+**** STARTED the auto-placer seems to be buggy
+**** STARTED double-check footprint for manufacturing
+** TODO paper writing
 
-** STARTED Make it happends
-*** TODO Make the HBkb
+* Better surface
+** TODO layout language
+** TODO layout use real units (e.g. mm)
+** DONE make-circuit to hide Atom and Composite
+CLOSED: [2020-07-30 Thu 01:17]
+** better visualization interface
+** simpler connect syntax
+I probably don't need =*+=
 
-- [X] the pict shape is roughly done
-- [X] wire things up
-- [X] write a version to place diode at fixed location
-- [-] pick the MCU and firmware
-  - [X] bluetooth and RF?
-  - [ ] battery and (fast) charging circuit?
-- [ ] stablizer and other mouting holes
-- [ ] Kahl hot swappable socket (which might have to go back side of the PCB,
-  and must align with the switch socket)
-- [-] connect everything
-- [ ] connect LEDs?
-- [ ] case CAD co-design?
-- [ ] double-check footprint for manufacturing
+- =*-=
+- ~*=~
+- =*<=
 
-*** cite:gd32vf103xxxx-datasheet
+** DONE better exporting wrapper
+CLOSED: [2020-07-30 Thu 01:17]
+
+* A better library management
+
+The user or other developers should be able to add more libraries easily. The
+library most consist of footprint drawing and pin orders for each footprint. I
+do not intend to offer ability to drawings, because that's quite tedius and
+requires exact precision. Instead, all footprint drawings are imported from
+KiCAD or EasyEDA.
+
+I should not distinct between ICs and regular components like resistors. The
+definition of a component should declare what are the available footprints.
+
+** STARTED Allow assigning of footprints during component creation
+
+- support multiple footprints
+- support assiging footprint
+- support values for different component.
+  - The regular components may have values, e.g. resistance and tolerance
+  - connectors are even more tricky: the footprints are different with different
+    pin counts
+
+** DONE unify Composite and Atom into Circuit
+CLOSED: [2020-07-29 Wed 23:44]
+
+** STARTED Use bhdl-footprints submodule repo
+and unify the different footprints into the hierarchy based on different repo
+
+** STARTED unify fp.rkt and library-IC.rkt
+
+** DONE use LCSC component ID to download easyEDA footprint on-demand
+CLOSED: [2020-07-30 Thu 01:32]
+Probably read the footprint for pin names and order
+
+A sample API:
+
+Where can I find the UUID =bfea62e0aaf64b3aba6360fe64400713=?
+
+LED-SMD_4P-L1.6-W1.5-BR
+https://easyeda.com/api/components/bfea62e0aaf64b3aba6360fe64400713
+
+LED-ARRAY-SMD_4P-L1.6-W1.5-BR
+https://easyeda.com/api/components/7d676f53ad0e474a89bb57a5656698b3
+
+https://easyeda.com/api/components/b6b9f937b1274110af7dee0a2e20c6a6
+
+https://easyeda.com/api/components/3e67c3e3b97b4ff38f0c80567ed48498
+
+I probably want to use products API since it does not require MD5 hash, but LCSC
+part number. The response contains the UUID of symbol and footprint.
+
+https://easyeda.com/api/products/C440457/svgs
+
+Or use the CN site:
+
+https://lceda.cn/api/products/C114587/svgs
+
+* Reference
+** cite:gd32vf103xxxx-datasheet
 - user manual: cite:gd32vf103xxxx-manual
 
 All voltage must be 3.3V for GD32VF103
@@ -35,7 +100,35 @@ NRST                    ; external reset
 ;; In FET, Vdd means drain, Vss stands for source
 ;; Now, Vcc=Vdd=, Vee=Vss
 
-*** cite:esp32-wrover-e
+** cite:esp32-wrover-e
+- cite:esp32-tech-ref
+- cite:esp32-datasheet
+
+* For Arxiv and first release, July
+
+** STARTED Make it happends
+*** TODO Make the HBkb
+
+- [X] the pict shape is roughly done
+- [X] wire things up
+- [X] write a version to place diode at fixed location
+- [-] pick the MCU and firmware
+  - [X] bluetooth and RF?
+  - [ ] battery and (fast) charging circuit?
+- [X] connect everything
+- [-] connect LEDs?
+- [-] case CAD co-design?
+**** STARTED stablizer and other mouting holes
+**** STARTED Kahl hot swappable socket
+which might have to go back side of the PCB, and must align with the switch
+socket
+**** STARTED double-check footprint for manufacturing
+
+**** CANCELED pin headers for GD32 and ESP32 for debugging
+CLOSED: [2020-07-30 Thu 01:18]
+**** CANCELED other pins for debugging?
+CLOSED: [2020-07-30 Thu 01:18]
+
 
 *** Mechanical Keyboard Switches Kailh PCB Socket
 - [[https://www.kailhswitch.com/mechanical-keyboard-switches/box-switches/mechanical-keyboard-switches-kailh-pcb-socket.html][offical product link]]
@@ -43,7 +136,8 @@ NRST                    ; external reset
 
 CPG151101S11
 
-*** TODO Make spreadboard
+*** DONE Make spreadboard
+CLOSED: [2020-07-30 Thu 01:20]
 **** DONE library
 CLOSED: [2020-07-12 Sun 14:46]
 
@@ -60,12 +154,16 @@ Headers:
 - jump headers: 2x3 or two 1x3 group
 - external headers: 1x6 1x8 1x10
 
-**** connections
-**** layout
+**** DONE connections
+CLOSED: [2020-07-30 Thu 01:20]
+**** DONE layout
+CLOSED: [2020-07-30 Thu 01:20]
 
-*** Make a K210 development board
+*** CANCELED Make a K210 development board
+CLOSED: [2020-07-30 Thu 01:20]
 
-** TODO vectorized connections
+** DONE vectorized connections
+CLOSED: [2020-07-30 Thu 01:20]
 
 ** TODO paper writing
 
