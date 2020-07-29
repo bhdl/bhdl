@@ -148,10 +148,10 @@
                         [yname (string->symbol (~a "col" (add1 y)))])
                     (when key
                       (*-
-                       ;; (pin-ref self yname)
+                       (pin-ref self yname)
                        ;; (diode)
                        key
-                       ;; (pin-ref self xname)
+                       (pin-ref self xname)
                        ))))))))
 
 (define gd32 (GD32VF103CBT6))
