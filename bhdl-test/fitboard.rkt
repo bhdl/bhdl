@@ -37,10 +37,12 @@
                [atom (begin (set-Atom-pict! atom pict-with-name)
                             atom)]
                ;; key with diode group
-               [key-with-diode (make-circuit #:external-pins (p1 p2)
-                                               #:vars ([d (Diode)])
-                                               #:connect (*- atom d)
-                                               #:layout (vc-append 3 atom d))])
+               [key-with-diode (make-circuit
+                                ;; FIXME user should not specify left and right
+                                #:external-pins (left right)
+                                #:vars ([d (Diode)])
+                                #:connect (*- self.left atom d self.right)
+                                #:layout (vc-append 3 atom d))])
           key-with-diode))))
 
 (struct KeyboardMatrix
@@ -154,6 +156,33 @@
                        (pin-ref self xname)
                        ))))))))
 
+(module+ debug
+  ;; FIXME why no atoms?
+  (collect-all-atoms matrix-module)
+
+  (Composite->netlist matrix-module)
+  (parameterize ([current-directory "/tmp/bhdl/"])
+    (circuit-export matrix-module
+                    #:auto-place #f #:formats '(kicad pdf dsn)))
+  (parameterize ([current-directory "/tmp/bhdl/"])
+    (circuit-export (make-circuit #:layout matrix-module
+                                  ;; FIXME why this diode is not showing up?
+                                  #:connect (*- matrix-module.row1
+                                                (R)
+                                                matrix-module.col1))
+                    #:auto-place #f #:formats '(kicad pdf dsn)))
+
+  (define c (make-circuit
+             #:external-pins (p1 p2 p3)
+             #:connect (*- self.p1 self.p3 (Diode) (Diode) self.p2)))
+
+  (collect-all-atoms c)
+  (collect-all-atoms (*- c))
+
+  (nplaced-atoms matrix-module)
+  (nfree-atoms matrix-module)
+  (collect-all-composites matrix-module))
+
 (define gd32 (GD32VF103CBT6))
 
 (define gd32-module
@@ -166,10 +195,7 @@
            [usb (USB-C-16)]
            ;; [rgb (TJ-S1615CY)]
            ;; I probably want to use 3 leds in a row?
-           [rgb (WS2812B)]
-
-           [btn-boot (SKRPACE010)]
-           [btn-reset (SKRPACE010)])
+           [rgb (WS2812B)])
    #:connect (list
               ;; reset pin
               (*- gd32.NRST (*< (*- (C '100nf) global.GND)
@@ -234,15 +260,11 @@
               (*- rgb.VDD global.5V (C '100nf) rgb.VSS global.GND)
               (*- rgb.DI gd32.PC13)
 
-              ;; buttons
-              ;;
-              ;; FIXME write in one *-, and use in-place component
-              (*- global.3V3 btn-boot.1)
-              (*- btn-boot.3 gd32.BOOT0 (R '10k) global.GND)
+              ;; boot button
+              (*- global.3V3 (SKRPACE010) gd32.BOOT0 (R '10k) global.GND)
               (*- gd32.BOOT1 (R '10k) global.GND)
-
-              (*- gd32.NRST btn-reset.1)
-              (*- btn-reset.3 global.GND))))
+              ;; reset button
+              (*- gd32.NRST (SKRPACE010) global.GND))))
 
 (define esp32 (ESP32-WROVER-E))
 
@@ -351,6 +373,7 @@
   (parameterize ([current-directory "/tmp/bhdl/"])
     ;; TODO NOW HEBI enable auto-place
     (circuit-export fitboard #:auto-place #f #:formats '(kicad pdf dsn)))
+
   ;; (parameterize ([current-directory "/tmp/bhdl/"])
   ;;   (circuit-export fitboard #:auto-place #t #:formats '(kicad pdf dsn ses)))
   (void))

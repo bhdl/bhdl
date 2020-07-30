@@ -10,15 +10,15 @@
 (define whole
   (make-circuit
    ;; FIXME inset a little bit
-   #:vars ([jumper-mini-nano-SCL (connector 3)]  ;j3
-           [jumper-mini-nano-SDA (connector 3)]  ;j4
-           [jumper-micro-SDA (connector 3)]      ;j10
-           [jumper-micro-SCL (connector 3)]      ;j11
-           [jumper-micro-mini-VCC (connector 3)] ;J1
-           [jumper-mkr-MOSI (connector 3)]       ;J5
-           [jumper-mkr-SCK (connector 3)]        ;J6
-           [jumper-mkr-SDA (connector 3)]        ;J8
-           [jumper-mkr-SCL (connector 3)]        ;J9
+   #:vars ([jumper-mini-nano-SCL (PinHeader 3)]  ;j3
+           [jumper-mini-nano-SDA (PinHeader 3)]  ;j4
+           [jumper-micro-SDA (PinHeader 3)]      ;j10
+           [jumper-micro-SCL (PinHeader 3)]      ;j11
+           [jumper-micro-mini-VCC (PinHeader 3)] ;J1
+           [jumper-mkr-MOSI (PinHeader 3)]       ;J5
+           [jumper-mkr-SCK (PinHeader 3)]        ;J6
+           [jumper-mkr-SDA (PinHeader 3)]        ;J8
+           [jumper-mkr-SCL (PinHeader 3)]        ;J9
            [uno1 (Arduino-Uno)]
            [uno2 (Arduino-Uno)]
            [uno3 (Arduino-Uno-ICSP)]
