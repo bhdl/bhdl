@@ -59,12 +59,12 @@
 (struct Pin
   ;; parent: an instance of either composite or Composite
   ;; index: it is the #index pin of the parent
-  (parent index)
+  (parent name)
   #:methods gen:custom-write
   [(define (write-proc pin port mode)
      (write-string (~a "#<Pin-"
                        (eq-hash-code (Pin-parent pin)) "-"
-                       (Pin-index pin) ">")
+                       (Pin-name pin) ">")
                    port))])
 
 (struct Atom

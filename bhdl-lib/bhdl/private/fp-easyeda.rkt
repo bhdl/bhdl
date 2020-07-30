@@ -48,8 +48,8 @@
   (match spec
     [(line-spec x1 y1 x2 y2 width)
      (line-spec (- x1 offx) (- y1 offy) (- x2 offx) (- y2 offy) width)]
-    [(pad-spec num x y mounting-type shape size dsize)
-     (pad-spec num (- x offx) (- y offy) mounting-type shape size dsize)]
+    [(pad-spec name x y mounting-type shape size dsize)
+     (pad-spec name (- x offx) (- y offy) mounting-type shape size dsize)]
     [else (error "spec-offset")]))
 
 (define (10mil->mm x)
@@ -74,14 +74,14 @@
   (match-let ([(list _ shape x y
                      ;; seems to be in reverse order???
                      height width
-                     layer net number
+                     layer net name
                      hole-radius points rotation ID
                      ;; HACK
                      ...
                      ;; hole-length hole-points _ _ _ _ _
                      )
                (string-split str "~")])
-    (pad-spec number
+    (pad-spec name
               (10mil->mm (string->number x))
               (10mil->mm (string->number y))
               ;; FIXME fixed smd

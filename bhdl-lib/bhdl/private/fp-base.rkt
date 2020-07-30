@@ -25,7 +25,7 @@
   #:prefab)
 
 (struct pad-spec
-  (num
+  (name
    x y
    mounting-type
    shape

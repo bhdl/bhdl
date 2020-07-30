@@ -107,9 +107,9 @@ Es (Edge, i.e. netlist), diearea"
                      (for/list ([pin (Net-pins net)])
                        (let* ([atom (Pin-parent pin)]
                               ;; FIXME pin index might be symbol
-                              [pin-index (Pin-index pin)]
+                              [pin-name (Pin-name pin)]
                               [macro (atom->macro atom)]
-                              [offset (hash-ref (Macro-Hlocs macro) pin-index)])
+                              [offset (hash-ref (Macro-Hlocs macro) pin-name)])
                          (list (hash-ref Hatom=>idx atom)
                                (exact->inexact (Point-x offset))
                                (exact->inexact (Point-y offset))))))])
@@ -223,9 +223,9 @@ Es (Edge, i.e. netlist), diearea"
          ;; pin positions
          [Hpin=>xy (for/hash ([pin (collect-all-pins comp)])
                      (let* ([atom (Pin-parent pin)]
-                            [index  (Pin-index pin)]
+                            [pinname  (Pin-name pin)]
                             [macro (atom->macro atom)]
-                            [offset (hash-ref (Macro-Hlocs macro) index)])
+                            [offset (hash-ref (Macro-Hlocs macro) pinname)])
                        (match-let ([(Point x y a) (fix-atom-xy-pin
                                                    atom (hash-ref Hatom=>loc atom)
                                                    offset)])
@@ -522,7 +522,7 @@ Es (Edge, i.e. netlist), diearea"
 
 (define (padstack-id pad)
   (match pad
-    [(pad-spec num x y mounting-type
+    [(pad-spec name x y mounting-type
                shape (list s1 s2) dsize)
      (case shape
        ;; FIXME treat roundrect as rect
@@ -541,7 +541,7 @@ Es (Edge, i.e. netlist), diearea"
 
 (define (padstack-spec pad)
   (match pad
-    [(pad-spec num x y mounting-type
+    [(pad-spec name x y mounting-type
                shape (list s1 s2) dsize)
      ;; return PADSTACK-ID
      (case shape
@@ -644,7 +644,7 @@ Es (Edge, i.e. netlist), diearea"
                        ,@(for/list ([pad (footprint-pads (atom->fp atom))]
                                     [i (in-naturals 1)])
                            (match pad
-                             [(pad-spec num x y mounting-type
+                             [(pad-spec name x y mounting-type
                                         shape (list s1 s2) dsize)
                               `(pin ,(padstack-id pad)
                                     ;; CAUTION all y are negative
@@ -655,7 +655,7 @@ Es (Edge, i.e. netlist), diearea"
                (for/list ([atom atoms])
                  (for/list ([pad (footprint-pads (atom->fp atom))])
                    (match pad
-                     [(pad-spec num x y mounting-type
+                     [(pad-spec name x y mounting-type
                                 shape (list s1 s2) dsize)
                       (padstack-spec pad)])))))
            ;; one last pre-defined via
@@ -672,7 +672,7 @@ Es (Edge, i.e. netlist), diearea"
                                       (~a "ATOM"
                                           (hash-ref Hatom=>index (Pin-parent pin))
                                           "-"
-                                          (Pin-index pin)))))))))))
+                                          (Pin-name pin)))))))))))
 
 (define (circuit-export
          circuit

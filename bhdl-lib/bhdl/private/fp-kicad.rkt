@@ -85,11 +85,11 @@
                    [`(fp_line (start ,sx ,sy) (end ,ex ,ey) (layer ,l) (width ,w))
                     (line-spec sx sy ex ey w)]
                    ;; FIXME optional z
-                   [`(pad ,num ,mounting-type ,shape (at ,x ,y ,z ...)
+                   [`(pad ,name ,mounting-type ,shape (at ,x ,y ,z ...)
                           (size ,s1 ,s2)
                           ;; FIXME optional dsize
                           (drill ,dsize) ... ,other-attrs ...)
-                    (pad-spec num x y mounting-type shape (list s1 s2) dsize)]
+                    (pad-spec name x y mounting-type shape (list s1 s2) dsize)]
                    ;; TODO
                    [`(fp_circle ,other ...)
                     #f]
@@ -105,7 +105,7 @@
                         ;;
                         ;; most of the pin names are numbers, but some like
                         ;; USB-C are symbols
-                        (λ (x) (string? (pad-spec-num x)))
+                        (λ (x) (string? (pad-spec-name x)))
                         (filter pad-spec? specs))])
         (footprint line-specs pad-specs)))))
 
