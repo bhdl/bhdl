@@ -9,11 +9,11 @@
          "common.rkt"
          ;; FIXME dependency
          "sch.rkt"
+         "utils.rkt"
          "library-base.rkt"
          pict)
 
-(provide IC->fp-pict
-         IC->fp-pict+Hlocs
+(provide IC->fp-pict+Hlocs
 
          ;; not sure if needed
          footprint->pict
@@ -55,39 +55,33 @@
 ;; IC -> footprint
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define (IC->fpspec ic)
-  ;; FIXME using the first available FP. TODO support selection of FP
-  (first (IC-fps ic)))
-
-(define (IC->fp-pict+Hlocs ic)
+(define (IC->fp-pict+Hlocs ic which-fp)
   ;; generate footprint for ic
   ;; 1. get the first footprint spec that matches selection
-  (let ([spec (IC->fpspec ic)])
+  (let* ([spec (ic-select-fpspec ic which-fp)]
+         [fp (FpSpec-fp spec)]
+         [pad-names (map pad-spec-name (footprint-pads fp))]
+         [pins (FpSpec-pins spec)]
+         [Hpin->pad (for/hash ([pin pins]
+                               [pad pad-names])
+                      (values pin pad))])
     ;; CAUTION p is scaled here
-    (let-values ([(p Hlocs) (footprint->pict+Hlocs (FpSpec-fp spec))]
-                 [(pins) (FpSpec-pins spec)])
+    (or (= (length pins) (length pad-names))
+        (error "pins and pad-names do not match: "
+               (length pins) (length pad-names)))
+    (let-values ([(p Hlocs) (footprint->pict+Hlocs fp)])
       ;; 1. compute the new Hlocs using pin name instead of number index,
       ;; because the number index is different across different footprint
       ;; packagings
       ;;
       ;; UPDATE but actually many footprint has already the pin name as index.
-      (let ([Hlocs (for/hash ([pin pins]
-                              [i (in-naturals 1)])
+      (let ([Hlocs (for/hash ([pin pins])
                      ;; FIXME the pin here may duplicate, e.g. there may be
                      ;; multiple 5V and GND, and they actually maps to multiple
                      ;; connected pins of the chip
-                     (values pin (hash-ref Hlocs i)))])
+                     (values pin (hash-ref Hlocs (hash-ref Hpin->pad pin))))])
         (values p Hlocs)))))
 
-
-(define (IC->fp-pict ic
-                     ;; FIXME duplication
-                     #:package (package #f)
-                     #:pin-count (pin-count #f))
-  (let-values ([(p Hlocs) (IC->fp-pict+Hlocs ic
-                                             #:package package
-                                             #:pin-count pin-count)])
-    p))
 
 ;; FIXME it should be in fp.rkt?
 (define (footprint->pict+Hlocs-uncached fp)
@@ -108,20 +102,11 @@
        ;; 1. scale the picture
        (scale p (fp-scale))
        ;; 2. offset and scale the loc
-       (for/hash ([pad (footprint-pads fp)]
-                  [i (in-naturals 1)])
-         (values
-          ;; FIXME instead of the num field of pad-spec, I'm using the index,
-          ;; i.e. the order of pads in kicad_mod file matters. The index
-          ;; increases from 1 in kicad's official footprint library, so that is
-          ;; ok. But sparkfun's and the Arduino library used symbols all the
-          ;; way, and to keep them consistent is the main goal here.
-          ;;
-          ;; (pad-spec-num pad)
-          i
-          (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))
-                 (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale))
-                 0)))))))
+       (for/hash ([pad (footprint-pads fp)])
+         (values (pad-spec-name pad)
+                 (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))
+                        (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale))
+                        0)))))))
 
 (define footprint->pict+Hlocs
   (let ([cache (make-hash)])
@@ -172,7 +157,8 @@
       (footprint->pict+Hlocs (atom->fp atom))))
 
 (define (atom->fp atom)
-  (FpSpec-fp (IC->fpspec (ICAtom-ic atom))))
+  (assert (ICAtom? atom))
+  (FpSpec-fp (ic-select-fpspec (ICAtom-ic atom) (ICAtom-which-fp atom))))
 
 (define (atom->fp-sexp atom x y a ID Hpin=>net Hnet=>index)
   "Generate FP raw kicad sexp."
@@ -207,26 +193,27 @@
                             ;; FIXME optional drill
                             ;; (drill ,dsize)
                             (layers *.Cu *.Mask F.SilkS)
-                            ,@(if (and (hash-has-key? pinhash num)
-                                       (hash-has-key? Hpin=>net
-                                                      (hash-ref pinhash num)))
-                                  (let ([index (hash-ref
-                                                Hnet=>index
-                                                (hash-ref Hpin=>net
-                                                          (hash-ref pinhash num)))])
-                                    `((net ,index
-                                           ,(number->string index))))
-                                  null))]))
+                            ,@(let ([name (string->symbol (~a "fp-" name))])
+                                (if (and (hash-has-key? pinhash name)
+                                         (hash-has-key? Hpin=>net
+                                                        (hash-ref pinhash name)))
+                                    (let ([index (hash-ref
+                                                  Hnet=>index
+                                                  (hash-ref Hpin=>net
+                                                            (hash-ref pinhash name)))])
+                                      `((net ,index
+                                             ,(number->string index))))
+                                    null)))]))
                ;; FIXME placeholder
                ;; (net 21 /Leds/lrow3)
                ))))
 
 (define (IC+Atom->fp-pict+Hlocs ic atom)
-  (let-values ([(p Hlocs) (IC->fp-pict+Hlocs ic)])
+  (let-values ([(p Hlocs) (IC->fp-pict+Hlocs ic (ICAtom-which-fp atom))])
     (let ([Hlocs (for/hash ([(name point) Hlocs])
                    (values
                     ;; basically change the name to the index of the atom
-                    (Pin-index (hash-ref (Atom-pinhash atom) name))
+                    (Pin-name (hash-ref (Atom-pinhash atom) name))
                     point))])
       (values p Hlocs))))
 
