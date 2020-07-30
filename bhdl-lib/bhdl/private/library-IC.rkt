@@ -674,11 +674,17 @@
         D12 D13 A0 A1 A2))
 
 (define/IC (Arduino-Mini)
+  ;; FIXME the sparkfun kicad library is very messy (e.g. see PRO_MINI symbol
+  ;; library and footprint mismatch). I need to figure them out.
   #:FP ((fp-Arduino 'Mini)
+        ;; FIXME these are from sparkfun's library, and the order is messed up
         TX RX RESET GND
         D2 D3 D4 D5 D6 D7
         A3 D8 VCC D9 RST D10 GND D11 VIN
         A4 D12 A5 D13 A6 A0 A7 A1 A2))
+
+(module+ debug
+  (map pad-spec-name (footprint-pads (fp-Arduino 'Mini))))
 
 ;; CAUTION Nano and MKR are from Arduino library
 
