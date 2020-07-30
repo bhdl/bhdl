@@ -1,7 +1,10 @@
 #lang racket
 
-(require (for-syntax syntax/parse)
+(require (for-syntax syntax/parse
+                     racket/list
+                     racket/format)
          "library-base.rkt"
+         "fp-base.rkt"
          "fp-kicad.rkt"
          "fp-easyeda.rkt"
          "sch.rkt"
@@ -22,13 +25,17 @@
          Resistor R
          Capacitor C
          Fuse
-         Cherry
          LED
          Diode
          FerriteBead
-         PinHeader
          Crystal-2
          Crystal-4
+
+         (contract-out
+          [rename PinHeader-out PinHeader
+                  ((or/c 1 2 3 4 5 6 7 8) . -> . ICAtom?)]
+          [rename Cherry-out Cherry
+                  ((or/c 1 1.25 1.5 1.75 2 2.25 2.75 6.25) . -> . ICAtom?)])
 
          CP2102N
          Transistor
@@ -58,22 +65,28 @@
 
          (struct-out ICAtom))
 
-
 (begin-for-syntax
-  (define-syntax-class symbol-spec
-    (pattern ((group:id ...) ...)))
+ (define-syntax-class symbol-spec
+   (pattern ((group:id ...) ...)))
 
-  (define-splicing-syntax-class footprint-spec
-    (pattern (~seq #:DIP (num pin ...))
-             ;; #:with package #'DIP
-             #:with fp #'(fp-DIP num))
-    (pattern (~seq #:QFN (num pin ...))
-             ;; #:with package #'QFN
-             #:with fp #'(fp-QFN num))
-    (pattern (~seq #:LQFP (num pin ...))
-             #:with fp #'(fp-LQFP num))
-    (pattern (~seq #:FP (fp pin ...)))))
-
+ (define-splicing-syntax-class footprint-spec
+   ;; TODO FIXME check the number of footprint pads and the number of pins match
+   (pattern (~seq #:DIP (num pin ...))
+            ;; #:with package #'DIP
+            #:with res #'(FpSpec (~a "DIP-" num) (fp-DIP num) '(pin ...)))
+   (pattern (~seq #:QFN (num pin ...))
+            ;; #:with package #'QFN
+            #:with res #'(FpSpec (~a "QFN-" num) (fp-QFN num) '(pin ...)))
+   (pattern (~seq #:LQFP (num pin ...))
+            #:with res #'(FpSpec (~a "LQFP-" num) (fp-LQFP num) '(pin ...)))
+   ;; FIXME HACK If we already specified custom FP, most likely we are only
+   ;; specifying one fp. In this case, no fp name is assigned.
+   (pattern (~seq #:FP (fp pin ...))
+            #:with res #'(FpSpec #f fp '(pin ...)))
+   (pattern (~seq #:auto-FP fp)
+            #:with res #'(FpSpec #f fp (map pad-spec-name (footprint-pads fp))))
+   (pattern (~seq #:auto-named-FP (name fp))
+            #:with res #'(FpSpec name fp (map pad-spec-name (footprint-pads fp))))))
 
 (define-syntax (define/IC stx)
   (syntax-parse
@@ -81,6 +94,8 @@
    [(_ (name ...)
        (~alt (~optional (~seq #:datasheet url) #:defaults ([url #'""]))
              (~optional (~seq #:ALTS alts) #:defaults ([alts #'()]))
+             (~optional (~seq #:LEFT left) #:defaults ([left #'#f]))
+             (~optional (~seq #:RIGHT right) #:defaults ([right #'#f]))
              (~seq #:DUMMY dummy)
              footprint:footprint-spec) ...)
     ;; construct IC:name
@@ -102,16 +117,13 @@
             (IC IC-name-str
                 url
                 'alts
-                (list
-                 ;; TODO FIXME check the number of footprint pads and the number of
-                 ;; pins match
-                 (FpSpec footprint.fp '(footprint.pin ...))
-                 ...)))
+                (list footprint.res ...)
+                'left 'right))
           ;; TODO make attrs with keyword arguments and get them spliced
           ;; TODO actually use the attrs
-          (define (name . attrs)
+          (define (name #:FP [which-fp #f] . attrs)
             ;; FIXME this requires definition of make-IC-atom
-            (make-IC-atom IC-name))
+            (make-IC-atom IC-name which-fp))
           ...
           ))]))
 
@@ -121,33 +133,34 @@
 ;; I'm going to see how struct is implemented
 ;;
 (define/IC (Resistor R)
-  #:FP ((fp-resistor "0603")
-        1 2))
+  #:auto-FP (fp-resistor "0603")
+  #:LEFT 1
+  #:RIGHT 2)
 
 (define/IC (Capacitor C)
-  #:FP ((fp-capacitor "0603")
-        1 2))
+  #:auto-FP (fp-capacitor "0603")
+  #:LEFT 1
+  #:RIGHT 2)
 
 (define/IC (Fuse)
-  #:FP ((fp-fuse "1206")
-        1 2))
-
-(define/IC (Cherry)
-  ;; FIXME spacing as parameter
-  #:FP ((fp-switch-keyboard 1 'pcb)
-        1 2))
+  #:auto-FP (fp-fuse "1206")
+  #:LEFT 1
+  #:RIGHT 2)
 
 (define/IC (LED)
-  #:FP (fp-diode
-        1 2))
+  #:FP (fp-diode plus minus)
+  #:LEFT plus
+  #:RIGHT minus)
 
 (define/IC (Diode)
-  #:FP (fp-diode
-        1 2))
+  #:FP (fp-diode plus minus)
+  #:LEFT plus
+  #:RIGHT minus)
 
 (define/IC (FerriteBead)
-  #:FP ((fp-resistor "0603")
-        1 2))
+  #:auto-FP (fp-resistor "0603")
+  #:LEFT 1
+  #:RIGHT 2)
 
 
 ;; Manufacturer	YL(Failong Crystal)
@@ -165,13 +178,43 @@
 ;;
 ;; TODO 32.768k
 (define/IC (Crystal-2)
-  #:FP (fp-smd-2012-2p
-        1 2))
+  #:auto-FP fp-smd-2012-2p
+  #:LEFT 1
+  #:RIGHT 2)
 
 (define/IC (PinHeader)
-  ;; FIXME num of pins, and since the pin varies, we need some new design
-  #:FP ((fp-pin-header 2)
-        1 2))
+  ;; FIXME remove duplication
+  #:auto-named-FP (1 (fp-pin-header 1))
+  #:auto-named-FP (2 (fp-pin-header 2))
+  #:auto-named-FP (3 (fp-pin-header 3))
+  #:auto-named-FP (4 (fp-pin-header 4))
+  #:auto-named-FP (5 (fp-pin-header 5))
+  #:auto-named-FP (6 (fp-pin-header 6))
+  #:auto-named-FP (7 (fp-pin-header 7))
+  #:auto-named-FP (8 (fp-pin-header 8)))
+
+(define (PinHeader-out num)
+  (PinHeader #:FP num))
+
+(module+ test
+  (Atom-pinhash (PinHeader-out 7))
+  (Atom-pinhash (PinHeader-out 1))
+  (Atom-pinhash (Diode)))
+
+(define/IC (Cherry)
+  #:auto-named-FP (1 (fp-switch-keyboard 1 'pcb))
+  #:auto-named-FP (1.25 (fp-switch-keyboard 1.25 'pcb))
+  #:auto-named-FP (1.5 (fp-switch-keyboard 1.5 'pcb))
+  #:auto-named-FP (1.75 (fp-switch-keyboard 1.75 'pcb))
+  #:auto-named-FP (2 (fp-switch-keyboard 2 'pcb))
+  #:auto-named-FP (2.25 (fp-switch-keyboard 2.25 'pcb))
+  #:auto-named-FP (2.75 (fp-switch-keyboard 2.75 'pcb))
+  #:auto-named-FP (6.25 (fp-switch-keyboard 6.25 'pcb))
+  #:LEFT 1
+  #:RIGHT 2)
+
+(define (Cherry-out spacing)
+  (Cherry #:FP spacing))
 
 (define/IC (ATtiny25 ATtiny45 ATtiny85)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf"
@@ -187,6 +230,10 @@
             DNC DNC GND DNC DNC
             PB0 PB1 DNC PB2 VCC
             DNC DNC DNC DNC DNC))
+
+(module+ debug
+  IC:ATtiny25
+  (ATtiny25 #:FP "DIP-8"))
 
 (define/IC (ATmega16)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc2466.pdf"
@@ -542,14 +589,16 @@
         ;; 1 2
         A1 A2
         ;; 3 4
-        B1 B2))
+        B1 B2)
+  #:LEFT A1
+  #:RIGHT B1)
 
 (define (Switch)
   (make-circuit
    #:vars ([it (SKRPACE010)])
-   #:external-pins (1 2)
-   #:connect (list (*- self.1 it.A1)
-                   (*- self.2 it.B1))))
+   #:external-pins (left right)
+   #:connect (list (*- self.left it.A1)
+                   (*- self.right it.B1))))
 
 ;; Manufacturer	Changjiang Electronics Tech (CJ)
 ;; Mfr.Part #	DTC143ECA
@@ -583,7 +632,10 @@
         IO34 IO35 IO32 IO33 IO25 IO26 IO27 IO14 IO12 GND IO13 NC NC NC
 
         NC NC NC
-        IO15 IO2 IO0 IO4 IO16 IO17 IO5 IO18 IO19 NC IO21 RXD0 TXD0 IO22 IO23 GND))
+        IO15 IO2 IO0 IO4 IO16 IO17 IO5 IO18 IO19 NC IO21 RXD0 TXD0 IO22 IO23 GND
+
+        ;; CAUTION this last GND is the bottom pad
+        GND))
 
 ;; CAUTION Uno Mini Micro are from Sparkfun library
 

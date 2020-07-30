@@ -18,7 +18,7 @@
   ;; *-find function call
   (set-Atom-pict! atom (launder (atom->fp-pict atom))))
 
-(define (make-IC-atom ic)
+(define (make-IC-atom ic which-fp)
   ;; For all the pins, create Pin.
   ;;
   ;; 1. get all pins by flattening orients
@@ -26,25 +26,52 @@
   ;; 3. create Pins
   ;;
   ;; then record ic into view
-  (let ([pins (flatten (map FpSpec-pins (IC-fps ic)))]
-        [alts (IC-alts ic)])
+  ;;
+  ;; get the right spec
+  (let* ([fpspec (ic-select-fpspec ic which-fp)]
+         [pins (FpSpec-pins fpspec)]
+         [alts (IC-alts ic)])
     ;; this is alts extended with all pins not recorded in original alts
     (let ([alts (append (map list (set-subtract pins (flatten alts)))
                         alts)])
-      (let ([comp (ICAtom (make-hash) ic)])
+      (let ([comp (ICAtom (make-hash) ic which-fp)])
         ;; each alt group
         (for ([alt alts]
-              ;; CAUTION the pin index is always number. The random order here
-              ;; is significant. I cannot use footprint order, because that is
-              ;; different across different footprints. TODO I can probably use
-              ;; schematic order.
-              [index (in-naturals 1)])
-          (let ([p (Pin comp index)])
+              [pin-index (in-naturals 1)])
+          (let* ([pin-name (string->symbol (~a "index-" pin-index))]
+                 ;; TODO I actually want to create pins with the order of FpSpec-pins
+                 [p (Pin comp pin-name)])
             ;; each pin name in the alt group
+            (hash-set! (Atom-pinhash comp) pin-name p)
             (for ([a alt])
-              (hash-set! (Atom-pinhash comp) a p))
-            ;; set the index to point to the same pin as well
-            (hash-set! (Atom-pinhash comp) index p)))
+              (hash-set! (Atom-pinhash comp) a p))))
+
+        ;; get the footprint and assign the footprint pin name to hash as well
+        (when (IC-left ic)
+          (hash-set! (Atom-pinhash comp)
+                     'left
+                     (hash-ref (Atom-pinhash comp) (IC-left ic))))
+        (when (IC-right ic)
+          (hash-set! (Atom-pinhash comp)
+                     'right
+                     (hash-ref (Atom-pinhash comp) (IC-right ic))))
+
+        ;; the fp names
+        ;;
+        ;; FIXME well, why do I need to fp names?
+        ;;
+        ;; Because when generating KiCAD file, I need to figure out which pad is
+        ;; connected to which net.
+        (let ([pad-names (map pad-spec-name (footprint-pads (FpSpec-fp fpspec)))])
+          (or (= (length pins) (length pad-names))
+              (error "pins and pad-names do not match: "
+                     (length pins) (length pad-names)))
+          (for ([pin pins]
+                [pad pad-names])
+            (hash-set! (Atom-pinhash comp)
+                       (string->symbol (~a "fp-" pad))
+                       (hash-ref (Atom-pinhash comp) pin))))
+
         ;; return the created Atom instance
         (set-default-pict! comp)
         comp))))

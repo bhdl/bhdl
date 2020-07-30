@@ -8,14 +8,16 @@
 
 (provide (struct-out IC)
          (struct-out FpSpec)
-         (struct-out ICAtom))
+         (struct-out ICAtom)
+
+         ic-select-fpspec)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IC definition, for symbol and footprint
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (struct FpSpec
-  (fp pins)
+  (name fp pins)
   #:prefab)
 
 ;; everything should be centered around the IC data structure
@@ -27,11 +29,18 @@
 ;; 3. fps: this determines the exact footprint of different packaging
 (struct IC
   ;; this tells nothing about the fields. I really need type
-  (name datasheet alts fps)
+  (name datasheet alts fps left right)
   #:prefab)
 
 
 (struct ICAtom
-  (ic)
+  (ic which-fp)
   #:super struct:Atom)
 
+(define (ic-select-fpspec ic which-fp)
+  (if which-fp
+      ;; FIXME fail to find?
+      (findf (lambda (x) (= (FpSpec-name x) which-fp))
+             (IC-fps ic))
+      ;; if #f, pass in the first
+      (first (IC-fps ic))))
