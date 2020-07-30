@@ -7,6 +7,7 @@
          show
          warn
          debug
+         assert
 
          define-alias
          compose-pipe
@@ -253,3 +254,10 @@ same rank
 
 (module+ test
   (group-by-2 '(1 2 3 4 5 6)))
+
+(define-syntax (assert stx)
+  (syntax-parse
+   stx
+   [(_ xxx)
+    #'(or xxx (error "Assertion failed:" 'xxx))]))
+
