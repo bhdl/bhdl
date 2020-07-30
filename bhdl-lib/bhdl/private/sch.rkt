@@ -29,9 +29,7 @@
          nplaced-atoms
          nfree-atoms
 
-         create-simple-Composite
-         combine-Composites
-         combine-Composites-1
+         maybe-atom->pict
 
          make-circuit
          self
@@ -97,7 +95,11 @@
   ;; 1. the whole pict, and it shall be the diearea for placement
   ;; 2. the mapping from atom to sub-pict
   (pinhash nets [pict #:auto])
-  #:mutable)
+  #:mutable
+  #:methods gen:custom-write
+  [(define (write-proc self port mode)
+     (write-string (~a "#<Composite-" (eq-hash-code self) ">")
+                   port))])
 
 (define-syntax (create-simple-Composite stx)
   (syntax-parse stx
@@ -109,12 +111,24 @@
            (let ([p (Pin res pname)])
              (hash-set! (Composite-pinhash res) pname p)
              ;; also assign numbers
-             (hash-set! (Composite-pinhash res) i p)))
+             (hash-set! (Composite-pinhash res)
+                        ;; CAUTION the auto index should have index-1
+                        ;; index-2. This is used in two places:
+                        ;; - inplace component connections
+                        ;; - footprint assignment
+                        (string->symbol (~a "index-" i)) p)))
          res)]))
 
 (define-syntax-parameter self
   (lambda (stx)
     (raise-syntax-error (syntax-e stx) "can only be used inside make-circuit")))
+
+(define (maybe-atom->pict atom-or-pict)
+  (cond
+   [(Atom? atom-or-pict) (Atom-pict atom-or-pict)]
+   [(Composite? atom-or-pict) (Composite-pict atom-or-pict)]
+   [(pict? atom-or-pict) atom-or-pict]
+   [else (error "Must be Atom, Composite, or just pict.")]))
 
 (define-syntax (make-circuit stx)
   (syntax-parse stx
@@ -131,29 +145,14 @@
          (syntax-parameterize ([self (make-rename-transformer #'self-obj)])
            (let* (var-clause ... ...)
              #,(if (attribute p-name)
-                   #'(set-Composite-pict! self-obj p-name)
+                   #'(set-Composite-pict! self-obj (maybe-atom->pict p-name))
                    #'(void))
              ;; do the connections
-             (combine-Composites-1
-              (flatten (list
-                        self-obj
-                        connect-clause ...))))))]))
-
-
-(define (combine-Composites lst)
-  "This function effectively merge separated Composite into one."
-  (let ([res (create-simple-Composite)])
-    (set-Composite-nets!
-     res
-     (apply append (map Composite-nets lst)))
-    res))
-
-(define (combine-Composites-1 lst)
-  "The first one's external pin is used"
-  (let ([res (combine-Composites lst)])
-    (set-Composite-pinhash! res (Composite-pinhash (first lst)))
-    (set-Composite-pict! res (Composite-pict (first lst)))
-    res))
+             (set-Composite-nets!
+              self-obj
+              (apply append (map Composite-nets
+                                 (flatten (list connect-clause ...)))))
+             self-obj)))]))
 
 ;; two-node net
 ;; FIXME well, it is not necessarily two-node nets
@@ -234,7 +233,7 @@
                                     'node.rhs) ...) ...)))))
 
 (define (*+-proc lsts)
-  (let ([res (create-simple-Composite)])
+  (let ([res (make-circuit)])
     (for ([lst lsts])
       (hook-proc! res (Net lst)))
     res))
@@ -242,18 +241,19 @@
 (define (*--proc lst)
   (let ([item-1 (first lst)]
         [item-n (last lst)]
-        [res (create-simple-Composite 1 2)])
+        
+        [res (make-circuit #:external-pins (left right))])
     ;; connect res.2 with first.1
-    (hook-proc! res (Net (list (pin-ref res 1)
-                               (pin-ref item-1 1))))
+    (hook-proc! res (Net (list (pin-ref res 'left)
+                               (pin-ref item-1 'left))))
+    ;; end
+    (hook-proc! res (Net (list (pin-ref item-n 'right)
+                               (pin-ref res 'right))))
     (for/fold ([prev (first lst)])
         ([cur (rest lst)])
-      (hook-proc! res (Net (list (pin-ref prev 2)
-                                 (pin-ref cur 1))))
+      (hook-proc! res (Net (list (pin-ref prev 'right)
+                                 (pin-ref cur 'left))))
       cur)
-    ;; end
-    (hook-proc! res (Net (list (pin-ref item-n 2)
-                               (pin-ref res 2))))
     res))
 
 (define-syntax (*- stx)
@@ -266,7 +266,7 @@
   (let ([res
          ;; FIXME this composite has no external pins. In fact, it should have
          ;; the same numbr of external pins as the lenght of the "vector"
-         (create-simple-Composite)])
+         (make-circuit)])
 
     ;; construct net
     ;;
@@ -298,13 +298,13 @@
                      ...))]))
 
 (define (*<-proc lst)
-  (let ([res (create-simple-Composite 1 2)])
+  (let ([res (make-circuit #:external-pins (left right))])
     (for ([item lst])
       (hook-proc! res
-                  (Net (list (pin-ref res 1)
-                             (pin-ref item 1)))
-                  (Net (list (pin-ref res 2)
-                             (pin-ref item 2)))))
+                  (Net (list (pin-ref res 'left)
+                             (pin-ref item 'left)))
+                  (Net (list (pin-ref res 'right)
+                             (pin-ref item 'right)))))
     res))
 
 (define-syntax (*< stx)
@@ -380,7 +380,7 @@ res: already in this set."
 (define (collect-all-composites comp)
   (collect-all-composites-helper (seteq comp) (seteq)))
 
-(define (Composite->netlist comp)
+(define (Composite->netlist-1 comp)
   "From a Composite to a list netlist ((a b c) (d e f))."
   ;; from Composite to netlist
   ;; 1. loop through all the connections, collect atoms
@@ -389,19 +389,27 @@ res: already in this set."
                                    (Composite-nets comp)))]
          ;; this merge does not take into account weights
          [merged (merge-nets all-nets)])
+    ;; FIXME this does not seem to be the bug that cannot reach certain atoms,
+    ;; so I'm adding the filtering of 1-size-net back.
+    ;; (filter (lambda (x) (> (length (Net-pins x)) 1)) merged)
     merged))
+
+(define (Composite->netlist comp)
+  "From a Composite to a list netlist ((a b c) (d e f))."
+  (filter (lambda (x) (> (length (Net-pins x)) 1))
+          (Composite->netlist-1 comp)))
 
 (define (collect-all-atoms comp)
   ;; remove dupilcate and FIXME fix order
   (set->list
    (list->set
-    (apply append (for/list ([net (Composite->netlist comp)])
+    (apply append (for/list ([net (Composite->netlist-1 comp)])
                     (for/list ([pin (Net-pins net)])
                       (Pin-parent pin)))))))
 
 (define (collect-all-pins comp)
   (remove-duplicates
-   (apply append (for/list ([net (Composite->netlist comp)])
+   (apply append (for/list ([net (Composite->netlist-1 comp)])
                    (for/list ([pin (Net-pins net)])
                      pin)))))
 

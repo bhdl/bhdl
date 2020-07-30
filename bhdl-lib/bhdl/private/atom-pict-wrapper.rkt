@@ -43,12 +43,6 @@
          ;; TODO pin-over
          default-append-spacing)
 
-(define (maybe-atom->pict atom-or-pict)
-  (cond
-   [(Atom? atom-or-pict) (Atom-pict atom-or-pict)]
-   [(Composite? atom-or-pict) (Composite-pict atom-or-pict)]
-   [(pict:pict? atom-or-pict) atom-or-pict]
-   [else (error "Must be Atom, Composite, or just pict.")]))
 
 #;
 (define (hb-append sep . args)
