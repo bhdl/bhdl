@@ -557,26 +557,35 @@ Es (Edge, i.e. netlist), diearea"
                                   ,(- (/ (* s2 1000) 2))
                                   ,(/ (* s1 1000) 2)
                                   ,(/ (* s2 1000) 2)))
-                     (shape (rect B.Cu
-                                  ,(- (/ (* s1 1000) 2))
-                                  ,(- (/ (* s2 1000) 2))
-                                  ,(/ (* s1 1000) 2)
-                                  ,(/ (* s2 1000) 2)))
+                     ,@(case mounting-type
+                         [(thru_hole) `((shape (rect B.Cu
+                                                     ,(- (/ (* s1 1000) 2))
+                                                     ,(- (/ (* s2 1000) 2))
+                                                     ,(/ (* s1 1000) 2)
+                                                     ,(/ (* s2 1000) 2))))]
+                         [(smd) null]
+                         [else (error "Mounting type error.")])
                      (attach off)))]
        ;; FIXME
        [(circle) (let ([ID (padstack-id pad)])
                    `(padstack ,ID
                               (shape (circle F.Cu ,(* s1 1000)))
-                              (shape (circle B.Cu ,(* s1 1000)))
+                              ,@(case mounting-type
+                                  [(thru_hole) `((shape (circle B.Cu ,(* s1 1000))))]
+                                  [(smd) null]
+                                  [else (error "Mounting type error.")])
                               (attach off)))]
        [(oval) (let ([ID (padstack-id pad)])
                  `(padstack ,ID
                             (shape (path F.Cu ,(* s2 1000)
                                          ;; FIXME not always 0
                                          0 0 0 0))
-                            (shape (path B.Cu ,(* s2 1000)
-                                         ;; FIXME not always 0
-                                         0 0 0 0))
+                            ,@(case mounting-type
+                                [(thru_hole) `((shape (path B.Cu ,(* s2 1000)
+                                                            ;; FIXME not always 0
+                                                            0 0 0 0)))]
+                                [(smd) nul]
+                                [else (error "Mounting type error.")])
                             (attach off)))])]))
 
 (define (Composite->dsn comp place-spec)

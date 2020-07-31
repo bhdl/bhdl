@@ -164,7 +164,10 @@
   "Generate FP raw kicad sexp."
   (match-let ([pinhash (Atom-pinhash atom)])
     (match-let* ([fp (atom->fp atom)])
-      `(module ,ID (layer F.Cu) (tedit 0) (tstamp 0)
+      `(module ,ID
+         ;; FIXME I might want to place some atoms at B.Cu
+         (layer F.Cu)
+         (tedit 0) (tstamp 0)
                ;; CAUTION placement
                ;; FIXME scale
                ;;
@@ -197,12 +200,13 @@
                             (size ,s1 ,s2)
                             ;; FIXME optional drill
                             ,@(case mounting-type
-                                [(thru_hole) `((drill oval ,@dsize))]
-                                [(smd) null]
+                                [(thru_hole) `((drill oval ,@dsize)
+                                               (layers *.Cu *.Mask F.SilkS))]
+                                [(smd) `((layers F.Cu F.Paste F.Mask))]
                                 [else (error "Unsupported mounting type:"
                                              mounting-type)])
                             ;; FIXME HEBI layers
-                            (layers *.Cu *.Mask F.SilkS)
+                            
                             ,@(let ([name (string->symbol (~a "fp-" name))])
                                 (if (and (hash-has-key? pinhash name)
                                          (hash-has-key? Hpin=>net
