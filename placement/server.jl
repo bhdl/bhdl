@@ -83,7 +83,7 @@ end
 
 function test()
     # FIXME relative path might not work
-    str = open("../../tests/fitboard.json") do io
+    str = open("/tmp/bhdl/place-spec.json") do io
         read(io, String)
     end;
     jobj = JSON.parse(str);
@@ -99,7 +99,7 @@ function test()
         ncycles=params["sa-ncycles"],
         nsteps=params["sa-nsteps"],
         stepsize=params["sa-stepsize"],
-        theta_stepsize=params["sa-theta-stepsize"],)
+        theta_stepsize=params["sa-theta-stepsize"])
 
     R = Region(xs, ys, ws, hs, diearea, 300)
     visualize(solxs, solys, ws, hs, R)

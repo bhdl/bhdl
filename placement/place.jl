@@ -7,9 +7,7 @@ import Plots
 import CuArrays: cu, allowscalar
 allowscalar(false)
 using Flux: gpu, cpu
-using GeometricalPredicates
-
-GP = GeometricalPredicates
+include("utils.jl")
 
 γ = 0.5
 
@@ -355,26 +353,6 @@ function visualize_density(vs, R)
     # display_plot(Plots.bar(sort(bxs)))
 end
 
-function greedy_legalization(xs, ys, ws, hs, mask)
-    # A Tetris-like greedy algorithm. It process items one by one, move to the
-    # legal location. The legal for VLSI is (1) valid row/column grids (2)
-    # non-overlapping. For us, the grid on PCB is mostly continuous, so we only
-    # consider non-overlapping.
-
-    # We have mixed-size components. Moving larger ones is harder. Thus should
-    # we consider move them first?
-
-    for i in 1:length(xs)
-        if mask[i] == 0: continue end
-        # 1. check if this cell overlaps with others. FIXME this sounds costly
-        #
-        # 2. if overlap, find the closest empty spot. FIXME how to find those
-        # spots? I probably generate random locations, and check?
-    end
-
-    return xs, ys
-end
-
 """Calculate the number of overlap of the rectangle defined by (x,y,w,h) and all
 the rectangles.
 
@@ -424,64 +402,25 @@ function cost_f(xs, ys, as, ws, hs, x, y, a, w, h, R; except=[])
     for i in 1:length(xs)
         if i in except continue end
         m1, m2, m3, m4 = four_corners(xs[i], ys[i], as[i], ws[i], hs[i])
-        # m1, m2, m3, m4 = four_corners(xs[i], ys[i], ws[i], hs[i])
-        # FIXME the four corners of the polygon will never be in polygon
-        #
-        # FIXME of course this is incorrect. It might be the case where one
-        # rectangle is inside another. Thus the corners of the larger one will
-        # never be inside the small one.
-        #
-        # maybe I'm doing double direction check
-        if overlap(l1, l2, l3, l4, m1, m2, m3, m4)
+        if isoverlap([l1, l2, l3, l4],
+                     [m1, m2, m3, m4])
             ct += 1
         end
     end
     return ct
 end
 
-function overlap(l1, l2, l3, l4, r1, r2, r3, r4)
-    tri1 = Primitive(l1, l2, l3)
-    tri2 = Primitive(l1, l4, l3)
-
-    tri3 = Primitive(r1, r2, r3)
-    tri4 = Primitive(r1, r4, r3)
-
-    if intriangle(tri1, r1) > 0 ||
-        intriangle(tri1, r2) > 0 ||
-        intriangle(tri1, r3) > 0 ||
-        intriangle(tri1, r4) > 0 ||
-
-        intriangle(tri2, r1) > 0 ||
-        intriangle(tri2, r2) > 0 ||
-        intriangle(tri2, r3) > 0 ||
-        intriangle(tri2, r4) > 0 ||
-
-        intriangle(tri3, l1) > 0 ||
-        intriangle(tri3, l2) > 0 ||
-        intriangle(tri3, l3) > 0 ||
-        intriangle(tri3, l4) > 0 ||
-
-        intriangle(tri4, l1) > 0 ||
-        intriangle(tri4, l2) > 0 ||
-        intriangle(tri4, l3) > 0 ||
-        intriangle(tri4, l4) > 0
-
-        return true
-    end
-    return false
-end
-
 function test()
-    overlap(four_corners(786, 617, 1.25, 122, 81)...,
-            four_corners(707, 730, -0.314, 224, 81)...)
+    isoverlap(four_corners(786, 617, 1.25, 122, 81),
+              four_corners(707, 730, -0.314, 224, 81))
 end
 
 function four_corners(x, y, w, h)
     # compute the 4 corners of the rectangle
-    l1 = GP.Point(x - w/2, y - h/2)
-    l2 = GP.Point(x + w/2, y - h/2)
-    l3 = GP.Point(x + w/2, y + h/2)
-    l4 = GP.Point(x - w/2, y + h/2)
+    l1 = (x - w/2, y - h/2)
+    l2 = (x + w/2, y - h/2)
+    l3 = (x + w/2, y + h/2)
+    l4 = (x - w/2, y + h/2)
     return l1, l2, l3, l4
 end
 
@@ -493,7 +432,7 @@ function four_corners(x, y, a, w, h)
                    θ = atan(Δh, Δw)
                    x1 = x - cos(θ + a) * r
                    y1 = y + sin(θ + a) * r
-                   GP.Point(x1, y1)
+                   (x1, y1)
                end
 end
 
@@ -630,4 +569,5 @@ function simulated_annealing_legalization(xs, ys, as, ws, hs, mask, diearea;
     conflicts = compute_conflicts(xs, ys, as, ws, hs, R)
     return xs, ys, as, conflicts
 end
+
 

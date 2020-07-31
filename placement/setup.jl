@@ -17,6 +17,9 @@ Pkg.add("ProfileView")
 Pkg.add("PackageCompiler")
 Pkg.add("GeometricalPredicates")
 
+# https://github.com/JuliaGeometry/Clipper.jl
+Pkg.add("Clipper")
+
 Pkg.rm("CuArrays")
 
 Pkg.update()
