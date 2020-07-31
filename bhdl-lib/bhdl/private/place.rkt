@@ -315,15 +315,18 @@ Es (Edge, i.e. netlist), diearea"
      (48 B.Fab user)
      (49 F.Fab user)
      )
+    ;; FIXME DRC rules
     (setup
      (last_trace_width 0.4064)
      (user_trace_width 0.254)
      (user_trace_width 0.4064)
      (user_trace_width 0.889)
-     (trace_clearance 0.2032)
+     ;; 0.127
+     (trace_clearance 0.127)
      (zone_clearance 0.307299)
      (zone_45_only yes)
-     (trace_min 0.2032)
+     ;; 0.127
+     (trace_min 0.127)
      (segment_width 2)
      (edge_width 0.0991)
      (via_size 1)
