@@ -40,7 +40,7 @@
                [key-with-diode (make-circuit
                                 ;; FIXME user should not specify left and right
                                 #:external-pins (left right)
-                                #:vars ([d (Diode)])
+                                #:vars ([d (1N4148W)])
                                 #:connect (*- self.left atom d self.right)
                                 #:layout (vc-append 3 atom d))])
           key-with-diode))))
@@ -102,22 +102,21 @@
                            (- pi))])])
     (let* ([padding (λ (unit)
                       (pict:ghost (pict:rectangle 10 unit)))])
-      (parameterize ([default-append-spacing 20])
-        (rotate (hb-append (vr-append col1 ..)
-                           (vr-append col2 .. (padding 30))
-                           (vr-append col3 .. (padding 60))
-                           (vr-append col4 .. (padding 80))
-                           (vr-append col5 .. (padding 60))
-                           ;; col6
-                           (match (list col6 col7)
-                             [(list (list k5 t g b lspace) (list lmid1 lmid2))
-                              (vl-append (hb-append (vl-append  k5 t g b)
-                                                    (vl-append
-                                                     (rotate lmid1 (/ pi 2))
-                                                     (rotate lmid2 (/ pi 2))))
-                                         lspace
-                                         (padding 30))]))
-                (- (/ pi 10)))))))
+      (rotate (hb-append (vr-append col1 ..)
+                         (vr-append col2 .. (padding 30))
+                         (vr-append col3 .. (padding 60))
+                         (vr-append col4 .. (padding 80))
+                         (vr-append col5 .. (padding 60))
+                         ;; col6
+                         (match (list col6 col7)
+                           [(list (list k5 t g b lspace) (list lmid1 lmid2))
+                            (vl-append (hb-append (vl-append  k5 t g b)
+                                                  (vl-append
+                                                   (rotate lmid1 (/ pi 2))
+                                                   (rotate lmid2 (/ pi 2))))
+                                       lspace
+                                       (padding 30))]))
+              (- (/ pi 10))))))
 
 ;; TODO I need to support two kinds of location.
 ;; 1. functional pict
@@ -130,15 +129,16 @@
    #:external-pins (row1 row2 row3 row4 row5
                          col1 col2 col3 col4 col5 col6 col7
                          col8 col9 col10 col11 col12 col13 col14)
-   #:layout (hc-append -150
-                       (make-half 'left
-                                  (for/list ([i (range 7)])
-                                    (keyboard-col matrix i))
-                                  ..)
-                       (make-half 'right
-                                  (for/list ([i (reverse (range 7 14))])
-                                    (keyboard-col matrix i))
-                                  ..))
+   #:layout (inset (hc-append -150
+                              (make-half 'left
+                                         (for/list ([i (range 7)])
+                                           (keyboard-col matrix i))
+                                         ..)
+                              (make-half 'right
+                                         (for/list ([i (reverse (range 7 14))])
+                                           (keyboard-col matrix i))
+                                         ..))
+                   -30)
    ;; connections
    #:connect (for/list ([x (range 5)])
                (filter-not
@@ -151,7 +151,6 @@
                     (when key
                       (*-
                        (pin-ref self yname)
-                       ;; (diode)
                        key
                        (pin-ref self xname)
                        ))))))))
@@ -174,7 +173,7 @@
 
   (define c (make-circuit
              #:external-pins (p1 p2 p3)
-             #:connect (*- self.p1 self.p3 (Diode) (Diode) self.p2)))
+             #:connect (*- self.p1 self.p3 (1N4148W) (1N4148W) self.p2)))
 
   (collect-all-atoms c)
   (collect-all-atoms (*- c))
@@ -183,19 +182,38 @@
   (nfree-atoms matrix-module)
   (collect-all-composites matrix-module))
 
-(define gd32 (GD32VF103CBT6))
-
 (define gd32-module
   (make-circuit
    ;; TODO signals to use in this circuit
    ;; #:signal ([GND 3V3])
-   #:vars ([x2 (Crystal-2)]
+   #:external-pins (SPI_CS SPI_CLK SPI_MISO SPI_MOSI
+                           ;; TODO how to abstract over pin names
+                           row1 row2 row3 row4 row5
+                           col1 col2 col3 col4 col5 col6 col7
+                           col8 col9 col10 col11 col12 col13 col14)
+   ;; variables
+   #:vars ([gd32 (GD32VF103CBT6)]
+           [x2 (Crystal-2)]
            [x4 (Crystal-4)]
            [reg (ME6211C)]
            [usb (USB-C-16)]
            ;; [rgb (TJ-S1615CY)]
-           ;; I probably want to use 3 leds in a row?
-           [rgb (WS2812B)])
+           ;; TODO I probably want to use 3 leds in a row?
+           ;; TODO I should also have a poweron LED?
+           [rgb (WS2812B)]
+           [btn-boot (SKRPACE010)]
+           [btn-reset (SKRPACE010)])
+   ;; setup external pins
+   #:connect (*= (self [row1 row2 row3 row4 row5])
+                 (gd32 [PA0 PA1 PA2 PA3 PA4]))
+   #:connect (*= (self [col1 col2 col3 col4 col5 col6 col7
+                             col8 col9 col10 col11 col12 col13 col14])
+                 (gd32 [PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7 PB8 PB9 PB10 PB11
+                            PA5 PA6]))
+   #:connect (*= (self [SPI_CS SPI_CLK SPI_MISO SPI_MOSI])
+                 (gd32 [SPI1_CS SPI1_SCLK SPI1_MISO SPI1_MOSI]))
+   ;; layout
+   #:layout (vc-append (rotate usb pi) (hc-append btn-boot btn-reset rgb) gd32)
    #:connect (list
               ;; reset pin
               (*- gd32.NRST (*< (*- (C '100nf) global.GND)
@@ -230,6 +248,7 @@
               ;;
               ;; FIXME place the capacitors close to where they are defined
               (*- reg.VIN global.5V (C '10uf) global.GND)
+              (*- reg.VIN (LED0603 'red))
               (*- reg.VSS global.GND)
               (*- reg.CE global.5V)
               (*- reg.VOUT global.3V3 (*< (C '100uf)
@@ -261,35 +280,45 @@
               (*- rgb.DI gd32.PC13)
 
               ;; boot button
-              (*- global.3V3 (SKRPACE010) gd32.BOOT0 (R '10k) global.GND)
+              (*- global.3V3 btn-boot gd32.BOOT0 (R '10k) global.GND)
               (*- gd32.BOOT1 (R '10k) global.GND)
               ;; reset button
-              (*- gd32.NRST (SKRPACE010) global.GND))))
+              (*- gd32.NRST btn-reset global.GND))))
 
-(define esp32 (ESP32-WROVER-E))
 
 (define esp32-module
   (make-circuit
-   #:vars ([usb (USB-C-16)]
+   ;; FIXME I intend this as internal signal name
+   #:external-pins (EXT5V
+                    SPI_CS SPI_CLK SPI_MISO SPI_MOSI)
+   #:connect (*= (self [SPI_CS SPI_CLK SPI_MISO SPI_MOSI])
+                 (esp32 [VSPICS0 VSPICLK VSPIMISO VSPIMOSI]))
+   #:layout (ht-append (inset esp32 0 -20 0 0)
+                       (vc-append (rotate usb pi)
+                                  (hc-append rgb btn-io0 btn-en)))
+   #:vars ([esp32 (ESP32-WROVER-E)]
+           [usb (USB-C-16)]
            [cp2102n (CP2102N)]
            ;; FIXME BJT and pin name and order
            [q1 (SS8050-G)]
            [q2 (SS8050-G)]
-           [reg (AMS1117-3.3)])
-   ;; FIXME I intend this as internal signal name
-   #:external-pins (EXT5V)
+           [reg (AMS1117-3.3)]
+           [rgb (WS2812B)]
+           ;; TODO what are the purpose of these buttons? Reset? Boot?
+           [btn-io0 (Switch)]
+           [btn-en (Switch)])
    #:connect (list
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
               ;; usb connector
               (*- usb.VBUS (R '22.1k) cp2102n.VBUS)
               (*- usb.VBUS
                   ;; FIXME polarized and /-\
-                  (Diode) self.EXT5V)
+                  (1N4148W) self.EXT5V)
               (*- usb.GND global.GND)
               ;; data bus
               ;; FIXME diode: LESD5D5
-              (*- usb.D+1 cp2102n.D+ (Diode) global.GND)
-              (*- usb.D-1 cp2102n.D- (Diode) global.GND)
+              (*- usb.D+1 cp2102n.D+ (1N4148W) global.GND)
+              (*- usb.D-1 cp2102n.D- (1N4148W) global.GND)
               ;; cp2102n additional periphral
               ;; FIXME DCD RI??
               (*- cp2102n.VBUS (R '47.5k) global.GND)
@@ -301,6 +330,11 @@
                       (C '0.1uf))
                   global.GND)
               (*- cp2102n.GND global.GND)
+
+
+              ;; RGB
+              (*- rgb.VDD global.5V (C '100nf) rgb.VSS global.GND)
+              (*- rgb.DI esp32.IO2)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
               ;; connect cp2102 to esp32
@@ -323,17 +357,17 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
               ;; power supply
-              (*- self.EXT5V (R '2k) (LED 'red) global.GND)
+              (*- self.EXT5V (R '2k) (LED0603) global.GND)
               (*- self.EXT5V (C '22uf) global.GND)
               (*- self.EXT5V reg.VIN)
               (*- reg.GND global.GND)
               (*- reg.VOUT (C '22uf) global.GND)
 
               ;; button
-              (*- esp32.IO0 (*< (Switch)
+              (*- esp32.IO0 (*< btn-io0
                                 (C '0.1uf))
                   global.GND)
-              (*- esp32.EN (*< (Switch)
+              (*- esp32.EN (*< btn-en
                                (C '0.1uf))
                   global.GND)
 
@@ -349,37 +383,47 @@
               ;;     (esp32 [EN NC NC IO34 IO35 IO23 IO33 IO25 IO25]))
               )))
 
+
+
 ;; TODO the rest of circuit
 (define fitboard
   (make-circuit
    ;; CAUTION just to declare the pict
-   #:layout (inset matrix-module 100)
+   #:layout (ct-superimpose (hc-append matrix-module)
+                            (ht-append (pict:ghost (pict:rectangle 50 10))
+                                       (ht-append 100 gd32-module esp32-module)))
    #:connect (list matrix-module esp32-module gd32-module
                    ;; connect matrix module with gd32 module
+                   ;; TODO *= connects corresponding pins with same name by default
                    (*= (matrix-module [row1 row2 row3 row4 row5])
-                       (gd32 [PA0 PA1 PA2 PA3 PA4]))
+                       (gd32-module [row1 row2 row3 row4 row5]))
                    (*= (matrix-module [col1 col2 col3 col4 col5 col6 col7
                                             col8 col9 col10 col11 col12 col13 col14])
-                       (gd32 [PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7 PB8 PB9 PB10 PB11
-                                  PA5 PA6]))
+                       (gd32-module [col1 col2 col3 col4 col5 col6 col7
+                                          col8 col9 col10 col11 col12 col13 col14]))
                    ;; connect esp32 and gd32 via SPI
-                   (*= (gd32 [SPI1_CS SPI1_SCLK SPI1_MISO SPI1_MOSI])
-                       (esp32 [VSPICS0 VSPICLK VSPIMISO VSPIMOSI])))))
+                   (*= (gd32-module [SPI_CS SPI_CLK SPI_MISO SPI_MOSI])
+                       (esp32-module [SPI_CS SPI_CLK SPI_MISO SPI_MOSI])))))
 
+;; visualize the board
+(Composite-pict fitboard)
 
 ;; visualizing init placement
 (module+ test
   (make-directory* "/tmp/bhdl/")
   (parameterize ([current-directory "/tmp/bhdl/"])
     ;; TODO NOW HEBI enable auto-place
-    (circuit-export fitboard #:auto-place #f #:formats '(kicad pdf dsn)))
+    (circuit-export fitboard
+                    #:auto-place #t
+                    #:use-cache #f
+                    #:formats '(kicad pdf dsn ses)))
 
   ;; (parameterize ([current-directory "/tmp/bhdl/"])
   ;;   (circuit-export fitboard #:auto-place #t #:formats '(kicad pdf dsn ses)))
   (void))
 
 (module+ debug
-  (IC-name (ICAtom-ic (Diode)))
+  (IC-name (ICAtom-ic (1N4148W)))
   (map Atom-pict (collect-all-atoms fitboard))
   (define place-spec (Composite->place-spec fitboard))
   (Composite->pict fitboard place-spec)

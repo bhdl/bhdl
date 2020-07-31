@@ -49,7 +49,7 @@
   (pict:hb-append (maybe-atom->pict sep)
                   (map maybe-atom->pict args) ..))
 
-(define default-append-spacing (make-parameter 0))
+(define default-append-spacing (make-parameter 20))
 
 (define-syntax (wrap-*-append stx)
   (syntax-parse

@@ -687,7 +687,7 @@ Es (Edge, i.e. netlist), diearea"
          ;; CAUTION auto-place requires backend placement engine running
          ;; and takes time
          #:auto-place [auto-place #f]
-         #:use-cache [use-cache #t]
+         #:use-cache [use-cache #f]
          ;; formats is a list of symbols from '(kicad pdf dsn ses)
          ;;
          ;; CAUTION ses requires freerouting.jar and takes time
