@@ -89,7 +89,10 @@ Es (Edge, i.e. netlist), diearea"
                                   ([loc locs])
                                 (match-let ([(Point x y a) loc])
                                   (values x y a)))]
-                  [(mask) (for/list ([atom atoms]) (if (Atom-pict atom) 0 1))]
+                  [(mask) (for/list ([atom atoms]) (if (maybe-find cc-find diepict
+                                                                   (Atom-pict atom))
+                                                       ;; 0 for fixed
+                                                       0 1))]
                   [(ws hs) (for/lists (l1 l2)
                                ([atom atoms])
                              (values (exact->inexact (Macro-w (atom->macro atom)))
