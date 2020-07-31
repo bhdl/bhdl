@@ -650,8 +650,14 @@ Es (Edge, i.e. netlist), diearea"
                              [(pad-spec name x y mounting-type
                                         shape (list s1 s2) dsize)
                               `(pin ,(padstack-id pad)
+                                    ;; ,i
+                                    ,(Pin-name
+                                      (pin-ref
+                                       atom
+                                       (string->symbol
+                                        (~a "fp-" name))))
                                     ;; CAUTION all y are negative
-                                    ,i ,(* x 1000) ,(* (- y) 1000))]))))
+                                    ,(* x 1000) ,(* (- y) 1000))]))))
            ;; padstacks FIXME remove duplicate
            ,@(remove-duplicates
               (apply append
@@ -672,8 +678,7 @@ Es (Edge, i.e. netlist), diearea"
                        `(net ,i (pins
                                  ,@(for/list ([pin (Net-pins net)])
                                      (string->symbol
-                                      (~a "ATOM"
-                                          (hash-ref Hatom=>index (Pin-parent pin))
+                                      (~a (atom->ID (Pin-parent pin) Hatom=>index)
                                           "-"
                                           (Pin-name pin)))))))))))
 
