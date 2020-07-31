@@ -88,6 +88,7 @@
                    [`(pad ,name ,mounting-type ,shape (at ,x ,y ,z ...)
                           (size ,s1 ,s2)
                           ;; FIXME optional dsize
+                          ;; FIXME Oval drill
                           (drill ,dsize) ... ,other-attrs ...)
                     (pad-spec name x y mounting-type shape (list s1 s2) dsize)]
                    ;; TODO

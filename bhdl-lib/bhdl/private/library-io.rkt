@@ -188,10 +188,20 @@
                      [(pad-spec name x y mounting-type shape (list s1 s2) dsize)
                       ;; FIXME the fp dimension and the location seems to be in
                       ;; different units
-                      `(pad ,name ,mounting-type ,shape (at ,x ,y ,(* (/ a pi) 180))
+                      `(pad ,name ,(case mounting-type
+                                     [(thru_hole) 'thru_hole]
+                                     [(smd) 'smd]
+                                     [else (error "Unsupported mounting type:"
+                                                  mounting-type)])
+                            ,shape (at ,x ,y ,(* (/ a pi) 180))
                             (size ,s1 ,s2)
                             ;; FIXME optional drill
-                            ;; (drill ,dsize)
+                            ,@(case mounting-type
+                                [(thru_hole) `((drill oval ,@dsize))]
+                                [(smd) null]
+                                [else (error "Unsupported mounting type:"
+                                             mounting-type)])
+                            ;; FIXME HEBI layers
                             (layers *.Cu *.Mask F.SilkS)
                             ,@(let ([name (string->symbol (~a "fp-" name))])
                                 (if (and (hash-has-key? pinhash name)

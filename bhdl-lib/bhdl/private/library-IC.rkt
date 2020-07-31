@@ -523,8 +523,7 @@
           [A12 GND]
           [B12 GND])
   #:FP ((lcsc->fp "C456012")
-        B12 B9 A5 B5 A9 A12))
-
+        B12 B9 A5 B5 A9 A12 7 7 7 7))
 
 ;; Manufacturer	SHOU HAN
 ;; Mfr.Part #	TYPE-C16PIN
@@ -550,6 +549,11 @@
         ;; FIXME this will conflict with numbers
         P4 P3 P2 P1))
 
+(module+ debug
+  ;; TODO use this to auto-generate FP pins to use in IC?
+  (map pad-spec-name (footprint-pads (lcsc->fp "C456012")))
+  (scale (Atom-pict (USB-C-6)) 10)
+  (scale (Atom-pict (USB-C-16)) 10))
 ;; TODO This is 6 pin
 ;;
 ;; Manufacturer	TOGIALED
@@ -591,7 +595,7 @@
 ;; LCSC Part #	C139797
 
 (define/IC (SKRPACE010)
-  #:FP (fp-SKRPACE010
+  #:FP ((lcsc->fp "C139797")
         ;; 1 2
         A1 A2
         ;; 3 4
@@ -614,6 +618,11 @@
   #:FP (fp-SOT-23
         IN GND OUT))
 
+
+;; Manufacturer	Espressif Systems
+;; Mfr.Part #	ESP32-WROVER-E(4MB)
+;; LCSC Part #	C529587
+;; Package	Module
 (define/IC (ESP32-WROVER-E)
   ;; ESP32 has 4xSPI ..
   ;; SPI* is SPI01
@@ -632,7 +641,7 @@
           [IO12 HSPIQ HSPIMISO]
           [IO13 HSPID HSPIMOSI]
           [IO15 HSPICS0])
-  #:FP (fp-esp32-wrover-e
+  #:FP ((lcsc->fp "C529587")
 
         GND 3V3 EN SENSOR-VP SENSOR-VN
         IO34 IO35 IO32 IO33 IO25 IO26 IO27 IO14 IO12 GND IO13 NC NC NC
@@ -642,6 +651,9 @@
 
         ;; CAUTION this last GND is the bottom pad
         GND))
+
+(module+ debug
+  (Atom-pict (ESP32-WROVER-E)))
 
 ;; CAUTION Uno Mini Micro are from Sparkfun library
 
