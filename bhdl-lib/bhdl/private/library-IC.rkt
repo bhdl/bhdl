@@ -26,7 +26,9 @@
          Capacitor C
          Fuse
          LED
+         LED0603
          Diode
+         1N4148W
          FerriteBead
          Crystal-2
          Crystal-4
@@ -157,11 +159,36 @@
   #:LEFT plus
   #:RIGHT minus)
 
+
 (define/IC (Diode)
   #:PREFIX "D"
   #:FP (fp-diode plus minus)
   #:LEFT plus
   #:RIGHT minus)
+
+
+;; Manufacturer	High Diode
+;; Mfr.Part #	1N4148W
+;; LCSC Part #	C466653
+;; Package	SOD-123
+(define/IC (1N4148W)
+  #:FP ((lcsc->fp "C466653")
+        - +)
+  #:LEFT +
+  #:RIGHT -
+  #:PREFIX "D")
+
+;; Manufacturer	TOGIALED
+;; Mfr.Part #	TJ-S1608SW6TGLC2G-A5
+;; LCSC Part #	C192316
+;; Package	0603
+
+(define/IC (LED0603)
+  #:PREFIX "LED"
+  #:FP ((lcsc->fp "C192316")
+        - +)
+  #:LEFT +
+  #:RIGHT -)
 
 (define/IC (FerriteBead)
   #:auto-FP (fp-resistor "0603")
@@ -587,7 +614,8 @@
 
 (define/IC (WS2812B)
   #:FP (fp-WS2812B
-        VDD DO VSS DI))
+        VDD DO VSS DI)
+  #:PREFIX "LED")
 
 
 ;; Manufacturer	ALPS Electric
@@ -600,6 +628,7 @@
         A1 A2
         ;; 3 4
         B1 B2)
+  #:PREFIX "KEY"
   #:LEFT A1
   #:RIGHT B1)
 
@@ -607,6 +636,7 @@
   (make-circuit
    #:vars ([it (SKRPACE010)])
    #:external-pins (left right)
+   #:layout it
    #:connect (list (*- self.left it.A1)
                    (*- self.right it.B1))))
 
@@ -616,7 +646,8 @@
 ;; Package	SOT-23(SOT-23-3)
 (define/IC (Transistor)
   #:FP (fp-SOT-23
-        IN GND OUT))
+        IN GND OUT)
+  #:PREFIX "Q")
 
 
 ;; Manufacturer	Espressif Systems
