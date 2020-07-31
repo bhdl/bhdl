@@ -621,9 +621,13 @@ function simulated_annealing_legalization(xs, ys, as, ws, hs, mask, diearea;
         # print how many conflicts
         conflicts = compute_conflicts(xs, ys, as, ws, hs, R)
         @info "cycle $cycle, remaining conflicts: " length(conflicts)
+
+        # break if already no conflicts
+        if length(conflicts) == 0 break end
         # FIXME visualize the angle
         if vis visualize(xs, ys, ws, hs, R) end
     end
     conflicts = compute_conflicts(xs, ys, as, ws, hs, R)
     return xs, ys, as, conflicts
 end
+
