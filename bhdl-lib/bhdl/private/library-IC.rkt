@@ -96,6 +96,7 @@
              (~optional (~seq #:ALTS alts) #:defaults ([alts #'()]))
              (~optional (~seq #:LEFT left) #:defaults ([left #'#f]))
              (~optional (~seq #:RIGHT right) #:defaults ([right #'#f]))
+             (~optional (~seq #:PREFIX prefix) #:defaults ([prefix #'"U"]))
              (~seq #:DUMMY dummy)
              footprint:footprint-spec) ...)
     ;; construct IC:name
@@ -114,7 +115,7 @@
       #`(begin
           (define-alias
             (IC-name ...)
-            (IC IC-name-str
+            (IC IC-name-str prefix
                 url
                 'alts
                 (list footprint.res ...)
@@ -134,25 +135,30 @@
 ;;
 (define/IC (Resistor R)
   #:auto-FP (fp-resistor "0603")
+  #:PREFIX "R"
   #:LEFT 1
   #:RIGHT 2)
 
 (define/IC (Capacitor C)
   #:auto-FP (fp-capacitor "0603")
+  #:PREFIX "C"
   #:LEFT 1
   #:RIGHT 2)
 
 (define/IC (Fuse)
   #:auto-FP (fp-fuse "1206")
+  #:PREFIX "F"
   #:LEFT 1
   #:RIGHT 2)
 
 (define/IC (LED)
   #:FP (fp-diode plus minus)
+  #:PREFIX "LED"
   #:LEFT plus
   #:RIGHT minus)
 
 (define/IC (Diode)
+  #:PREFIX "D"
   #:FP (fp-diode plus minus)
   #:LEFT plus
   #:RIGHT minus)

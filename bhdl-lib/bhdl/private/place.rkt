@@ -407,7 +407,7 @@ Es (Edge, i.e. netlist), diearea"
   ;; UPDATE using some meaningful name instead of "ATOM"
   ;;
   ;; FIXME assuming all atoms are ICAtom
-  (~a (IC-name (ICAtom-ic atom))
+  (~a (IC-prefix (ICAtom-ic atom))
       ;; "ATOM"
       (hash-ref Hatom=>index atom)))
 

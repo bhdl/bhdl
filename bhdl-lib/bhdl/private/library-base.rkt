@@ -29,7 +29,7 @@
 ;; 3. fps: this determines the exact footprint of different packaging
 (struct IC
   ;; this tells nothing about the fields. I really need type
-  (name datasheet alts fps left right)
+  (name prefix datasheet alts fps left right)
   #:prefab)
 
 
