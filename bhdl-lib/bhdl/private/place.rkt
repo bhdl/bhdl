@@ -682,6 +682,7 @@ Es (Edge, i.e. netlist), diearea"
          ;; CAUTION auto-place requires backend placement engine running
          ;; and takes time
          #:auto-place [auto-place #f]
+         #:use-cache [use-cache #t]
          ;; formats is a list of symbols from '(kicad pdf dsn ses)
          ;;
          ;; CAUTION ses requires freerouting.jar and takes time
@@ -698,10 +699,26 @@ Es (Edge, i.e. netlist), diearea"
                       #:sa-ncycles 10
                       #:sa-nsteps 3000
                       #:sa-stepsize 10
-                      #:sa-theta-stepsize 0.3)]
-         [place-result (if auto-place
-                           (send-for-placement place-spec)
-                           place-spec)])
+                      ;; to support rotation, use non-0 e.g. 0.3
+                      #:sa-theta-stepsize 0)]
+         [place-result (case auto-place
+                         [(#t) (let ([fname "place-result.json"])
+                                 (cond
+                                  [(and (file-exists? fname) use-cache)
+                                   (debug "loading ..")
+                                   (call-with-input-file fname
+                                     (λ (in)
+                                       (string->jsexpr (port->string in))))]
+                                  [else (begin
+                                          (debug "sending for placement ..")
+                                          (let ([res (send-for-placement place-spec)])
+                                            (debug "saving ..")
+                                            (call-with-output-file fname
+                                              (λ (out)
+                                                (write-string (jsexpr->string res) out))
+                                              #:exists 'replace)
+                                            res))]))]
+                         [else place-spec])])
     (when (member 'kicad formats)
       (call-with-output-file "out.kicad_pcb"
         #:exists 'replace
