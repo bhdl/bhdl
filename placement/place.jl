@@ -231,6 +231,28 @@ function display_plot(p)
     println("#<Image: $(path)>")
 end
 
+function validate_region!(xs, ys, ws, hs, R)
+    # FIXME consider rotation angles
+    #
+    # FIXME I belive this is pass-by-reference, so that I can modify the values
+    # But strange enough, this doesn't work. I have to copy these inline in the
+    # two places for now.
+    #
+    # UPDATE But the fixed locations should not change
+    let idx = (xs .- ws ./ 2 .< R.xmin) .& (mask .== 1)
+        xs[idx] .= (ws ./ 2 .+ R.xmin)[idx]
+    end
+    let idx = (xs .+ ws ./ 2 .> R.xmax) .& (mask .== 1)
+        xs[idx] .= (ws ./ 2 .- R.xmax)[idx]
+    end
+    let idx = (ys .- hs ./ 2 .< R.ymin) .& (mask .== 1)
+        ys[idx] .= (hs ./ 2 .+ R.ymin)[idx]
+    end
+    let idx = (ys .+ hs ./ 2 .> R.ymax) .& (mask .== 1)
+        ys[idx] .= (hs ./ 2 .- R.ymax)[idx]
+    end
+end
+
 # return a new pos
 function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, nsteps=50, nbins=300)
     xs = Float32.(xs)
@@ -301,11 +323,19 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, nsteps=50, nbins=30
         ys .-= deltay .* mask
 
         # map back to valid region
-        # FIXME consider w and h
-        xs[xs .- ws ./ 2 .< R.xmin] .= (ws ./ 2 .+ R.xmin)[xs .- ws ./ 2 .< R.xmin]
-        xs[xs .+ ws ./ 2 .> R.xmax] .= (ws ./ 2 .- R.xmax)[xs .+ ws ./ 2 .> R.xmax]
-        ys[ys .- hs ./ 2 .< R.ymin] .= (hs ./ 2 .+ R.ymin)[ys .- hs ./ 2 .< R.ymin]
-        ys[ys .+ hs ./ 2 .> R.ymax] .= (hs ./ 2 .- R.ymax)[ys .+ hs ./ 2 .> R.ymax]
+        # validate_region!(xs, ys, ws, hs, R)
+        let idx = (xs .- ws ./ 2 .< R.xmin) .& (mask .== 1)
+            xs[idx] .= (ws ./ 2 .+ R.xmin)[idx]
+        end
+        let idx = (xs .+ ws ./ 2 .> R.xmax) .& (mask .== 1)
+            xs[idx] .= (ws ./ 2 .- R.xmax)[idx]
+        end
+        let idx = (ys .- hs ./ 2 .< R.ymin) .& (mask .== 1)
+            ys[idx] .= (hs ./ 2 .+ R.ymin)[idx]
+        end
+        let idx = (ys .+ hs ./ 2 .> R.ymax) .& (mask .== 1)
+            ys[idx] .= (hs ./ 2 .- R.ymax)[idx]
+        end
         if vis visualize(xs, ys, ws, hs, R) end
     end
     # if vis visualize_density((xs, ys, ws, hs), R) end
@@ -574,12 +604,20 @@ function simulated_annealing_legalization(xs, ys, as, ws, hs, mask, diearea;
         end
 
         # map back to valid region
-        # FIXME consider w and h
-        xs[xs .- ws ./ 2 .< R.xmin] .= (ws ./ 2 .+ R.xmin)[xs .- ws ./ 2 .< R.xmin]
-        xs[xs .+ ws ./ 2 .> R.xmax] .= (ws ./ 2 .- R.xmax)[xs .+ ws ./ 2 .> R.xmax]
-        ys[ys .- hs ./ 2 .< R.ymin] .= (hs ./ 2 .+ R.ymin)[ys .- hs ./ 2 .< R.ymin]
-        ys[ys .+ hs ./ 2 .> R.ymax] .= (hs ./ 2 .- R.ymax)[ys .+ hs ./ 2 .> R.ymax]
-
+        # validate_region!(xs, ys, ws, hs, R)
+        let idx = (xs .- ws ./ 2 .< R.xmin) .& (mask .== 1)
+            xs[idx] .= (ws ./ 2 .+ R.xmin)[idx]
+        end
+        let idx = (xs .+ ws ./ 2 .> R.xmax) .& (mask .== 1)
+            xs[idx] .= (ws ./ 2 .- R.xmax)[idx]
+        end
+        let idx = (ys .- hs ./ 2 .< R.ymin) .& (mask .== 1)
+            ys[idx] .= (hs ./ 2 .+ R.ymin)[idx]
+        end
+        let idx = (ys .+ hs ./ 2 .> R.ymax) .& (mask .== 1)
+            ys[idx] .= (hs ./ 2 .- R.ymax)[idx]
+        end
+        
         # print how many conflicts
         conflicts = compute_conflicts(xs, ys, as, ws, hs, R)
         @info "cycle $cycle, remaining conflicts: " length(conflicts)
