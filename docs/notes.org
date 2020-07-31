@@ -13,8 +13,10 @@
 - [-] connect LEDs?
 - [-] case CAD co-design?
 
-*** TODO place USB, SoCs, LEDsat some proper position
-*** TODO run auto-placer
+*** DONE place USB, SoCs, LEDsat some proper position
+CLOSED: [2020-08-01 Sat 01:10]
+*** DONE run auto-placer
+CLOSED: [2020-07-31 Fri 17:57]
 *** STARTED stablizer and other mouting holes
 *** STARTED Kahl hot swappable socket
 which might have to go back side of the PCB, and must align with the switch
@@ -32,12 +34,43 @@ CLOSED: [2020-07-30 Thu 01:18]
 *** CANCELED other pins for debugging?
 CLOSED: [2020-07-30 Thu 01:18]
 
+** Other
+*** STARTED add some padding during placement
+So that it not too tight, easier for routing.
+
+*** DONE IC prefix
+CLOSED: [2020-07-31 Fri 12:24]
+*** solder mask layer text position
+*** DONE PAD holes
+CLOSED: [2020-07-31 Fri 12:24]
+*** TODO IC pinhash conflicts
+*** TODO check conflict of IC pin usage
+*** TODO deterministic layout and atom order
+- and output BOM
+*** DONE freerouting does not pass DRC check
+CLOSED: [2020-08-01 Sat 01:08]
+- [X] probably something wrong with exporting?
+  - the exporting was not working correctly. The SMD pads should not have pads in
+    the other side
+- [ ] Maybe add some padding during placement?
+- [ ] use groud and power plane
+*** DONE auto-placer some conflicts not detected
+CLOSED: [2020-08-01 Sat 01:08]
+
+This is because of one bug. I'm turning to use clipping packages, but they are
+slow.
+
+
+** TODO Bypass capacitor must be close to the point-of-interest
+
 ** TODO paper writing
 
 *** syntax
 *** semantics
 *** system
 *** evaluation and case study
+
+** Online demo
 
 * Reference
 ** cite:gd32vf103xxxx-datasheet
@@ -89,6 +122,7 @@ Some conflicts are not counted in the placement engine.
 and unify the different footprints into the hierarchy based on different repo
 
 ** TODO unify fp.rkt and library-IC.rkt
+** TODO performance of clipping conflict detection in auto-placer
 
 ** Better surface
 *** TODO layout language

@@ -109,6 +109,22 @@ Check Polyline element of SVG out.
 - id : gge18
 - locked: null
 
+*** RECT
+"RECT~406~220~105~52~1~gge32"
+Format:
+
+Check Rect element of SVG out.
+
+- command: RECT
+- x: 406
+- y: 220
+- width: 105
+- height: 52
+- layer id:1
+- id: gge36
+- locked:null
+- Rect’s attributes and image looks like bellow image:
+
 *** PAD
 "PAD~OVAL~814~371~6~16~11~~1~1.8~814 366 814 376~0~gge5~11~814 374.7 814 367.3~N"
 Format:
@@ -128,7 +144,9 @@ Format:
 - rotation: 0 [0 - 360]
 - id: gge19
 - Hole(Length): 11 (110mil)
+  - (HEBI: why there's another hole?). This seems to be the important one
 - Hole Points: 814 374.7 814 367.3 // slot hole from to point
+  - And I need to compute the width and height of the hole
 - Plated:Y/N
 - locked:null
 
