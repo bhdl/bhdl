@@ -97,11 +97,10 @@ Es (Edge, i.e. netlist), diearea"
                                ([atom atoms])
                              (values (exact->inexact (Macro-w (atom->macro atom)))
                                      (exact->inexact (Macro-h (atom->macro atom)))))]
-                  ;; add some margin for better placement result
-                  ;;
-                  ;; FIXME not working, the placement engine will screw out entirely
-                  ;; [(ws hs) (values (map (lambda (x) (+ x 0.05)) ws)
-                  ;;                  (map (lambda (x) (+ x 0.05)) ws))]
+                  ;; DEBUG CAUTION add some margin for better placement result
+                  ;; FIXME how to decide the size? I'll have to use mm or mil as unit
+                  [(ws hs) (values (map (lambda (x) (+ x 0.05)) ws)
+                                   (map (lambda (x) (+ x 0.05)) hs))]
                   [(Es)
                    ;; Edge is list of nets. Each net is a list of nodes, a node is
                    ;; (index offx offy)
