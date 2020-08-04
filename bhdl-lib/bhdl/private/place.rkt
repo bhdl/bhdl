@@ -591,7 +591,7 @@ Es (Edge, i.e. netlist), diearea"
                                 [(thru_hole) `((shape (path B.Cu ,(* s2 1000)
                                                             ;; FIXME not always 0
                                                             0 0 0 0)))]
-                                [(smd) nul]
+                                [(smd) null]
                                 [else (error "Mounting type error.")])
                             (attach off)))])]))
 
