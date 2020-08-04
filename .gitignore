@@ -20,3 +20,5 @@ fp-info-cache
 *.ses
 compiled/
 *.html
+
+*.ipynb_checkpoints/
