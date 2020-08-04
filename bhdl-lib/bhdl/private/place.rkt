@@ -498,6 +498,8 @@ Es (Edge, i.e. netlist), diearea"
          [Hnet=>index (for/hash ([net nets]
                                  ;; CAUTION the net 0 is special, and must have ID ""
                                  [i (in-naturals 1)])
+                        ;; I'll probably want to assign VCC and GND for
+                        ;; powerplane. Maybe just GND for now
                         (values net i))]
          ;; 3. get a map from atom pin to nets
          [Hpin=>net (for*/hash ([net nets]
