@@ -298,6 +298,9 @@ Es (Edge, i.e. netlist), diearea"
      )
     (layers
      (0 F.Cu signal)
+     ;; TODO using 4-layer board is as easy as 2 lines!
+     ;; (1 In1.Cu signal)
+     ;; (2 In2.Cu signal)
      (31 B.Cu signal)
      (32 B.Adhes user)
      (33 F.Adhes user)
