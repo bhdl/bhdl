@@ -740,6 +740,8 @@ Es (Edge, i.e. netlist), diearea"
                                               #:exists 'replace)
                                             res))]))]
                          [else place-spec])])
+    ;; save place spec
+    (save-for-placement place-spec "place-spec.json")
     (when (member 'kicad formats)
       (call-with-output-file "out.kicad_pcb"
         #:exists 'replace
