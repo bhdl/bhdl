@@ -13,7 +13,9 @@
          compose-pipe
          group-by-2
          group-by-index
-         hash-ref-ref)
+         hash-ref-ref
+
+         shell)
 
 (define-syntax-rule (myvoid stx ...)
   (void))
@@ -260,4 +262,9 @@ same rank
    stx
    [(_ xxx)
     #'(or xxx (error "Assertion failed:" 'xxx))]))
+
+(define (shell cmd)
+  "This is system, but receive no input. Jupyter notebook hangs on input."
+  (parameterize ([current-input-port (open-input-string "")])
+    (system cmd)))
 

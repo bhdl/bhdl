@@ -144,9 +144,10 @@ Es (Edge, i.e. netlist), diearea"
       ;; make-temporary-file creates the file
       #:exists 'replace)
     ;; pretty print by python -m json.tool
-    (let ([formatted (with-output-to-string
-                       (λ ()
-                         (system (~a "python -m json.tool " tmp))))])
+    (let ([formatted
+           (with-output-to-string
+             (λ ()
+               (shell (~a "python -m json.tool " tmp))))])
       (call-with-output-file fname
         (λ (out)
           ;; FIXME text output port?
@@ -745,22 +746,32 @@ Es (Edge, i.e. netlist), diearea"
     ;; save place spec
     (save-for-placement place-spec "place-spec.json")
     (when (member 'kicad formats)
+      (displayln "generating KiCAD PCB ..")
       (call-with-output-file "out.kicad_pcb"
         #:exists 'replace
         (λ (out)
           (pretty-write
            (Composite->kicad-pcb circuit place-result)
-           out))))
+           out)))
+      (displayln (~a "link: " (current-directory) "out.kicad_pcb")))
     (when (member 'pdf formats)
+      (displayln "generating pdf ..")
       (save-file
        (Composite->pict circuit place-result)
-       "out.pdf"))
+       "out.pdf")
+      (displayln (~a "link: " (current-directory) "out.pdf")))
     (when (member 'dsn formats)
+      (displayln "generating Spectre DSN ..")
       (call-with-output-file "out.dsn"
         #:exists 'replace
         (λ (out)
           (pretty-write
            (Composite->dsn circuit place-result)
-           out))))
+           out)))
+      (displayln (~a "link: " (current-directory) "out.dsn")))
     (when (member 'ses formats)
-      (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 10"))))
+      (displayln "invoking freerouting ..")
+      (let ([success? (shell "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 10")])
+        (displayln (~a "freerouting succeeded? " success?))
+        (when success?
+          (displayln (~a "link: " (current-directory) "out.ses")))))))
