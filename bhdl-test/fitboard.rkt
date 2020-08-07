@@ -1,122 +1,31 @@
-;; #lang racket
+#lang racket
 ;; #lang s-exp "bhdl/splicing.rkt"
-;; #lang bhdl
-#lang s-exp bhdl/splicing
 
 (require
  ;; require bhdl for production use
  ;; bhdl
  ;; require the file for incremental development
  "../bhdl-lib/bhdl/main.rkt"
+ "fitboard-lib.rkt"
          
  (prefix-in pict: pict)
  json
  (for-syntax syntax/parse
              racket/string))
 
+
+
 (define global
   (make-circuit
    #:external-pins (GND 3V3 5V USB5V)))
 
-(define (key-name-filter name)
-  (if (string-prefix? name "k")
-      (substring name 1)
-      name))
-
-;; or just key-with-diode group
-(define (create-switch-fn spacing)
-  (lambda (name)
-    (if (= spacing 0)
-        #f
-        (let* ([atom (Cherry spacing)]
-               [pict-with-name (cc-superimpose (atom->fp-pict atom)
-                                               (pict:text
-                                                (key-name-filter
-                                                 (symbol->string name))))]
-               ;; FIXME more functional way to do this?
-               [atom (begin (set-Atom-pict! atom pict-with-name)
-                            atom)]
-               ;; key with diode group
-               [key-with-diode (make-circuit
-                                ;; FIXME user should not specify left and right
-                                #:external-pins (left right)
-                                #:vars ([d (1N4148W)])
-                                #:connect (*- self.left atom d self.right)
-                                #:layout (vc-append 3 atom d))])
-          key-with-diode))))
-
-(struct KeyboardMatrix
-  (rows))
-
-(define (keyboard-row mat i)
-  (filter identity (list-ref (KeyboardMatrix-rows mat) i)))
-(define (keyboard-col mat i)
-  (filter identity
-          (for/list ([row (KeyboardMatrix-rows mat)])
-            (list-ref row i))))
-(define (keyboard-xy mat x y)
-  (list-ref (list-ref (KeyboardMatrix-rows mat) x) y))
-
-(begin-for-syntax
- (define-syntax-class key-spec
-   #:datum-literals (-)
-   (pattern - #:with name (car (generate-temporaries '(a)))
-            #:with spacing #'0)
-   (pattern ID:id #:with name #'ID
-            #:with spacing #'1)
-   (pattern (ID:id spacing0:number)
-            #:with name #'ID
-            #:with spacing #'spacing0)))
-
-(define-syntax (define-key-matrix stx)
-  (syntax-parse
-   stx
-   [(_ name ([key:key-spec ...] ...))
-    #'(begin
-        ;; 1. define the atoms
-        (define key.name ((create-switch-fn key.spacing) 'key.name))
-        ... ...
-        ;; 2. assign matrix to the variable
-        (define name (KeyboardMatrix (list (list key.name ...) ...))))]))
-
 (define-key-matrix matrix
-  ([(esc 1.5)    k1 k2 k3 k4    k5       -         -        k6 k7 k8  k9  k0   (backspace 1.5)]
-   [(tab 1.5)    Q  W  E  kR     T        -         -        Y  U  I   O   P    (k\\ 1.5)]
-   [(caps 1.5)   A  S  D  F     G        (lmid1 1.5) (rmid1 1.5)        H  J  K   L   k\;  (enter 1.5)]
-   [(lshift 1.5) Z  X  kC  V     B        (lmid2 1.5) (rmid2 1.5)        N  M  k\, k\. k\/  (rshift 1.5)]
+  ([(esc 1.5)    1 2 3 4    5       -         -        6 7 8  9  0   (backspace 1.5)]
+   [(tab 1.5)    Q  W  E  R     T        -         -        Y  U  I   O   P    (\\ 1.5)]
+   [(caps 1.5)   A  S  D  F     G        (lmid1 1.5) (rmid1 1.5)        H  J  K   L   \;  (enter 1.5)]
+   [(lshift 1.5) Z  X  C  V     B        (lmid2 1.5) (rmid2 1.5)        N  M  \, \. \/  (rshift 1.5)]
    [lctrl lfn lsuper lalt lTBD (lspace 2.75) - - (rspace 2.75) rTBD ralt rsuper rfn rctrl]))
 
-(module+ test
-  (KeyboardMatrix-rows matrix)
-  (keyboard-row matrix 1)
-  (keyboard-col matrix 6))
-
-(define (make-half left-or-right col1 col2 col3 col4 col5 col6 col7)
-  (let-values
-      ([(vr-append vl-append hb-append pi)
-        (case left-or-right
-          [(left)  (values vr-append vl-append hb-append pi)]
-          [(right) (values vl-append vr-append
-                           (lambda (arg . args)
-                             (hb-append (reverse (cons arg args)) ..))
-                           (- pi))])])
-    (let* ([padding (λ (unit)
-                      (pict:ghost (pict:rectangle 10 unit)))])
-      (rotate (hb-append (vr-append col1 ..)
-                         (vr-append col2 .. (padding 30))
-                         (vr-append col3 .. (padding 60))
-                         (vr-append col4 .. (padding 80))
-                         (vr-append col5 .. (padding 60))
-                         ;; col6
-                         (match (list col6 col7)
-                           [(list (list k5 t g b lspace) (list lmid1 lmid2))
-                            (vl-append (hb-append (vl-append  k5 t g b)
-                                                  (vl-append
-                                                   (rotate lmid1 (/ pi 2))
-                                                   (rotate lmid2 (/ pi 2))))
-                                       lspace
-                                       (padding 30))]))
-              (- (/ pi 10))))))
 
 ;; TODO I need to support two kinds of location.
 ;; 1. functional pict
@@ -129,16 +38,7 @@
    #:external-pins (row1 row2 row3 row4 row5
                          col1 col2 col3 col4 col5 col6 col7
                          col8 col9 col10 col11 col12 col13 col14)
-   #:layout (inset (hc-append -150
-                              (make-half 'left
-                                         (for/list ([i (range 7)])
-                                           (keyboard-col matrix i))
-                                         ..)
-                              (make-half 'right
-                                         (for/list ([i (reverse (range 7 14))])
-                                           (keyboard-col matrix i))
-                                         ..))
-                   -30)
+   #:layout (make-fitboard-layout matrix)
    ;; connections
    #:connect (for/list ([x (range 5)])
                (filter-not
