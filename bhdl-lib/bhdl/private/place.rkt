@@ -708,6 +708,8 @@ Es (Edge, i.e. netlist), diearea"
          ;;
          ;; CAUTION ses requires freerouting.jar and takes time
          #:formats [formats '(pdf kicad dsn)])
+  (when (not (directory-exists? (current-directory)))
+    (make-directory* (current-directory)))
   (let* ([place-spec (Composite->place-spec
                       circuit
                       #:place-nsteps 50
