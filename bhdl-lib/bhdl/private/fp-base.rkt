@@ -35,4 +35,10 @@
 
 
 (define bhdl-footprints-path
-  (make-parameter (expand-user-path "~/git/bhdl/bhdl-footprints")))
+  ;; FIXME make this configurable
+  (make-parameter
+   (expand-user-path
+    ;; "~/git/bhdl/bhdl-footprints"
+    (or (getenv "BHDL_LIBRARY_PATH")
+        ;; TODO well, I could probably just download for user
+        (error "BHDL: env variable BHDL_LIBRARY_PATH is not set")))))

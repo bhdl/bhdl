@@ -117,24 +117,19 @@
 ;;    "/path/to/arduino-kicad-library/"
 ;;    "/path/to/SparkFun-KiCad-Libraries/Footprints/"))
 (define kicad-footprint-paths
-  (make-parameter #f))
-
-(define (load-kicad-footprint-paths)
-  (when (not (kicad-footprint-paths))
-    (kicad-footprint-paths
-     (string-split
-      (or (getenv "BHDL_KICAD_FOOTPRINT_PATH")
-          ;; TODO well, I could probably just download for user
-          (error "BHDL: env variable BHDL_KICAD_FOOTPRINT_PATH is not set"))
-      ":")))
-  (kicad-footprint-paths))
+  (make-parameter (map (lambda (x)
+                         (build-path (bhdl-footprints-path)
+                                     x))
+                       '("kicad-footprints"
+                         "arduino-kicad-library"
+                         "SparkFun-KiCad-Libraries/Footprints"))))
 
 (define (kicad-helper . lst)
   ;; libpath is a list of path
   ;;
   ;; FIXME the first match will be returned. This is problematic when different
   ;; path contains same name
-  (or (for/or ([d (load-kicad-footprint-paths)])
+  (or (for/or ([d (kicad-footprint-paths)])
         (let ([p (expand-user-path (apply build-path d lst))])
           (if (file-exists? p)
               (read-kicad-mod p)
