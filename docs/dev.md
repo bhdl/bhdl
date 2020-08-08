@@ -26,7 +26,8 @@ general process to setup a jupyterhub server capable of running BHDL.
 ### Install the jupyterhub
 
 This section mostly follows [the official jupyterhub
-guide](https://jupyterhub.readthedocs.io/en/latest/installation-guide-hard.html).
+guide](https://jupyterhub.readthedocs.io/en/latest/installation-guide-hard.html). It
+is simplied a little (removed the conda part) and noted here for quick reference.
 
 
 Create a virtual environment for jupyterhub:
@@ -86,3 +87,43 @@ enable and start it:
 The default port is `8000`, and it seems also to use `8001`. Chaning 8000 in
 configuration does not change 8001, which in turns seems to make it unable to
 start two instances of jupyterhub easily.
+
+### The iracket kernel
+
+```
+git clone https://github.com/lihebi/iracket
+cd iracket && git checkout dev
+raco pkg install
+raco iracket install
+```
+
+### Install BHDL and start the placement engine
+Install BHDL:
+
+```
+raco pkg install git://github.com/lihebi/bhdl/?path=bhdl-lib
+```
+
+Start placement engine (and this will listen on port 8082 and shared for all
+users):
+
+
+```
+git clone https://github.com/lihebi/bhdl
+cd bhdl/placement
+# NOTE: Need install Julia dependencies via:
+# julia --project
+# Julia> ]instantiate
+julia --project server.jl
+```
+
+
+#### (Optional) Clone the bhdl libraries:
+
+```
+git clone --recursive https://github.com/lihebi/bhdl-footprints /opt/bhdl-footprints
+export BHDL_LIBRARY_PATH=/opt/bhdl-footprints
+```
+
+Users probably should set up their own libraries in their home directory,
+because the easyeda library is written to disk if not available locally, thus users need write access to the library.
