@@ -97,6 +97,8 @@ You can specify which footprint variant to use via
 
     (R #:FP "0603")
 
+If not specified, the first one is used.
+
 For ICs, there are two special notes:
 1. ICs typically have well-defined footprints. For that, some syntax sugar names
    can be used, e.g. `#:DIP` `#:QFN`.
