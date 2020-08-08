@@ -156,7 +156,7 @@ Es (Edge, i.e. netlist), diearea"
 
 (define (send-for-placement specs)
   (let ([in (post-pure-port
-             (string->url "http://localhost:8081")
+             (string->url "http://localhost:8082")
              (jsexpr->bytes specs))])
     (begin0
         ;; TODO parse the placement results

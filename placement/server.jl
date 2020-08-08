@@ -11,7 +11,8 @@ using HTTP
 # test this: accept a file, append hello to the file, and respond back
 
 function web_server()
-    HTTP.serve(HTTP.Sockets.localhost, 8081) do request::HTTP.Request
+    # FIXME 8081 seems to be used by jupyterhub, I'm thus using 8082
+    HTTP.serve(HTTP.Sockets.localhost, 8082) do request::HTTP.Request
         @show request
         @show request.method
 
