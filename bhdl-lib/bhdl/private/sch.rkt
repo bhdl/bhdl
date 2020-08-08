@@ -22,6 +22,7 @@
          (struct-out Pin)
          (struct-out Atom)
          (struct-out Composite)
+         show-layout
          ;; FIXME naming conflicts. This shall only be used in place.rkt for
          ;; genereting place spec
          (struct-out Net)
@@ -100,6 +101,12 @@
   [(define (write-proc self port mode)
      (write-string (~a "#<Composite-" (eq-hash-code self) ">")
                    port))])
+
+(define (show-layout x)
+  (cond
+   [(Atom? x) (Atom-pict x)]
+   [(Composite x) (Composite-pict x)]
+   [else (error "show-layout error.")]))
 
 (define-syntax (create-simple-Composite stx)
   (syntax-parse stx
