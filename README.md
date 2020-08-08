@@ -1,74 +1,82 @@
-#+TITLE: BHDL: A Programming Language and System for making PCBs
+# BHDL: A Programming Language and System for making PCBs
 
-BHDL is a programming language embedded in [[https://racket-lang.org/][racket]]. In addition to the language,
-the system consists of a layout co-design system based on functional picture,
-REPL-driven interactive development and visualization, libraries, KiCAD
-compatible exporter, and placement engines including an optimization-based
-anlytical placer (ePlace) and simulated annealing based detailed placer.
+BHDL is a programming language embedded in
+[racket](https://racket-lang.org/). In addition to the language, the system
+consists of a layout co-design system based on functional picture, REPL-driven
+interactive development and visualization, libraries, KiCAD compatible exporter,
+and placement engines including an optimization-based anlytical placer (ePlace)
+and simulated annealing based detailed placer.
 
-* Install
+# Install
+
+## The BHDL library
+
+First, install [racket](https://racket-lang.org/). Install the BHDL directly as
+a racket package:
 
 
-
-** The BHDL library
-First, install [[https://racket-lang.org/][racket]]. Install the BHDL directly as a racket package:
-
-#+begin_example
+```
 raco pkg install git://github.com/lihebi/bhdl/?path=bhdl-lib
-#+end_example
+```
 
 For development purpose, you might want to clone the repo and install the cloned
 local package. This is known as "linking":
 
-#+begin_example
+```
 cd bhdl-lib
 raco pkg install
-#+end_example
+```
 
 This will place a link between the installed packages and this local
 directory. Everytime this local code is modified, the update is immediately
-available for the package =bhdl=.
+available for the package `bhdl`.
 
-** KiCAD footprint libraries
+
+
+## KiCAD footprint libraries
 You will then download the kicad library.
 
 - https://github.com/KiCad/kicad-footprints
 - https://github.com/forrestbao/arduino-kicad-library
 - https://github.com/sparkfun/SparkFun-KiCad-Libraries
 
-And you need to set the environement variable =BHDL_KICAD_FOOTPRINT_PATH= to
+And you need to set the environement variable `BHDL_LIBRARY_PATH` to
 point to the right path:
 
-#+begin_example
-export BHDL_KICAD_FOOTPRINT_PATH="/path/to/kicad-footprints/:/path/to/arduino-kicad-library/:/path/to/SparkFun-KiCad-Libraries/Footprints/"
-#+end_example
+```
+export BHDL_LIBRARY_PATH=/path/to/bhdl/bhdl-footprints
+```
 
-** (optional) placement engine setup
-To run the placement engine, you need setup julia. In the =placement= folder,
+
+## (optional) placement engine setup
+To run the placement engine, you need setup julia. In the `placement` folder,
 install the package by:
 
-#+begin_example
+
+```
 julia --project
 ]instantiate
-#+end_example
+```
 
 Then run the placement server:
-#+begin_example
-julia --project server.jl
-#+end_example
 
-In racket, the =send-for-placement= API call will send placement request to the
+```
+julia --project server.jl
+```
+
+In racket, the `send-for-placement` API call will send placement request to the
 backend placer.
 
-** (optional) freerouting
-To use routing, you need to have [[https://github.com/freerouting/freerouting][freerouting]] available. We tested on
-[[https://github.com/freerouting/freerouting/releases/tag/v1.4.4][freerouting-v1.4.4]]. Make sure =freerouting-1.4.4-executable.jar= is available in
-your =$PATH=.
+## (optional) freerouting
+To use routing, you need to have
+[freerouting](https://github.com/freerouting/freerouting) available. We tested
+on
+[freerouting-v1.4.4](https://github.com/freerouting/freerouting/releases/tag/v1.4.4). Make
+sure `freerouting-1.4.4-executable.jar` is available in your `$PATH`.
 
-* Run
+# Run
 The following two boards are available for tests:
 
-# - [[file:bhdl-test/gh60.rkt]]
 - [[file:bhdl-test/fitboard.rkt]]: ergonimic keyboard
 - [[file:bhdl-test/spreadboard.rkt]]: spreadboard
 - [[file:bhdl-test/test-fp-kicad.rkt]]: this will visualize rendered KiCAD
@@ -78,148 +86,150 @@ There are three ways to run the code.
 
 First, you can run in command line. Run the top-level script:
 
-#+begin_example
+```
 racket fitboard.rkt
-#+end_example
+```
 
-And run the =test= submodule:
-#+begin_example
+And run the `test` submodule:
+
+```
 raco test fitboard.rkt
-#+end_example
+```
 
-Second, you can run in [[https://racket-lang.org/][Dr. Racket]]. Open the file and click =Run=. The =test=
-submodule will be run.
+Second, you can run in [Dr. Racket](https://racket-lang.org/). Open the file and
+click `Run`. The `test` submodule will be run.
 
 Last, you can also run via Emacs. If you wonder how to do that, let me know.
 
 When you run the code, you will see some visualizations on REPL, and freerouting
-window will pop up, the KiCAD file will be output to =/tmp/bhdl/out.kicad_pcb=.
+window will pop up, the KiCAD file will be output to `/tmp/bhdl/out.kicad_pcb`.
 
 The Dr. Racket REPL and Emacs REPL supports images. So you can view the image
 via e.g.
 
-#+BEGIN_SRC lisp
+```lisp
 (Atom-pict (make-IC-atom Arduino-Uno))
 ;; assuming whole is defined as in the example scripts
 (Composite-pict whole)
-#+END_SRC
+```
 
+# API document
 
-* API document
-
-** importing the library
+## importing the library
 You include the library via
 
-#+BEGIN_SRC lisp
+```lisp
 (require bhdl)
-#+END_SRC
+```
 
-Since =bhdl= re-exposes =*-append= and =*-superimpose= functions to be generic
-to =bhdl= components and circuits, if you want to import =pict=, you need to
+Since `bhdl` re-exposes `*-append` and `*-superimpose` functions to be generic
+to `bhdl` components and circuits, if you want to import `pict`, you need to
 prefix it, e.g.:
 
-#+BEGIN_SRC lisp
+```lisp
 (require (prefix-in pict: pict))
-#+END_SRC
+```
 
-The language =bhdl/splicing= is not BHDL syntax. It provides a simple "splicing
+The language `bhdl/splicing` is not BHDL syntax. It provides a simple "splicing
 syntax" for function application:
 
-#+BEGIN_SRC lisp
+```lisp
 #lang reader bhdl/splicing
 
 (list 1 2 (list 3 4) .. 5)
 ;; equivalent to
 (list 1 2 3 4 5)
 ;; which evaluates to => '(1 2 3 4 5)
-#+END_SRC
+```
 
-** Basic Concepts
+## Basic Concepts
 
 There are two first-class types in the BHDL to represent circuits, Atoms and
-Composites. An =Atom= is a single component, while =Composite= represents a
-circuit consisting of some =Atoms= and =Composites= and a netlist specifying
-connections. An =Atom= has pins, and =Composite= also has external pins that is
+Composites. An `Atom` is a single component, while `Composite` represents a
+circuit consisting of some `Atoms` and `Composites` and a netlist specifying
+connections. An `Atom` has pins, and `Composite` also has external pins that is
 visible for connections.
 
-#+BEGIN_SRC lisp
+```lisp
 (struct Atom
   (pinhash [pict #:auto]))
-#+END_SRC
+```
 
-#+BEGIN_SRC lisp
+```lisp
 (struct Composite
   (pinhash nets [pict #:auto]))
-#+END_SRC
+```
 
-** Connection syntax and semantics
+## Connection syntax and semantics
 Composing circuit is the process of combining smaller circuits and atoms with
 netlist. There are 4 syntax for composing Composites. The return value is a
 Composite that contains the used components, and the external pin for the
-returned Composite is denoted as =out.X=.
+returned Composite is denoted as `out.X`.
 
 The line connection:
 
-#+BEGIN_SRC lisp
+```lisp
 (*- a b c)
-#+END_SRC
+```
 
 Results in the netlist:
 
-#+begin_example
+```
 out.1 -- a.1
 a.2 -- b.1
 b.2 -- c.1
 c.2 -- out.2
-#+end_example
+```
 
 The split connection:
-#+BEGIN_SRC lisp
+```lisp
 (*< a b c)
-#+END_SRC
+```
 
 results in the netlist:
-#+begin_example
+
+```
 out.1 -- a.1 -- b.1 -- c.1
 out.2 -- a.2 -- b.2 -- c.2
-#+end_example
+```
 
 The vectorized connection:
-#+BEGIN_SRC lisp
+```lisp
 (*= (a [p1 p2 p3])
     ([b.p1 c.p2 d.p3]))
-#+END_SRC
+```
 
 results in the netlist:
-#+begin_example
+```
 a.p1 -- b.p1
 a.p2 -- c.p2
 a.p3 -- d.p3
-#+end_example
+```
 
 Note that the vector supports two slightly different syntax: the component can
-be write once. I.e. =(a [1 2 3])= is equivalent to =([a.1 a.2 a.3])=.
+be write once. I.e. `(a [1 2 3])` is equivalent to `([a.1 a.2 a.3])`.
 
 And finally the netlist syntax:
 
-#+BEGIN_SRC lisp
+```lisp
 (*+ ([a.1 b.1 c.1]
      [a.2 b.3]))
-#+END_SRC
+```
 
 results in the netlis:
 
-#+begin_example
+```
 a.1 -- b.1 -- c.1
 a.2 -- b.3
-#+end_example
+```
 
-** Component library
+## Component library
 
-*** Discrete components
-We provide the following functions to create regular electronic components (in [[file:bhdl-lib/bhdl/library.rkt]]):
+### Discrete components
+We provide the following functions to create regular electronic components (in
+[bhdl-lib/bhdl/library.rkt](bhdl-lib/bhdl/library.rkt)):
 
-#+BEGIN_SRC lisp
+```lisp
 (R value) ; resistor
 (C value) ; capacitor
 (crystal)
@@ -234,21 +244,22 @@ We provide the following functions to create regular electronic components (in [
 ;; a-male a-female c-male c-female
 ;; micro-male micro-female
 ;; mini-male mini-female
-#+END_SRC
+```
 
-*** IC components
-Besides discrete components, we also provide IC components in [[file:/bhdl-lib/bhdl/library-IC.rkt]]
-Some IC-like components like Arduino are also included. The IC instance is created by:
+### IC components
+Besides discrete components, we also provide IC components in
+[bhdl-lib/bhdl/library-IC.rkt](bhdl-lib/bhdl/library-IC.rkt) Some IC-like
+components like Arduino are also included. The IC instance is created by:
 
-#+BEGIN_SRC lisp
+```lisp
 (make-IC-atom ATmega128)
 (make-IC-atom Arduino-Uno)
-#+END_SRC
+```
 
 Here is an example definition of ATtiny25, ATtiny45, and ATtiny85 (all has
 exactly the same pin-out).
 
-#+BEGIN_SRC lisp
+```lisp
 (define/IC (ATtiny25 ATtiny45 ATtiny85)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf"
   #:ALTS ([VCC]
@@ -263,16 +274,16 @@ exactly the same pin-out).
             DNC DNC GND DNC DNC
             PB0 PB1 DNC PB2 VCC
             DNC DNC DNC DNC DNC))
-#+END_SRC
+```
 
 There are often many footprints available for a component. You can assign the
 footprint when you create the component (TODO).
 
-** define-Composite wrapper syntax
+## define-Composite wrapper syntax
 
 This syntax makes it easy to define a composite. The syntax is:
 
-#+BEGIN_SRC lisp
+```lisp
 (define-Composite comp
   #:external-pins (o1 o2)
   #:vars ([a (R 22)]
@@ -280,22 +291,23 @@ This syntax makes it easy to define a composite. The syntax is:
           [c (crystal)])
   #:connect (*- self.o1 a b c self.o2)
   #:layout (hc-append a b c))
-#+END_SRC
+```
 
-This declares a Composite named =comp=, with external pins named =o1= and =o2=
+This declares a Composite named `comp`, with external pins named `o1` and `o2`
 respectively. It contains a resistor, a capacitor, and a crystal, lined together
-linearly. In the meantime, the physical layout of =comp= is defined as
+linearly. In the meantime, the physical layout of `comp` is defined as
 horizontally append the three components.
 
-** Layout co-design
+## Layout co-design
 
-The layout is inspired by [[https://docs.racket-lang.org/pict/][racket's functional picture library]]. The following
-combinators are provided:
+The layout is inspired by [racket's functional picture
+library](https://docs.racket-lang.org/pict/). The following combinators are
+provided:
 
-The =*-append= family of functions append its arguments horizontally or
+The `*-append` family of functions append its arguments horizontally or
 vertically:
 
-#+begin_example
+```
 vl-append
 vc-append
 vr-append
@@ -304,11 +316,11 @@ hc-append
 hb-append
 htl-append
 hbl-append
-#+end_example
+```
 
-The =*-superimpose= family of functions overlap its arguments.
+The `*-superimpose` family of functions overlap its arguments.
 
-#+begin_example
+```
 lt-superimpose
 lb-superimpose
 lc-superimpose
@@ -324,27 +336,27 @@ cb-superimpose
 cc-superimpose
 ctl-superimpose
 cbl-superimpose
-#+end_example
+```
 
 You can also rotate or pin-over at a absolute location in terms of (x,y)
 coordinates:
 
-#+begin_example
+```
 (rotate item 3.14)
 (pin-over base dx dy item)
-#+end_example
+```
 
-** Auto Placement
+## Auto Placement
 We implemented an analytical global placer and a simulated annealing detailed
 placer. To use them, follow the above installation guide to setup the julia
 environment and run the server in the backend:
 
-#+begin_example
+```
 julia --project server.jl
-#+end_example
+```
 
 You can then send the placement request to backend server via:
-#+BEGIN_SRC lisp
+```lisp
 (define place-result
     (send-for-placement
      (Composite->place-spec whole
@@ -354,53 +366,51 @@ You can then send the placement request to backend server via:
                             #:sa-nsteps 3000
                             #:sa-stepsize 10
                             #:sa-theta-stepsize 0.3)))
-
-#+END_SRC
+```
 
 You can visualize the placed Composite via:
 
-#+BEGIN_SRC lisp
+```lisp
 (Composite->pict whole place-result)
-#+END_SRC
+```
 
+## Visualization and export
+Once you have placement result, you can generate `kicad_pcb` file:
 
-** Visualization and export
-Once you have placement result, you can generate =kicad_pcb= file:
-
-#+BEGIN_SRC lisp
+```lisp
 (Composite->kicad-pcb whole place-result)
-#+END_SRC
+```
 
 And generate Spectre format for routing:
 
-#+BEGIN_SRC lisp
+```lisp
 (Composite->dsn whole place-result)
-#+END_SRC
+```
 
 They return strings.  If you want to save it to a file:
 
-#+BEGIN_SRC lisp
+```lisp
 (call-with-output-file "out.kicad_pcb"
     #:exists 'replace
     (λ (out)
       (pretty-write (Composite->kicad-pcb whole place-result)
                     out)))
-#+END_SRC
+```
 
 and
 
-#+BEGIN_SRC lisp
+```lisp
 (call-with-output-file "out.dsn"
     #:exists 'replace
     (λ (out)
       (pretty-write (Composite->dsn whole place-result)
                     out)))
-#+END_SRC
+```
 
 Finally, call the freerouter:
 
-#+BEGIN_SRC lisp
+```lisp
 (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 5")
-#+END_SRC
+```
 
 The nice router window will pop up and does its job.
