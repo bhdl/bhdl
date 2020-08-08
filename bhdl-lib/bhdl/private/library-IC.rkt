@@ -95,7 +95,7 @@
    stx
    [(_ (name ...)
        (~alt (~optional (~seq #:datasheet url) #:defaults ([url #'""]))
-             (~optional (~seq #:ALTS alts) #:defaults ([alts #'()]))
+             (~optional (~seq #:ALIAS alts) #:defaults ([alts #'()]))
              (~optional (~seq #:LEFT left) #:defaults ([left #'#f]))
              (~optional (~seq #:RIGHT right) #:defaults ([right #'#f]))
              (~optional (~seq #:PREFIX prefix) #:defaults ([prefix #'"U"]))
@@ -251,7 +251,7 @@
 
 (define/IC (ATtiny25 ATtiny45 ATtiny85)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf"
-  #:ALTS ([VCC]
+  #:ALIAS ([VCC]
           [GND]
           [PB0 MOSI DI SDA AIN0 OC0A OC1A AREF PCINT0]
           [PB2 SCK USCK SCL ADC1 T0 INT0 PCINT2]
@@ -270,7 +270,7 @@
 
 (define/IC (ATmega16)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc2466.pdf"
-  #:ALTS ((VCC)
+  #:ALIAS ((VCC)
           (AVCC) (AREF) (RESET)
           (GND) (XTAL2) (XTAL1)
           (PA0 ADC0) (PA1 ADC1) (PA2 ADC2) (PA3 ADC3) (PA4 ADC4)
@@ -295,7 +295,7 @@
 
 (define/IC (ATmega128)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc2467.pdf"
-  #:ALTS ((VCC)
+  #:ALIAS ((VCC)
           (RESET) (AVCC)
           (GND) (XTAL2) (XTAL1) (AREF)
           (PA0 AD0) (PA1 AD1) (PA2 AD2) (PA3 AD3)
@@ -319,7 +319,7 @@
 
 (define/IC (ATmega48 ATmega88 ATmega168 ATmega328)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf"
-  #:ALTS ((VCC) (AVCC)
+  #:ALIAS ((VCC) (AVCC)
                 (GND) (AREF)
 
                 (PB0 PCINT0 CLKO ICP1)
@@ -360,7 +360,7 @@
 
 (define/IC (ATmega8U2 ATmega16U2 ATmega32U2)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/doc7799.pdf"
-  #:ALTS ((VCC)
+  #:ALIAS ((VCC)
           (GND) (AVCC)
           ;; FIXME PAD
           ;; (PAD)
@@ -382,7 +382,7 @@
 (define/IC (ATmega16U4 ATmega32U4)
   ;; it is very similar to the U2 edition
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7766-8-bit-AVR-ATmega16U4-32U4_Datasheet.pdf"
-  #:ALTS ([PB0 SS PCINT0]
+  #:ALIAS ([PB0 SS PCINT0]
           [PB1 PCINT1 SCLK]
           [PB2 PDI PCINT2 MOSI]
           [PB3 PDO PCINT3 MISO]
@@ -420,7 +420,7 @@
 
 (define/IC (ATmega8)
   #:datasheet "https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2486-8-bit-AVR-microcontroller-ATmega8_L_datasheet.pdf"
-  #:ALTS ([PD0 RXD]
+  #:ALIAS ([PD0 RXD]
           [PD1 TXD]
           [PD2 INT0]
           [PD3 INT1]
@@ -453,7 +453,7 @@
             PC2 PC3 PC4 PC5 PC6 PD0 PD1 PD2))
 
 (define/IC (GD32VF103CBT6)
-  #:ALTS ([PC13 TAMPER RTC]
+  #:ALIAS ([PC13 TAMPER RTC]
           [PC14 OSC32IN OSC32out]
           [PD0 OSCIN]
           [PD1 OSCOUT]
@@ -520,7 +520,7 @@
 
 (define/IC (USB-Type-C)
   ;; FIXME CAUTION the GND pins (A1 A12 might not be physically connected
-  #:ALTS ([A1 A12 B1 B12 GND]
+  #:ALIAS ([A1 A12 B1 B12 GND]
           [A4 A9 B9 B4 VBUS]
           [A5 CC1]
           [B5 CC2]
@@ -543,7 +543,7 @@
 ;; Package	SMD
 (define/IC (USB-C-6)
   ;; 6pin usb type c
-  #:ALTS ([A5 CC1]
+  #:ALIAS ([A5 CC1]
           [B5 CC2]
           [A9 VBUS]
           [B9 VBUS]
@@ -557,7 +557,7 @@
 ;; LCSC Part #	C393939
 ;; Package	SMD
 (define/IC (USB-C-16)
-  #:ALTS ([A1 B12 GND]
+  #:ALIAS ([A1 B12 GND]
           [A4 B9 VBUS]
           [B1 A12 GND]
           [B4 A9 VBUS]
@@ -663,7 +663,7 @@
   ;; In master mode:
   ;; SPID = MOSI = data out
   ;; SPIQ = MISO = data in
-  #:ALTS ([IO5 VSPICS0]
+  #:ALIAS ([IO5 VSPICS0]
           [IO18 VSPICLK]
           [IO19 VSPIQ VSPIMISO]
           [IO23 VSPID VSPIMOSI]
@@ -754,7 +754,7 @@
         D0 D1))
 
 (define/IC (Arduino-MKR)
-  #:ALTS ([MOSI D8]
+  #:ALIAS ([MOSI D8]
           [MISO D10]
           [SCK D9]
           [SDA D11]
@@ -768,13 +768,13 @@
 (define/IC (LM555-sym)
   #:datasheet ""
   ;; FIXME when there're no alts, I should be able to just leave it blank
-  #:ALTS ()
+  #:ALIAS ()
   #:DIP (8 GND TR OUTPUT RESET CV THR DIS VCC))
 
 ;; ;; FIXME this is comparator, should have triangular symbol
 ;; (define/IC (LM358)
 ;;   #:datasheet ""
-;;   #:ALTS ()
+;;   #:ALIAS ()
 ;;   #:TOP ()
 ;;   #:BOTTOM ()
 ;;   #:LEFT ((2 3))
