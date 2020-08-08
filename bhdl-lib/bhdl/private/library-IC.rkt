@@ -136,7 +136,8 @@
 ;; I'm going to see how struct is implemented
 ;;
 (define/IC (Resistor R)
-  #:auto-FP (fp-resistor "0603")
+  #:auto-named-FP ("0603" (fp-resistor "0603"))
+  #:auto-named-FP ("0805" (fp-resistor "0805"))
   #:PREFIX "R"
   #:LEFT 1
   #:RIGHT 2)
