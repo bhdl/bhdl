@@ -3,7 +3,7 @@ using SparseArrays: sparse, spzeros
 import ForwardDiff
 import Zygote
 using Statistics: mean
-import Plots
+# import Plots
 import CuArrays: cu, allowscalar
 allowscalar(false)
 using Flux: gpu, cpu
