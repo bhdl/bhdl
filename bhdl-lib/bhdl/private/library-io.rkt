@@ -21,6 +21,8 @@
          ;; footprint->pad-locs
          footprint->offset
 
+         padding-general
+
          atom->fp-pict+Hlocs
          atom->fp-pict
          atom->fp
@@ -40,6 +42,10 @@
                   (/ (sqrt (+ (expt 2560 2) (expt 1440 2)))
                      ;; mm in diagnal
                      (* 27 25.4))))
+
+;; the unit is mm
+(define padding-general (make-parameter 0.1))
+(define padding-LQFP (make-parameter 5))
 
 
 ;; DEBUG scale factor
