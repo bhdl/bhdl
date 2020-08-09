@@ -64,6 +64,8 @@ function web_server()
                            # DEBUG
                            "ws"=>ws,
                            "hs"=>hs,
+                           # should I add diearea here?
+                           "diearea"=>diearea,
                            # for visualization and debug
                            "conflicts"=>conflicts) |> JSON.json
 

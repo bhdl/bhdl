@@ -289,5 +289,5 @@
                     out)))
   ;; call command line tool to do routing
   (current-directory)
-  (system "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 5")
-  (system "ls"))
+  (shell "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 5")
+  (shell "ls"))

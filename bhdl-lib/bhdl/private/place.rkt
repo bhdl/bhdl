@@ -157,6 +157,8 @@ Es (Edge, i.e. netlist), diearea"
         #:exists 'replace))))
 
 (define (send-for-placement specs)
+  "FIXME detect whether the server is alive, and report meaningful errors and
+recover with appropriate default."
   (let ([in (post-pure-port
              (string->url "http://localhost:8082")
              (jsexpr->bytes specs))])
@@ -235,6 +237,7 @@ Es (Edge, i.e. netlist), diearea"
                                                    atom (hash-ref Hatom=>loc atom)
                                                    offset)])
                          (values pin (list x y)))))])
+    (debug "Number of conflicts:" (length conflicts))
     (let ([res (for/fold ([die die])
                    ([atom atoms]
                     [i (in-naturals)]
