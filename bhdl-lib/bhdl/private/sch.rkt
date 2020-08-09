@@ -105,7 +105,7 @@
 (define (show-layout x)
   (cond
    [(Atom? x) (Atom-pict x)]
-   [(Composite x) (Composite-pict x)]
+   [(Composite? x) (Composite-pict x)]
    [else (error "show-layout error.")]))
 
 (define-syntax (create-simple-Composite stx)
