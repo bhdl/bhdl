@@ -486,9 +486,13 @@ Es (Edge, i.e. netlist), diearea"
 (define (Composite->kicad-pcb comp place-spec)
   "Generate .kicad_pcb."
   ;; 1. collect all atoms
-  (let* ([xs (hash-ref place-spec 'xs)]
+  (match-let* ([xs (hash-ref place-spec 'xs)]
          [ys (hash-ref place-spec 'ys)]
          [as (hash-ref place-spec 'as)]
+         [(list diex diey) (hash-ref place-spec 'diearea)]
+         ;; CAUTION I have fp-scaling here and there, need to clean them up
+         [(list diex diey) (list (/ diex (fp-scale))
+                                 (/ diey (fp-scale)))]
          [atoms (collect-all-atoms comp)]
          [Hatom=>index (for/hash ([atom atoms]
                                   [i (in-naturals 1)])
@@ -515,8 +519,11 @@ Es (Edge, i.e. netlist), diearea"
                                 [a as])
                        (values atom (Point x y a)))])
     ;; 2. generate!
-    `(kicad_pcb ,@(kicad-pcb-prefix (/ (pict-width die) (fp-scale))
-                                    (/ (pict-height die) (fp-scale)))
+    `(kicad_pcb ,@(kicad-pcb-prefix
+                   ;; I actually already have the size of the board. Looks like
+                   ;; KiCAD does not respect these values
+                   (/ (pict-width die) (fp-scale))
+                   (/ (pict-height die) (fp-scale)))
                 ;; FIXME TODO add netlist
                 ;; 4. add the nets declaration
                 ,@(for/list ([i (hash-values Hnet=>index)])
@@ -531,7 +538,16 @@ Es (Edge, i.e. netlist), diearea"
                                      x y a
                                      (atom->ID atom Hatom=>index)
                                      ;; hash tables
-                                     Hpin=>net Hnet=>index))))))
+                                     Hpin=>net Hnet=>index)))
+
+                ;; TODO add edge cut layer
+                ;;
+                ;; FIXME I can actually use (/ (pict-width die) (fp-scale)) to
+                ;; compute diex. Need to verify they have the same value
+                (gr_line (start 0 0) (end ,diex 0) (layer Edge.Cuts) (width 0.1))
+                (gr_line (start ,diex 0) (end ,diex ,diey) (layer Edge.Cuts) (width 0.1))
+                (gr_line (start ,diex ,diey) (end 0 ,diey) (layer Edge.Cuts) (width 0.1))
+                (gr_line (start 0 ,diey) (end 0 0) (layer Edge.Cuts) (width 0.1)))))
 
 (define (padstack-id pad)
   (match pad
