@@ -1,4 +1,4 @@
-#lang s-exp bhdl/splicing
+#lang racket
 
 (require bhdl
          (prefix-in pict: pict))
