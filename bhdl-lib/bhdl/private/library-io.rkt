@@ -207,7 +207,7 @@
                             ;; FIXME optional drill
                             ,@(case mounting-type
                                 [(thru_hole) `((drill oval ,@dsize)
-                                               (layers *.Cu *.Mask F.SilkS))]
+                                               (layers *.Cu *.Mask))]
                                 [(smd) `((layers F.Cu F.Paste F.Mask))]
                                 [else (error "Unsupported mounting type:"
                                              mounting-type)])
