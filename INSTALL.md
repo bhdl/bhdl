@@ -13,7 +13,7 @@ raco pkg install git://github.com/lihebi/bhdl/?path=bhdl-lib
 In the future, you can update the package if there're updates upstream via:
 
 ```
-raco pkg update bhdl
+raco pkg update bhdl-lib
 ```
 
 You will also need the footprint libraries and set the ENV variable

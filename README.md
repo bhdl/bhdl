@@ -10,9 +10,9 @@ and simulated annealing based detailed placer.
 
 Documents:
 - [Installation guide](INSTALL.md)
+- [Developer and system admin guide](docs/dev.md)
 - [API reference](docs/reference.md)
 - [Advanced API reference](docs/advanced.md)
-- [Developer and system admin guide](docs/dev.md)
 
 Notebook Demos:
 - [fitboard](bhdl-test/fitboard.ipynb)

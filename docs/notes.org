@@ -13,10 +13,7 @@
 - [-] connect LEDs?
 - [-] case CAD co-design?
 
-*** DONE place USB, SoCs, LEDsat some proper position
-CLOSED: [2020-08-01 Sat 01:10]
-*** DONE run auto-placer
-CLOSED: [2020-07-31 Fri 17:57]
+
 *** STARTED stablizer and other mouting holes
 *** STARTED Kahl hot swappable socket
 which might have to go back side of the PCB, and must align with the switch
@@ -26,8 +23,31 @@ Mechanical Keyboard Switches Kailh PCB Socket
 - [[https://www.kailhswitch.com/mechanical-keyboard-switches/box-switches/mechanical-keyboard-switches-kailh-pcb-socket.html][offical product link]]
 - [[https://www.kailhswitch.com/uploads/201815927/PG151101S11.pdf][datasheet]]
 - CPG151101S11
+*** STARTED double-check footprint for manufacturing
+**** TODO the connection of same name footprint pads
+***** TODO IC pinhash conflicts
+***** TODO check conflict of IC pin usage
+**** TODO deterministic layout and atom order
+- and output BOM
+**** TODO annotate better for pads of PCBs
+**** TODO double check the PCB orientation mark
 
-*** TODO use groud and power plane
+*** TODO routing issues
+**** TODO maybe enable hierarchical placement
+**** TODO the spacing around ICs should be large
+
+**** TODO freerouting fine-tuning
+***** TODO looks like it's probably the fault of auto-router
+***** TODO run auto-router for longer time
+***** TODO is there any configuration options for freerouting?
+
+*** DONE place USB, SoCs, LEDsat some proper position
+CLOSED: [2020-08-01 Sat 01:10]
+*** DONE run auto-placer
+CLOSED: [2020-07-31 Fri 17:57]
+
+*** CANCELED use groud and power plane
+CLOSED: [2020-08-08 Sat 22:32]
 And the first thing I need to do is to identify which net is GND and label it
 correspondingly for kicad and dsn.
 
@@ -38,15 +58,11 @@ I probably also consider 4 layer boards if routing is really a problem. But
 actually, I don't think 4 layer boards help either. The most important problem
 now is that gd32 has too many things around it.
 
-*** STARTED increase density cost
+*** CANCELED increase density cost
+CLOSED: [2020-08-08 Sat 22:33]
 - [ ] direclty increase density weight in auto-placer
-- [ ] try adding more spacing for each component
+- [X] try adding more spacing for each component
 
-*** STARTED double-check footprint for manufacturing
-**** TODO IC pinhash conflicts
-**** TODO check conflict of IC pin usage
-**** TODO deterministic layout and atom order
-- and output BOM
 
 *** CANCELED pin headers for GD32 and ESP32 for debugging
 CLOSED: [2020-07-30 Thu 01:18]
@@ -93,6 +109,20 @@ NRST                    ; external reset
 
 
 * Not-so-urgent issues
+** jupyter notebook
+
+*** freerouting actually opens GUI window. How should I appraoch that?
+*** show link for download
+https://github.com/rmculpepper/iracket/issues/7
+
+
+** TODO bhdl-lib
+why not just use bhdl
+
+** TODO footprint library into $HOME.bhdl
+To ease the installation process, I can actually use $HOME/.bhdl to store
+libraries.
+
 ** detailed placement minor issues
 Some conflicts are not counted in the placement engine.
 
