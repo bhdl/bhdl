@@ -12,7 +12,12 @@
          make-fitboard-layout
          keyboard-xy
          keyboard-row
-         keyboard-col)
+         keyboard-col
+         
+         ;; for debugging purpose
+         make-half
+         key-with-diode
+         (struct-out KeyboardMatrix))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

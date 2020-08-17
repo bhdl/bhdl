@@ -8,6 +8,7 @@
          "library-io.rkt"
          ;; for padstack-id
          "fp-base.rkt"
+         "exporter.rkt"
          ;; https://docs.racket-lang.org/json/index.html
          json
          graph
@@ -18,7 +19,11 @@
 (provide Composite->place-spec
 
          ;; these requires (xs ys as)
-         Composite->pict
+         circuit->pict
+         send-for-global-place
+         send-for-detailed-place
+         send-for-global-and-detailed-place
+
          Composite->kicad-pcb
          Composite->dsn
 
@@ -172,7 +177,7 @@ recover with appropriate default."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Composite->pict with placement results
+;; circuit->pict with placement results
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -210,7 +215,9 @@ recover with appropriate default."
   ;; (min-st-kruskal g)
   g)
 
-(define (Composite->pict comp place-spec)
+(define (circuit->pict comp 
+                       ;; by default, use initial place
+                       [place-spec (Composite->place-spec comp)])
   ;; 1. draw the macro of each atoms on the right location
   (let* ([xs (hash-ref place-spec 'xs)]
          [ys (hash-ref place-spec 'ys)]
@@ -384,35 +391,6 @@ recover with appropriate default."
       (outputdirectory gerber/))
      )))
 
-(define (dsn-prefix w h)
-  `((parser (parser
-             (string_quote #\")
-             (space_in_quoted_tokens on)
-             (host_cad "KiCad's Pcbnew")
-             (host_version "5.1.4+dfsg1-1")))
-    ;; CAUTION small value (e.g. 1) doesn't work, leave many unrouted
-    (resolution um 10)
-    (unit um)
-    (structure
-     (layer F.Cu
-            (type signal)
-            (property
-             (index 0)))
-     (layer B.Cu
-            (type signal)
-            (property
-             (index 1)))
-     (boundary
-      (rect pcb
-            ;; CAUTION negative!
-            0 ,(- (* h 1000))
-            ,(* w 1000) 0))
-     (via "Via[0-1]_1000:400_um")
-     (rule
-      (width 250)
-      (clearance 203.3)
-      (clearance 203.3 (type default_smd))
-      (clearance 50.8 (type smd_smd))))))
 
 (define (atom->ID atom Hatom=>index)
   ;; UPDATE using some meaningful name instead of "ATOM"
@@ -720,6 +698,50 @@ recover with appropriate default."
                                           "-"
                                           (Pin-name pin)))))))))))
 
+(define (send-for-global-place circuit)
+  "Return global placement result."
+  (send-for-placement (Composite->place-spec
+                      circuit
+                      #:place-nsteps 50
+                      #:place-nbins 300
+                        ;; do not do detailed placement
+                      #:sa-ncycles 0)))
+
+(define (send-for-detailed-place circuit global-place-result)
+  "Given global placement result, run detailed placement."
+  ;; modify (by-copy) the place result with updated place params
+  (let* ([spec (Composite->place-spec
+                      circuit
+                      #:place-nsteps 0
+                      ;; When cycle increases, the temperature cools down,
+                      ;; and the later cycles are not very useful to
+                      ;; remove conflicts. Thus, for this application, I
+                      ;; might consider using only the first few cycles,
+                      ;; and use a large number of steps (per cycle)
+                      #:sa-ncycles 10
+                      #:sa-nsteps 3000
+                      #:sa-stepsize 10
+                      ;; to support rotation, use non-0 e.g. 0.3
+                      #:sa-theta-stepsize 0)]
+        [spec (hash-set* spec
+                         'xs (hash-ref global-place-result 'xs)
+                         'ys (hash-ref global-place-result 'ys)
+                         'as (hash-ref global-place-result 'as))])
+    (send-for-placement spec)))
+
+(define (send-for-global-and-detailed-place circuit)
+  "Return global placement result."
+  (send-for-placement (Composite->place-spec
+                      circuit
+                      #:place-nsteps 50
+                      #:place-nbins 300
+                        ;; do not do detailed placement
+                      #:sa-ncycles 10
+                      #:sa-nsteps 3000
+                      #:sa-stepsize 10
+                      ;; to support rotation, use non-0 e.g. 0.3
+                      #:sa-theta-stepsize 0)))
+
 (define (circuit-export
          circuit
          ;; CAUTION auto-place requires backend placement engine running
@@ -778,7 +800,7 @@ recover with appropriate default."
     (when (member 'pdf formats)
       (displayln "generating pdf ..")
       (save-file
-       (Composite->pict circuit place-result)
+       (circuit->pict circuit place-result)
        "out.pdf")
       (displayln (~a "link: " (current-directory) "out.pdf")))
     (when (member 'dsn formats)
@@ -792,7 +814,8 @@ recover with appropriate default."
       (displayln (~a "link: " (current-directory) "out.dsn")))
     (when (member 'ses formats)
       (displayln "invoking freerouting ..")
-      (let ([success? (shell "freerouting-1.4.4-executable.jar -de out.dsn -do out.ses -mp 10")])
+;;           "-1.4.4-executable.jar"
+      (let ([success? (shell "freerouting -de out.dsn -do out.ses -mp 10")])
         (displayln (~a "freerouting succeeded? " success?))
         (when success?
           (displayln (~a "link: " (current-directory) "out.ses")))))))
