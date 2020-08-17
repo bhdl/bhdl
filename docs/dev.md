@@ -91,6 +91,7 @@ start two instances of jupyterhub easily.
 ### The iracket kernel
 
 ```
+sudo apt install libzmq5
 git clone https://github.com/lihebi/iracket
 cd iracket && git checkout dev
 raco pkg install

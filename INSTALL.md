@@ -2,8 +2,11 @@
 
 ## Installation
 
-First, install [racket](https://racket-lang.org/). Install the BHDL directly as
-a racket package:
+First, install [racket](https://racket-lang.org/).
+
+IMPORTANT: racket v7.8 seems to be broken! The cc-find will return negative values. That's apparently a bug of either racket v7.8 or the bundled pict library. Use v7.7 instead.
+
+Install the BHDL directly as a racket package:
 
 
 ```
@@ -42,7 +45,8 @@ julia --project
 You run the placement server via:
 
 ```
-julia --project server.jl
+cd placement
+julia --project main.jl
 ```
 
 ## (optional) freerouting
@@ -52,3 +56,27 @@ To use routing, you need to have
 on
 [freerouting-v1.4.4](https://github.com/freerouting/freerouting/releases/tag/v1.4.4). Make
 sure `freerouting-1.4.4-executable.jar` is available in your `$PATH`.
+
+The executable can be downloaded [here](https://bintray.com/miho/Freerouting/download_file?file_path=eu%2Fmihosoft%2Ffreerouting%2Ffreerouting%2F1.4.4%2Ffreerouting-1.4.4-executable.jar) on the new freerouting maintainer website: https://freerouting.mihosoft.eu/
+
+UPDATE: the jar file is often not an executable command. You'll need
+
+```
+java -jar freerouting-1.4.4-executable.jar
+```
+
+Thus, you need to create a executable called `freerouting`, containing:
+
+```
+#!/bin/bash
+java -jar /path/to/freerouting-1.4.4-executable.jar
+```
+
+freerouting will need X11 window, even if we are running it in command line. Simulate the X11 session via:
+
+```
+sudo apt install xvfb
+Xvfb :1
+```
+
+But it seems to be impossible to view the progress. We'll probably need to use VNC if we really want to know what's going on.
