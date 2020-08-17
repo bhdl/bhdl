@@ -11,6 +11,7 @@ using HTTP
 # test this: accept a file, append hello to the file, and respond back
 
 function web_server()
+    @info "Listening on localhost:8082 .."
     # FIXME 8081 seems to be used by jupyterhub, I'm thus using 8082
     HTTP.serve(HTTP.Sockets.localhost, 8082) do request::HTTP.Request
         @show request
@@ -86,7 +87,7 @@ end
 
 function test()
     # FIXME relative path might not work
-    str = open("/tmp/bhdl/place-spec.json") do io
+    str = open("place-spec.json") do io
         read(io, String)
     end;
     jobj = JSON.parse(str);
@@ -109,10 +110,3 @@ function test()
     visualize(solxs2, solys2, ws, hs, R)
     # visualize(solxs, solys, ws, hs, R)
 end
-
-function main()
-    @info "starting server .."
-    web_server()
-end
-
-main()

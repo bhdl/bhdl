@@ -49,52 +49,6 @@ function test_Luxor()
     end
 end
 
-function visualize(nodes, nets, pos)
-    # 1. construct a dictionary from nodeID->pos
-    # 2. construct a dictionary from nodeID->(width,height)
-    node_dict = Dict()
-    for (name, width, height, _) in nodes
-        # FIXME parse in the bench reader
-        node_dict[name] = (width, height)
-    end
-    pos_dict = Dict()
-    for (name, x, y, _) in pos
-        pos_dict[name] = (x,y)
-    end
-
-    xmax = -Inf
-    ymax = -Inf
-    xmin = Inf
-    ymin = Inf
-    for node in node_dict
-        name = node[1]
-        w, h = node[2]
-        x, y = pos_dict[name]
-        xmin = min(xmin, x-w/2)
-        xmax = max(xmax, x+w/2)
-        ymin = min(ymin, y-h/2)
-        ymax = max(ymax, y+h/2)
-    end
-
-    xshift = (xmax - xmin) / 2
-    yshift = (ymax - ymin) / 2
-    scale = 500 / max(xmax - xmin, ymax - ymin)
-
-    # do the drawing
-    @luxoremacs begin
-        @showprogress 0.1 "drawing .." for node in node_dict
-            name = node[1]
-            # scale down
-            w, h = node[2] .* scale
-            x, y = pos_dict[name]
-            x = (x - xmin - xshift) * scale
-            y = (y - ymin - yshift) * scale
-            # @show w, h, x, y
-            box(Luxor.Point(x,y), w, h, :stroke)
-        end
-    end
-end
-
 function visualize(x, y, w, h, R)
     # shift all
     x = x .- R.xmax / 2
@@ -107,7 +61,7 @@ function visualize(x, y, w, h, R)
     w = w .* scale
     h = h .* scale
 
-    @luxoremacs begin
+    @svg begin
         setdash("dash")
         # the point is the center of box
         box(Luxor.Point(0,0), R.xmax * scale, R.ymax * scale, :stroke)

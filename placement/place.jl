@@ -7,6 +7,8 @@ using Statistics: mean
 import CuArrays: cu, allowscalar
 allowscalar(false)
 using Flux: gpu, cpu
+
+using ProgressMeter
 include("utils.jl")
 
 γ = 0.5
@@ -145,17 +147,20 @@ function density(vs, R)
     # vs = xs, ys, ws, hs
     xs, ys, ws, hs = gpu.(vs)
     # 1. calculate rho
-    @info "calculating rho .."
+    @debug "calculating rho .."
     # rho = rho_all(vs, R)
     # rho = rho_fast(vs, R)
-    @time rho = rho_fast((xs, ys, ws, hs), R);
+#     @time
+    rho = rho_fast((xs, ys, ws, hs), R);
     # 2. calculate potential and field using FFT
-    @info "calculating potential and field .."
-    @time phi, Ephix, Ephiy = phi_b(rho, R);
+    @debug "calculating potential and field .."
+#     @time 
+    phi, Ephix, Ephiy = phi_b(rho, R);
     # calculate for each v
 
     # M,M,N
-    @time rrr = rho_cells((xs, ys, ws, hs), R);
+#     @time 
+    rrr = rho_cells((xs, ys, ws, hs), R);
     d = dropdims(sum(rrr .* gpu(phi), dims=(1,2)), dims=(1,2))
     dx = dropdims(sum(rrr .* gpu(Ephix), dims=(1,2)), dims=(1,2))
     dy = dropdims(sum(rrr .* gpu(Ephiy), dims=(1,2)), dims=(1,2))
@@ -251,6 +256,7 @@ function validate_region!(xs, ys, ws, hs, R)
     end
 end
 
+
 # return a new pos
 function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, nsteps=50, nbins=300)
     xs = Float32.(xs)
@@ -276,11 +282,12 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, nsteps=50, nbins=30
     # iteratively solve the loss
     # 800 * 10 / 3600 = 2.2 hour
     # FIXME stop criteria: when the update is small enough for several epochs
-    for step in 1:nsteps
-        @info "step: $step"
-        @info "calculating W .."
+    @showprogress 0.1 "Running for $nsteps steps .." for step in 1:nsteps
+        @debug "step: $step"
+        
+        @debug "calculating W .."
         w = W(Es, xs, ys)
-        @info "calculating W gradient .."
+        @debug "calculating W gradient .."
         wgradx = W_grad_x(Es, xs, :x)
         wgrady = W_grad_x(Es, ys, :y)
         wgradx[mask .== 0] .= 0
@@ -288,7 +295,7 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, nsteps=50, nbins=30
         # remove the grad for fixed values
 
         # FIXME this density impl seems to be wrong
-        @info "Calculating fft density .."
+        @debug "Calculating fft density .."
         d, dx, dy = density((xs, ys, ws, hs), R) .|> cpu
         dx[mask .== 0] .= 0
         dy[mask .== 0] .= 0
@@ -312,7 +319,7 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, nsteps=50, nbins=30
         # deltay = wgrady
         # loss = w
 
-        @info("data", step, loss,
+        @debug("data", step, loss,
               mean(abs.(d)), mean(abs.(wgradx)),
               mean(abs.(dx)), hpwl(xs, ys, Es))
 
@@ -334,7 +341,7 @@ function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, nsteps=50, nbins=30
         let idx = (ys .+ hs ./ 2 .> R.ymax) .& (mask .== 1)
             ys[idx] .= (hs ./ 2 .- R.ymax)[idx]
         end
-        if vis visualize(xs, ys, ws, hs, R) end
+        if vis display(visualize(xs, ys, ws, hs, R)) end
     end
     # if vis visualize_density((xs, ys, ws, hs), R) end
     xs, ys
@@ -376,25 +383,8 @@ end
 
 function cost_f(xs, ys, as, ws, hs, x, y, a, w, h, R; except=[])
     # scale everything down
-    scale = max(R.xmax - R.xmin, R.ymax - R.ymin)
-    xs = (xs .- R.xmin) ./ scale .+ 1
-    ys = (ys .- R.ymin) ./ scale .+ 1
-    ws = ws ./ scale
-    hs = hs ./ scale
-
-    x = (x - R.xmin) / scale + 1
-    y = (y - R.ymin) / scale + 1
-    w = w / scale
-    h = h / scale
-
-    # FIXME why would it happen, should the value be exact, and whether [1,2] is
-    # still needed
-    if x < 0.99 || x > 2.01
-        # FIXME magic number
-        @warn "x out of range: $x"
-        return 100
-    end
-
+    #
+    # UPDATE I don't need to scale it anymore due to use of Clipper
     l1, l2, l3, l4 = four_corners(x, y, a, w, h)
 
     # check for all the other rectangles
@@ -509,7 +499,7 @@ function simulated_annealing_legalization(xs, ys, as, ws, hs, mask, diearea;
     # multiple components
     # t = 50
     # randomly choose a point
-    for cycle in 2:ncycles+1
+    @showprogress 0.1 "Running for $ncycles cycles .." for cycle in 2:ncycles+1
         t = temperature(cycle)
         for step in 1:nsteps
             # no movable components, not meaningful, for debugging purpose
@@ -559,7 +549,7 @@ function simulated_annealing_legalization(xs, ys, as, ws, hs, mask, diearea;
         
         # print how many conflicts
         conflicts = compute_conflicts(xs, ys, as, ws, hs, R)
-        @info "cycle $cycle, remaining conflicts: " length(conflicts)
+        @info "cycle $cycle, remaining conflicts: $(length(conflicts))"
 
         # break if already no conflicts
         if length(conflicts) == 0 break end
@@ -569,5 +559,7 @@ function simulated_annealing_legalization(xs, ys, as, ws, hs, mask, diearea;
     conflicts = compute_conflicts(xs, ys, as, ws, hs, R)
     return xs, ys, as, conflicts
 end
+
+
 
 
