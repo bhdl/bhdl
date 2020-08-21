@@ -465,10 +465,12 @@ end
 FIXME fixed position?
 TODO report and debug this if there are still conflicts left?
 """
-function compute_conflicts(xs, ys, as, ws, hs, R)
+function compute_conflicts(xs, ys, as, ws, hs, mask, R)
     # conflicted items
     items = []
     for i in 1:length(xs)
+        # TODO if the i-th item is fixed, then, skip it.
+        if mask[i] == 0 continue end
         c = cost_f(xs, ys, as, ws, hs,
                    xs[i], ys[i], as[i], ws[i], hs[i],
                    R, except=[i])
@@ -548,7 +550,7 @@ function simulated_annealing_legalization(xs, ys, as, ws, hs, mask, diearea;
         end
         
         # print how many conflicts
-        conflicts = compute_conflicts(xs, ys, as, ws, hs, R)
+        conflicts = compute_conflicts(xs, ys, as, ws, hs, mask, R)
         @info "cycle $cycle, remaining conflicts: $(length(conflicts))"
 
         # break if already no conflicts
@@ -556,7 +558,7 @@ function simulated_annealing_legalization(xs, ys, as, ws, hs, mask, diearea;
         # FIXME visualize the angle
         if vis visualize(xs, ys, ws, hs, R) end
     end
-    conflicts = compute_conflicts(xs, ys, as, ws, hs, R)
+    conflicts = compute_conflicts(xs, ys, as, ws, hs, mask, R)
     return xs, ys, as, conflicts
 end
 
