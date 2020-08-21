@@ -752,6 +752,7 @@ recover with appropriate default."
          ;;
          ;; CAUTION ses requires freerouting.jar and takes time
          #:formats [formats '(pdf kicad dsn)])
+  ;; this function will return the picture to show in console
   (when (not (directory-exists? (current-directory)))
     (make-directory* (current-directory)))
   (let* ([place-spec (Composite->place-spec
@@ -797,10 +798,11 @@ recover with appropriate default."
            (Composite->kicad-pcb circuit place-result)
            out)))
       (displayln (~a "link: " (current-directory) "out.kicad_pcb")))
+    (define the-pict (circuit->pict circuit place-result))
     (when (member 'pdf formats)
       (displayln "generating pdf ..")
       (save-file
-       (circuit->pict circuit place-result)
+       the-pict
        "out.pdf")
       (displayln (~a "link: " (current-directory) "out.pdf")))
     (when (member 'dsn formats)
@@ -818,4 +820,5 @@ recover with appropriate default."
       (let ([success? (shell "freerouting -de out.dsn -do out.ses -mp 10")])
         (displayln (~a "freerouting succeeded? " success?))
         (when success?
-          (displayln (~a "link: " (current-directory) "out.ses")))))))
+          (displayln (~a "link: " (current-directory) "out.ses")))))
+    the-pict))
