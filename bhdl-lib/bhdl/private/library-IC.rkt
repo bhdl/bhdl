@@ -36,6 +36,8 @@
          (contract-out
           [rename PinHeader-out PinHeader
                   ((or/c 1 2 3 4 5 6 7 8) . -> . ICAtom?)]
+          [rename PinHeader2-out PinHeader2
+                  ((or/c 1 2 3 4 5 6 7 8) . -> . ICAtom?)]
           [rename Cherry-out Cherry
                   ((or/c 1 1.25 1.5 1.75 2 2.25 2.75 6.25) . -> . ICAtom?)])
 
@@ -64,6 +66,8 @@
          SKRPACE010
          Switch
          WS2812B
+         
+         Kailh-socket
 
          (struct-out ICAtom))
 
@@ -235,6 +239,20 @@
   (Atom-pinhash (PinHeader-out 1))
   (Atom-pinhash (Diode)))
 
+(define/IC (PinHeader2)
+  ;; FIXME remove duplication
+  #:auto-named-FP (1 (fp-pin-header-2 1))
+  #:auto-named-FP (2 (fp-pin-header-2 2))
+  #:auto-named-FP (3 (fp-pin-header-2 3))
+  #:auto-named-FP (4 (fp-pin-header-2 4))
+  #:auto-named-FP (5 (fp-pin-header-2 5))
+  #:auto-named-FP (6 (fp-pin-header-2 6))
+  #:auto-named-FP (7 (fp-pin-header-2 7))
+  #:auto-named-FP (8 (fp-pin-header-2 8)))
+
+(define (PinHeader2-out num)
+  (PinHeader2 #:FP num))
+
 (define/IC (Cherry)
   #:auto-named-FP (1 (fp-switch-keyboard 1 'pcb))
   #:auto-named-FP (1.25 (fp-switch-keyboard 1.25 'pcb))
@@ -249,6 +267,10 @@
 
 (define (Cherry-out spacing)
   (Cherry #:FP spacing))
+
+(define kailh-socket-fp (uuid->fp "bd8c6c64dc7b4d18806bb8859f9f2606"))
+(define/IC (Kailh-socket)
+  #:auto-FP kailh-socket-fp)
 
 (define/IC (ATtiny25 ATtiny45 ATtiny85)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf"

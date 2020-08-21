@@ -20,6 +20,7 @@
           [fp-fuse ((or/c "1206") . -> . footprint?)]
           [fp-sw-spst (-> (or/c 1 2 3 4 6 8) footprint?)]
           [fp-pin-header (-> (or/c 1 2 3 4 5 6 7 8) footprint?)]
+          [fp-pin-header-2 (-> (or/c 1 2 3 4 5 6 7 8) footprint?)]
           [fp-usb (-> (or/c 'a-male 'a-female
                             'c-male 'c-female
                             'micro-male 'micro-female
@@ -226,6 +227,12 @@
   ;; available ct: 1,2,3,4,5,6,7,8
   (kicad-helper "Connector_PinHeader_2.54mm.pretty/"
                 (~a "PinHeader_1x"
+                    (~r ct #:min-width 2 #:pad-string "0")
+                    "_P2.54mm_Vertical.kicad_mod")))
+
+(define (fp-pin-header-2 ct)
+  (kicad-helper "Connector_PinHeader_2.54mm.pretty/"
+                (~a "PinHeader_2x"
                     (~r ct #:min-width 2 #:pad-string "0")
                     "_P2.54mm_Vertical.kicad_mod")))
 
