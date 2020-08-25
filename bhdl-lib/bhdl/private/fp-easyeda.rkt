@@ -16,20 +16,39 @@
 
 (provide uuid->fp
          lcsc->fp
-         lcsc->uuid)
+         lcsc->uuid
+         
+         10mil->mm)
+
+(define (10mil->mm x)
+  (* 25.4 (/ (* x 10) 1000)))
+
+(define (adapt-unit x)
+  (cond 
+   [(string? x) (10mil->mm (string->number x))]
+   [else (10mil->mm x)]))
 
 (define (read-easyeda fname)
   "Read EasyEDA json file."
   (let ([jobj (call-with-input-file fname
                 (lambda (in) (read-json in)))])
-    (match-let* ([origin-x (10mil->mm (hash-ref-ref jobj 'head 'x))]
-                 [origin-y (10mil->mm (hash-ref-ref jobj 'head 'y))]
+    (match-let* ([origin-x (adapt-unit (hash-ref-ref jobj 'head 'x))]
+                 [origin-y (adapt-unit (hash-ref-ref jobj 'head 'y))]
                  [pre (hash-ref-ref jobj 'head 'c_para 'pre)]
                  [canvas (hash-ref jobj 'canvas)]
                  [shapes (hash-ref jobj 'shape)]
                  [tracks (filter (lambda (x) (string-prefix? x "TRACK")) shapes)]
                  [rects (filter (lambda (x) (string-prefix? x "RECT")) shapes)]
                  [pads (filter (lambda (x) (string-prefix? x "PAD")) shapes)]
+                 [holes (filter (lambda (x) (string-prefix? x "HOLE")) shapes)]
+                 [_ (for ([shape (filter-not (lambda (x) (or (string-prefix? x "TRACK")
+                                                             (string-prefix? x "RECT")
+                                                             (string-prefix? x "PAD")
+                                                             (string-prefix? x "HOLE"))) shapes)])
+                         ;; FIXME HOLEs
+                         (debug "unrecognized shape: " (first (string-split shape "~"))))]
+                 ;; FIXME more shapes, like "PL ..."
+                 ;; FIXME report warnings for unrecognized shapes
                  [(hash-table ('x x) ('y y) ('width width) ('height height))
                   (hash-ref jobj 'BBox)])
       ;; FIXME unit
@@ -37,8 +56,10 @@
                                           (parse-track track))
                                         (for/list ([rect rects])
                                           (parse-rect rect))))]
-             [pad-specs (for/list ([pad pads])
-                          (parse-pad pad))]
+             [pad-specs (append (for/list ([pad pads])
+                                  (parse-pad pad))
+                                (for/list ([hole holes])
+                                   (parse-hole hole)))]
              [fn (lambda (item) (spec-offset item origin-x origin-y))])
         (footprint (map fn line-specs)
                    (map fn pad-specs))))))
@@ -51,8 +72,6 @@
      (pad-spec name (- x offx) (- y offy) mounting-type shape size dsize)]
     [else (error "spec-offset")]))
 
-(define (10mil->mm x)
-  (* 25.4 (/ (* x 10) 1000)))
 
 (define (parse-track str)
   (match-let ([(list _ stroke layer net points ID
@@ -63,20 +82,20 @@
     (let ([points (group-by-2 (string-split points))])
       (for/list ([a points]
                  [b (rest points)])
-        (line-spec (10mil->mm (string->number (first a)))
-                   (10mil->mm (string->number (second a)))
-                   (10mil->mm (string->number (first b)))
-                   (10mil->mm (string->number (second b)))
-                   (10mil->mm (string->number stroke)))))))
+        (line-spec (adapt-unit (first a))
+                   (adapt-unit (second a))
+                   (adapt-unit (first b))
+                   (adapt-unit (second b))
+                   (adapt-unit stroke))))))
 
 (define (parse-rect str)
   (match-let* ([(list _ x y w h other ...) (string-split str "~")]
                [(list x y w h) (map (lambda (x)
-                                      (10mil->mm (string->number x)))
+                                      (adapt-unit x))
                                     (list x y w h))]
                [(list x1 y1 x2 y2) (list x y (+ x w) (+ y h))]
                ;; FIXME there's no stroke in this command
-               [stroke (10mil->mm 1)])
+               [stroke (adapt-unit 1)])
     ;; 4 segments
     ;; FIXME better use fp_poly
     ;; FIXME read fp_poly and others for kicad
@@ -102,22 +121,22 @@
                     [(thru_hole) (match-let ([(list x1 y1 x2 y2)
                                               (map string->number
                                                    (string-split hole-points))])
-                                   (let ([w (10mil->mm (- x2 x1))]
-                                         [h (10mil->mm (abs (- y2 y1)))])
+                                   (let ([w (adapt-unit (- x2 x1))]
+                                         [h (adapt-unit (abs (- y2 y1)))])
                                      ;; FIXME w seems to be 0
-                                     (list h (10mil->mm (string->number hole-length)))
+                                     (list h (adapt-unit hole-length))
                                      ;; CAUTION x2 seems to be reasonable size ..
-                                     (list (10mil->mm
-                                            (* 2 (string->number hole-radius)))
-                                           (10mil->mm (string->number hole-length)))))])])
+                                     (list (adapt-unit
+                                            (* 2 (adapt-unit hole-radius)))
+                                           (adapt-unit hole-length))))])])
       (pad-spec name
-                (10mil->mm (string->number x))
-                (10mil->mm (string->number y))
+                (adapt-unit x)
+                (adapt-unit y)
                 type
                 ;; FIXME shape corresponding to kicad
                 (string->symbol (string-downcase shape))
-                (list (10mil->mm (string->number width))
-                      (10mil->mm (string->number height)))
+                (list (adapt-unit width)
+                      (adapt-unit height))
                 ;; hole? shape?
                 ;; d size is also a 2 size, same when round, differ when oval
                 ;; (10mil->mm (string->number hole-radius))
@@ -125,6 +144,24 @@
                 ;;
                 ;; FIXME rotation seems to follow the pad
                 dsize))))
+
+;; "HOLE~284~255~4~gge5"
+;; "HOLE~410~280~5.905~"
+;; center x: 284
+;; center y: 255
+;; diameter: 4
+;; id: gge5
+(define (parse-hole str)
+  (match-let ([(list _ x y d other ...)
+               (string-split str "~")])
+             ;; a pad with "" as name is a hole, doesn't have electrical pads, but only footprint. On the footprint, it should not be red.
+             (pad-spec "" (adapt-unit x)
+                              (adapt-unit y)
+                       'thru_hole
+                       'circle
+                       (list (* 2 (adapt-unit d)) (* 2 (adapt-unit d)))
+                       (list (* 2 (adapt-unit d)) (* 2 (adapt-unit d)))
+                       )))
 
 (module+ test
   (parse-track "TRACK~1~3~S$216~4035.4331 2925.5906 3964.5669 2925.5906~gge219~0")
@@ -200,7 +237,10 @@
                                   get-pure-port
                                   (lambda (in)
                                     (hash-ref-ref (read-json in)
-                                                  'result 'dataStr)))])
+                                                  'result
+                                                  ;; FIXME seems to be inconsistent, some json doesn't have this
+                                                  'packageDetail
+                                                  'dataStr)))])
         (call-with-output-file fname
           (lambda (out) (write-json obj out)))
         ;; TODO pretty print using python
