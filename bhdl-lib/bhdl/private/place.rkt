@@ -533,7 +533,7 @@ recover with appropriate default."
 (define (padstack-id pad)
   (match pad
     [(pad-spec name x y mounting-type
-               shape (list s1 s2) dsize)
+               shape (list s1 s2) dsize layer)
      (case shape
        ;; FIXME treat roundrect as rect
        [(rect roundrect) (~a "RectPad_"
@@ -552,13 +552,14 @@ recover with appropriate default."
 (define (padstack-spec pad)
   (match pad
     [(pad-spec name x y mounting-type
-               shape (list s1 s2) dsize)
+               shape (list s1 s2) dsize layer)
      ;; return PADSTACK-ID
      (case shape
        ;; FIXME treat roundrect as rect
        [(rect roundrect)
         (let ([ID (padstack-id pad)])
           `(padstack ,ID
+                     ;; FIXME these F.Cu and B.Cu are almost certainly wrong
                      (shape (rect F.Cu
                                   ,(- (/ (* s1 1000) 2))
                                   ,(- (/ (* s2 1000) 2))
@@ -664,7 +665,7 @@ recover with appropriate default."
                                     [i (in-naturals 1)])
                            (match pad
                              [(pad-spec name x y mounting-type
-                                        shape (list s1 s2) dsize)
+                                        shape (list s1 s2) dsize layer)
                               `(pin ,(padstack-id pad)
                                     ;; ,i
                                     ,(Pin-name
@@ -681,7 +682,7 @@ recover with appropriate default."
                  (for/list ([pad (footprint-pads (atom->fp atom))])
                    (match pad
                      [(pad-spec name x y mounting-type
-                                shape (list s1 s2) dsize)
+                                shape (list s1 s2) dsize layer)
                       (padstack-spec pad)])))))
            ;; one last pre-defined via
            (padstack "Via[0-1]_1000:400_um"

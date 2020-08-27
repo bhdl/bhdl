@@ -63,10 +63,12 @@
         ;;
         ;; Because when generating KiCAD file, I need to figure out which pad is
         ;; connected to which net.
-        (let ([pad-names (map pad-spec-name (footprint-pads (FpSpec-fp fpspec)))])
+        (let ([pad-names (filter-not string? (map pad-spec-name (footprint-pads (FpSpec-fp fpspec))))])
           (or (= (length pins) (length pad-names))
               (error "pins and pad-names do not match: "
-                     (length pins) (length pad-names)))
+                     (length pins) (length pad-names)
+                     "pad names: "
+                     pad-names))
           (for ([pin pins]
                 [pad pad-names])
             (hash-set! (Atom-pinhash comp)

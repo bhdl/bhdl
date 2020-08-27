@@ -18,6 +18,8 @@
          lcsc->fp
          lcsc->uuid
          
+         fp-kailh-socket
+         
          10mil->mm)
 
 (define (10mil->mm x)
@@ -56,20 +58,21 @@
                                           (parse-track track))
                                         (for/list ([rect rects])
                                           (parse-rect rect))))]
-             [pad-specs (append (for/list ([pad pads])
-                                  (parse-pad pad))
-                                (for/list ([hole holes])
-                                   (parse-hole hole)))]
+             [pad-specs (for/list ([pad pads])
+                                  (parse-pad pad))]
+             [hole-specs (for/list ([hole holes])
+                                   (parse-hole hole))]
              [fn (lambda (item) (spec-offset item origin-x origin-y))])
         (footprint (map fn line-specs)
-                   (map fn pad-specs))))))
+                   (map fn pad-specs)
+                   (map fn hole-specs))))))
 
 (define (spec-offset spec offx offy)
   (match spec
     [(line-spec x1 y1 x2 y2 width)
      (line-spec (- x1 offx) (- y1 offy) (- x2 offx) (- y2 offy) width)]
-    [(pad-spec name x y mounting-type shape size dsize)
-     (pad-spec name (- x offx) (- y offy) mounting-type shape size dsize)]
+    [(pad-spec name x y mounting-type shape size dsize layer)
+     (pad-spec name (- x offx) (- y offy) mounting-type shape size dsize layer)]
     [else (error "spec-offset")]))
 
 
@@ -104,6 +107,10 @@
           (line-spec x2 y2 x1 y2 stroke)
           (line-spec x1 y2 x1 y1 stroke))))
 
+(define (->padname x)
+  (or (string->number x)
+      (string->symbol x)))
+
 (define (parse-pad str)
   (match-let ([(list _ shape x y
                      ;; seems to be in reverse order???
@@ -117,19 +124,22 @@
                (string-split str "~")])
     (let* ([type (if (= (string->number hole-length) 0) 'smd 'thru_hole)]
            [dsize (case type
-                    [(smd) (list 0 0)]
+                    [(smd) (list 0)]
                     [(thru_hole) (match-let ([(list x1 y1 x2 y2)
                                               (map string->number
                                                    (string-split hole-points))])
                                    (let ([w (adapt-unit (- x2 x1))]
                                          [h (adapt-unit (abs (- y2 y1)))])
-                                     ;; FIXME w seems to be 0
-                                     (list h (adapt-unit hole-length))
                                      ;; CAUTION x2 seems to be reasonable size ..
-                                     (list (adapt-unit
-                                            (* 2 (adapt-unit hole-radius)))
-                                           (adapt-unit hole-length))))])])
-      (pad-spec name
+                                     (list 'oval (adapt-unit
+                                                    (* 2 (adapt-unit hole-radius)))
+                                           (adapt-unit hole-length))))])]
+           [layer (case (string->number layer)
+                        [(1) 'top]
+                        [(2) 'bottom]
+                        [(11) 'multi]
+                        [else (error "layer not 1,2,11: " layer)])])
+      (pad-spec (->padname name)
                 (adapt-unit x)
                 (adapt-unit y)
                 type
@@ -143,7 +153,8 @@
                 ;; not the hole-radius, but hole-points
                 ;;
                 ;; FIXME rotation seems to follow the pad
-                dsize))))
+                dsize
+                layer))))
 
 ;; "HOLE~284~255~4~gge5"
 ;; "HOLE~410~280~5.905~"
@@ -154,14 +165,15 @@
 (define (parse-hole str)
   (match-let ([(list _ x y d other ...)
                (string-split str "~")])
-             ;; a pad with "" as name is a hole, doesn't have electrical pads, but only footprint. On the footprint, it should not be red.
+             ;; HACK a pad with "" as name is a hole, doesn't have electrical pads,
+             ;; but only footprint. On the footprint, it should not be red.
              (pad-spec "" (adapt-unit x)
                               (adapt-unit y)
                        'thru_hole
                        'circle
                        (list (* 2 (adapt-unit d)) (* 2 (adapt-unit d)))
-                       (list (* 2 (adapt-unit d)) (* 2 (adapt-unit d)))
-                       )))
+                       (list (* 2 (adapt-unit d)))
+                       'multi)))
 
 (module+ test
   (parse-track "TRACK~1~3~S$216~4035.4331 2925.5906 3964.5669 2925.5906~gge219~0")
@@ -253,3 +265,47 @@
   (uuid->fp (lcsc->uuid "C440457"))
   (uuid->fp (lcsc->uuid "C393939"))
   (uuid->fp "C456012"))
+
+
+;; kailh socket with different spacing units
+;; 1, 1.25, 1.5, 1.75, 2.25, 6.25
+;; Since I don't have the footprints, how can I make those?
+;; I could probably use some HACK like get the width of 1u fp and add some spacing
+;; But I cannot generate gerber for that fp. I should add some lines to fp itself.
+;; The origin is 0,0, I should:
+;; - get the positions of all lines
+;; - get the left most and right most
+;; - compute the unit
+;; - compute the new ..
+
+(define kailh-socket-fp-1 (uuid->fp "bd8c6c64dc7b4d18806bb8859f9f2606"))
+
+(define (get-corner lines x-or-y min-or-max)
+  (apply min-or-max (for/list ([line lines])
+                              (match-let ([(line-spec x1 y1 x2 y2 stroke) line])
+                                         (case x-or-y
+                                               [(x) (min-or-max x1 x2)]
+                                               [(y) (min-or-max y1 y2)])))))
+
+(define (get-4-corners lines)
+  (list (get-corner lines 'x min)
+        (get-corner lines 'y min)
+        (get-corner lines 'x max)
+        (get-corner lines 'y max)))
+
+(define (fp-kailh-socket [unit 1])
+  (match-let* ([(list x1 y1 x2 y2) (get-4-corners (footprint-lines kailh-socket-fp-1))]
+              [u1 (- x2 x1)]
+              [Δx (/ (* (- unit 1) u1) 2)]
+              [stroke (line-spec-width (car (footprint-lines kailh-socket-fp-1)))]
+              [(list x1n x2n) (list (- x1 Δx) (+ x2 Δx))])
+             ;; more lines
+            (footprint (append (footprint-lines kailh-socket-fp-1)
+                               (list (line-spec x1n y1 x2n y1 stroke)
+                                   (line-spec x2n y1 x2n y2 stroke)
+                                   (line-spec x2n y2 x1n y2 stroke)
+                                   (line-spec x1n y2 x1n y1 stroke)))
+                       (footprint-pads kailh-socket-fp-1)
+                       (footprint-holes kailh-socket-fp-1))
+             ))
+

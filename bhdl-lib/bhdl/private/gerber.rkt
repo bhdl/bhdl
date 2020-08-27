@@ -31,7 +31,9 @@
                         (select-ap-func (~a "R," w "X" w))
                         (gerber-format-xy (+ x1 dx) (+ y1 dy)) "D02*" "\n"
                         (gerber-format-xy (+ x2 dx) (+ y2 dy)) "D01*")))]
-        [body-pad (for/list ([pad (footprint-pads fp)])
+        [body-pad (for/list ([pad (append (footprint-pads fp)
+                                          ;; TODO flash the holes separately?
+                                          (or (footprint-holes fp) '()))])
                     (let* ([size (pad-spec-size pad)]
                            [shape (pad-spec-shape pad)]
                            [s1 (first size)]

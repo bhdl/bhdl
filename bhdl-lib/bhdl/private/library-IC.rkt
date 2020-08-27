@@ -39,6 +39,8 @@
           [rename PinHeader2-out PinHeader2
                   ((or/c 1 2 3 4 5 6 7 8) . -> . ICAtom?)]
           [rename Cherry-out Cherry
+                  ((or/c 1 1.25 1.5 1.75 2 2.25 2.75 6.25) . -> . ICAtom?)]
+          [rename kailh-socket-out kailh-socket
                   ((or/c 1 1.25 1.5 1.75 2 2.25 2.75 6.25) . -> . ICAtom?)])
 
          CP2102N
@@ -67,8 +69,6 @@
          Switch
          WS2812B
          
-         Kailh-socket
-
          (struct-out ICAtom))
 
 (begin-for-syntax
@@ -92,7 +92,14 @@
    (pattern (~seq #:auto-FP fp)
             #:with res #'(FpSpec #f fp (map pad-spec-name (footprint-pads fp))))
    (pattern (~seq #:auto-named-FP (name fp))
-            #:with res #'(FpSpec name fp (map pad-spec-name (footprint-pads fp))))))
+            #:with res #`(FpSpec name fp (filter-not
+                                          ;; HACK the pad names can be integer, string, symbol.
+                                          ;; I'm filtering out empty strings representing holes ..
+                                          ;; I should have a separate hole section.
+                                          string?
+                                          (map pad-spec-name (footprint-pads fp))
+                                          
+                                                     )))))
 
 (define-syntax (define/IC stx)
   (syntax-parse
@@ -268,9 +275,21 @@
 (define (Cherry-out spacing)
   (Cherry #:FP spacing))
 
-(define kailh-socket-fp (uuid->fp "bd8c6c64dc7b4d18806bb8859f9f2606"))
-(define/IC (Kailh-socket)
-  #:auto-FP kailh-socket-fp)
+(define/IC (kailh-socket)
+           #:auto-named-FP (1 (fp-kailh-socket 1))
+          #:auto-named-FP (1.25 (fp-kailh-socket 1.25))
+          #:auto-named-FP (1.5 (fp-kailh-socket 1.5))
+          #:auto-named-FP (1.75 (fp-kailh-socket 1.75))
+          #:auto-named-FP (2 (fp-kailh-socket 2))
+          #:auto-named-FP (2.25 (fp-kailh-socket 2.25))
+          #:auto-named-FP (2.75 (fp-kailh-socket 2.75))
+          #:auto-named-FP (6.25 (fp-kailh-socket 6.25))
+           ;; FIXME the names are string in current easyeda parser
+           #:LEFT 1
+           #:RIGHT 2)
+           
+(define (kailh-socket-out spacing)
+  (kailh-socket #:FP spacing))
 
 (define/IC (ATtiny25 ATtiny45 ATtiny85)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf"

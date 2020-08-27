@@ -17,7 +17,8 @@
   ;; line will have start (x,y), end (x,y), width
   ;; pads will have num, mounting-type, (shape attr), (x y)
   (lines
-   pads)
+   pads
+   holes)
   #:prefab)
 
 (struct line-spec
@@ -30,9 +31,10 @@
    mounting-type
    shape
    size
-   dsize)
+   dsize
+   ;; possible values: top, bottom, multi
+   layer)
   #:prefab)
-
 
 (define bhdl-footprints-path
   ;; FIXME make this configurable

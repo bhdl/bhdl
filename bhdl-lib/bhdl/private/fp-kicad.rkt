@@ -89,9 +89,15 @@
                    [`(pad ,name ,mounting-type ,shape (at ,x ,y ,z ...)
                           (size ,s1 ,s2)
                           ;; FIXME optional dsize
-                          ;; FIXME Oval drill
-                          (drill ,dsize) ... ,other-attrs ...)
-                    (pad-spec name x y mounting-type shape (list s1 s2) dsize)]
+                          ;; FIXME Oval drill has (oval 1 2)
+                          (drill ,dsize ...) ...
+                          (layers ,layer ...)
+                          ,other-attrs ...)
+                    (pad-spec name x y mounting-type shape (list s1 s2) (if (not (empty? dsize))
+                                                                            (first dsize)
+                                                                            '())
+                              ;; FIXME hard-coded layer
+                              'top)]
                    ;; TODO
                    [`(fp_circle ,other ...)
                     #f]
@@ -109,7 +115,8 @@
                         ;; USB-C are symbols
                         (λ (x) (string? (pad-spec-name x)))
                         (filter pad-spec? specs))])
-        (footprint line-specs pad-specs)))))
+        ;; FIXME no holes for now
+        (footprint line-specs pad-specs #f)))))
 
 ;; FIXME actually use this
 ;;

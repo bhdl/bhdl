@@ -166,6 +166,116 @@
   (assert (ICAtom? atom))
   (FpSpec-fp (ic-select-fpspec (ICAtom-ic atom) (ICAtom-which-fp atom))))
 
+(define easyeda-layers-prefix
+  (list "1~TopLayer~#FF0000~true~false~true~"
+    "2~BottomLayer~#0000FF~true~true~true~"
+    "3~TopSilkLayer~#FFCC00~true~false~true~"
+    "4~BottomSilkLayer~#66CC33~true~false~true~"
+    "5~TopPasteMaskLayer~#808080~true~false~true~"
+    "6~BottomPasteMaskLayer~#800000~true~false~true~"
+    "7~TopSolderMaskLayer~#800080~true~false~true~0.3"
+    "8~BottomSolderMaskLayer~#AA00FF~true~false~true~0.3"
+    "9~Ratlines~#6464FF~true~false~true~"
+    "10~BoardOutLine~#FF00FF~true~false~true~"
+    "11~Multi-Layer~#C0C0C0~true~false~true~"
+    "12~Document~#FFFFFF~true~false~true~"
+    "13~TopAssembly~#33CC99~false~false~false~"
+    "14~BottomAssembly~#5555FF~false~false~false~"
+    "15~Mechanical~#F022F0~false~false~false~"
+    "19~3DModel~#66CCFF~false~false~false~"
+    "21~Inner1~#999966~false~false~false~~"
+    "22~Inner2~#008000~false~false~false~~"
+    "23~Inner3~#00FF00~false~false~false~~"
+    "24~Inner4~#BC8E00~false~false~false~~"
+    "25~Inner5~#70DBFA~false~false~false~~"
+    "26~Inner6~#00CC66~false~false~false~~"
+    "27~Inner7~#9966FF~false~false~false~~"
+    "28~Inner8~#800080~false~false~false~~"
+    "29~Inner9~#008080~false~false~false~~"
+    "30~Inner10~#15935F~false~false~false~~"
+    "31~Inner11~#000080~false~false~false~~"
+    "32~Inner12~#00B400~false~false~false~~"
+    "33~Inner13~#2E4756~false~false~false~~"
+    "34~Inner14~#99842F~false~false~false~~"
+    "35~Inner15~#FFFFAA~false~false~false~~"
+    "36~Inner16~#99842F~false~false~false~~"
+    "37~Inner17~#2E4756~false~false~false~~"
+    "38~Inner18~#3535FF~false~false~false~~"
+    "39~Inner19~#8000BC~false~false~false~~"
+    "40~Inner20~#43AE5F~false~false~false~~"
+    "41~Inner21~#C3ECCE~false~false~false~~"
+    "42~Inner22~#728978~false~false~false~~"
+    "43~Inner23~#39503F~false~false~false~~"
+    "44~Inner24~#0C715D~false~false~false~~"
+    "45~Inner25~#5A8A80~false~false~false~~"
+    "46~Inner26~#2B937E~false~false~false~~"
+    "47~Inner27~#23999D~false~false~false~~"
+    "48~Inner28~#45B4E3~false~false~false~~"
+    "49~Inner29~#215DA1~false~false~false~~"
+    "50~Inner30~#4564D7~false~false~false~~"
+    "51~Inner31~#6969E9~false~false~false~~"
+    "52~Inner32~#9069E9~false~false~false~~"
+    "99~ComponentShapeLayer~#00CCCC~false~false~false~"
+    "100~LeadShapeLayer~#CC9999~false~false~false~"
+    "Hole~Hole~#222222~false~false~true~"
+    "DRCError~DRCError~#FAD609~false~false~true~"
+  ))
+
+(define easyeda-objects-prefix
+  (list
+    "All~true~false"
+    "Component~true~true"
+    "Prefix~true~true"
+    "Name~true~false"
+    "Track~true~true"
+    "Pad~true~true"
+    "Via~true~true"
+    "Hole~true~true"
+    "Copper_Area~true~true"
+    "Circle~true~true"
+    "Arc~true~true"
+    "Solid_Region~true~true"
+    "Text~true~true"
+    "Image~true~true"
+    "Rect~true~true"
+    "Dimension~true~true"
+    "Protractor~true~true"
+  ))
+
+(define (atom->easyeda-shape atom x y a ID Hpin=>net Hnet=>index)
+  "Generating easyeda shape commands."
+  (make-hash 'layers easyeda-layers-prefix
+             'objects easyeda-objects-prefix
+             'head (make-hash 'docType 3
+                              "editorVersion" "6.4.5"
+                                "newgId" true
+                                "c_para" (make-hash)
+                                "hasIdFlag" true
+                                "x" "4020"
+                                "y" "3425"
+                                "importFlag" 0
+                                "transformList" "")
+             ;; TODO canvas should be adjusted according to diearea
+             'canvas
+             "CA~1000~1000~#000000~yes~#FFFFFF~10~1000~1000~line~0.5~mm~3.937~45~visible~0.5~4020~3425~1~yes"
+             'shape (list "TRACK ..."
+                          "PAD ..."
+                          "LIB ...")
+             'BBox (make-hash 'x 0
+                              'y 0
+                              'width 0
+                              'height 0)
+             'DRCRULE (make-hash 'DRCRULE (make-hash 'Default
+                                                     (make-hash
+                                                      "trackWidth" 1
+                                                      "clearance" 0.6
+                                                      "viaHoleDiameter" 2.4
+                                                      "viaHoleD" 1.2))
+                                'isRealtime #t
+                                "isDrcOnRoutingOrPlaceVia" #f
+                                "checkObjectToCopperarea" #t
+                                "showDRCRangeLine" #t)))
+
 (define (atom->fp-sexp atom x y a ID Hpin=>net Hnet=>index)
   "Generate FP raw kicad sexp."
   (match-let ([pinhash (Atom-pinhash atom)])
@@ -192,9 +302,11 @@
                      [(line-spec x1 y1 x2 y2 width)
                       `(fp_line (start ,x1 ,y1) (end ,x2 ,y2)
                                 (layer F.SilkS) (width ,width))]))
-               ,@(for/list ([pad (footprint-pads fp)])
+               ,@(for/list ([pad (append (footprint-pads fp)
+                                         ;; FIXME kicad might use "hole" instead of pad
+                                         (or (footprint-holes fp) '()))])
                    (match pad
-                     [(pad-spec name x y mounting-type shape (list s1 s2) dsize)
+                     [(pad-spec name x y mounting-type shape (list s1 s2) dsize layer)
                       ;; FIXME the fp dimension and the location seems to be in
                       ;; different units
                       `(pad ,name ,(case mounting-type
@@ -206,9 +318,20 @@
                             (size ,s1 ,s2)
                             ;; FIXME optional drill
                             ,@(case mounting-type
-                                [(thru_hole) `((drill oval ,@dsize)
+                                [(thru_hole) `((drill ,@dsize)
                                                (layers *.Cu *.Mask))]
-                                [(smd) `((layers F.Cu F.Paste F.Mask))]
+                                    ;; 
+                                [(smd) `((layers ,@(case layer
+                                                        [(top) '(F.Cu F.Paste)]
+                                                        [(bottom) '(B.Cu B.Paste)]
+                                                        [else (warn "smd must have either layer top or bottom, but got" layer)
+                                                              '(F.Cu F.Paste)])
+                                                 ;; FIXME should I have *.Mask layers at all?
+                                                 ;; Or maybe KiCAD is clever enough to put only the outline as masked?
+                                                 ;; Looks like NO, the mask is covering the whole pads.
+                                                 ;;
+                                                 ;; F.Mask
+                                                 ))]
                                 [else (error "Unsupported mounting type:"
                                              mounting-type)])
                             ;; FIXME HEBI layers

@@ -62,7 +62,7 @@
   (syntax-parse
    stx
    [(_ name ([key:key-spec ...] ...))
-    #'(begin
+    #`(begin
         ;; 1. define the atoms
         (define key.varname (key-with-diode key.spacing (~a 'key.name)))
         ... ...
@@ -78,7 +78,8 @@ key"
           ;; FIXME user should not specify left and right
           #:external-pins (left right)
           #:vars ([d (1N4148W)]
-                  [key (Cherry spacing)])
+;;                   [key (Cherry spacing)]
+                  [key (kailh-socket spacing)])
           #:connect (*- self.left key d self.right)
           #:layout (vc-append
                     3
