@@ -10,6 +10,7 @@
 (provide (struct-out footprint)
          (struct-out line-spec)
          (struct-out pad-spec)
+         (struct-out text-spec)
 
          bhdl-footprints-path)
 
@@ -18,6 +19,7 @@
   ;; pads will have num, mounting-type, (shape attr), (x y)
   (lines
    pads
+   texts
    holes)
   #:prefab)
 
@@ -35,6 +37,9 @@
    ;; possible values: top, bottom, multi
    layer)
   #:prefab)
+
+(struct text-spec
+        (x y))
 
 (define bhdl-footprints-path
   ;; FIXME make this configurable

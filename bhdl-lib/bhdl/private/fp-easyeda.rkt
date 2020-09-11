@@ -30,6 +30,19 @@
    [(string? x) (10mil->mm (string->number x))]
    [else (10mil->mm x)]))
 
+(define (get-corner lines x-or-y min-or-max)
+  (apply min-or-max (for/list ([line lines])
+                              (match-let ([(line-spec x1 y1 x2 y2 stroke) line])
+                                         (case x-or-y
+                                               [(x) (min-or-max x1 x2)]
+                                               [(y) (min-or-max y1 y2)])))))
+
+(define (get-4-corners lines)
+  (list (get-corner lines 'x min)
+        (get-corner lines 'y min)
+        (get-corner lines 'x max)
+        (get-corner lines 'y max)))
+
 (define (read-easyeda fname)
   "Read EasyEDA json file."
   (let ([jobj (call-with-input-file fname
@@ -54,7 +67,7 @@
                  [(hash-table ('x x) ('y y) ('width width) ('height height))
                   (hash-ref jobj 'BBox)])
       ;; FIXME unit
-      (let* ([line-specs (flatten (list (for/list ([track tracks])
+      (match-let* ([line-specs (flatten (list (for/list ([track tracks])
                                           (parse-track track))
                                         (for/list ([rect rects])
                                           (parse-rect rect))))]
@@ -62,9 +75,14 @@
                                   (parse-pad pad))]
              [hole-specs (for/list ([hole holes])
                                    (parse-hole hole))]
-             [fn (lambda (item) (spec-offset item origin-x origin-y))])
+             [fn (lambda (item) (spec-offset item origin-x origin-y))]
+             [(list x1 y1 x2 y2) (get-4-corners (map fn line-specs))])
         (footprint (map fn line-specs)
                    (map fn pad-specs)
+                   ;; by default, place at left
+                   ;; FIXME hard-coded "3" what's the unit? mm?
+                   (list (text-spec (- x1 3) (* 0.5 (+ y1 y2)))
+                         (text-spec 0 0))
                    (map fn hole-specs))))))
 
 (define (spec-offset spec offx offy)
@@ -280,19 +298,6 @@
 
 (define kailh-socket-fp-1 (uuid->fp "bd8c6c64dc7b4d18806bb8859f9f2606"))
 
-(define (get-corner lines x-or-y min-or-max)
-  (apply min-or-max (for/list ([line lines])
-                              (match-let ([(line-spec x1 y1 x2 y2 stroke) line])
-                                         (case x-or-y
-                                               [(x) (min-or-max x1 x2)]
-                                               [(y) (min-or-max y1 y2)])))))
-
-(define (get-4-corners lines)
-  (list (get-corner lines 'x min)
-        (get-corner lines 'y min)
-        (get-corner lines 'x max)
-        (get-corner lines 'y max)))
-
 (define (fp-kailh-socket [unit 1])
   (match-let* ([(list x1 y1 x2 y2) (get-4-corners (footprint-lines kailh-socket-fp-1))]
               [u1 (- x2 x1)]
@@ -306,6 +311,9 @@
                                    (line-spec x2n y2 x1n y2 stroke)
                                    (line-spec x1n y2 x1n y1 stroke)))
                        (footprint-pads kailh-socket-fp-1)
+                       ;; not place at the middle, but bottom right
+                       (list (text-spec (+ x1 (* u1 0.75))
+                                        (+ y1 (* (- y2 y1) 0.75))))
                        (footprint-holes kailh-socket-fp-1))
              ))
 

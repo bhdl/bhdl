@@ -78,7 +78,11 @@
                  (match e
                    ;; TODO
                    ;; FIXME optional z
+                    [`(fp_text reference ,text (at ,x ,y ,z ...) (layer ,l) ,other ...)
+                     ;; TODO fp_text reference get the location
+                    (text-spec x y)]
                    [`(fp_text ,_ ,text (at ,x ,y ,z ...) (layer ,l) ,other ...)
+                     ;; TODO fp_text reference get the location
                     #f]
                    [`(fp_arc (start ,sx ,sy) (end ,ex ,ey)
                              (angle ,ag) (layer ,l) (width ,w))
@@ -114,9 +118,10 @@
                         ;; most of the pin names are numbers, but some like
                         ;; USB-C are symbols
                         (λ (x) (string? (pad-spec-name x)))
-                        (filter pad-spec? specs))])
+                        (filter pad-spec? specs))]
+            [text-specs (append (filter text-spec? specs) (list (text-spec 0 0)))])
         ;; FIXME no holes for now
-        (footprint line-specs pad-specs #f)))))
+        (footprint line-specs pad-specs text-specs #f)))))
 
 ;; FIXME actually use this
 ;;

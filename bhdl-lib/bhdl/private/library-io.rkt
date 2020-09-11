@@ -279,7 +279,8 @@
 (define (atom->fp-sexp atom x y a ID Hpin=>net Hnet=>index)
   "Generate FP raw kicad sexp."
   (match-let ([pinhash (Atom-pinhash atom)])
-    (match-let* ([fp (atom->fp atom)])
+    (match-let* ([fp (atom->fp atom)]
+                 [(text-spec tx ty) (first (footprint-texts fp))])
       `(module ,ID
          ;; FIXME I might want to place some atoms at B.Cu
          (layer F.Cu)
@@ -295,8 +296,8 @@
                         ;; this reference is required for Spectra export of
                         ;; KiCAD. But this UUID is too long for this purpose
                         ,ID
-                        ;; FIXME it should be a little off? This should be different for different Units. Maybe place on top.
-                        (at 0 0 0) (layer F.SilkS)
+                        ;; FIXME it should be a little off? This should be different for different Units. Maybe place on top.                        
+                        (at ,tx ,ty 0) (layer F.SilkS)
                         (effects (font (size 1.524 1.524) (thickness 0.3048))))
                ,@(for/list ([line (footprint-lines fp)])
                    (match line
