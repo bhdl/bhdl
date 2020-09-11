@@ -36,6 +36,9 @@
     (let ([alts (append (map list (set-subtract pins (flatten alts)))
                         alts)])
       (let ([comp (ICAtom (make-hash) ic which-fp)])
+        ;; HACK is all the atoms are ICAtom, and all created here, I can just activate the hashcode here.
+;;         (debug "make-ICAtom" (eq-hash-code comp))
+        (eq-hash-code comp)
         ;; each alt group
         (for ([alt alts]
               [pin-index (in-naturals 1)])

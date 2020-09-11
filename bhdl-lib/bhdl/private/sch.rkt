@@ -17,6 +17,7 @@
 
 (provide collect-all-composites
          collect-all-atoms
+         collect-all-atoms-random
          collect-all-pins
          Composite->netlist
          (struct-out Pin)
@@ -70,7 +71,15 @@
   (pinhash [pict #:auto])
   ;; #:prefab
   ;; CAUTION #:mutable only for changing loc
-  #:mutable)
+  #:mutable
+;;         #:omit-define-syntaxes
+;;         #:constructor-name make-Atom
+        )
+
+;; (define (Atom pinhash)
+;;   (let ([res (make-Atom pinhash)])
+;;     (debug "make-Atom: hash code: " (eq-hash-code res))
+;;     res))
 
 
 ;; DESIGN each composite should keep a location map of Atoms and (not yet
@@ -106,7 +115,7 @@
   (cond
    [(Atom? x) (Atom-pict x)]
    [(Composite? x) (Composite-pict x)]
-   [else (error "show-layout error.")]))
+   [else (error "show-layout error:" x)]))
 
 (define-syntax (create-simple-Composite stx)
   (syntax-parse stx
@@ -406,13 +415,17 @@ res: already in this set."
   (filter (lambda (x) (> (length (Net-pins x)) 1))
           (Composite->netlist-1 comp)))
 
-(define (collect-all-atoms comp)
-  ;; remove dupilcate and FIXME fix order
+(define (collect-all-atoms-random comp)
+  "Thsi version does not have a deterministic order."
   (set->list
    (list->set
     (apply append (for/list ([net (Composite->netlist-1 comp)])
                     (for/list ([pin (Net-pins net)])
                       (Pin-parent pin)))))))
+
+(define (collect-all-atoms comp)
+  "This version sort the atoms based on their eq-hash-code."
+  (sort (collect-all-atoms-random comp) < #:key eq-hash-code))
 
 (define (collect-all-pins comp)
   (remove-duplicates
