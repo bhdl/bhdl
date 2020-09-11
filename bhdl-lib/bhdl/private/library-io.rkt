@@ -11,7 +11,10 @@
          "sch.rkt"
          "utils.rkt"
          "library-base.rkt"
-         pict)
+         pict
+         
+         rebellion/collection/entry
+         rebellion/collection/multidict)
 
 (provide IC->fp-pict+Hlocs
 
@@ -28,6 +31,8 @@
          atom->fp
 
          atom->fp-sexp
+         
+         Atom->Hpad=>altstr
 
          fp-scale)
 
@@ -56,6 +61,8 @@
 ;; scaled AFTER the text is created.
 ;;
 ;; (define fp-font-size (make-parameter 12))
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; IC -> footprint
@@ -276,11 +283,39 @@
                                 "checkObjectToCopperarea" #t
                                 "showDRCRangeLine" #t)))
 
+
+
+(define (Atom->Hpad=>altstr atom)
+  "Given fp pad index/name, get all the alternative names.
+  This is currently used for generating pad names on footprint in KiCAD export."
+  ;; 1. get all pins
+  (let* ([H (Atom-pinhash atom)]
+         ;; 2. get the fp-XXX name of all pins
+         [fp-XXs (filter (lambda (x) (string-prefix?  (~a x) "fp-"))
+                         (hash-keys H))]
+         ;; 3. for each XXX, get the index. But this is not useful
+         ;; 4. for each XXX, get the names other than index and fp-XXX. These are the alts
+         [revdict (for/multidict ([key (hash-keys (Atom-pinhash atom))])
+                                 (entry (hash-ref (Atom-pinhash atom) key) key))]
+         )
+    (hash-set (for/hash ([fp-XX fp-XXs])
+      (let* ([keys (multidict-ref revdict (hash-ref (Atom-pinhash atom) fp-XX))]
+             [keys (filter (lambda (x) (not (or (string-prefix? (~a x) "fp-")
+                                                (string-prefix? (~a x) "index-"))))
+                           (set->list keys))]
+             [key-str (string-join (map ~a keys) "/")]
+             [XX (substring (symbol->string fp-XX) 3)])
+        (values XX key-str)))
+              "" "")
+    ))
+
+
 (define (atom->fp-sexp atom x y a ID Hpin=>net Hnet=>index)
   "Generate FP raw kicad sexp."
   (match-let ([pinhash (Atom-pinhash atom)])
     (match-let* ([fp (atom->fp atom)]
-                 [(text-spec tx ty) (first (footprint-texts fp))])
+                 [(text-spec tx ty) (first (footprint-texts fp))]
+                 [pad=>altstr (Atom->Hpad=>altstr atom)])
       `(module ,ID
          ;; FIXME I might want to place some atoms at B.Cu
          (layer F.Cu)
@@ -349,6 +384,21 @@
                                       `((net ,index
                                              ,(number->string index))))
                                     null)))]))
+               ;; TODO pad names
+               ,@(for/list ([pad (append (footprint-pads fp)
+                                         ;; FIXME kicad might use "hole" instead of pad
+                                         (or (footprint-holes fp) '()))])
+                           (match pad
+                                  [(pad-spec name x y mounting-type shape (list s1 s2) dsize layer)
+                                   ;; TODO get the reasonable pad name(s)
+                                   `(fp_text user ,(hash-ref pad=>altstr (~a name))
+                                             ;; according to the pad shape, rotate the text accordingly
+                                             ,(if (> s1 s2)
+                                                  `(at ,x ,y)
+                                                  `(at ,x ,y 90))
+;;                                              (at ,x ,y) 
+                                             (layer Eco1.User)
+                                             (effects (font (size 0.1 0.1) (thickness 0.01))))]))
                ;; FIXME placeholder
                ;; (net 21 /Leds/lrow3)
                ))))
