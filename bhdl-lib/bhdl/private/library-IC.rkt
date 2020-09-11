@@ -437,7 +437,7 @@
           (PC6 OC3A OC4A)
           (PC7 ICP3 CLK0 OC4A)
 
-          (PD0 OC0B SCL/INT0)
+          (PD0 OC0B SCL INT0)
           (PD1 SDA INT1)
           (PD2 RXD1 INT2)
           (PD3 TXD1 INT3)
