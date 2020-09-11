@@ -18,7 +18,7 @@
          lcsc->fp
          lcsc->uuid
          
-         fp-kailh-socket
+         fp-kailh-socket-easyeda
          
          10mil->mm)
 
@@ -30,18 +30,6 @@
    [(string? x) (10mil->mm (string->number x))]
    [else (10mil->mm x)]))
 
-(define (get-corner lines x-or-y min-or-max)
-  (apply min-or-max (for/list ([line lines])
-                              (match-let ([(line-spec x1 y1 x2 y2 stroke) line])
-                                         (case x-or-y
-                                               [(x) (min-or-max x1 x2)]
-                                               [(y) (min-or-max y1 y2)])))))
-
-(define (get-4-corners lines)
-  (list (get-corner lines 'x min)
-        (get-corner lines 'y min)
-        (get-corner lines 'x max)
-        (get-corner lines 'y max)))
 
 (define (read-easyeda fname)
   "Read EasyEDA json file."
@@ -296,24 +284,4 @@
 ;; - compute the unit
 ;; - compute the new ..
 
-(define kailh-socket-fp-1 (uuid->fp "bd8c6c64dc7b4d18806bb8859f9f2606"))
-
-(define (fp-kailh-socket [unit 1])
-  (match-let* ([(list x1 y1 x2 y2) (get-4-corners (footprint-lines kailh-socket-fp-1))]
-              [u1 (- x2 x1)]
-              [Δx (/ (* (- unit 1) u1) 2)]
-              [stroke (line-spec-width (car (footprint-lines kailh-socket-fp-1)))]
-              [(list x1n x2n) (list (- x1 Δx) (+ x2 Δx))])
-             ;; more lines
-            (footprint (append (footprint-lines kailh-socket-fp-1)
-                               (list (line-spec x1n y1 x2n y1 stroke)
-                                   (line-spec x2n y1 x2n y2 stroke)
-                                   (line-spec x2n y2 x1n y2 stroke)
-                                   (line-spec x1n y2 x1n y1 stroke)))
-                       (footprint-pads kailh-socket-fp-1)
-                       ;; not place at the middle, but bottom right
-                       (list (text-spec (+ x1 (* u1 0.75))
-                                        (+ y1 (* (- y2 y1) 0.75))))
-                       (footprint-holes kailh-socket-fp-1))
-             ))
-
+(define fp-kailh-socket-easyeda (uuid->fp "bd8c6c64dc7b4d18806bb8859f9f2606"))

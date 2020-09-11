@@ -566,7 +566,7 @@ recover with appropriate default."
                                   ,(/ (* s1 1000) 2)
                                   ,(/ (* s2 1000) 2)))
                      ,@(case mounting-type
-                         [(thru_hole) `((shape (rect B.Cu
+                         [(thru_hole np_thru_hole) `((shape (rect B.Cu
                                                      ,(- (/ (* s1 1000) 2))
                                                      ,(- (/ (* s2 1000) 2))
                                                      ,(/ (* s1 1000) 2)
@@ -579,7 +579,7 @@ recover with appropriate default."
                    `(padstack ,ID
                               (shape (circle F.Cu ,(* s1 1000)))
                               ,@(case mounting-type
-                                  [(thru_hole) `((shape (circle B.Cu ,(* s1 1000))))]
+                                  [(thru_hole np_thru_hole) `((shape (circle B.Cu ,(* s1 1000))))]
                                   [(smd) null]
                                   [else (error "Mounting type error.")])
                               (attach off)))]
@@ -589,7 +589,7 @@ recover with appropriate default."
                                          ;; FIXME not always 0
                                          0 0 0 0))
                             ,@(case mounting-type
-                                [(thru_hole) `((shape (path B.Cu ,(* s2 1000)
+                                [(thru_hole np_thru_hole) `((shape (path B.Cu ,(* s2 1000)
                                                             ;; FIXME not always 0
                                                             0 0 0 0)))]
                                 [(smd) null]

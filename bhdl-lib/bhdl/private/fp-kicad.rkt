@@ -53,6 +53,9 @@
          fp-SOT-23
          fp-SOT-223
          fp-SOT-23-5
+         
+         fp-stabilizer-2u
+         fp-kailh-socket-kicad
 
          fp-crystal
          fp-diode
@@ -90,6 +93,8 @@
                    [`(fp_line (start ,sx ,sy) (end ,ex ,ey) (layer ,l) (width ,w))
                     (line-spec sx sy ex ey w)]
                    ;; FIXME optional z
+                   [`(pad "" np_thru_hole circle (at ,x ,y) (size ,s1 ,s2) (drill ,dsize) ,layer)
+                     (pad-spec "" x y 'thru_hole 'circle (list s1 s2) (list dsize) 'multi)]
                    [`(pad ,name ,mounting-type ,shape (at ,x ,y ,z ...)
                           (size ,s1 ,s2)
                           ;; FIXME optional dsize
@@ -119,9 +124,11 @@
                         ;; USB-C are symbols
                         (λ (x) (string? (pad-spec-name x)))
                         (filter pad-spec? specs))]
-            [text-specs (append (filter text-spec? specs) (list (text-spec 0 0)))])
+            [text-specs (append (filter text-spec? specs) (list (text-spec 0 0)))]
+            [hole-specs (filter (λ (x) (string? (pad-spec-name x)))
+                                (filter pad-spec? specs))])
         ;; FIXME no holes for now
-        (footprint line-specs pad-specs text-specs #f)))))
+        (footprint line-specs pad-specs text-specs hole-specs)))))
 
 ;; FIXME actually use this
 ;;
@@ -135,7 +142,8 @@
                                      x))
                        '("kicad-footprints"
                          "arduino-kicad-library"
-                         "SparkFun-KiCad-Libraries/Footprints"))))
+                         "SparkFun-KiCad-Libraries/Footprints"
+                         "."))))
 
 (define (kicad-helper . lst)
   ;; libpath is a list of path
@@ -301,6 +309,15 @@
 (define fp-dummy fp-1602)
 
 (define (fp-mounting-hole m)
+  "Augmented mounting hole with 2 dummy pads."
+  (merge-fp (fp-mounting-hole-raw m)
+            (footprint '() 
+                       (list ;; FIXME these dummy pads should not be generated to KiCAD
+                            (pad-spec 1 0 0 'thru_hole 'circle (list 0 0) (list 0 0) 'multi)
+                            (pad-spec 2 0 0 'thru_hole 'circle (list 0 0) (list 0 0) 'multi)) 
+                       '() '())))
+
+(define (fp-mounting-hole-raw m)
   ;; MountingHole_2.2mm_M2.kicad_mod
   ;; MountingHole_2.7mm_M2.5.kicad_mod
   ;; MountingHole_3.2mm_M3.kicad_mod
@@ -567,3 +584,10 @@
 
 (define fp-WS2812B
   (kicad-helper "LED_SMD.pretty" "LED_WS2812B_PLCC4_5.0x5.0mm_P3.2mm.kicad_mod"))
+
+;; keyboard switch
+
+(define fp-stabilizer-2u
+  (kicad-helper "keyswitches.pretty" "Stabilizer_MX_2u.kicad_mod"))
+(define fp-kailh-socket-kicad
+  (kicad-helper "keyswitches.pretty" "Kailh_socket_MX.kicad_mod"))

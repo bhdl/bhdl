@@ -7,6 +7,7 @@
          "private/fp-base.rkt"
          "private/fp-easyeda.rkt"
          "private/fp-kicad.rkt"
+         "private/fp.rkt"
          ;; FIXME probably not provide these
          "private/gerber.rkt"
          "private/gerber-viewer.rkt")
@@ -17,5 +18,6 @@
          (all-from-out "private/fp-base.rkt")
          (all-from-out "private/fp-easyeda.rkt")
          (all-from-out "private/fp-kicad.rkt")
+         (all-from-out "private/fp.rkt")
          (all-from-out "private/gerber.rkt")
          (all-from-out "private/gerber-viewer.rkt"))

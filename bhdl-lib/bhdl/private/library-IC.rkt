@@ -7,6 +7,7 @@
          "fp-base.rkt"
          "fp-kicad.rkt"
          "fp-easyeda.rkt"
+         "fp.rkt"
          "sch.rkt"
          "utils.rkt"
          "library-utils.rkt"
@@ -42,6 +43,10 @@
                   ((or/c 1 1.25 1.5 1.75 2 2.25 2.75 6.25) . -> . ICAtom?)]
           [rename kailh-socket-out kailh-socket
                   ((or/c 1 1.25 1.5 1.75 2 2.25 2.75 6.25) . -> . ICAtom?)])
+         
+         mounting-hole
+         
+         stabilizer-2u
 
          CP2102N
          Transistor
@@ -179,6 +184,8 @@
   #:RIGHT minus)
 
 
+
+
 ;; Manufacturer	High Diode
 ;; Mfr.Part #	1N4148W
 ;; LCSC Part #	C466653
@@ -280,16 +287,33 @@
           #:auto-named-FP (1.25 (fp-kailh-socket 1.25))
           #:auto-named-FP (1.5 (fp-kailh-socket 1.5))
           #:auto-named-FP (1.75 (fp-kailh-socket 1.75))
-          #:auto-named-FP (2 (fp-kailh-socket 2))
-          #:auto-named-FP (2.25 (fp-kailh-socket 2.25))
-          #:auto-named-FP (2.75 (fp-kailh-socket 2.75))
-          #:auto-named-FP (6.25 (fp-kailh-socket 6.25))
+          #:auto-named-FP (2 (fp-kailh-socket-with-stab 2))
+          #:auto-named-FP (2.25 (fp-kailh-socket-with-stab 2.25))
+          #:auto-named-FP (2.75 (fp-kailh-socket-with-stab 2.75))
+           ;; FIXME the stab is 2u
+          #:auto-named-FP (6.25 (fp-kailh-socket-with-stab 6.25))
            ;; FIXME the names are string in current easyeda parser
            #:LEFT 1
            #:RIGHT 2)
            
 (define (kailh-socket-out spacing)
   (kailh-socket #:FP spacing))
+
+(define/IC (stabilizer-2u)
+           ;; Note: I'm only using the footprint. In other words, this IC has 0 pins
+  #:auto-FP fp-stabilizer-2u)
+
+(define/IC (MountingHole)
+           #:auto-named-FP (2 (fp-mounting-hole 2))
+           #:auto-named-FP (3 (fp-mounting-hole 3))
+           #:auto-named-FP (4 (fp-mounting-hole 4))
+           #:auto-named-FP (5 (fp-mounting-hole 5))
+           #:auto-named-FP (6 (fp-mounting-hole 6))
+           #:LEFT 1
+           #:RIGHT 2)
+
+(define (mounting-hole d)
+  (MountingHole #:FP d))
 
 (define/IC (ATtiny25 ATtiny45 ATtiny85)
   #:datasheet "http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf"

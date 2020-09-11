@@ -347,7 +347,8 @@
                       ;; FIXME the fp dimension and the location seems to be in
                       ;; different units
                       `(pad ,name ,(case mounting-type
-                                     [(thru_hole) 'thru_hole]
+                                         ;; FIXME special handle for np_thru_hole
+                                     [(thru_hole np_thru_hole) 'thru_hole]
                                      [(smd) 'smd]
                                      [else (error "Unsupported mounting type:"
                                                   mounting-type)])
@@ -355,7 +356,7 @@
                             (size ,s1 ,s2)
                             ;; FIXME optional drill
                             ,@(case mounting-type
-                                [(thru_hole) `((drill ,@dsize)
+                                [(thru_hole np_thru_hole) `((drill ,@dsize)
                                                (layers *.Cu *.Mask))]
                                     ;; 
                                 [(smd) `((layers ,@(case layer
