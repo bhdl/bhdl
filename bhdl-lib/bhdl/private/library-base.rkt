@@ -35,7 +35,15 @@
 
 (struct ICAtom
   (ic which-fp)
-  #:super struct:Atom)
+  #:super struct:Atom
+  #:methods gen:custom-write
+        [(define (write-proc self port mode)
+           (write-string (~a "#<ICAtom:"
+                             (IC-name (ICAtom-ic self))
+                             "-"
+                             (eq-hash-code self)
+                             ">")
+                         port))])
 
 (define (ic-select-fpspec ic which-fp)
   (if which-fp
