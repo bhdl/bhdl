@@ -22,3 +22,8 @@ compiled/
 *.html
 
 *.ipynb_checkpoints/
+
+netlist
+netlist-1
+pict
+bhdl-footprints
