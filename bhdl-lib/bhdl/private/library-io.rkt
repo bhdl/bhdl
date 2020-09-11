@@ -295,7 +295,8 @@
                         ;; this reference is required for Spectra export of
                         ;; KiCAD. But this UUID is too long for this purpose
                         ,ID
-                        (at 0 0 0) (layer F.SilkS) hide
+                        ;; FIXME it should be a little off? This should be different for different Units. Maybe place on top.
+                        (at 0 0 0) (layer F.SilkS)
                         (effects (font (size 1.524 1.524) (thickness 0.3048))))
                ,@(for/list ([line (footprint-lines fp)])
                    (match line
