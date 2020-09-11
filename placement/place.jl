@@ -4,7 +4,7 @@ import ForwardDiff
 import Zygote
 using Statistics: mean
 # import Plots
-import CuArrays: cu, allowscalar
+import CUDA: cu, allowscalar
 allowscalar(false)
 using Flux: gpu, cpu
 
