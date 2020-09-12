@@ -532,7 +532,7 @@ recover with appropriate default."
 
 (define (padstack-id pad)
   (match pad
-    [(pad-spec name x y mounting-type
+    [(pad-spec name x y a mounting-type
                shape (list s1 s2) dsize layer)
      (case shape
        ;; FIXME treat roundrect as rect
@@ -551,7 +551,7 @@ recover with appropriate default."
 
 (define (padstack-spec pad)
   (match pad
-    [(pad-spec name x y mounting-type
+    [(pad-spec name x y a mounting-type
                shape (list s1 s2) dsize layer)
      ;; return PADSTACK-ID
      (case shape
@@ -664,7 +664,7 @@ recover with appropriate default."
                        ,@(for/list ([pad (footprint-pads (atom->fp atom))]
                                     [i (in-naturals 1)])
                            (match pad
-                             [(pad-spec name x y mounting-type
+                             [(pad-spec name x y a mounting-type
                                         shape (list s1 s2) dsize layer)
                               `(pin ,(padstack-id pad)
                                     ;; ,i
@@ -681,7 +681,7 @@ recover with appropriate default."
                (for/list ([atom atoms])
                  (for/list ([pad (footprint-pads (atom->fp atom))])
                    (match pad
-                     [(pad-spec name x y mounting-type
+                     [(pad-spec name x y a mounting-type
                                 shape (list s1 s2) dsize layer)
                       (padstack-spec pad)])))))
            ;; one last pre-defined via

@@ -33,7 +33,7 @@
 
 (struct pad-spec
   (name
-   x y
+   x y a
    mounting-type
    shape
    size

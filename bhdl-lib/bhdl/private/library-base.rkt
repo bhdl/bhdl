@@ -48,7 +48,7 @@
 (define (ic-select-fpspec ic which-fp)
   (if which-fp
       ;; FIXME fail to find?
-      (findf (lambda (x) (= (FpSpec-name x) which-fp))
+      (findf (lambda (x) (equal? (FpSpec-name x) which-fp))
              (IC-fps ic))
       ;; if #f, pass in the first
       (first (IC-fps ic))))

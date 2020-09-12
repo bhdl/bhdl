@@ -117,6 +117,7 @@
        ;; 2. offset and scale the loc
        (for/hash ([pad (footprint-pads fp)])
          (values (pad-spec-name pad)
+                 ;; FIXME pad-spec-a
                  (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))
                         (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale))
                         0)))))))
@@ -339,11 +340,15 @@
                      [(line-spec x1 y1 x2 y2 width)
                       `(fp_line (start ,x1 ,y1) (end ,x2 ,y2)
                                 (layer F.SilkS) (width ,width))]))
-               ,@(for/list ([pad (append (footprint-pads fp)
+               ,@(for/list ([pad (filter
+                                  ;; filter out mounting hole dummy pads
+                                  (lambda (x)
+                                    (not (equal? 'dummy (pad-spec-name x))))
+                                  (append (footprint-pads fp)
                                          ;; FIXME kicad might use "hole" instead of pad
-                                         (or (footprint-holes fp) '()))])
+                                         (or (footprint-holes fp) '())))])
                    (match pad
-                     [(pad-spec name x y mounting-type shape (list s1 s2) dsize layer)
+                     [(pad-spec name x y pa mounting-type shape (list s1 s2) dsize layer)
                       ;; FIXME the fp dimension and the location seems to be in
                       ;; different units
                       `(pad ,name ,(case mounting-type
@@ -352,7 +357,7 @@
                                      [(smd) 'smd]
                                      [else (error "Unsupported mounting type:"
                                                   mounting-type)])
-                            ,shape (at ,x ,y ,(* (/ a pi) 180))
+                            ,shape (at ,x ,y ,(+ pa (* (/ a pi) 180)))
                             (size ,s1 ,s2)
                             ;; FIXME optional drill
                             ,@(case mounting-type
@@ -360,10 +365,10 @@
                                                (layers *.Cu *.Mask))]
                                     ;; 
                                 [(smd) `((layers ,@(case layer
-                                                        [(top) '(F.Cu F.Paste)]
-                                                        [(bottom) '(B.Cu B.Paste)]
+                                                        [(top) '(F.Cu F.Paste F.Mask)]
+                                                        [(bottom) '(B.Cu B.Paste B.Mask)]
                                                         [else (warn "smd must have either layer top or bottom, but got" layer)
-                                                              '(F.Cu F.Paste)])
+                                                              '(F.Cu F.Paste F.Mask)])
                                                  ;; FIXME should I have *.Mask layers at all?
                                                  ;; Or maybe KiCAD is clever enough to put only the outline as masked?
                                                  ;; Looks like NO, the mask is covering the whole pads.
@@ -385,16 +390,16 @@
                                       `((net ,index
                                              ,(number->string index))))
                                     null)))]))
-               ;; TODO pad names
+               ;; pad names
                ,@(for/list ([pad (append (footprint-pads fp)
                                          ;; FIXME kicad might use "hole" instead of pad
                                          (or (footprint-holes fp) '()))])
                            (match pad
-                                  [(pad-spec name x y mounting-type shape (list s1 s2) dsize layer)
+                                  [(pad-spec name x y pa mounting-type shape (list s1 s2) dsize layer)
                                    ;; TODO get the reasonable pad name(s)
                                    `(fp_text user ,(hash-ref pad=>altstr (~a name))
                                              ;; according to the pad shape, rotate the text accordingly
-                                             ,(if (> s1 s2)
+                                             ,(if (and (> s1 s2) (= pa 0))
                                                   `(at ,x ,y)
                                                   `(at ,x ,y 90))
 ;;                                              (at ,x ,y) 

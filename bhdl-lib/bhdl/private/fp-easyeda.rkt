@@ -77,8 +77,8 @@
   (match spec
     [(line-spec x1 y1 x2 y2 width)
      (line-spec (- x1 offx) (- y1 offy) (- x2 offx) (- y2 offy) width)]
-    [(pad-spec name x y mounting-type shape size dsize layer)
-     (pad-spec name (- x offx) (- y offy) mounting-type shape size dsize layer)]
+    [(pad-spec name x y 0 mounting-type shape size dsize layer)
+     (pad-spec name (- x offx) (- y offy) 0 mounting-type shape size dsize layer)]
     [else (error "spec-offset")]))
 
 
@@ -148,6 +148,7 @@
       (pad-spec (->padname name)
                 (adapt-unit x)
                 (adapt-unit y)
+                0
                 type
                 ;; FIXME shape corresponding to kicad
                 (string->symbol (string-downcase shape))
@@ -175,6 +176,7 @@
              ;; but only footprint. On the footprint, it should not be red.
              (pad-spec "" (adapt-unit x)
                               (adapt-unit y)
+                       0
                        'thru_hole
                        'circle
                        (list (* 2 (adapt-unit d)) (* 2 (adapt-unit d)))
@@ -254,13 +256,16 @@
              [obj (call/input-url (string->url url)
                                   get-pure-port
                                   (lambda (in)
-                                    (hash-ref-ref (read-json in)
-                                                  'result
-                                                  ;; FIXME seems to be inconsistent, some json doesn't have this
-                                                  'packageDetail
-                                                  'dataStr)))])
+                                    (let ([j (read-json in)])
+                                        (or (hash-ref-ref-noerr j
+                                                      'result
+                                                      ;; FIXME seems to be inconsistent, some json doesn't have this
+                                                      'packageDetail
+                                                      'dataStr)
+                                            (hash-ref-ref j 'result 'dataStr)))))])
         (call-with-output-file fname
           (lambda (out) (write-json obj out)))
+        (debug "Saved to" fname)
         ;; TODO pretty print using python
         ;; (system (~a "python -m json.tool " fname))
         ))

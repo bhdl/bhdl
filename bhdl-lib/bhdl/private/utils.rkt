@@ -14,6 +14,7 @@
          group-by-2
          group-by-index
          hash-ref-ref
+         hash-ref-ref-noerr
 
          shell)
 
@@ -30,7 +31,6 @@
   (define-alias (a b c) '(1 2))
   (check-true (eq? a b))
   (check-false (eq? a '(1 2))))
-
 
 
 (define (map-recur-normalize lst)
@@ -240,6 +240,14 @@ same rank
   (for/fold ([acc hash])
       ([key keys])
     (hash-ref acc key)))
+
+(define (hash-ref-ref-noerr hash . keys)
+  "On error, return #f."
+  (for/fold ([acc hash])
+      ([key keys])
+    (if (and acc (hash-has-key? acc key))
+        (hash-ref acc key)
+        #f)))
 
 (define (group-by-index key lst)
   "Group lst by key(index)."

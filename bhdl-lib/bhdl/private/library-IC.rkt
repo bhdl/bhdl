@@ -90,10 +90,14 @@
             #:with res #'(FpSpec (~a "QFN-" num) (fp-QFN num) '(pin ...)))
    (pattern (~seq #:LQFP (num pin ...))
             #:with res #'(FpSpec (~a "LQFP-" num) (fp-LQFP num) '(pin ...)))
+   (pattern (~seq #:TQFP (num pin ...))
+            #:with res #'(FpSpec (~a "TQFP-" num) (fp-TQFP num) '(pin ...)))
    ;; FIXME HACK If we already specified custom FP, most likely we are only
    ;; specifying one fp. In this case, no fp name is assigned.
    (pattern (~seq #:FP (fp pin ...))
             #:with res #'(FpSpec #f fp '(pin ...)))
+   (pattern (~seq #:named-FP (fp name pin ...))
+            #:with res #'(FpSpec name fp '(pin ...)))
    (pattern (~seq #:auto-FP fp)
             #:with res #'(FpSpec #f fp (map pad-spec-name (footprint-pads fp))))
    (pattern (~seq #:auto-named-FP (name fp))
@@ -310,7 +314,7 @@
            #:auto-named-FP (5 (fp-mounting-hole 5))
            #:auto-named-FP (6 (fp-mounting-hole 6))
            #:LEFT 1
-           #:RIGHT 2)
+           )
 
 (define (mounting-hole d)
   (MountingHole #:FP d))
@@ -480,6 +484,20 @@
           (PF6 ADC6 TDO)
           (PF7 ADC7 TDI))
   #:QFN (44 PE6 UVCC D- D+ UGND UCAP VBUS PB0 PB1 PB2 PB3
+            PB7 RESET VCC GND XTAL2 XTAL1 PD0 PD1 PD2 PD3 PD5
+            GND AVCC PD4 PD6 PD7 PB4 PB5 PB6 PC6 PC7 PE2
+            VCC GND PF7 PF6 PF5 PF4 PF1 PF0 AREF GND AVCC)
+  #:TQFP (44
+        PE6 UVCC D- D+ UGND UCAP VBUS PB0 PB1 PB2 PB3
+            PB7 RESET VCC GND XTAL2 XTAL1 PD0 PD1 PD2 PD3 PD5
+            GND AVCC PD4 PD6 PD7 PB4 PB5 PB6 PC6 PC7 PE2
+            VCC GND PF7 PF6 PF5 PF4 PF1 PF0 AREF GND AVCC)
+  #:named-FP ((lcsc->fp "C44854")
+              "TQFP-44-lcsc"
+        ;; QFP-44_10x10x08P
+        ;; ATMEGA32U4-AU
+              ;; FIXME KiCAD QFP-44 contains rotated pads
+        PE6 UVCC D- D+ UGND UCAP VBUS PB0 PB1 PB2 PB3
             PB7 RESET VCC GND XTAL2 XTAL1 PD0 PD1 PD2 PD3 PD5
             GND AVCC PD4 PD6 PD7 PB4 PB5 PB6 PC6 PC7 PE2
             VCC GND PF7 PF6 PF5 PF4 PF1 PF0 AREF GND AVCC))

@@ -6,10 +6,12 @@
          rackunit
          "fp-base.rkt"
          "gerber.rkt"
+         "utils.rkt"
          pict
          racket/trace
          racket/contract
          racket/draw
+         racket/string
          json)
 
 (provide kicad-footprint-paths
@@ -94,19 +96,34 @@
                     (line-spec sx sy ex ey w)]
                    ;; FIXME optional z
                    [`(pad "" np_thru_hole circle (at ,x ,y) (size ,s1 ,s2) (drill ,dsize) ,layer)
-                     (pad-spec "" x y 'thru_hole 'circle (list s1 s2) (list dsize) 'multi)]
-                   [`(pad ,name ,mounting-type ,shape (at ,x ,y ,z ...)
+                     (pad-spec "" x y 0 'thru_hole 'circle (list s1 s2) (list dsize) 'multi)]
+                   [`(pad ,name ,mounting-type ,shape (at ,x ,y ,a ...)
                           (size ,s1 ,s2)
                           ;; FIXME optional dsize
                           ;; FIXME Oval drill has (oval 1 2)
                           (drill ,dsize ...) ...
-                          (layers ,layer ...)
+                          ;; example: (layers B.Cu B.Paste B.Mask)
+                          (layers ,layers ...)
                           ,other-attrs ...)
-                    (pad-spec name x y mounting-type shape (list s1 s2) (if (not (empty? dsize))
+                     ;; FIXME z is used for TQFP
+                    (pad-spec name x y
+                              (if (empty? a) 0 (first a))
+                              mounting-type shape (list s1 s2) (if (not (empty? dsize))
                                                                             (first dsize)
                                                                             '())
-                              ;; FIXME hard-coded layer
-                              'top)]
+                              (cond
+                               [(member '*.Cu layers) 'multi]
+                               [(member 'F.Cu layers) 'top]
+                               [(member 'B.Cu layers) 'bottom]
+                               [(member 'F.Paste layers)
+                                (when (not (string-contains? 
+                                            (path->string fname)
+                                            ;; FIXME this file is buggy
+                                            "Package_DFN_QFN.pretty/QFN"))
+                                      (warn "Unknown layer" layers "from" fname))
+                                'top]
+                               [else (error "Unknown layer:" layers)])
+                              )]
                    ;; TODO
                    [`(fp_circle ,other ...)
                     #f]
@@ -313,8 +330,8 @@
   (merge-fp (fp-mounting-hole-raw m)
             (footprint '() 
                        (list ;; FIXME these dummy pads should not be generated to KiCAD
-                            (pad-spec 1 0 0 'thru_hole 'circle (list 0 0) (list 0 0) 'multi)
-                            (pad-spec 2 0 0 'thru_hole 'circle (list 0 0) (list 0 0) 'multi)) 
+                            (pad-spec 'dummy 0 0 0 'thru_hole 'circle (list 0 0) (list 0 0) 'multi)
+                            (pad-spec 'dummy 0 0 0 'thru_hole 'circle (list 0 0) (list 0 0) 'multi))
                        '() '())))
 
 (define (fp-mounting-hole-raw m)
@@ -589,5 +606,7 @@
 
 (define fp-stabilizer-2u
   (kicad-helper "keyswitches.pretty" "Stabilizer_MX_2u.kicad_mod"))
+
+;; FIXME the pad layer
 (define fp-kailh-socket-kicad
   (kicad-helper "keyswitches.pretty" "Kailh_socket_MX.kicad_mod"))
