@@ -331,6 +331,11 @@
                (fp_text reference
                         ;; this reference is required for Spectra export of
                         ;; KiCAD. But this UUID is too long for this purpose
+                        ;;
+                        ;; Add attrs, this might be too large
+;;                         ,(if (empty? (ICAtom-attrs atom))
+;;                              ID
+;;                              (~a ID (ICAtom-attrs atom)))
                         ,ID
                         ;; FIXME it should be a little off? This should be different for different Units. Maybe place on top.                        
                         (at ,tx ,ty 0) (layer F.SilkS)

@@ -19,7 +19,7 @@
   ;; *-find function call
   (set-Atom-pict! atom (launder (atom->fp-pict atom))))
 
-(define (make-IC-atom ic which-fp)
+(define (make-IC-atom ic which-fp attrs)
   ;; For all the pins, create Pin.
   ;;
   ;; 1. get all pins by flattening orients
@@ -35,7 +35,7 @@
     ;; this is alts extended with all pins not recorded in original alts
     (let ([alts (append (map list (set-subtract pins (flatten alts)))
                         alts)])
-      (let ([comp (ICAtom (make-hash) ic which-fp)])
+      (let ([comp (ICAtom (make-hash) ic which-fp attrs)])
         ;; HACK is all the atoms are ICAtom, and all created here, I can just activate the hashcode here.
 ;;         (debug "make-ICAtom" (eq-hash-code comp))
         (eq-hash-code comp)

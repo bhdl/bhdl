@@ -44,7 +44,8 @@
                        (select-ap-func
                         (case shape
                           [(rect) (~a "R," s1 "X" s2)]
-                          [(oval) (~a "O," s1 "X" s2)]
+                              ;; FIXME ellipse
+                          [(oval ellipse) (~a "O," s1 "X" s2)]
                           ;; TODO roundrect
                           [(roundrect) (~a "R," s1 "X" s2)]
                           ;; TODO circle

@@ -306,7 +306,7 @@
                 "USB_Micro-B_Wuerth_629105150521.kicad_mod"))
 (define fp-usb-micro-female
   (kicad-helper "Connector_USB.pretty/"
-                "USB_Micro-B_Molex-105133-0001.kicad_mod"))
+                "USB_Micro-B_Molex-105017-0001.kicad_mod"))
 (define fp-usb-mini-male
   (kicad-helper "Connector_USB.pretty/"
                 "USB_Mini-B_Tensility_54-00023_Vertical.kicad_mod"))

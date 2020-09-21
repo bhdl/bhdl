@@ -2,7 +2,8 @@
 
 (require (for-syntax syntax/parse
                      racket/list
-                     racket/format)
+                     racket/format
+                     racket/string)
          "library-base.rkt"
          "fp-base.rkt"
          "fp-kicad.rkt"
@@ -29,6 +30,7 @@
          LED
          LED0603
          Diode
+         LL4148
          1N4148W
          FerriteBead
          Crystal-2
@@ -67,7 +69,9 @@
          ME6211C
 
          ;; USB-Type-C
+         USB-C-6
          USB-C-16
+         USB-Micro
 
          TJ-S1615CY
          SKRPACE010
@@ -131,9 +135,10 @@
                              (syntax->datum #'(name ...))))]
                   [IC-name-str
                    (datum->syntax
-                    stx (apply string-append
+                    stx (string-join
                                (map symbol->string
-                                    (syntax->datum #'(name ...)))))])
+                                    (syntax->datum #'(name ...)))
+                         "/"))])
       #`(begin
           (define-alias
             (IC-name ...)
@@ -146,7 +151,7 @@
           ;; TODO actually use the attrs
           (define (name #:FP [which-fp #f] . attrs)
             ;; FIXME this requires definition of make-IC-atom
-            (make-IC-atom IC-name which-fp))
+            (make-IC-atom IC-name which-fp attrs))
           ...
           ))]))
 
@@ -188,7 +193,11 @@
   #:RIGHT minus)
 
 
-
+(define/IC (LL4148)
+           #:PREFIX "D"
+           #:FP ((lcsc->fp "C212826") + -)
+           #:LEFT +
+           #:RIGHT -)
 
 ;; Manufacturer	High Diode
 ;; Mfr.Part #	1N4148W
@@ -625,6 +634,8 @@
 ;; Mfr.Part #	TYPE-C 6P
 ;; LCSC Part #	C456012
 ;; Package	SMD
+;;
+;; CAUTION this is power only, no data, so not useful at all
 (define/IC (USB-C-6)
   ;; 6pin usb type c
   #:ALIAS ([A5 CC1]
@@ -659,6 +670,14 @@
         ;; FIXME what are these pads
         ;; FIXME this will conflict with numbers
         P4 P3 P2 P1))
+
+(define/IC (USB-Micro)
+           ;; FIXME this easyeda footprint pads are rotated 180 degrees
+;;            #:FP ((lcsc->fp "C404969") VBUS D- D+ ID GND 0 0 0 0)
+           ;; (6 6 2 1 5 4 3 6 6 6 6 6 6)
+           ;; FIXME this pads and ordering is terrible
+           #:FP ((fp-usb 'micro-female) 6 6  D- VBUS GND ID D+ 6 6 6 6 6 6)
+           )
 
 (module+ debug
   ;; TODO use this to auto-generate FP pins to use in IC?

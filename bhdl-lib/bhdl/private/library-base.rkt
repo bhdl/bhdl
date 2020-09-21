@@ -34,7 +34,7 @@
 
 
 (struct ICAtom
-  (ic which-fp)
+  (ic which-fp attrs)
   #:super struct:Atom
   #:methods gen:custom-write
         [(define (write-proc self port mode)
@@ -42,6 +42,8 @@
                              (IC-name (ICAtom-ic self))
                              "-"
                              (eq-hash-code self)
+;;                              "/" 
+;;                              (IC-attrs self)
                              ">")
                          port))])
 

@@ -26,6 +26,9 @@
 
          Composite->kicad-pcb
          Composite->dsn
+         Composite->BOM
+         
+         atom->ID
 
          atom->macro
          (struct-out Macro)
@@ -596,6 +599,22 @@ recover with appropriate default."
                                 [else (error "Mounting type error.")])
                             (attach off)))])]))
 
+(define (Composite->BOM circuit)
+  (string-append
+   "Annotation, Name, Footprint, Values\n"
+   (let* ([atoms (collect-all-atoms circuit)]
+         [Hatom=>index (for/hash ([atom atoms]
+                                  [i (in-naturals 1)])
+                         (values atom i))])
+    (string-join (for/list ([atom atoms])
+                           (~a (atom->ID atom Hatom=>index)
+                             "," (IC-name (ICAtom-ic atom))
+                             "," (FpSpec-name (ic-select-fpspec (ICAtom-ic atom) 
+                                                                  (ICAtom-which-fp atom)))
+                             "," (ICAtom-attrs atom))
+                     )
+                 "\n"))))
+
 (define (Composite->dsn comp place-spec)
   "Generate Spectra file .dsn to be used for routing."
   ;; 1. collect all atoms
@@ -752,7 +771,9 @@ recover with appropriate default."
          ;; formats is a list of symbols from '(kicad pdf dsn ses)
          ;;
          ;; CAUTION ses requires freerouting.jar and takes time
-         #:formats [formats '(pdf kicad dsn)])
+         ;;
+         ;; TODO BOM PLACE
+         #:formats [formats '(pdf kicad dsn bom)])
   ;; this function will return the picture to show in console
   (when (not (directory-exists? (current-directory)))
     (make-directory* (current-directory)))
@@ -799,6 +820,17 @@ recover with appropriate default."
            (Composite->kicad-pcb circuit place-result)
            out)))
       (displayln (~a "link: " (current-directory) "out.kicad_pcb")))
+    (when (member 'bom formats)
+          (displayln "Generating BOM ..")
+          ;; loop through all atoms, and print their ID and attrs into a txt file
+          (call-with-output-file "BOM.csv"
+            #:exists 'replace
+            (λ (out)
+              (display
+               (Composite->BOM circuit)
+               out))))
+    (when (member 'pos formats)
+          (warn "POSITION file not implemented"))
     (define the-pict (circuit->pict circuit place-result))
     (when (member 'pdf formats)
       (displayln "generating pdf ..")
@@ -823,3 +855,4 @@ recover with appropriate default."
         (when success?
           (displayln (~a "link: " (current-directory) "out.ses")))))
     the-pict))
+
