@@ -125,7 +125,7 @@ key"
                                (for/list ([i (reverse (range 7 14))])
                                  (keyboard-col matrix i))
                                ..))
-         -30))
+         -30 -30 -30 -50))
 
 (myvoid
   (KeyboardMatrix-rows matrix)
