@@ -793,6 +793,12 @@
 
 (define/IC (Arduino-Uno-ICSP)
   ;; FIXME the names of pads are different!
+           #:ALIAS ([D18 SDA]
+                    [D19 SCL]
+                    [D13 SCK]
+                    [D12 MISO]
+                    [D11 MOSI]
+                    [D10 SS])
   #:FP ((fp-Arduino 'Uno-ICSP)
         3V3
         ;; FIXME are they the same? 5V VCC VIN
@@ -807,6 +813,12 @@
         RX SCK SCL SDA TX VIN))
 
 (define/IC (Arduino-Uno)
+           #:ALIAS ([D18 SDA]
+                    [D19 SCL]
+                    [D13 SCK]
+                    [D12 MISO]
+                    [D11 MOSI]
+                    [D10 SS])
   #:FP ((fp-Arduino 'Uno)
         3V3 5V
         A0 A1 A2 A3 A4 A5 AREF
@@ -817,23 +829,32 @@
         RX SCL SDA TX VIN))
 
 (define/IC (Arduino-Micro)
+           #:ALIAS ([D2 SDA]
+                   [D3 SCL])
   #:FP ((fp-Arduino 'Micro)
         TX RX GND GND
-        D2 D3 D4 D5 D6 D7
-        A3 D8 VCC D9 RESET D10 GND D11
+        D2 D3 D4 D5 D6 D7 D8 D9
+        D10 MOSI MISO SCLK
+;;         D18 D19 D20 D21
+        A0 A1 A2 A3
+        VCC RESET GND
         ;; FIXME RAW seems to be VIN
-        VIN
-        D12 D13 A0 A1 A2))
+        VIN))
 
 (define/IC (Arduino-Mini)
   ;; FIXME the sparkfun kicad library is very messy (e.g. see PRO_MINI symbol
   ;; library and footprint mismatch). I need to figure them out.
+           #:ALIAS ([A5 SCL]
+                   [A4 SDA])
   #:FP ((fp-Arduino 'Mini)
-        ;; FIXME these are from sparkfun's library, and the order is messed up
         TX RX RESET GND
         D2 D3 D4 D5 D6 D7
-        A3 D8 VCC D9 RST D10 GND D11 VIN
-        A4 D12 A5 D13 A6 A0 A7 A1 A2))
+        D8 D9 D10 D11 D12 D13
+        A0 A1 A2 A3 
+        VCC RESET GND VIN
+        A4 A5 A6 A7
+        ;; FIXME ??? these pins are probably not useful
+        NC NC NC NC NC NC))
 
 (module+ debug
   (map pad-spec-name (footprint-pads (fp-Arduino 'Mini))))
@@ -863,9 +884,16 @@
           [SDA D11]
           [SCL D12])
   #:FP ((fp-Arduino 'MKR)
-        AREF A0 A1 A2 A3 A4 A5 A6 D0
-        D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12
-        D13 D14 RESET GND 3V3 VIN 5V))
+        AREF A0 A1 A2 A3 A4 A5 A6 
+        D0 D1 D2 D3 D4 D5
+        
+        ;; 28-15 is reverse in kicad
+        5V VIN 3V3 GND RESET D14 D13 D12 D11 D10 D9 D8 D7 D6
+        
+;;         AREF A0 A1 A2 A3 A4 A5 A6 D0
+;;         D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12
+;;         D13 D14 RESET GND 3V3 VIN 5V
+        ))
 
 
 (define/IC (LM555-sym)
