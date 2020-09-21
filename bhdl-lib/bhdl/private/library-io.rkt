@@ -409,7 +409,11 @@
                                                   `(at ,x ,y 90))
 ;;                                              (at ,x ,y) 
                                              (layer Eco1.User)
-                                             (effects (font (size 0.1 0.1) (thickness 0.01))))]))
+                                             ;; TODO I should make the font size configurable
+                                             (effects 
+;;                                               (font (size 0.1 0.1) (thickness 0.01))
+                                              (font (size 0.2 0.2) (thickness 0.05))
+                                                      ))]))
                ;; FIXME placeholder
                ;; (net 21 /Leds/lrow3)
                ))))
