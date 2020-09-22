@@ -36,6 +36,7 @@
          save-for-placement
          send-for-placement
 
+         circuit-plot
          circuit-export)
 
 (struct Macro
@@ -761,6 +762,12 @@ recover with appropriate default."
                       #:sa-stepsize 10
                       ;; to support rotation, use non-0 e.g. 0.3
                       #:sa-theta-stepsize 0)))
+
+
+(define (circuit-plot circuit [auto-place #f])
+  (parameterize ([current-directory "/tmp"]
+                 [padding-general 2])
+                (circuit-export circuit #:auto-place auto-place #:formats '(pdf))))
 
 (define (circuit-export
          circuit
