@@ -83,9 +83,9 @@
                (error "pins and pad-names do not match: "
                      (length pins) (length pad-names))))
           ;; printing pairs for debugging
-          (debug "IC-name:" (IC-name ic)
-                 "\npairs:"
-                 (map cons pins pad-names))
+;;           (debug "IC-name:" (IC-name ic)
+;;                  "\npairs:"
+;;                  (map cons pins pad-names))
           (for ([pin pins]
                 [pad pad-names])
             (hash-set! (Atom-pinhash comp)
