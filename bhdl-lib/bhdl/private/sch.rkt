@@ -3,7 +3,8 @@
 (require (for-syntax syntax/parse
                      racket/string
                      racket/list
-                     racket/match)
+                     racket/match
+                     racket/format)
          syntax/parse/define
          racket/stxparam
 
@@ -35,18 +36,11 @@
 
          make-circuit
          self
+         create-simple-Composite
 
          *-
          *<
          *=
-         *+
-
-
-         ;; DEBUG
-         *--proc
-         *<-proc
-         *=-proc
-         *+-proc
 
          pin-ref)
 
@@ -117,11 +111,30 @@
    [(Composite? x) (Composite-pict x)]
    [else (error "show-layout error:" x)]))
 
+(begin-for-syntax
+ (define-splicing-syntax-class
+  pin-cls
+  (pattern (~seq name [num]))
+  (pattern (~seq name)
+           #:with num -1)))
+
+(define (get-pin-names name num)
+  (case num
+        [(-1) (list name)]
+        [else (for/list ([i (in-range num)])
+                        (~a name "--" i))]))
+
+(define (get-pin-name name num)
+  (case num
+        [(-1) name]
+        [else (~a name "--" num)]))
+
 (define-syntax (create-simple-Composite stx)
   (syntax-parse stx
-    [(_ pin ...)
-     #'(let ([res (Composite (make-hash) '())])
-         (for ([pname '(pin ...)]
+    [(_ pin:pin-cls ...)
+     #`(let ([res (Composite (make-hash) '())]
+             [pins (append (get-pin-names 'pin.name 'pin.num) ...)])
+         (for ([pname pins]
                ;; FIXME the pins may contain numbers
                [i (in-naturals 1)])
            (let ([p (Pin res pname)])
@@ -145,6 +158,8 @@
    [(Composite? atom-or-pict) (Composite-pict atom-or-pict)]
    [(pict? atom-or-pict) atom-or-pict]
    [else (error "Must be Atom, Composite, or just pict.")]))
+
+
 
 (define-syntax (make-circuit stx)
   (syntax-parse stx
@@ -217,18 +232,29 @@
  (parse-maybe-dot #'ab.cd))
 
 (begin-for-syntax
-  (define-syntax-class dot
+  (define-splicing-syntax-class dot
     #:description "dot"
+    (pattern (~seq x [num])
+             #:with (lhs rhs1) (parse-dot #'x)
+             #:with rhs #`(get-pin-names (syntax->datum #'x)
+                                        (syntax->datum #'num))
+             )
     (pattern x
-             #:with (lhs rhs) (parse-dot #'x)))
-  (define-syntax-class maybe-dot
+             #:with (lhs rhs) (parse-dot #'x)
+             #:with rhs-2 #'0))
+  (define-splicing-syntax-class maybe-dot
     #:description "maybe-dot"
     ;; if it is a list, do nothing
     (pattern (x ...)
              #:with res #'(x ...))
     ;; otherwise, it must be an id. check to see if it has a dot
+    (pattern (~seq y:id [num])
+             #:with (lhs rhs) (parse-dot #'y)
+             #:with res #`(pin-ref lhs (get-pin-name (syntax->datum #'rhs)
+                                                     num)))
     (pattern y:id
              #:with res (parse-maybe-dot #'y))))
+
 
 (define (hook-proc! comp . nets)
   ;; FIXME constract for nets to be instance of Net
@@ -237,22 +263,6 @@
    (remove-duplicates
     (append (Composite-nets comp)
             nets))))
-
-;; FIXME test it
-;; FIXME define and use *+-proc
-(define-syntax (*+ stx)
-  (syntax-parse
-   stx
-   ([_ ([node:dot ...] ...)]
-    #'(*+-proc (list (list (pin-ref node.lhs
-                                    ;; CAUTION need quote rhs
-                                    'node.rhs) ...) ...)))))
-
-(define (*+-proc lsts)
-  (let ([res (make-circuit)])
-    (for ([lst lsts])
-      (hook-proc! res (Net lst)))
-    res))
 
 (define (*--proc lst)
   (let ([item-1 (first lst)]
@@ -276,7 +286,7 @@
   (syntax-parse stx
     [(_ node:maybe-dot ...)
      ;; TODO add #:weight
-     #'(*--proc (list node.res ...))]))
+     #`(*--proc (list node.res ...))]))
 
 (define (*=-proc lst-of-nodepins)
   (let ([res
@@ -301,14 +311,29 @@
     (when (not (eq? pin '-))
       (pin-ref node pin))))
 
+
+(define (get-range-names name num1 num2)
+  (for/list ([i (in-range num1 (add1 num2))])
+            (~a name "--" i)))
+
 (define-syntax (*= stx)
   "vectorized connection"
   (syntax-parse
    stx
-   [(_ (~alt (node [pin ...])
+   [(_ (~alt 
+        ;; (self [ a b c[3] d])
+        (node [pin:pin-cls ...])
+        ;; (self col [1 8])
+        ;; TODO better syntax, e.g. self.col[1:8]
+             (nodeid pinname [num1 num2])
+        ;; ([mcu.VCC mcu.GND])
              ([nodepin:dot ...]))
        ...)
-    #'(*=-proc (list (node-pins->nodepins node '(pin ...))
+    #`(*=-proc (list (node-pins->nodepins node
+                                          (list (get-pin-name 'pin.name 'pin.num) ...)
+                                          )
+                     ...
+                     (node-pins->nodepins nodeid (get-range-names 'pinname num1 num2))
                      ...
                      (list (pin-ref nodepin.lhs 'nodepin.rhs) ...)
                      ...))]))
