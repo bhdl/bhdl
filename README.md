@@ -7,13 +7,22 @@ interactive development and visualization, libraries, KiCAD compatible exporter,
 and placement engines including an optimization-based anlytical placer (ePlace)
 and simulated annealing based detailed placer.
 
+The online demo server can be found at https://lihebi.xyz. Currently it supports authorized users signing via GitHub OAuth. Contact us (at hebi@lihebi.com) for user account.
 
 Documents:
-- [Installation guide](INSTALL.md)
-- [Developer and system admin guide](docs/dev.md)
-- [API reference](docs/reference.md)
-- [Advanced API reference](docs/advanced.md)
 
-Notebook Demos:
-- [fitboard](bhdl-test/fitboard.ipynb)
-- [spreadboard](bhdl-test/spreadboard.ipynb)
+- User Documents
+    - [Installation guide](INSTALL.md)
+    - [Getting Started](docs/getting-started.md): this guide presents all you need to compose your circuit through an example keyboard circuit.
+    - [Component Library](docs/library.md): the official BHDL components library, and how to create your own library easily.
+    - [API reference](docs/API.md): the function APIs including
+        - the primary API, `make-circuit`
+        - three connection syntax, `*-` `*<` and `*=`
+        - layout API
+        - exporting API for KiCAD, PNG, PDF, BOM, etc.
+- Developer Documents
+    - [Advanced API reference](docs/advanced.md): this documents some advanced and internal APIs of BHDL.
+    - [Developer and system admin guide](docs/dev.md)
+- Example Notebooks:
+  - [BHDL-Key](bhdl-test/fitboard.ipynb): an ergonomic keyboard
+  - [Arduino Spreadboard](bhdl-test/spreadboard.ipynb): an multi-dock for different form-factor Arduinos

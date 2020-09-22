@@ -1,4 +1,4 @@
-# BHDL Developer and Administrator Guide
+# BHDL Administrator Setup Guide
 
 ## Install for development
 
