@@ -841,10 +841,14 @@ recover with appropriate default."
     (define the-pict (circuit->pict circuit place-result))
     (when (member 'pdf formats)
       (displayln "generating pdf ..")
-      (save-file
-       the-pict
-       "out.pdf")
+      (save-file the-pict "out.pdf")
       (displayln (~a "link: " (current-directory) "out.pdf")))
+    (when (member 'png formats)
+      (save-file the-pict "out.png")
+      (displayln (~a "link: " (current-directory) "out.png")))
+    (when (member 'svg formats)
+      (save-file the-pict "out.svg")
+      (displayln (~a "link: " (current-directory) "out.svg")))
     (when (member 'dsn formats)
       (displayln "generating Spectre DSN ..")
       (call-with-output-file "out.dsn"
