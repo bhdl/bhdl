@@ -27,6 +27,35 @@ git clone --recursive https://github.com/lihebi/bhdl-footprints
 export BHDL_LIBRARY_PATH=/path/to/bhdl-footprints
 ```
 
+## Running via the Jupyter Kernel
+In general, you can run racket programs via command line, editor plugins, IDEs. We are not covering them here. Instead, we recommand run the program via jupyter notebook. To set it up, first install jupyter:
+
+```
+pip install jupyterlab notebook
+```
+
+Install the iracket kernel:
+
+```
+git clone https://github.com/lihebi/iracket
+cd iracket && git checkout dev &&\
+   raco pkg install --deps search-auto
+raco iracket install
+```
+
+Then start the jupyter notebook server:
+
+```
+cd /path/to/bhdl-test
+jupyter notebook
+```
+
+You might want to open the example notebooks:
+
+- [BHDL-Key](bhdl-test/fitboard.ipynb): an ergonomic keyboard
+- [Arduino Spreadboard](bhdl-test/spreadboard.ipynb): an multi-dock for different form-factor Arduinos
+
+
 
 ## (optional) placement engine
 
