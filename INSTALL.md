@@ -2,11 +2,17 @@
 
 ## Installation
 
-First, install [racket](https://racket-lang.org/).
+Step 1: install [racket](https://racket-lang.org/):
 
-IMPORTANT: racket v7.8 seems to be broken! The cc-find will return negative values. That's apparently a bug of either racket v7.8 or the bundled pict library. Use v7.7 instead.
+```
+apt install racket
+```
 
-Install the BHDL directly as a racket package:
+IMPORTANT: racket v7.8 seems to be broken! The cc-find will return negative values. That's apparently a bug of either racket v7.8 or the bundled pict library. Use v7.7 instead. Links to the download pages:
+- [all versions](https://download.racket-lang.org/all-versions.html)
+- [v7.7](https://download.racket-lang.org/racket-v7.7.html)
+
+Step 2: Install the BHDL directly as a racket package:
 
 
 ```
@@ -27,6 +33,7 @@ git clone --recursive https://github.com/lihebi/bhdl-footprints
 export BHDL_LIBRARY_PATH=/path/to/bhdl-footprints
 ```
 
+
 ## Running via the Jupyter Kernel
 In general, you can run racket programs via command line, editor plugins, IDEs. We are not covering them here. Instead, we recommand run the program via jupyter notebook. To set it up, first install jupyter:
 
@@ -34,7 +41,7 @@ In general, you can run racket programs via command line, editor plugins, IDEs. 
 pip install jupyterlab notebook
 ```
 
-Install the iracket kernel:
+Then install the iracket kernel:
 
 ```
 git clone https://github.com/lihebi/iracket
@@ -42,6 +49,8 @@ cd iracket && git checkout dev &&\
    raco pkg install --deps search-auto
 raco iracket install
 ```
+
+Note that we made some fix to the upstream iracket kernel ([rmculpepper/iracket](https://github.com/rmculpepper/iracket)), and you need to clone our repo ([lihebi/iracket](https://github.com/lihebi/iracket)) and switch to `dev` branch.
 
 Then start the jupyter notebook server:
 
@@ -52,6 +61,7 @@ jupyter notebook
 
 You might want to open the example notebooks:
 
+<!-- TODO rename fitboard to BHDL-Key -->
 - [BHDL-Key](bhdl-test/fitboard.ipynb): an ergonomic keyboard
 - [Arduino Spreadboard](bhdl-test/spreadboard.ipynb): an multi-dock for different form-factor Arduinos
 
