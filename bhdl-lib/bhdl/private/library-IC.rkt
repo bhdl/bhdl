@@ -14,7 +14,9 @@
          "library-utils.rkt"
          pict)
 
-(provide ATtiny25 ATtiny45 ATtiny85
+(provide define/IC
+         
+         ATtiny25 ATtiny45 ATtiny85
          ATmega128
          ATmega16
          ATmega48 ATmega88 ATmega168 ATmega328
@@ -189,6 +191,8 @@
 (define/IC (Diode)
   #:PREFIX "D"
   #:FP (fp-diode plus minus)
+           #:ALIAS ([plus anode]
+                    [minus cathode])
   #:LEFT plus
   #:RIGHT minus)
 
@@ -208,6 +212,8 @@
         - +)
   #:LEFT +
   #:RIGHT -
+           #:ALIAS ([+ anode]
+                    [- cathode])
   #:PREFIX "D")
 
 ;; Manufacturer	TOGIALED
