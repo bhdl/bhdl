@@ -46,6 +46,8 @@
 
           ;; direct footprints
           [fp-dummy footprint?])
+         
+         (rename-out [kicad-helper kicad->fp])
 
          fp-sw-push
          fp-jack-audio
