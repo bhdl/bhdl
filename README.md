@@ -24,5 +24,6 @@ Documents:
     - [Advanced API reference](docs/advanced.md): this documents some advanced and internal APIs of BHDL.
     - [Developer and system admin guide](docs/dev.md)
 - Example Notebooks:
-  - [BHDL-Key](bhdl-test/fitboard.ipynb): an ergonomic keyboard
+  - [BHDL-Key](bhdl-test/BHDL-Key.ipynb): an ergonomic keyboard
+  - [onebutton](bhdl-test/onebutton.ipynb): a pushbutton board: https://github.com/forrestbao/onebutton
   - [Arduino Spreadboard](bhdl-test/spreadboard.ipynb): an multi-dock for different form-factor Arduinos
