@@ -174,7 +174,7 @@
          (~seq #:connect connect-clause)) ...)
      #`(let ([self-obj (create-simple-Composite ext-pin ...)])
          (syntax-parameterize ([self (make-rename-transformer #'self-obj)])
-           (let* (var-clause ... ...)
+           (match-let* (var-clause ... ...)
              #,(if (attribute p-name)
                    #'(set-Composite-pict! self-obj (maybe-atom->pict p-name))
                    #'(void))
