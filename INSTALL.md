@@ -63,8 +63,10 @@ You might want to open the example notebooks:
 
 <!-- TODO rename fitboard to BHDL-Key -->
 - [BHDL-Key](bhdl-test/fitboard.ipynb): an ergonomic keyboard
+- [onebutton](bhdl-test/onebutton.ipynb): a pushbutton board: https://github.com/forrestbao/onebutton
 - [Arduino Spreadboard](bhdl-test/spreadboard.ipynb): an multi-dock for different form-factor Arduinos
 
+One caveat to notice: the iRacket kernel seems to have problem when "restarting the kernel". The walk-around is to "shutdown the kernel" and "start it again".
 
 
 ## (optional) placement engine
@@ -87,6 +89,17 @@ You run the placement server via:
 cd placement
 julia --project main.jl
 ```
+
+Note that you only need the placement engine when you use the `circuit-export` API with `#:auto-place #t`:
+
+```racket
+(circuit-export three-button #:auto-place #t ...)
+```
+
+Some future features to notice:
+- We will be adding management of placement engine directly in BHDL code
+- currently the placement engine uses GPU. We'll be making it compatible with CPU only setup, but that might be substantially slower than on GPU machines.
+
 
 ## (optional) freerouting
 
