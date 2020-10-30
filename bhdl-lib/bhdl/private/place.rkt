@@ -292,7 +292,7 @@ recover with appropriate default."
 
 
 (define (kicad-pcb-prefix w h)
-  `((version 4)
+  `((version 5)
     (host pcbnew 4.0.2-stable)
     (general
      (links 469)
