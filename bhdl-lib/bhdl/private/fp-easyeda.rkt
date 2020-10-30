@@ -151,7 +151,10 @@
                 0
                 type
                 ;; FIXME shape corresponding to kicad
-                (string->symbol (string-downcase shape))
+                ;; KiCAD has no ellipse pads, using oval instead
+                (if (string=? (string-downcase shape) "ellipse") 
+                    'oval
+                    (string->symbol (string-downcase shape)))
                 (list (adapt-unit width)
                       (adapt-unit height))
                 ;; hole? shape?
