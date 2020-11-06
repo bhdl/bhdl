@@ -134,7 +134,7 @@
     (size 2 2)
     (drill 1.1)
     (layers *.Cu *.Mask)
-    (net 3 "3"))
+    (net 1 "1"))
    (pad
     1
     thru_hole
@@ -143,7 +143,7 @@
     (size 2 2)
     (drill 1.1)
     (layers *.Cu *.Mask)
-    (net 3 "3"))
+    (net 1 "1"))
    (pad
     2
     thru_hole
@@ -152,7 +152,7 @@
     (size 2 2)
     (drill 1.1)
     (layers *.Cu *.Mask)
-    (net 3 "3"))
+    (net 1 "1"))
    (pad
     1
     thru_hole
@@ -161,7 +161,7 @@
     (size 2 2)
     (drill 1.1)
     (layers *.Cu *.Mask)
-    (net 3 "3"))
+    (net 1 "1"))
    (fp_text
     user
     "right/2"
@@ -222,7 +222,7 @@
     (at -0.7875 0 0.0)
     (size 0.875 0.95)
     (layers F.Cu F.Paste F.Mask)
-    (net 3 "3"))
+    (net 1 "1"))
    (pad
     2
     smd
@@ -350,7 +350,7 @@
     (size 1.6 1.6)
     (drill 0.8)
     (layers *.Cu *.Mask)
-    (net 3 "3"))
+    (net 1 "1"))
    (fp_text
     user
     "anode/left/plus"
@@ -431,7 +431,7 @@
     (at 1.2496800000000121 0.9499600000000044 0.0)
     (size 0.6999985999999999 1.2500101999999997)
     (layers F.Cu F.Paste F.Mask)
-    (net 1 "1"))
+    (net 3 "3"))
    (fp_text
     user
     "1"
@@ -491,7 +491,7 @@
     (size 1.6 1.6)
     (drill 0.8)
     (layers *.Cu *.Mask)
-    (net 1 "1"))
+    (net 3 "3"))
    (pad
     2
     thru_hole
@@ -500,7 +500,7 @@
     (size 1.6 1.6)
     (drill 0.8)
     (layers *.Cu *.Mask)
-    (net 1 "1"))
+    (net 3 "3"))
    (fp_text
     user
     "left/plus"
@@ -549,7 +549,7 @@
     (at -0.7875 0 0.0)
     (size 0.875 0.95)
     (layers F.Cu F.Paste F.Mask)
-    (net 1 "1"))
+    (net 3 "3"))
    (pad
     2
     smd
@@ -557,7 +557,7 @@
     (at 0.7875 0 0.0)
     (size 0.875 0.95)
     (layers F.Cu F.Paste F.Mask)
-    (net 1 "1"))
+    (net 3 "3"))
    (fp_text
     user
     "left/1"
@@ -606,7 +606,7 @@
     (at -0.7875 0 0.0)
     (size 0.875 0.95)
     (layers F.Cu F.Paste F.Mask)
-    (net 1 "1"))
+    (net 3 "3"))
    (pad
     2
     smd
@@ -614,7 +614,7 @@
     (at 0.7875 0 0.0)
     (size 0.875 0.95)
     (layers F.Cu F.Paste F.Mask)
-    (net 1 "1"))
+    (net 3 "3"))
    (fp_text
     user
     "left/1"
@@ -690,7 +690,7 @@
     (size 1.7 1.7)
     (drill 1.0)
     (layers *.Cu *.Mask)
-    (net 1 "1"))
+    (net 3 "3"))
    (pad
     2
     thru_hole
@@ -699,7 +699,7 @@
     (size 1.7 1.7)
     (drill 1.0)
     (layers *.Cu *.Mask)
-    (net 3 "3"))
+    (net 1 "1"))
    (fp_text
     user
     "pos"
@@ -805,7 +805,7 @@
     (at -1.2699999999997544 3.810000000000059 0.0)
     (size 1.7999964 1.7999964)
     (layers F.Cu F.Paste F.Mask)
-    (net 3 "3"))
+    (net 1 "1"))
    (pad
     7
     smd
@@ -841,7 +841,7 @@
     (at 1.2700000000002092 1.2699999999999818 0.0)
     (size 1.7999964 1.7999964)
     (layers F.Cu F.Paste F.Mask)
-    (net 1 "1"))
+    (net 3 "3"))
    (pad
     2
     smd
@@ -849,7 +849,7 @@
     (at 1.2700000000002092 -1.2699999999999818 0.0)
     (size 1.7999964 1.7999964)
     (layers F.Cu F.Paste F.Mask)
-    (net 1 "1"))
+    (net 3 "3"))
    (pad
     1
     smd
@@ -857,7 +857,7 @@
     (at 1.2700000000002092 -3.8099999999999454 0.0)
     (size 1.7999964 1.7999964)
     (layers F.Cu F.Paste F.Mask)
-    (net 1 "1"))
+    (net 3 "3"))
    (fp_text
     user
     "GND"
