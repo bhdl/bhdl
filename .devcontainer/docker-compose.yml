@@ -1,16 +1,17 @@
 services:
-  lab:
+  bhdl:
     build: .
     # image: jupyter/datascience-notebook
     ports:
       - "8889:8888"
-    # runtime: nvidia
+    runtime: nvidia
     volumes:
       - ..:/home/jovyan/bhdl
-      # - dotjulia:/home/jovyan/.julia
+      # FIXME racket might already have something inside this directory
+      - dotracket:/home/jovyan/.local/share/racket
   #     links:
   #       - redis
   #   redis:
   #     image: redis
-#   volumes:
-#     dotjulia: {}
+volumes:
+  dotracket: {}

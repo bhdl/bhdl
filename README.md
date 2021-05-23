@@ -27,3 +27,26 @@ Documents:
   - [BHDL-Key](bhdl-test/BHDL-Key.ipynb): an ergonomic keyboard
   - [onebutton](bhdl-test/onebutton.ipynb): a pushbutton board: https://github.com/forrestbao/onebutton
   - [Arduino Spreadboard](bhdl-test/spreadboard.ipynb): an multi-dock for different form-factor Arduinos
+
+
+# Development
+
+A dev container is described in .devcontainer. I found using VSCode's `reopen in
+container` awkward. So the best practice is:
+
+```
+cd .devcontainer
+docker-compose up -d --build
+```
+
+Now, go to http://localhost:8889 to see the jupyterlab interface. This local
+`bhdl` folder is mounted under the `$HOME` inside the container. BHDL pkg is NOT
+installed by default, thus, inside the container:
+
+```
+cd bhdl
+raco pkg install --auto
+```
+
+This will install the bhdl for development. Changes of the bhdl source code will
+immediately available for use via `(require bhdl)`.

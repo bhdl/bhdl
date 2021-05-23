@@ -172,6 +172,46 @@ RUN cd $HOME/iracket && git checkout dev &&\
 RUN raco iracket install
 
 
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
+# Julia
+ENV JULIA_VERSION=1.6.1
+WORKDIR /tmp
+
+RUN mkdir "/opt/julia-${JULIA_VERSION}" && \
+    wget -q https://julialang-s3.julialang.org/bin/linux/x64/$(echo "${JULIA_VERSION}" | cut -d. -f 1,2)"/julia-${JULIA_VERSION}-linux-x86_64.tar.gz" && \
+    tar xzf "julia-${JULIA_VERSION}-linux-x86_64.tar.gz" -C "/opt/julia-${JULIA_VERSION}" --strip-components=1 && \
+    rm "/tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz"
+RUN ln -fs /opt/julia-*/bin/julia /usr/local/bin/julia
+
+##############################
+RUN fix-permissions /home/$NB_USER
+USER $NB_UID
+
+
+
+# UPDATE I don't need these. I would just install per-user, and those persist
+# with the mounted volume.  Even if these are set, they will be removed.
+#
+# CAUTION this is slow
+RUN julia -e 'import Pkg; Pkg.update()' && \
+    (test $TEST_ONLY_BUILD || julia -e 'import Pkg; Pkg.add("HDF5")') && \
+    julia -e "using Pkg; pkg\"add IJulia\"; pkg\"precompile\""
+
+
+# TODO clone bhdl repo?
+# bhdl footprints
+ENV BHDL_LIBRARY_PATH=$HOME/bhdl-footprints
+RUN git clone --recursive https://github.com/bhdl/bhdl-footprints $BHDL_LIBRARY_PATH
+
+
+# This is used in start.sh
+# ENV GRANT_SUDO=1
+
+USER root
+RUN echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
 
 USER $NB_UID
 
@@ -185,6 +225,7 @@ RUN chmod a+rx /usr/local/bin/start.sh
 USER $NB_UID
 
 EXPOSE 8888
+WORKDIR $HOME
 
 # TODO install jupyter
 
