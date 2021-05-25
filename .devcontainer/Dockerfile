@@ -207,11 +207,28 @@ ENV BHDL_LIBRARY_PATH=$HOME/bhdl-footprints
 RUN git clone --recursive https://github.com/bhdl/bhdl-footprints $BHDL_LIBRARY_PATH
 
 
+USER $NB_UID
+# jupyterlab extensions
+RUN pip install --upgrade jupyterlab-git
+RUN jupyter labextension install --no-build @jupyterlab/toc
+RUN jupyter labextension install --no-build @ijmbarr/jupyterlab_spellchecker
+RUN jupyter labextension install --no-build @aquirdturtle/collapsible_headings
+# RUN pip install git+https://github.com/lihebi/jupyterlab-racket
+
+# can use either one of the following to install
+#
+# FIXME jupyter labextension install is not working properly
+# RUN jupyter labextension install --no-build https://github.com/lihebi/jupyterlab-racket
+RUN pip install git+https://github.com/lihebi/jupyterlab-racket
+# RUN jupyter lab build
+
 # This is used in start.sh
 # ENV GRANT_SUDO=1
 
 USER root
 RUN echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
+
+
 
 USER $NB_UID
 
