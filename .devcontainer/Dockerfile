@@ -158,8 +158,8 @@ RUN conda install --quiet --yes jupyterlab && \
 
 # Install racket
 
-ENV RACKET_INSTALLER_URL=http://mirror.racket-lang.org/installers/7.7/racket-7.7-x86_64-linux-natipkg.sh
-ENV RACKET_VERSION=7.7
+ENV RACKET_VERSION=8.1
+ENV RACKET_INSTALLER_URL=http://mirror.racket-lang.org/installers/${RACKET_VERSION}/racket-${RACKET_VERSION}-x86_64-linux-natipkg.sh
 RUN wget --output-document=racket-install.sh -q ${RACKET_INSTALLER_URL} && \
     echo "yes\n1\n" | sh racket-install.sh --create-dir --unix-style --dest /usr/ && \
     rm racket-install.sh
