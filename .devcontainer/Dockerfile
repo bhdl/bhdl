@@ -34,8 +34,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     fonts-liberation \
     run-one \
     build-essential \
-    vim-tiny \
-    git tmux
+    git tmux \
+    vim emacs
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
@@ -53,14 +53,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     unzip \
     nano \
     iputils-ping iproute2 htop locate libzmq5\
-    silversearcher-ag emacs
-
-
-# Install racket
-RUN apt-get install -y software-properties-common &&\
-    add-apt-repository ppa:plt/racket &&\
-    apt-get update && \
-    apt-get install -y racket
+    silversearcher-ag
 
 
 # Using Ubuntu, install nodejs
@@ -68,8 +61,6 @@ RUN apt-get install -y software-properties-common &&\
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 RUN apt-get update && \
     apt-get install -y --no-install-recommends nodejs
-
-
 
 
 # Configure environment
@@ -165,11 +156,23 @@ RUN conda install --quiet --yes jupyterlab && \
     fix-permissions /home/$NB_USER
 
 
-# ENV JULIA_DEPOT_PATH=$HOME/.julia:/opt/julia
-RUN git clone https://github.com/lihebi/iracket $HOME/iracket
-RUN cd $HOME/iracket && git checkout dev &&\
-    raco pkg install --batch --deps search-auto --link; exit 0
-RUN raco iracket install
+# Install racket
+
+ENV RACKET_INSTALLER_URL=http://mirror.racket-lang.org/installers/7.7/racket-7.7-x86_64-linux-natipkg.sh
+ENV RACKET_VERSION=7.7
+RUN wget --output-document=racket-install.sh -q ${RACKET_INSTALLER_URL} && \
+    echo "yes\n1\n" | sh racket-install.sh --create-dir --unix-style --dest /usr/ && \
+    rm racket-install.sh
+
+# RUN apt-get install -y software-properties-common &&\
+#     add-apt-repository ppa:plt/racket &&\
+#     apt-get update && \
+#     apt-get install -y racket
+
+RUN git clone https://github.com/lihebi/iracket /tmp/iracket && \
+    cd /tmp/iracket && git checkout dev &&\
+    raco pkg install --auto &&\
+    raco iracket install
 
 
 ENV TINI_VERSION v0.19.0
