@@ -163,6 +163,7 @@ ENV RACKET_INSTALLER_URL=http://mirror.racket-lang.org/installers/${RACKET_VERSI
 RUN wget --output-document=racket-install.sh -q ${RACKET_INSTALLER_URL} && \
     echo "yes\n1\n" | sh racket-install.sh --create-dir --unix-style --dest /usr/ && \
     rm racket-install.sh
+RUN raco pkg install --auto --force git://github.com/racket/pict/?path=pict-lib
 
 # RUN apt-get install -y software-properties-common &&\
 #     add-apt-repository ppa:plt/racket &&\
