@@ -1,3 +1,6 @@
+import Pkg
+Pkg.instantiate()
+
 include("server.jl")
 
 function main()

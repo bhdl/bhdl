@@ -13,7 +13,8 @@ using HTTP
 function web_server()
     @info "Listening on localhost:8082 .."
     # FIXME 8081 seems to be used by jupyterhub, I'm thus using 8082
-    HTTP.serve(HTTP.Sockets.localhost, 8082) do request::HTTP.Request
+#     HTTP.Sockets.localhost
+    HTTP.serve("0.0.0.0", 8082) do request::HTTP.Request
         @show request
         @show request.method
 
