@@ -9,3 +9,4 @@ fp-info-cache
 *.rules
 *.dsn
 *.ses
+*.cache-7
