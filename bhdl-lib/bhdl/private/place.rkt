@@ -35,6 +35,7 @@
 
          save-for-placement
          send-for-placement
+         placer-url
 
          circuit-plot
          circuit-export
@@ -240,11 +241,13 @@ Es (Edge, i.e. netlist), diearea"
           (write-string formatted out))
         #:exists 'replace))))
 
+(define placer-url (make-parameter "http://localhost:8082"))
+
 (define (send-for-placement specs)
   "FIXME detect whether the server is alive, and report meaningful errors and
 recover with appropriate default."
   (let ([in (post-pure-port
-             (string->url "http://localhost:8082")
+             (string->url (placer-url))
              (jsexpr->bytes specs))])
     (begin0
         ;; TODO parse the placement results
