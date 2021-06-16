@@ -35,6 +35,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     run-one \
     build-essential \
     git tmux \
+    lsof \
     vim emacs
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
