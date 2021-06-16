@@ -1,0 +1,118 @@
+# See here for image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.177.0/containers/ubuntu/.devcontainer/base.Dockerfile
+
+# [Choice] Ubuntu version: bionic, focal
+# ARG VARIANT="focal"
+# FROM mcr.microsoft.com/vscode/devcontainers/base:0-${VARIANT}
+
+FROM nvidia/cuda:10.1-devel-ubuntu18.04
+
+# [Optional] Uncomment this section to install additional OS packages.
+# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+#     && apt-get -y install --no-install-recommends <your-package-list-here>
+
+
+# Install all OS dependencies for notebook server that starts but lacks all
+# features (e.g., download as all possible file formats)
+ENV DEBIAN_FRONTEND noninteractive
+
+
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends \
+    wget curl \
+    bzip2 \
+    ca-certificates \
+    sudo \
+    locales \
+    fonts-liberation \
+    run-one \
+    build-essential
+
+
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends \
+    git tmux \
+    lsof \
+    vim emacs
+
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen
+
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends\
+    jed \
+    libsm6 \
+    libxext-dev \
+    libxrender1 \
+    lmodern \
+    netcat \
+    python-dev \
+    tzdata \
+    unzip \
+    nano \
+    iputils-ping iproute2 htop locate libzmq5\
+    silversearcher-ag
+
+
+# Using Ubuntu, install nodejs
+# https://github.com/nodesource/distributions/blob/master/README.md#debinstall
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends nodejs
+
+
+# Configure environment
+ENV SHELL=/bin/bash \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8 \
+    HOME=/root
+
+# Enable prompt color in the skeleton .bashrc before creating the default NB_USER
+RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 python3-pip python3-setuptools
+
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
+# Julia
+ENV JULIA_VERSION=1.6.1
+WORKDIR /tmp
+
+RUN mkdir "/opt/julia-${JULIA_VERSION}" && \
+    wget -q https://julialang-s3.julialang.org/bin/linux/x64/$(echo "${JULIA_VERSION}" | cut -d. -f 1,2)"/julia-${JULIA_VERSION}-linux-x86_64.tar.gz" && \
+    tar xzf "julia-${JULIA_VERSION}-linux-x86_64.tar.gz" -C "/opt/julia-${JULIA_VERSION}" --strip-components=1 && \
+    rm "/tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz"
+RUN ln -fs /opt/julia-*/bin/julia /usr/local/bin/julia
+
+
+# UPDATE I don't need these. I would just install per-user, and those persist
+# with the mounted volume.  Even if these are set, they will be removed.
+#
+# CAUTION this is slow
+RUN julia -e 'import Pkg; Pkg.update()' && \
+    (test $TEST_ONLY_BUILD || julia -e 'import Pkg; Pkg.add("HDF5")') && \
+    julia -e "using Pkg; pkg\"add IJulia\"; pkg\"precompile\""
+
+# https://stackoverflow.com/questions/53204916/what-is-the-meaning-of-failed-building-wheel-for-x-in-pip-install
+RUN pip3 install wheel
+
+RUN pip3 install jupyterlab
+# jupyterlab extensions
+RUN pip3 install --upgrade jupyterlab-git
+RUN jupyter labextension install --no-build @jupyterlab/toc
+RUN jupyter labextension install --no-build @ijmbarr/jupyterlab_spellchecker
+RUN jupyter labextension install --no-build @aquirdturtle/collapsible_headings
+
+EXPOSE 8888
+WORKDIR $HOME
+
+# WORKDIR $HOME/bhdl/placement
+# RUN julia --project -e 'import Pkg; Pkg.instantiate(); Pkg.precompile();'
+# RUN julia --project main.jl > ~/bhdl/output.txt 2>&1
+
+ENTRYPOINT ["/tini", "-g", "--"]
+CMD [ "jupyter", "lab", "--ip='0.0.0.0'", "--allow-root" ]
+# CMD ["julia", "--project", "main.jl"]

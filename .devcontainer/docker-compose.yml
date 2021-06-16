@@ -1,17 +1,37 @@
 services:
   bhdl:
-    build: .
-    # image: jupyter/datascience-notebook
+    build:
+      context: .
+      dockerfile: Dockerfile.bhdl
     ports:
-      - "8889:8888"
-    runtime: nvidia
+      - "8888:8888"
     volumes:
-      - ..:/home/jovyan/bhdl
+      - ..:/root/bhdl
       # FIXME racket might already have something inside this directory
-      - dotracket:/home/jovyan/.local/share/racket
-  #     links:
-  #       - redis
+      - dotracket:/root/.local/share/racket
+    # links:
+    #   - placer
   #   redis:
   #     image: redis
+  placer:
+    build:
+      context: .
+      dockerfile: Dockerfile.placer
+    # restart: always
+    runtime: nvidia
+    volumes:
+      - ..:/root/bhdl
+    command: julia --project=/root/bhdl/placement /root/bhdl/placement/main.jl
+  placer-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.placer
+    runtime: nvidia
+    ports:
+      - "8889:8888"
+    volumes:
+      - ..:/root/bhdl
+      - dotjulia:/root/.julia
 volumes:
   dotracket: {}
+  dotjulia: {}
