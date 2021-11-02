@@ -44,7 +44,7 @@ Resistor
 CODEPOD-link
 
 (define (key-with-diode)
-  (make-circuit 
+  (make-circuit0
    #:external-pins (left right)
    #:vars ([d (1N4148W)]
            [key (kailh-socket 1)])
@@ -60,7 +60,7 @@ CODEPOD-link
 
 ;; connect the matrix
 (define matrix-module
-  (make-circuit 
+  (make-circuit0
     #:external-pins (row[4] col[5])
     ;; col in, row out
     #:connect 
@@ -88,7 +88,7 @@ Composite->place-spec
                     #:formats '(kicad pdf png svg)))
 
 (define (icsp-header)
-   (make-circuit #:vars ([h (PinHeader2 3)])
+   (make-circuit0 #:vars ([h (PinHeader2 3)])
                    #:external-pins (MOSI SCK MISO RESET VCC GND)
                    #:connect (*= (self (MISO VCC SCK MOSI RESET GND))
                                  (h [1 2 3 4 5 6]))
@@ -101,7 +101,7 @@ Composite->place-spec
 
 ;; Now using the Atmega32u4 from the arduino board
 (define mcu-module 
-  (make-circuit 
+  (make-circuit0 
  #:vars ([mcu (ATmega32U4 #:FP "TQFP-44")]
          [usb (USB-Micro)]
          [icsp (icsp-header)]
@@ -152,7 +152,7 @@ Composite->place-spec
 
 ;; connect MCU
 (define mcu-board
-  (make-circuit 
+  (make-circuit0 
    #:layout (inset (cb-superimpose mcu-module) 50 0)
    #:connect mcu-module))
 

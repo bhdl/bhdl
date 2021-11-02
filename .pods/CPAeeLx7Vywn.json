@@ -2,7 +2,7 @@
   "id": "CPAeeLx7Vywn",
   "parentId": "CPgh3kxexKr7",
   "index": 20,
-  "content": "\";; connect MCU\\n(define mcu-board\\n  (make-circuit \\n   #:layout (inset (cb-superimpose mcu-module) 50 0)\\n   #:connect mcu-module))\"",
+  "content": "\";; connect MCU\\n(define mcu-board\\n  (make-circuit0 \\n   #:layout (inset (cb-superimpose mcu-module) 50 0)\\n   #:connect mcu-module))\"",
   "column": 1,
   "fold": false,
   "thundar": false,

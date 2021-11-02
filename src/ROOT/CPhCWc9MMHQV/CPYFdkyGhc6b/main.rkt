@@ -29,7 +29,7 @@
 (show-layout (key-with-diode))
 
 (show-layout 
-  (make-circuit2
+  (make-circuit
     (pin left right)
     (part [d (1N4148W)]
           [key (kailh-socket 1)])

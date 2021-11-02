@@ -2,7 +2,7 @@
   "id": "CPLnRwgYy3n8",
   "parentId": "CPgh3kxexKr7",
   "index": 16,
-  "content": "\"(define (icsp-header)\\n   (make-circuit #:vars ([h (PinHeader2 3)])\\n                   #:external-pins (MOSI SCK MISO RESET VCC GND)\\n                   #:connect (*= (self (MISO VCC SCK MOSI RESET GND))\\n                                 (h [1 2 3 4 5 6]))\\n                   #:layout h))\"",
+  "content": "\"(define (icsp-header)\\n   (make-circuit0 #:vars ([h (PinHeader2 3)])\\n                   #:external-pins (MOSI SCK MISO RESET VCC GND)\\n                   #:connect (*= (self (MISO VCC SCK MOSI RESET GND))\\n                                 (h [1 2 3 4 5 6]))\\n                   #:layout h))\"",
   "column": 1,
   "fold": false,
   "thundar": false,
