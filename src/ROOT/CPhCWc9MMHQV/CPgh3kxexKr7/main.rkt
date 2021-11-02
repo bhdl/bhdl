@@ -26,9 +26,9 @@ atom->fp-pict+Hlocs
 
 Resistor
 
-(define global
-  (make-circuit0
-   #:external-pins (GND 3V3 5V VCC USB5V)))
+; (define global
+;   (make-circuit0
+;    #:external-pins (GND 3V3 5V VCC USB5V)))
 
 (define global
   (make-circuit
