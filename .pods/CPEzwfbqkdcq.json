@@ -1,7 +1,7 @@
 {
   "id": "CPEzwfbqkdcq",
   "parentId": "CPQU4nPmdVqN",
-  "index": 12,
+  "index": 13,
   "content": "\"(define (pin-ref part ref)\\n  (cond\\n    [(Composite? part) (hash-ref (Composite-pinhash part) ref)]\\n    [(Atom? part) (hash-ref (Atom-pinhash part) ref)]\\n    ;; HACK if it is already a pin, just return it. This enables B- and B<\\n    ;; operators to accept both pin and part\\n    [(Pin? part) part]\\n    ;; FIXME better error message\\n    [else (error (~a \\\"pin-ref error: part: \\\" part \\\" ref: \\\" ref\\n                     \\\", must be an Atom or Composite.\\\"\\n                     \\\" Probably the variable is undefined.\\\"))]))\"",
   "column": 1,
   "fold": false,

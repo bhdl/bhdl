@@ -1,8 +1,8 @@
 {
-  "id": "CP3NrkTaVdLE",
-  "parentId": "CPgh3kxexKr7",
-  "index": 18,
-  "content": "\"(icsp-header)\"",
+  "id": "CPrdQDGcwJG8",
+  "parentId": "CPeiY7cLzrUT",
+  "index": 0,
+  "content": "\"(define global\\n  (make-circuit\\n   (pin GND 3V3 5V VCC USB5V)\\n  ;  (part)\\n  ;  (wire)\\n  ;  (layout)\\n   ))\"",
   "column": 1,
   "fold": false,
   "thundar": false,

@@ -2,7 +2,7 @@
   "id": "CPqnc8rfG7Dw",
   "parentId": "CPadywggP7TT",
   "index": 8,
-  "content": "\"(define (download-footprints)\\n  (let ([dir (bhdl-footprints-path)])\\n    (when (not (directory-exists? dir))\\n      (displayln (~a \\\"Downloading footprints to \\\" dir))\\n      (parameterize \\n        ([current-directory (build-path dir \\\"..\\\")])\\n        (system (~a \\\"git clone --recursive \\\"\\n                    \\\"https://github.com/lihebi/bhdl-footprints \\\"\\n                    ))))))\"",
+  "content": "\"(define (download-footprints)\\n  (let ([dir (bhdl-footprints-path)])\\n    (when (not (directory-exists? dir))\\n      (displayln (~a \\\"Downloading footprints to \\\" dir))\\n      (make-directory* (build-path dir \\\"..\\\"))\\n      (parameterize \\n        ([current-directory (build-path dir \\\"..\\\")])\\n        (system (~a \\\"git clone --recursive \\\"\\n                    \\\"https://github.com/lihebi/bhdl-footprints \\\"\\n                    ))))))\"",
   "column": 1,
   "fold": false,
   "thundar": false,

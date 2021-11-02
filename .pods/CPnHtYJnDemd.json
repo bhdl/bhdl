@@ -1,7 +1,7 @@
 {
   "id": "CPnHtYJnDemd",
   "parentId": "CPQU4nPmdVqN",
-  "index": 13,
+  "index": 14,
   "content": "\"(begin-for-syntax\\n  (define (parse-dot stx)\\n    (match-let ([(list l r) (string-split (symbol->string (syntax-e stx)) \\\".\\\")])\\n      (let ([l (string->symbol l)]\\n            [r (or (string->number r) (string->symbol r))])\\n           (datum->syntax stx (list l r)))))\\n  (define (parse-maybe-dot stx)\\n    \\\"Return lhs rhs if there is a dot, else, return itself and (void)\\\"\\n    (let ([s (symbol->string (syntax-e stx))])\\n      (cond\\n        [(string-contains? s \\\".\\\")\\n        (match-let ([(list l r) (string-split s \\\".\\\")])\\n          (let ([l (string->symbol l)]\\n                [r (or (string->number r) (string->symbol r))])\\n               (datum->syntax\\n                 stx (list 'pin-ref l (list 'quote r)))))]\\n        [else stx]))))\"",
   "column": 1,
   "fold": false,

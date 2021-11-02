@@ -588,7 +588,7 @@
 
 
 (define (Switch)
-  (make-circuit
+  (make-circuit0
    #:vars ([it (SKRPACE010)])
    #:external-pins (left right)
    #:layout it

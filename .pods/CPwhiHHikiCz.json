@@ -1,7 +1,7 @@
 {
   "id": "CPwhiHHikiCz",
   "parentId": "CPQU4nPmdVqN",
-  "index": 27,
+  "index": 28,
   "content": "\";; TODO set the resulting's left and right\\n;; TODO The resulting thing should be a circuit?\\n;; TODO allowing chaining and in-place component creation\\n; (define-syntax-rule (parallel a ...)\\n;   (begin (series a.1 ...)\\n;          (series a.2 ...)))\\n(define-syntax-rule (parallel a ...)\\n  (*< a ...))\"",
   "column": 1,
   "fold": false,

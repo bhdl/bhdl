@@ -1,7 +1,7 @@
 {
   "id": "CPawBXhcdDfL",
   "parentId": "CPQU4nPmdVqN",
-  "index": 14,
+  "index": 15,
   "content": "\"(begin-for-syntax\\n  (define-splicing-syntax-class dot\\n    #:description \\\"dot\\\"\\n    (pattern (~seq x [num])\\n             #:with (lhs rhs1) (parse-dot #'x)\\n             #:with rhs #`(get-pin-names (syntax->datum #'x)\\n                                        (syntax->datum #'num))\\n             )\\n    (pattern x\\n             #:with (lhs rhs) (parse-dot #'x)\\n             #:with rhs-2 #'0))\\n  (define-splicing-syntax-class maybe-dot\\n    #:description \\\"maybe-dot\\\"\\n    ;; if it is a list, do nothing\\n    (pattern (x ...)\\n             #:with res #'(x ...))\\n    ;; otherwise, it must be an id. check to see if it has a dot\\n    (pattern (~seq y:id [num])\\n             #:with (lhs rhs) (parse-dot #'y)\\n             #:with res #`(pin-ref lhs (get-pin-name (syntax->datum #'rhs)\\n                                                     num)))\\n    (pattern y:id\\n             #:with res (parse-maybe-dot #'y))))\"",
   "column": 1,
   "fold": false,

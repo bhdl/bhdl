@@ -1,7 +1,7 @@
 {
   "id": "CPfUKLaPe3AC",
   "parentId": "CPgh3kxexKr7",
-  "index": 22,
+  "index": 24,
   "content": "\"(parameterize ([current-directory \\\"./out/demo-board/mcu-board\\\"]\\n               [padding-general 2])\\n    (circuit-export mcu-board\\n                    #:auto-place #t\\n                    #:formats '(kicad pdf bom png)))\"",
   "column": 1,
   "fold": false,

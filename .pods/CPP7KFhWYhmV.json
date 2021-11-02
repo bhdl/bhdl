@@ -1,7 +1,7 @@
 {
   "id": "CPP7KFhWYhmV",
   "parentId": "CPgh3kxexKr7",
-  "index": 7,
+  "index": 9,
   "content": "\"(define (key-with-diode)\\n  (make-circuit \\n   #:external-pins (left right)\\n   #:vars ([d (1N4148W)]\\n           [key (kailh-socket 1)])\\n   #:connect (*- self.left key d self.right)\\n   #:layout (vc-append key d)))\"",
   "column": 1,
   "fold": false,

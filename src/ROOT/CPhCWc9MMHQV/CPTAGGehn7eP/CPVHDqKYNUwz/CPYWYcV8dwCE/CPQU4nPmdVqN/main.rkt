@@ -3,7 +3,7 @@
   (require rackunit 
     "../../../../../../codepod.rkt"
     "../../../../../../ROOT/CPhCWc9MMHQV/CPTAGGehn7eP/CPVHDqKYNUwz/CPYWYcV8dwCE/CPckUrdGFJME/main.rkt" "../../../../../../ROOT/CPhCWc9MMHQV/CPTAGGehn7eP/CPVHDqKYNUwz/CP9hPyBA9z8P/main.rkt")
-  (provide show-layout create-simple-Composite self make-circuit make-circuit2 circuit pin-ref *- series net *= bus *< parallel
+  (provide show-layout create-simple-Composite self make-circuit0 make-circuit circuit pin-ref *- series net *= bus *< parallel
     
     
     )
@@ -76,13 +76,14 @@
     )
 
 
-(define-syntax (make-circuit stx)
+(define-syntax (make-circuit0 stx)
   (syntax-parse 
     stx
     [(_ (~alt
           (~optional (~seq #:external-pins (ext-pin ...))
                      #:defaults ([(ext-pin 1) null]))
-          (~optional (~seq #:layout p-name))
+          (~optional (~seq #:layout p-name)
+                     #:defaults ([p-name #'#f]))
           (~optional (~seq #:where where-clause)
                      #:defaults ([where-clause #'()]))
           (~seq #:vars (var-clause ...))
@@ -91,42 +92,51 @@
          (syntax-parameterize 
            ([self (make-rename-transformer #'self-obj)])
            (match-let* (var-clause ... ...)
-             #,(if (attribute p-name)
-                 #'(set-Composite-pict! 
-                     self-obj 
-                     (maybe-atom->pict p-name))
-                   #'(void))
-               ;; do the connections
-               (set-Composite-nets!
-                 self-obj
-                 (apply append 
-                   (map Composite-nets
-                     (flatten 
-                       (list connect-clause ...)))))
-               self-obj)))]))
+             (when p-name
+               (set-Composite-pict! 
+                 self-obj 
+                 (maybe-atom->pict p-name)))
+             ;; do the connections
+             (set-Composite-nets!
+               self-obj
+               (apply append 
+                      (map Composite-nets
+                           (flatten 
+                             (list connect-clause ...)))))
+             self-obj)))]))
 
 
-(make-circuit #:external-pins (left right))
+; (make-circuit #:external-pins (left right))
+(make-circuit0)
+; 2
 
-(define-syntax (make-circuit2 stx)
+(define-syntax (make-circuit stx)
   (syntax-parse
     stx
     #:datum-literals (pin part wire layout)
-    [(_ (pin ext-pin ...)
-        (part [d v] ...)
-        (wire w ...)
-        (layout l ...))
-     #`(make-circuit #:external-pins (ext-pin ...)
-                       #:vars ([d v] ...)
-                       #:connect (list w ...)
-                       #:layout (begin l ...))]))
+    [(_ (~alt (~optional (pin ext-pin ...) 
+                         #:defaults ([(ext-pin 1) null]))
+              (~optional (part dv ...)
+                         #:defaults ([(dv 1) null]))
+              (~optional (wire w ...)
+                         #:defaults ([(w 1) null]))
+              (~optional (layout l) #:defaults ([l #'#f]))) ...)
+     #`(make-circuit0 #:external-pins (ext-pin ...)
+                     #:vars (dv ...)
+                     #:connect (list w ...)
+                     #:layout l
+                     )]))
+
+; (expand-once #'
+             (make-circuit (pin left right))
+            ;  )
 
 (define-syntax (circuit stx)
   (syntax-parse
     stx
     [(_ name x ...)
      #`(define (name)
-         (make-circuit2 x ...))]))
+         (make-circuit x ...))]))
 
 (define (pin-ref part ref)
   (cond
@@ -194,7 +204,7 @@
   (let ([item-1 (first lst)]
         [item-n (last lst)]
         
-        [res (make-circuit #:external-pins (left right))])
+        [res (make-circuit0 #:external-pins (left right))])
     ;; connect res.2 with first.1
     (hook-proc! res (Net (list (pin-ref res 'left)
                                (pin-ref item-1 'left))))
@@ -224,7 +234,7 @@
   (let ([res
          ;; FIXME this composite has no external pins. In fact, it should have
          ;; the same numbr of external pins as the lenght of the "vector"
-         (make-circuit)])
+         (make-circuit0)])
 
     ;; construct net
     ;;
@@ -274,7 +284,7 @@
   (*= a ...))
 
 (define (*<-proc lst)
-  (let ([res (make-circuit #:external-pins (left right))])
+  (let ([res (make-circuit0 #:external-pins (left right))])
     (for ([item lst])
       (hook-proc! res
                   (Net (list (pin-ref res 'left)

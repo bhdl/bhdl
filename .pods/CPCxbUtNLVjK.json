@@ -1,7 +1,7 @@
 {
   "id": "CPCxbUtNLVjK",
   "parentId": "CPQU4nPmdVqN",
-  "index": 21,
+  "index": 22,
   "content": "\"(define (node-pins->nodepins node pins)\\n  (for/list ([pin pins])\\n    (when (not (eq? pin '-))\\n      (pin-ref node pin))))\"",
   "column": 1,
   "fold": false,

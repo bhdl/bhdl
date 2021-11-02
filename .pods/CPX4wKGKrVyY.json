@@ -1,7 +1,7 @@
 {
   "id": "CPX4wKGKrVyY",
   "parentId": "CPQU4nPmdVqN",
-  "index": 26,
+  "index": 27,
   "content": "\"(define-syntax (*< stx)\\n  (syntax-parse stx\\n    [(_ node:maybe-dot ...)\\n     #'(*<-proc (list node.res ...))]))\"",
   "column": 1,
   "fold": false,

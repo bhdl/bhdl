@@ -1,8 +1,8 @@
 {
-  "id": "CP3NrkTaVdLE",
-  "parentId": "CPgh3kxexKr7",
-  "index": 18,
-  "content": "\"(icsp-header)\"",
+  "id": "CPAFngCnzfVc",
+  "parentId": "CPQU4nPmdVqN",
+  "index": 11,
+  "content": "\"; (expand-once #'\\n             (make-circuit (pin left right))\\n            ;  )\"",
   "column": 1,
   "fold": false,
   "thundar": false,

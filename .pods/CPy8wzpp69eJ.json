@@ -1,7 +1,7 @@
 {
   "id": "CPy8wzpp69eJ",
   "parentId": "CPQU4nPmdVqN",
-  "index": 15,
+  "index": 16,
   "content": "\"(define (hook-proc! comp . nets)\\n  ;; FIXME constract for nets to be instance of Net\\n  (set-Composite-nets!\\n   comp\\n   (remove-duplicates\\n    (append (Composite-nets comp)\\n            nets))))\"",
   "column": 1,
   "fold": false,

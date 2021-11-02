@@ -77,6 +77,7 @@
   (let ([dir (bhdl-footprints-path)])
     (when (not (directory-exists? dir))
       (displayln (~a "Downloading footprints to " dir))
+      (make-directory* (build-path dir ".."))
       (parameterize 
         ([current-directory (build-path dir "..")])
         (system (~a "git clone --recursive "

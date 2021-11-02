@@ -1,8 +1,8 @@
 {
   "id": "CPcTE4rin7wt",
   "parentId": "CPQU4nPmdVqN",
-  "index": 11,
-  "content": "\"(define-syntax (circuit stx)\\n  (syntax-parse\\n    stx\\n    [(_ name x ...)\\n     #`(define (name)\\n         (make-circuit2 x ...))]))\"",
+  "index": 12,
+  "content": "\"(define-syntax (circuit stx)\\n  (syntax-parse\\n    stx\\n    [(_ name x ...)\\n     #`(define (name)\\n         (make-circuit x ...))]))\"",
   "column": 1,
   "fold": false,
   "thundar": false,
