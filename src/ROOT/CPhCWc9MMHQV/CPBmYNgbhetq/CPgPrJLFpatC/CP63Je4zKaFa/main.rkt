@@ -8,7 +8,9 @@
     
     )
 
-    lcsc->fp
+    (module+ test
+     lcsc->fp
+    )
 
 (require (for-syntax syntax/parse
                      racket/list

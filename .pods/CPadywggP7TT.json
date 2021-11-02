@@ -4,7 +4,7 @@
   "index": 0,
   "content": "null",
   "column": 1,
-  "fold": true,
+  "fold": false,
   "thundar": false,
   "utility": true,
   "name": "fp-base",

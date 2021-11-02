@@ -1,7 +1,7 @@
 {
   "id": "CP7883AJLJAD",
   "parentId": "CPckUrdGFJME",
-  "index": 24,
+  "index": 23,
   "content": "\"(define (my-merge-helper lsts todo res)\\n  (if (set-empty? todo) res\\n      (let ([item (set-first todo)]\\n            [todo (set-rest todo)])\\n        (let ([group (get-all-connected lsts (seteq item) (seteq))])\\n          (my-merge-helper lsts (set-subtract todo group)\\n                           (set-add res group))))))\"",
   "column": 1,
   "fold": false,

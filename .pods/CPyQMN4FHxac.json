@@ -1,7 +1,7 @@
 {
   "id": "CPyQMN4FHxac",
   "parentId": "CPckUrdGFJME",
-  "index": 7,
+  "index": 6,
   "content": "\"(define (maybe-atom->pict atom-or-pict)\\n  (cond\\n    [(Atom? atom-or-pict) (Atom-pict atom-or-pict)]\\n    [(Composite? atom-or-pict) (Composite-pict atom-or-pict)]\\n    ;  [(pict? atom-or-pict) atom-or-pict]\\n    ;  [else (error \\\"Must be Atom, Composite, or just pict.\\\")]\\n    [else atom-or-pict]\\n    ))\\n\\n\"",
   "column": 1,
   "fold": false,

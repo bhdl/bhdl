@@ -1,7 +1,7 @@
 {
   "id": "CP3Wp6ciffHe",
   "parentId": "CPckUrdGFJME",
-  "index": 34,
+  "index": 33,
   "content": "\"(define (nplaced-atoms comp)\\n  \\\"The atoms that are placed to locations.\\\"\\n  (length (filter\\n           identity\\n           (map (lambda (atom)\\n                  (maybe-find cc-find (Composite-pict comp)\\n                              (Atom-pict atom)))\\n                (collect-all-atoms comp)))))\"",
   "column": 1,
   "fold": false,

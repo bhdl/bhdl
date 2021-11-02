@@ -105,10 +105,12 @@
                              (list connect-clause ...)))))
              self-obj)))]))
 
-
+(module+ test
+     
 ; (make-circuit #:external-pins (left right))
 (make-circuit0)
 ; 2
+    )
 
 (define-syntax (make-circuit stx)
   (syntax-parse
@@ -127,9 +129,11 @@
                      #:layout l
                      )]))
 
-; (expand-once #'
+(module+ test
+     ; (expand-once #'
              (make-circuit (pin left right))
             ;  )
+    )
 
 (define-syntax (circuit stx)
   (syntax-parse

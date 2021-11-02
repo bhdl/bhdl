@@ -9,9 +9,13 @@
 (all-from-out "../../../ROOT/CPhCWc9MMHQV/CPBmYNgbhetq/CPENFUAttyc7/main.rkt")
     )
 
-    ICAtom
+    (module+ test
+     ICAtom
+    )
 
-(ATmega32U4)
+(module+ test
+     (ATmega32U4)
 ; atom->fp-pict+Hlocs
+    )
   )
     

@@ -5,7 +5,7 @@
   "content": "\"(ATmega32U4)\\n; atom->fp-pict+Hlocs\"",
   "column": 1,
   "fold": false,
-  "thundar": false,
+  "thundar": true,
   "utility": false,
   "name": null,
   "lang": "racket",

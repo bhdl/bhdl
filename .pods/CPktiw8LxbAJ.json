@@ -1,7 +1,7 @@
 {
   "id": "CPktiw8LxbAJ",
   "parentId": "CPckUrdGFJME",
-  "index": 26,
+  "index": 25,
   "content": "\"(define (merge-nets nets)\\n  \\\"Merge nets and keep the special (not 1) weights.\\\"\\n  (let ([merged-lsts (let* ([lsts (map Net-pins nets)]\\n                            [merged (my-merge lsts)])\\n                       ;; filter 1. only Atoms 2. net size at least two\\n                       ;;\\n                       ;; UPDATE I don't want to filter 1-size net, otherwise I\\n                       ;; would lost reference to some components\\n                       (for/list ([l merged])\\n                         (filter (λ (pin) (Atom? (Pin-parent pin)))\\n                                 l)))]\\n        [H (for*/hash ([net nets]\\n                       [pin (Net-pins net)])\\n             (values pin net))])\\n    (for/list ([pins merged-lsts])\\n      (Net pins))))\\n\"",
   "column": 1,
   "fold": false,

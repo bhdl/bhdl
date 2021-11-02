@@ -1,7 +1,7 @@
 {
   "id": "CPHYDUEhJKh8",
   "parentId": "CPckUrdGFJME",
-  "index": 23,
+  "index": 22,
   "content": "\"(define (get-all-connected lsts todo done)\\n  \\\"Get all connected Composites.\\n\\ntodo: to examine their Composites.\\ndone: whose neighbors already checked\\nres: already in this set.\\\"\\n  (if (set-empty? todo) done\\n      (let ([item (set-first todo)]\\n            [todo (set-rest todo)])\\n        (let ([neighbors (get-neighbors lsts item)])\\n          (get-all-connected lsts\\n                             (set-subtract (set-union todo neighbors) done)\\n                             (set-add done item))))))\"",
   "column": 1,
   "fold": false,

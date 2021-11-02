@@ -33,44 +33,50 @@
 (define (read-easyeda fname)
   "Read EasyEDA json file."
   (let ([jobj (call-with-input-file fname
-                (lambda (in) (read-json in)))])
-    (match-let* ([origin-x (adapt-unit (hash-ref-ref jobj 'head 'x))]
-                 [origin-y (adapt-unit (hash-ref-ref jobj 'head 'y))]
-                 [pre (hash-ref-ref jobj 'head 'c_para 'pre)]
-                 [canvas (hash-ref jobj 'canvas)]
-                 [shapes (hash-ref jobj 'shape)]
-                 [tracks (filter (lambda (x) (string-prefix? x "TRACK")) shapes)]
-                 [rects (filter (lambda (x) (string-prefix? x "RECT")) shapes)]
-                 [pads (filter (lambda (x) (string-prefix? x "PAD")) shapes)]
-                 [holes (filter (lambda (x) (string-prefix? x "HOLE")) shapes)]
-                 [_ (for ([shape (filter-not (lambda (x) (or (string-prefix? x "TRACK")
-                                                             (string-prefix? x "RECT")
-                                                             (string-prefix? x "PAD")
-                                                             (string-prefix? x "HOLE"))) shapes)])
-                         ;; FIXME HOLEs
-                         (debug "unrecognized shape: " (first (string-split shape "~"))))]
-                 ;; FIXME more shapes, like "PL ..."
-                 ;; FIXME report warnings for unrecognized shapes
-                 [(hash-table ('x x) ('y y) ('width width) ('height height))
-                  (hash-ref jobj 'BBox)])
+                                    (lambda (in) (read-json in)))])
+    (match-let* 
+      ([origin-x (adapt-unit (hash-ref-ref jobj 'head 'x))]
+       [origin-y (adapt-unit (hash-ref-ref jobj 'head 'y))]
+       [pre (hash-ref-ref jobj 'head 'c_para 'pre)]
+       [canvas (hash-ref jobj 'canvas)]
+       [shapes (hash-ref jobj 'shape)]
+       [tracks (filter (lambda (x) (string-prefix? x "TRACK")) shapes)]
+       [rects (filter (lambda (x) (string-prefix? x "RECT")) shapes)]
+       [pads (filter (lambda (x) (string-prefix? x "PAD")) shapes)]
+       [holes (filter (lambda (x) (string-prefix? x "HOLE")) shapes)]
+       [_ (for ([shape (filter-not 
+                         (lambda (x) 
+                           (or (string-prefix? x "TRACK")
+                               (string-prefix? x "RECT")
+                               (string-prefix? x "PAD")
+                               (string-prefix? x "HOLE"))) shapes)])
+            ;; FIXME HOLEs
+            ;; FIXME removing debug output for verbosity
+            ; (debug "unrecognized shape: " (first (string-split shape "~")))
+            (void)
+            )]
+       ;; FIXME more shapes, like "PL ..."
+       ;; FIXME report warnings for unrecognized shapes
+       [(hash-table ('x x) ('y y) ('width width) ('height height))
+        (hash-ref jobj 'BBox)])
       ;; FIXME unit
       (match-let* ([line-specs (flatten (list (for/list ([track tracks])
-                                          (parse-track track))
-                                        (for/list ([rect rects])
-                                          (parse-rect rect))))]
-             [pad-specs (for/list ([pad pads])
-                                  (parse-pad pad))]
-             [hole-specs (for/list ([hole holes])
-                                   (parse-hole hole))]
-             [fn (lambda (item) (spec-offset item origin-x origin-y))]
-             [(list x1 y1 x2 y2) (get-4-corners (map fn line-specs))])
-        (footprint (map fn line-specs)
-                   (map fn pad-specs)
-                   ;; by default, place at left
-                   ;; FIXME hard-coded "3" what's the unit? mm?
-                   (list (text-spec (- x1 3) (* 0.5 (+ y1 y2)))
-                         (text-spec 0 0))
-                   (map fn hole-specs))))))
+                                                (parse-track track))
+                                              (for/list ([rect rects])
+                                                (parse-rect rect))))]
+                   [pad-specs (for/list ([pad pads])
+                                (parse-pad pad))]
+                   [hole-specs (for/list ([hole holes])
+                                 (parse-hole hole))]
+                   [fn (lambda (item) (spec-offset item origin-x origin-y))]
+                   [(list x1 y1 x2 y2) (get-4-corners (map fn line-specs))])
+                  (footprint (map fn line-specs)
+                             (map fn pad-specs)
+                             ;; by default, place at left
+                             ;; FIXME hard-coded "3" what's the unit? mm?
+                             (list (text-spec (- x1 3) (* 0.5 (+ y1 y2)))
+                                   (text-spec 0 0))
+                             (map fn hole-specs))))))
 
 (define (spec-offset spec offx offy)
   (match spec

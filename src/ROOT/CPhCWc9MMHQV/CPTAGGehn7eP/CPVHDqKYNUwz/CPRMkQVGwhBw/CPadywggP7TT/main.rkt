@@ -85,7 +85,10 @@
                     ))))))
 
 ;; warning downloading
-(download-footprints)
+;; remove output from (require bhdl)
+(void
+  (download-footprints))
+
 
 
 (define (merge-fp fp1 fp2)

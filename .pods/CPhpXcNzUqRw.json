@@ -1,7 +1,7 @@
 {
   "id": "CPhpXcNzUqRw",
   "parentId": "CPckUrdGFJME",
-  "index": 30,
+  "index": 29,
   "content": "\"(define (Composite->netlist comp)\\n  \\\"From a Composite to a list netlist ((a b c) (d e f)).\\\"\\n  (filter (lambda (x) (> (length (Net-pins x)) 1))\\n          (Composite->netlist-1 comp)))\"",
   "column": 1,
   "fold": false,

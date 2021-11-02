@@ -99,7 +99,9 @@
   (displayln (~a #:separator " " "WARNING: " args)))
 
 
-(warn "hello" 1 2 "wolrd")
+(module+ test
+     (warn "hello" 1 2 "wolrd")
+    )
 
 
 (define (debug . args)

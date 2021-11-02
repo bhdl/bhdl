@@ -37,8 +37,6 @@
      (write-string (~a "#<Composite-" (eq-hash-code self) ">")
                    port))])
 
-
-
 (struct Net
   (pins))
 
@@ -181,9 +179,11 @@ res: already in this set."
                               (Atom-pict atom)))
                 (collect-all-atoms comp)))))
 
-(define mylsts '((1 2 3) (4 5 6) (1 7 8) (4 9 10)))
+(module+ test
+     (define mylsts '((1 2 3) (4 5 6) (1 7 8) (4 9 10)))
 (get-neighbors mylsts 1)
 (get-all-connected mylsts (seteq 1) (seteq))
 (my-merge mylsts)
+    )
   )
     

@@ -1,7 +1,7 @@
 {
   "id": "CPLytxQhLQrJ",
   "parentId": "CPckUrdGFJME",
-  "index": 27,
+  "index": 26,
   "content": "\"(define (collect-all-composites-helper todo done)\\n  \\\"return all Composites this composite has reach to, except known-composites\\\"\\n  (if (set-empty? todo) done\\n      (let ([item (set-first todo)]\\n            [todo (set-rest todo)])\\n        (let* ([new-comps (list->seteq\\n                           (filter Composite?\\n                                   ;; get the nets, and find the parent of the pins\\n                                   (for*/list ([net (Composite-nets item)]\\n                                               [pin (Net-pins net)])\\n                                     (Pin-parent pin))))]\\n               [done (set-add done item)]\\n               [todo (set-subtract (set-union todo new-comps) done)])\\n          (collect-all-composites-helper todo done)))))\"",
   "column": 1,
   "fold": false,
