@@ -1,0 +1,17 @@
+{
+  "id": "CPP7KFhWYhmV",
+  "parentId": "CPgh3kxexKr7",
+  "index": 7,
+  "content": "\"(define (key-with-diode)\\n  (make-circuit \\n   #:external-pins (left right)\\n   #:vars ([d (1N4148W)]\\n           [key (kailh-socket 1)])\\n   #:connect (*- self.left key d self.right)\\n   #:layout (vc-append key d)))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

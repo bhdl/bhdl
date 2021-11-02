@@ -1,0 +1,17 @@
+{
+  "id": "CPa9dCEVkFq9",
+  "parentId": "CPRfakBVH9q6",
+  "index": 1,
+  "content": "\"(define (padstack-id pad)\\n  (match pad\\n    [(pad-spec name x y a mounting-type\\n               shape (list s1 s2) dsize layer)\\n     (case shape\\n           ;; FIXME treat roundrect as rect\\n           [(rect roundrect) (~a \\\"RectPad_\\\"\\n                                 (* s1 1000) \\\"x\\\"\\n                                 (* s2 1000)\\n                                 \\\"_um\\\")]\\n           ;; FIXME\\n           [(circle) (~a \\\"RoundPad_\\\" (* s1 1000) \\\"_um\\\")]\\n           ;; Oval[A]Pad_3500x1900_um\\n           [(oval) (~a \\\"OvalPad_\\\"\\n                       (* s1 1000) \\\"x\\\"\\n                       (* s2 1000)\\n                       \\\"_um\\\")]\\n           [else (error (~a \\\"padstack-id: shape \\\" shape\\n                            \\\" not supported\\\"))])]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPt9BfCeeWrj",
+  "parentId": "CP63Je4zKaFa",
+  "index": 21,
+  "content": "\"(define/IC (ATmega16)\\n  #:datasheet \\\"http://ww1.microchip.com/downloads/en/DeviceDoc/doc2466.pdf\\\"\\n  #:ALIAS ((VCC)\\n          (AVCC) (AREF) (RESET)\\n          (GND) (XTAL2) (XTAL1)\\n          (PA0 ADC0) (PA1 ADC1) (PA2 ADC2) (PA3 ADC3) (PA4 ADC4)\\n          (PA5 ADC5) (PA6 ADC6) (PA7 ADC7)\\n          (PB0 XCK T0) (PB1 T1) (PB2 INT2 AIN0) (PB3 OC0 AIN1)\\n          (PB4 SS) (PB5 MOSI) (PB6 MISO) (PB7 SCK)\\n          (PC0 SCL) (PC1 SDA) (PC2 TCK) (PC3 TMS) \\n          (PC4 TDO) (PC5 TDI) (PC6 TOSC1) (PC7 TOSC2)\\n          (PD0 RXD) (PD1 TXD) (PD2 INT0) (PD3 INT1) (PD4 OC1B)\\n          (PD5 OC1A) (PD6 ICP1) (PD7 OC2))\\n  #:DIP (40 PB0 PB1 PB2 PB3 PB4 PB5 PB6 PB7\\n            RESET VCC GND XTAL2 XTAL1\\n            PD0 PD1 PD2 PD3 PD4 PD5 PD6\\n\\n            PD7 PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7\\n            AVCC GND AREF\\n            PA7 PA6 PA5 PA4 PA3 PA2 PA1 PA0)\\n  #:QFN (44 PB5 PB6 PB7 RESET VCC GND XTAL2 XTAL1 PD0 PD1 PD2\\n            PD3 PD4 PD5 PD6 PD7 VCC GND PC0 PC1 PC2 PC3\\n            PC4 PC5 PC6 PC7 AVCC GND AREF PA7 PA6 PA5 PA4\\n            PA3 PA2 PA1 PA0 VCC GND PB0 PB1 PB2 PB3 PB4))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"ATmega16\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

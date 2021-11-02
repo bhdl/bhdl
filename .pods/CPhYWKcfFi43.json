@@ -1,0 +1,17 @@
+{
+  "id": "CPhYWKcfFi43",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 17,
+  "content": "\"function validate_region!(xs, ys, ws, hs, R)\\n    # FIXME consider rotation angles\\n    #\\n    # FIXME I belive this is pass-by-reference, so that I can modify the values\\n    # But strange enough, this doesn't work. I have to copy these inline in the\\n    # two places for now.\\n    #\\n    # UPDATE But the fixed locations should not change\\n    let idx = (xs .- ws ./ 2 .< R.xmin) .& (mask .== 1)\\n        xs[idx] .= (ws ./ 2 .+ R.xmin)[idx]\\n    end\\n    let idx = (xs .+ ws ./ 2 .> R.xmax) .& (mask .== 1)\\n        xs[idx] .= (ws ./ 2 .- R.xmax)[idx]\\n    end\\n    let idx = (ys .- hs ./ 2 .< R.ymin) .& (mask .== 1)\\n        ys[idx] .= (hs ./ 2 .+ R.ymin)[idx]\\n    end\\n    let idx = (ys .+ hs ./ 2 .> R.ymax) .& (mask .== 1)\\n        ys[idx] .= (hs ./ 2 .- R.ymax)[idx]\\n    end\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

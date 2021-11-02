@@ -1,0 +1,17 @@
+{
+  "id": "CPxriNTpDrGE",
+  "parentId": "CPtgV36e4DrU",
+  "index": 1,
+  "content": "\"(define fp-scale (make-parameter\\n                  ;; 20\\n                  ;;\\n                  ;; my monitor is 27 inch, 16:9, 2K 2560x1440\\n                  ;;\\n                  ;; pixel / mm\\n                  (/ (sqrt (+ (expt 2560 2) (expt 1440 2)))\\n                     ;; mm in diagnal\\n                     (* 27 25.4))))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-scale\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

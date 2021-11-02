@@ -1,0 +1,17 @@
+{
+  "id": "CPq6FjUtafAf",
+  "parentId": "CPtgV36e4DrU",
+  "index": 2,
+  "content": "\"(define padding-general (make-parameter 0.1))\\n(define padding-LQFP (make-parameter 5))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"padding-general\":true,\"padding-LQFP\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

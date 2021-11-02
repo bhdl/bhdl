@@ -1,0 +1,17 @@
+{
+  "id": "CPbAKiMMzFgm",
+  "parentId": "CPn9Kk3EhUPf",
+  "index": 3,
+  "content": "\"function clipSH(spoly, cpoly)\\n    outarr = spoly\\n    q = cpoly[end]\\n    for p in cpoly\\n        # @show p\\n        inarr = outarr\\n        outarr = Point[]\\n        # DEBUG if inarr is empty, I assume the two poly does not overlap\\n        # if isempty(inarr) return Point[] end\\n        s = inarr[end]\\n        for vtx in inarr\\n            if isinside(vtx, q, p)\\n                if !isinside(s, q, p)\\n                    push!(outarr, intersection(q, p, s, vtx))\\n                end\\n                push!(outarr, vtx)\\n            elseif isinside(s, q, p)\\n                push!(outarr, intersection(q, p, s, vtx))\\n            end\\n            s = vtx\\n        end\\n        q = p\\n    end\\n    outarr\\nend\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"clipSH\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

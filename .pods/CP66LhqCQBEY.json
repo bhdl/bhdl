@@ -1,0 +1,17 @@
+{
+  "id": "CP66LhqCQBEY",
+  "parentId": "CPQU4nPmdVqN",
+  "index": 18,
+  "content": "\"(define-syntax-rule (series a ...)\\n  (*- a ...))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"series\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CP4NVmpPPbK3",
+  "parentId": "CPckUrdGFJME",
+  "index": 35,
+  "content": "\"(define (nfree-atoms comp)\\n  \\\"The atoms that are NOT placed to fixed locations.\\\"\\n  (length (filter-not\\n           identity\\n           (map (lambda (atom)\\n                  (maybe-find cc-find (Composite-pict comp)\\n                              (Atom-pict atom)))\\n                (collect-all-atoms comp)))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"nfree-atoms\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

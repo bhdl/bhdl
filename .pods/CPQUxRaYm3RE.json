@@ -1,0 +1,17 @@
+{
+  "id": "CPQUxRaYm3RE",
+  "parentId": "CP63Je4zKaFa",
+  "index": 41,
+  "content": "\"(define/IC (ESP32-WROVER-E)\\n  ;; ESP32 has 4xSPI ..\\n  ;; SPI* is SPI01\\n  ;; HSPI* is SPI2\\n  ;; VSPI* is SPI3\\n  ;;\\n  ;; In master mode:\\n  ;; SPID = MOSI = data out\\n  ;; SPIQ = MISO = data in\\n  #:ALIAS ([IO5 VSPICS0]\\n          [IO18 VSPICLK]\\n          [IO19 VSPIQ VSPIMISO]\\n          [IO23 VSPID VSPIMOSI]\\n\\n          [IO14 HSPICLK]\\n          [IO12 HSPIQ HSPIMISO]\\n          [IO13 HSPID HSPIMOSI]\\n          [IO15 HSPICS0])\\n  #:FP ((lcsc->fp \\\"C529587\\\")\\n\\n        GND 3V3 EN SENSOR-VP SENSOR-VN\\n        IO34 IO35 IO32 IO33 IO25 IO26 IO27 IO14 IO12 GND IO13 NC NC NC\\n\\n        NC NC NC\\n        IO15 IO2 IO0 IO4 IO16 IO17 IO5 IO18 IO19 NC IO21 RXD0 TXD0 IO22 IO23 GND\\n\\n        ;; CAUTION this last GND is the bottom pad\\n        GND))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"ESP32-WROVER-E\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPGNezLiaRLm",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 25,
+  "content": "\"function temperature(step)\\n    1 / log(step)\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

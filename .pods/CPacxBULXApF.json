@@ -1,0 +1,17 @@
+{
+  "id": "CPacxBULXApF",
+  "parentId": "CP63Je4zKaFa",
+  "index": 44,
+  "content": "\"(define/IC (Arduino-Micro)\\n           #:ALIAS ([D2 SDA]\\n                   [D3 SCL])\\n  #:FP ((fp-Arduino 'Micro)\\n        TX RX GND GND\\n        D2 D3 D4 D5 D6 D7 D8 D9\\n        D10 MOSI MISO SCLK\\n;;         D18 D19 D20 D21\\n        A0 A1 A2 A3\\n        VCC RESET GND\\n        ;; FIXME RAW seems to be VIN\\n        VIN))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"Arduino-Micro\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPgPAMeGzzUW",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 13,
+  "content": "\"struct Region\\n    # number of bins\\n    M\\n    # bin width and height\\n    bw\\n    bh\\n    # overall diearea\\n    xmin\\n    xmax\\n    ymin\\n    ymax\\n    # bounding box for bins (to compute only once)\\n    # TODO when printing out, omit these arrays\\n    bx1s\\n    by1s\\n    bx2s\\n    by2s\\n    # for FFT\\n    wu\\n    wv\\n    wuv2\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

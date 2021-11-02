@@ -1,0 +1,17 @@
+{
+  "id": "CPUyipcUzB8D",
+  "parentId": "CPtgV36e4DrU",
+  "index": 9,
+  "content": "\"(define (atom->fp-pict+Hlocs atom)\\n  (if (ICAtom? atom)\\n      (IC+Atom->fp-pict+Hlocs (ICAtom-ic atom) atom)\\n      (footprint->pict+Hlocs (atom->fp atom))))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"atom->fp-pict+Hlocs\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

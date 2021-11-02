@@ -1,0 +1,17 @@
+{
+  "id": "CPAeA6CMhCGm",
+  "parentId": "CP63Je4zKaFa",
+  "index": 12,
+  "content": "\"\\n(define/IC (FerriteBead)\\n  #:auto-FP (fp-resistor \\\"0603\\\")\\n  #:LEFT 1\\n  #:RIGHT 2)\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": null,
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "null",
+  "exports": "{\"FerriteBead\":true}",
+  "midports": "null",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

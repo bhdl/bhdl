@@ -1,0 +1,17 @@
+{
+  "id": "CP4m3fhM8V7J",
+  "parentId": "CP9hPyBA9z8P",
+  "index": 10,
+  "content": "\"(define-syntax (show stx)\\n  (syntax-parse\\n   stx\\n   [(_ v)\\n    #'(begin\\n        (display (~a 'v \\\" = \\\"))\\n        (println v))]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": null,
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "null",
+  "exports": "{\"show\":true}",
+  "midports": "null",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

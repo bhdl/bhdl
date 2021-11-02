@@ -1,0 +1,17 @@
+{
+  "id": "CPfNKHz7eDXi",
+  "parentId": "CPHKPFTgKmQp",
+  "index": 8,
+  "content": "\"(define fp-crystal\\n  (kicad-helper \\\"Crystal.pretty/\\\"\\n                \\\"Resonator-2Pin_W10.0mm_H5.0mm.kicad_mod\\\"))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-crystal\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

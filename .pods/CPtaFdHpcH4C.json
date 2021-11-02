@@ -1,0 +1,17 @@
+{
+  "id": "CPtaFdHpcH4C",
+  "parentId": "CPWtgTBEDKJd",
+  "index": 5,
+  "content": "\"(define (save-for-placement specs fname)\\n  (let ([tmp (make-temporary-file)])\\n    (call-with-output-file tmp\\n      (λ (out)\\n        (write-bytes\\n         (jsexpr->bytes specs)\\n         out))\\n      ;; make-temporary-file creates the file\\n      #:exists 'replace)\\n    ;; pretty print by python -m json.tool\\n    (let ([formatted\\n           (with-output-to-string\\n             (λ ()\\n               (shell (~a \\\"python -m json.tool \\\" tmp))))])\\n      (call-with-output-file fname\\n        (λ (out)\\n          ;; FIXME text output port?\\n          (write-string formatted out))\\n        #:exists 'replace))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"save-for-placement\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

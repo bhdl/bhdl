@@ -1,0 +1,17 @@
+{
+  "id": "CP8tkLgzgih9",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 6,
+  "content": "\"function We_grad_x(net, x, xory)\\n    # FIXME why sparse?\\n    # res = spzeros(length(x))\\n    res = zeros(length(x))\\n    # all the x values of net\\n\\n    if xory == :x\\n        netx = [x[n] - offx for (n, offx, offy) in net]\\n    else\\n        netx = [x[n] - offy for (n, offx, offy) in net]\\n    end\\n\\n    grad = We_grad_x_impl(netx)\\n    # map back to whole x\\n    for (i,(n,offx,offy)) in enumerate(net)\\n        res[n] = grad[i]\\n    end\\n    res\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

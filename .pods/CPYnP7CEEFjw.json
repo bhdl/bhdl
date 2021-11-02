@@ -1,0 +1,17 @@
+{
+  "id": "CPYnP7CEEFjw",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 26,
+  "content": "\"function compute_conflicts(xs, ys, as, ws, hs, mask, R)\\n    # conflicted items\\n    items = []\\n    for i in 1:length(xs)\\n        # TODO if the i-th item is fixed, then, skip it.\\n        if mask[i] == 0 continue end\\n        c = cost_f(xs, ys, as, ws, hs,\\n                   xs[i], ys[i], as[i], ws[i], hs[i],\\n                   R, except=[i])\\n        if c > 0\\n            append!(items, i)\\n        end\\n    end\\n    return items\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

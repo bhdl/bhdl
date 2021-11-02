@@ -1,0 +1,17 @@
+{
+  "id": "CPe3zJ8Xy9XA",
+  "parentId": "CP63Je4zKaFa",
+  "index": 39,
+  "content": "\"\\n(define (Switch)\\n  (make-circuit\\n   #:vars ([it (SKRPACE010)])\\n   #:external-pins (left right)\\n   #:layout it\\n   #:connect (list (*- self.left it.A1)\\n                   (*- self.right it.B1))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": null,
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "null",
+  "exports": "{\"Switch\":true}",
+  "midports": "null",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

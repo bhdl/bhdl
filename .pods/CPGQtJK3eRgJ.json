@@ -1,0 +1,17 @@
+{
+  "id": "CPGQtJK3eRgJ",
+  "parentId": "CP6KwDyj8wHg",
+  "index": 9,
+  "content": "\"(define (sincos->theta sinθ cosθ)\\n  \\\"Return a angle in the range of [0,2π)\\\"\\n  (match (cons (>= sinθ 0) (>= cosθ 0))\\n    [(cons #t #t) (asin sinθ)]\\n    [(cons #t #f) (acos cosθ)]\\n    [(cons #f #f) (- (acos cosθ))]\\n    [(cons #f #t) (asin sinθ)]\\n    [else (error \\\"error!\\\")]))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"sincos->theta\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPKzEq7Gywgn",
+  "parentId": "CPHKPFTgKmQp",
+  "index": 36,
+  "content": "\"(define fp-kailh-socket-kicad\\n  (kicad-helper \\\"keyswitches.pretty\\\" \\\"Kailh_socket_MX.kicad_mod\\\"))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-kailh-socket-kicad\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

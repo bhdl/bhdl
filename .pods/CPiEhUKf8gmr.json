@@ -1,0 +1,17 @@
+{
+  "id": "CPiEhUKf8gmr",
+  "parentId": "CPHXAGdqGGDF",
+  "index": 4,
+  "content": "\"(define (circuit-plot circuit [auto-place #f])\\n  (parameterize ([current-directory \\\"/tmp\\\"]\\n                 [padding-general 2])\\n                (circuit-export circuit #:auto-place auto-place #:formats '(pdf))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"circuit-plot\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPmj3kCR694y",
+  "parentId": "CPn9Kk3EhUPf",
+  "index": 5,
+  "content": "\"function isoverlap_clip(poly0, polys...)\\n    path1 = Vector{IntPoint}()\\n    for p in poly0\\n        push!(path1, p)\\n    end\\n    c = Clip()\\n    add_path!(c, path1, PolyTypeSubject, true)\\n\\n    for poly in polys\\n        path2 = Vector{IntPoint}()\\n        for p in poly\\n            push!(path2, p)\\n        end\\n        add_path!(c, path2, PolyTypeClip, true)\\n    end\\n\\n    result, polys = execute(c,\\n                            # ClipTypeUnion,\\n                            # ClipTypeDifference,\\n                            ClipTypeIntersection,\\n                            PolyFillTypeEvenOdd,\\n                            PolyFillTypeEvenOdd)\\n    # @show polys\\n    # FIXME isempty(polys) does not work\\n    return length(polys) > 0\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"isoverlap_clip\":false}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

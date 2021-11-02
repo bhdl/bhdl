@@ -1,0 +1,17 @@
+{
+  "id": "CPccqW4LaP8L",
+  "parentId": "CP63Je4zKaFa",
+  "index": 43,
+  "content": "\"(define/IC (Arduino-Uno)\\n           #:ALIAS ([D18 SDA]\\n                    [D19 SCL]\\n                    [D13 SCK]\\n                    [D12 MISO]\\n                    [D11 MOSI]\\n                    [D10 SS])\\n  #:FP ((fp-Arduino 'Uno)\\n        3V3 5V\\n        A0 A1 A2 A3 A4 A5 AREF\\n        D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13\\n        GND GND GND\\n        IOREF\\n        NC RESET\\n        RX SCL SDA TX VIN))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"Arduino-Uno\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

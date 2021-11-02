@@ -1,0 +1,17 @@
+{
+  "id": "CPiqiA8ELdHy",
+  "parentId": "CPHKPFTgKmQp",
+  "index": 32,
+  "content": "\"(define fp-smd-2520\\n  (kicad-helper \\\"Crystal.pretty\\\"\\n                \\\"Crystal_SMD_2520-4Pin_2.5x2.0mm.kicad_mod\\\"))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-smd-2520\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

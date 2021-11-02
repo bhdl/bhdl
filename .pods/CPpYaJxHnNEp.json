@@ -1,0 +1,17 @@
+{
+  "id": "CPpYaJxHnNEp",
+  "parentId": "CP63Je4zKaFa",
+  "index": 3,
+  "content": "\"(define-syntax (define/IC stx)\\n  (syntax-parse\\n   stx\\n   [(_ (name ...)\\n       (~alt (~optional (~seq #:datasheet url) #:defaults ([url #'\\\"\\\"]))\\n             (~optional (~seq #:ALIAS alts) #:defaults ([alts #'()]))\\n             (~optional (~seq #:LEFT left) #:defaults ([left #'#f]))\\n             (~optional (~seq #:RIGHT right) #:defaults ([right #'#f]))\\n             (~optional (~seq #:PREFIX prefix) #:defaults ([prefix #'\\\"U\\\"]))\\n             (~seq #:DUMMY dummy)\\n             footprint:footprint-spec) ...)\\n    ;; construct IC:name\\n    ;; define name as function for creating the component\\n    (with-syntax ([(IC-name ...)\\n                   (datum->syntax\\n                    stx (map (lambda (x)\\n                               (string->symbol\\n                                (string-append \\\"IC:\\\" (symbol->string x))))\\n                             (syntax->datum #'(name ...))))]\\n                  [IC-name-str\\n                   (datum->syntax\\n                    stx (string-join\\n                               (map symbol->string\\n                                    (syntax->datum #'(name ...)))\\n                         \\\"/\\\"))])\\n      #`(begin\\n          (define-alias\\n            (IC-name ...)\\n            (IC IC-name-str prefix\\n                url\\n                'alts\\n                (list footprint.res ...)\\n                'left 'right))\\n          ;; TODO make attrs with keyword arguments and get them spliced\\n          ;; TODO actually use the attrs\\n          (define (name #:FP [which-fp #f] . attrs)\\n            ;; FIXME this requires definition of make-IC-atom\\n            (make-IC-atom IC-name which-fp attrs))\\n          ...\\n          ))]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"define/IC\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

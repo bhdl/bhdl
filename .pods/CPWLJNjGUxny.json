@@ -1,0 +1,17 @@
+{
+  "id": "CPWLJNjGUxny",
+  "parentId": "CP9hPyBA9z8P",
+  "index": 7,
+  "content": "\"(define-syntax (compose-pipe stx)\\n  (syntax-parse stx\\n    [(_ e0:expr e:expr-until-pipe ...)\\n     #`((apply compose (reverse (list (λ (prev) (e.func1 prev e.e ...)) ...)))\\n        e0)]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": null,
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "null",
+  "exports": "{\"compose-pipe\":true}",
+  "midports": "null",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

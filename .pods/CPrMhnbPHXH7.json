@@ -1,0 +1,17 @@
+{
+  "id": "CPrMhnbPHXH7",
+  "parentId": "CPtgV36e4DrU",
+  "index": 6,
+  "content": "\"(define (footprint->offset-uncached fp)\\n  (let ([fname (make-temporary-file)])\\n    (println (~a \\\"DEBUG: \\\" fname))\\n    (call-with-output-file fname\\n      #:exists 'replace\\n      (λ (out)\\n        (write-string (footprint->gerber fp)\\n                      out)))\\n    (let-values ([(p offset) (gerber-file->pict+offset fname)])\\n      offset)))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"footprint->offset-uncached\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPMEiMzrGiFJ",
+  "parentId": "CP6KwDyj8wHg",
+  "index": 2,
+  "content": "\"(define (triangular x #:color [color #f]\\n                    #:border-color [border-color #f]\\n                    #:border-width [border-width #f])\\n  (draw-shape/border (* 2 x) (* (sqrt 3) x)\\n                     (λ (dc dx dy)\\n                       (define path (new dc-path%))\\n                       (send path move-to 0 0)\\n                       (send path line-to (* 2 x) 0)\\n                       (send path line-to x (* (sqrt 3) x))\\n                       (send path close)\\n                       (send dc draw-path path dx dy))\\n                     color border-color border-width))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"triangular\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

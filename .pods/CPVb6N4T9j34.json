@@ -1,0 +1,17 @@
+{
+  "id": "CPVb6N4T9j34",
+  "parentId": "CPQU4nPmdVqN",
+  "index": 4,
+  "content": "\"(define (get-pin-name name num)\\n  (case num\\n        [(-1) name]\\n        [else (~a name \\\"--\\\" num)]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

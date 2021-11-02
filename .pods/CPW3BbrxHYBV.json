@@ -1,0 +1,17 @@
+{
+  "id": "CPW3BbrxHYBV",
+  "parentId": "CP6KwDyj8wHg",
+  "index": 4,
+  "content": "\"(define (pin-over-cc base dx dy pict)\\n  ;; like pin-over, but put pict centered at (dx,dy)\\n  (pin-over base\\n            (- dx (/ (pict-width pict) 2))\\n            (- dy (/ (pict-height pict) 2))\\n            pict))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"pin-over-cc\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

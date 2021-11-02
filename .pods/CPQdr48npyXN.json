@@ -1,0 +1,17 @@
+{
+  "id": "CPQdr48npyXN",
+  "parentId": "CPHKPFTgKmQp",
+  "index": 19,
+  "content": "\"(define (fp-mounting-hole m)\\n  \\\"Augmented mounting hole with 2 dummy pads.\\\"\\n  (merge-fp (fp-mounting-hole-raw m)\\n            (footprint '() \\n                       (list ;; FIXME these dummy pads should not be generated to KiCAD\\n                            (pad-spec 'dummy 0 0 0 'thru_hole 'circle (list 0 0) (list 0 0) 'multi)\\n                            (pad-spec 'dummy 0 0 0 'thru_hole 'circle (list 0 0) (list 0 0) 'multi))\\n                       '() '())))\\n\\n(define (fp-mounting-hole-raw m)\\n  ;; MountingHole_2.2mm_M2.kicad_mod\\n  ;; MountingHole_2.7mm_M2.5.kicad_mod\\n  ;; MountingHole_3.2mm_M3.kicad_mod\\n  ;; MountingHole_4.3mm_M4.kicad_mod\\n  ;; MountingHole_5.3mm_M5.kicad_mod\\n  ;; MountingHole_6.4mm_M6.kicad_mod\\n  ;; MountingHole_8.4mm_M8.kicad_mod\\n  (kicad-helper \\\"MountingHole.pretty/\\\"\\n                (~a \\\"MountingHole_\\\"\\n                    (case m\\n                      [(2) 2.2]\\n                      [(2.5) 2.7]\\n                      [(3) 3.2]\\n                      [(4) 4.3]\\n                      [(5) 5.3]\\n                      [(6) 6.4]\\n                      [(8) 8.4])\\n                    \\\"mm_M\\\"\\n                    m\\n                    \\\".kicad_mod\\\")))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-mounting-hole\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

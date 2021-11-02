@@ -1,0 +1,17 @@
+{
+  "id": "CPD8mWMbRLDz",
+  "parentId": "CPHKPFTgKmQp",
+  "index": 13,
+  "content": "\"(define fp-jack-barrel (kicad-helper \\\"Connector_BarrelJack.pretty/\\\"\\n                                     \\\"BarrelJack_Horizontal.kicad_mod\\\"))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-jack-barrel\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

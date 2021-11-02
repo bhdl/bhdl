@@ -1,0 +1,17 @@
+{
+  "id": "CP64hVyjGUtB",
+  "parentId": "CPtgV36e4DrU",
+  "index": 4,
+  "content": "\"(define (footprint->pict+Hlocs-uncached fp)\\n  \\\"This functions takes care of two additional things:\\n\\n1. the offset created by turning gerber into pict\\n2. the scale for making pict suitable for display\\n\\\"\\n  (let ([fname (make-temporary-file)])\\n    (println (~a \\\"DEBUG: \\\" fname))\\n    (call-with-output-file fname\\n      #:exists 'replace\\n      (λ (out)\\n        (write-string (footprint->gerber fp)\\n                      out)))\\n    (let-values ([(p offset) (gerber-file->pict+offset fname)])\\n      (values\\n       ;; 1. scale the picture\\n       (scale p (fp-scale))\\n       ;; 2. offset and scale the loc\\n       (for/hash ([pad (footprint-pads fp)])\\n         (values (pad-spec-name pad)\\n                 ;; FIXME pad-spec-a\\n                 (Point (* (- (pad-spec-x pad) (Point-x offset)) (fp-scale))\\n                        (* (- (pad-spec-y pad) (Point-y offset)) (fp-scale))\\n                        0)))))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"footprint->pict+Hlocs-uncached\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

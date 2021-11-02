@@ -1,0 +1,17 @@
+{
+  "id": "CPADaPjRrCGh",
+  "parentId": "CPWtgTBEDKJd",
+  "index": 2,
+  "content": "\"(define (atom->macro atom)\\n  (let-values ([(pict Hlocs) (atom->fp-pict+Hlocs atom)])\\n    ;; CAUTION use the pict-height/width as macro size\\n    ;; FIXME this is exact, e.g. 6/5\\n    (let ([h (pict-height pict)]\\n          [w (pict-width pict)])\\n      ;; get the location of pins\\n      (Macro w h Hlocs))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"atom->macro\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

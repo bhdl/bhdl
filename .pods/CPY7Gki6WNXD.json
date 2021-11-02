@@ -1,0 +1,17 @@
+{
+  "id": "CPY7Gki6WNXD",
+  "parentId": "CPadywggP7TT",
+  "index": 1,
+  "content": "\"(current-directory)\\n(directory-list \\\"/mount/shared\\\")\\n; (system \\\"echo 'hallo'\\\")\\n; (system \\\"git\\\")\\n; (system \\\"git clone --recursive https://github.com/lihebi/bhdl-footprints /mount/shared/bhdl-footprints\\\")\\n(system \\\"ls /mount/shared/\\\")\"",
+  "column": 1,
+  "fold": false,
+  "thundar": true,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

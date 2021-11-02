@@ -1,0 +1,17 @@
+{
+  "id": "CPj87fpVifAM",
+  "parentId": "CPVMzLibHe9N",
+  "index": 3,
+  "content": "\"(define (gerber-file->pict+offset gbr-file)\\n  \\\"Return a pict for the gerber file.\\\"\\n  (let-values ([(p box) (execute-gbr-instructions (gbr->instructions gbr-file))])\\n    (match box\\n      [(list xmin ymin _ _) (values p (Point xmin ymin 0))])))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"gerber-file->pict+offset\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

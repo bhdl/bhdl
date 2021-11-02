@@ -1,0 +1,17 @@
+{
+  "id": "CPjMYyzPqYry",
+  "parentId": "CPHKPFTgKmQp",
+  "index": 20,
+  "content": "\"(define (fp-switch-keyboard spacing pcb-or-plate)\\n  ;; SW_Cherry_MX_1.00u_PCB.kicad_mod\\n  ;; SW_Cherry_MX_1.00u_Plate.kicad_mod\\n  ;; SW_Cherry_MX_1.25u_PCB.kicad_mod\\n  ;; SW_Cherry_MX_1.25u_Plate.kicad_mod\\n  (kicad-helper \\\"Button_Switch_Keyboard.pretty/\\\"\\n                (~a \\\"SW_Cherry_MX_\\\"\\n                    (~r spacing #:precision '(= 2))\\n                    \\\"u_\\\"\\n                    (case pcb-or-plate\\n                      [(pcb) \\\"PCB\\\"]\\n                      [(plate) \\\"Plate\\\"]\\n                      [else (error \\\"Unknown pcb-or-place.\\\")])\\n                    \\\".kicad_mod\\\")))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-switch-keyboard\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

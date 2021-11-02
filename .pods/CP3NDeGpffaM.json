@@ -1,0 +1,17 @@
+{
+  "id": "CP3NDeGpffaM",
+  "parentId": "CPeFXHDVER93",
+  "index": 1,
+  "content": "\"(define (kicad-pcb-prefix w h)\\n  `((version 5)\\n    (host pcbnew 4.0.2-stable)\\n    (general\\n     (links 469)\\n     (no_connects 0)\\n     (area 0 0 ,w ,h)\\n     (thickness 1.6002)\\n     (drawings 311)\\n     (tracks 3484)\\n     (zones 0)\\n     (modules 338)\\n     (nets 131)\\n     )\\n    (page A3)\\n    (title_block\\n     (title GH60)\\n     (date \\\"20 jan 2014\\\")\\n     (rev B)\\n     (company \\\"geekhack GH60 design team\\\")\\n     )\\n    (layers\\n     (0 F.Cu signal)\\n     ;; TODO using 4-layer board is as easy as 2 lines!\\n     ;; (1 In1.Cu signal)\\n     ;; (2 In2.Cu signal)\\n     (31 B.Cu signal)\\n     (32 B.Adhes user)\\n     (33 F.Adhes user)\\n     (34 B.Paste user)\\n     (35 F.Paste user)\\n     (36 B.SilkS user)\\n     (37 F.SilkS user)\\n     (38 B.Mask user)\\n     (39 F.Mask user)\\n     (40 Dwgs.User user)\\n     (41 Cmts.User user)\\n     (42 Eco1.User user)\\n     (43 Eco2.User user)\\n     (44 Edge.Cuts user)\\n     (48 B.Fab user)\\n     (49 F.Fab user)\\n     )\\n    ;; FIXME DRC rules\\n    (setup\\n     (last_trace_width 0.4064)\\n     (user_trace_width 0.254)\\n     (user_trace_width 0.4064)\\n     (user_trace_width 0.889)\\n     ;; 0.127\\n     (trace_clearance 0.127)\\n     (zone_clearance 0.307299)\\n     (zone_45_only yes)\\n     ;; 0.127\\n     (trace_min 0.127)\\n     (segment_width 2)\\n     (edge_width 0.0991)\\n     (via_size 1)\\n     (via_drill 0.4)\\n     (via_min_size 1)\\n     (via_min_drill 0.4)\\n     (uvia_size 0.508)\\n     (uvia_drill 0.127)\\n     (uvias_allowed no)\\n     (uvia_min_size 0.508)\\n     (uvia_min_drill 0.127)\\n     (pcb_text_width 0.3048)\\n     (pcb_text_size 1.524 2.032)\\n     (mod_edge_width 0.3)\\n     (mod_text_size 1.524 1.524)\\n     (mod_text_width 0.3048)\\n     (pad_size 0.9 0.9)\\n     (pad_drill 0.9)\\n     (pad_to_mask_clearance 0.1016)\\n     (pad_to_paste_clearance -0.02)\\n     (aux_axis_origin 62.29 64.62)\\n     (visible_elements FFFFFFFF)\\n     (pcbplotparams\\n      (layerselection 0x012a0_00000000)\\n      (usegerberextensions false)\\n      (excludeedgelayer true)\\n      (linewidth 0.150000)\\n      (plotframeref false)\\n      (viasonmask false)\\n      (mode 1)\\n      (useauxorigin false)\\n      (hpglpennumber 1)\\n      (hpglpenspeed 20)\\n      (hpglpendiameter 15)\\n      (hpglpenoverlay 0)\\n      (psnegative false)\\n      (psa4output false)\\n      (plotreference true)\\n      (plotvalue false)\\n      (plotinvisibletext false)\\n      (padsonsilk false)\\n      (subtractmaskfromsilk false)\\n      (outputformat 4)\\n      (mirror false)\\n      (drillshape 0)\\n      (scaleselection 1)\\n      (outputdirectory gerber/))\\n     )))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"kicad-pcb-prefix\":false}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

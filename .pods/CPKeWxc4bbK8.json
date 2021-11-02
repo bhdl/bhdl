@@ -1,0 +1,17 @@
+{
+  "id": "CPKeWxc4bbK8",
+  "parentId": "CPadywggP7TT",
+  "index": 6,
+  "content": "\"(struct text-spec\\n        (x y))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"struct text-spec\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

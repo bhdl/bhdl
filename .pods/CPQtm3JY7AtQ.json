@@ -1,0 +1,17 @@
+{
+  "id": "CPQtm3JY7AtQ",
+  "parentId": "CPQU4nPmdVqN",
+  "index": 23,
+  "content": "\"(define-syntax (*= stx)\\n  \\\"vectorized connection\\\"\\n  (syntax-parse\\n   stx\\n   [(_ (~alt \\n        ;; (self [ a b c[3] d])\\n        (node [pin:pin-cls ...])\\n        ;; (self col [1 8])\\n        ;; TODO better syntax, e.g. self.col[1:8]\\n             (nodeid pinname [num1 num2])\\n        ;; ([mcu.VCC mcu.GND])\\n             ([nodepin:dot ...]))\\n       ...)\\n    #`(*=-proc (list (node-pins->nodepins node\\n                                          (list (get-pin-name 'pin.name 'pin.num) ...)\\n                                          )\\n                     ...\\n                     (node-pins->nodepins nodeid (get-range-names 'pinname num1 num2))\\n                     ...\\n                     (list (pin-ref nodepin.lhs 'nodepin.rhs) ...)\\n                     ...))]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"*=\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

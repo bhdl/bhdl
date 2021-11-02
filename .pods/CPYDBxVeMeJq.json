@@ -1,0 +1,17 @@
+{
+  "id": "CPYDBxVeMeJq",
+  "parentId": "CP9EieDjGcKX",
+  "index": 1,
+  "content": "\"(define (maybe-find find-fn base p)\\n  \\\"Return find value, or #f if not found. FIXME performance\\\"\\n  ;; FIXME make sure it is find-XX: not found problem\\n  (with-handlers ([exn:fail? (lambda (exn) #f)])\\n    ;; FIXME this might return different number of values. Thus, I'm converting\\n    ;; this to a list, so that we can test whether the return is #f or not,\\n    ;; because most functions do not work with multiple values\\n    (call-with-values (lambda () (find-fn base p))\\n      (lambda lst\\n        ;; if returned no value, this is empty list\\n        ;; if returned a single value, this is a list of 1 item\\n        ;; if returned multiple values, this is a list of those values\\n        lst))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"maybe-find\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

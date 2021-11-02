@@ -1,0 +1,17 @@
+{
+  "id": "CPxFhDXVNwwU",
+  "parentId": "CPTWFby3RYrV",
+  "index": 2,
+  "content": "\"function visualize(x, y, w, h, R)\\n    # shift all\\n    x = x .- R.xmax / 2\\n    y = y .- R.ymax / 2\\n\\n    # apply scale\\n    scale = 500 / max(R.xmax, R.ymax)\\n    x = x .* scale\\n    y = y .* scale\\n    w = w .* scale\\n    h = h .* scale\\n\\n    @svg begin\\n        setdash(\\\"dash\\\")\\n        # the point is the center of box\\n        box(Luxor.Point(0,0), R.xmax * scale, R.ymax * scale, :stroke)\\n        setdash(\\\"solid\\\")\\n        @showprogress 0.1 \\\"drawing ..\\\" for i in 1:length(x)\\n            # this x y is center\\n            box(Luxor.Point(x[i],y[i]), w[i], h[i], :stroke)\\n        end\\n    end\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

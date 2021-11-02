@@ -1,0 +1,17 @@
+{
+  "id": "CPQiDLRD9dMn",
+  "parentId": "CP7f8k4k7kLU",
+  "index": 0,
+  "content": "\"(define (atom->ID atom Hatom=>index)\\n  ;; UPDATE using some meaningful name instead of \\\"ATOM\\\"\\n  ;;\\n  ;; FIXME assuming all atoms are ICAtom\\n  (~a (IC-prefix (ICAtom-ic atom))\\n      ;; \\\"ATOM\\\"\\n      (hash-ref Hatom=>index atom)))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"atom->ID\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

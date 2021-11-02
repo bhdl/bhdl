@@ -1,0 +1,17 @@
+{
+  "id": "CPHLcD9jR9bw",
+  "parentId": "CPtgV36e4DrU",
+  "index": 14,
+  "content": "\"(define (atom->fp-pict atom)\\n  (let-values ([(p locs) (atom->fp-pict+Hlocs atom)]) p))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"atom->fp-pict\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

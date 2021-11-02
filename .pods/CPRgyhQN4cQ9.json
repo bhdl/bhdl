@@ -1,0 +1,17 @@
+{
+  "id": "CPRgyhQN4cQ9",
+  "parentId": "CPTWFby3RYrV",
+  "index": 1,
+  "content": "\"macro luxoremacs(body, width=600, height=600)\\n    quote\\n        path, io = Base.Filesystem.mktemp()\\n        close(io)\\n\\n        path * \\\".png\\\"\\n        lfname = path * \\\".png\\\"\\n        # local lfname = Luxor._add_ext($(esc(fname)), :png)\\n        Drawing($width, $height, lfname)\\n        origin()\\n        background(\\\"white\\\")\\n        sethue(\\\"black\\\")\\n        $(esc(body))\\n        finish()\\n        # instead of preview, I'm printing out something\\n        println(\\\"$lfname\\\")\\n        println(\\\"#<Image: $lfname>\\\")\\n        # preview()\\n    end\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

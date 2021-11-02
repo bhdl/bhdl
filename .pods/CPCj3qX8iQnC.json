@@ -1,0 +1,17 @@
+{
+  "id": "CPCj3qX8iQnC",
+  "parentId": "CPrmYHr6Ux6K",
+  "index": 3,
+  "content": "\"(define (stop-8082-process)\\n  (let ([id (get-8082-processid)])\\n    (when id\\n          (shell (~a \\\"kill -9 \\\" id)))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

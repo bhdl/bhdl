@@ -1,0 +1,17 @@
+{
+  "id": "CPGy9qiLAt33",
+  "parentId": "CPgeDcY8C9kA",
+  "index": 3,
+  "content": "\"function read_pos(fname)\\n    res = []\\n    open(fname, \\\"r\\\") do io\\n        for line in eachline(io)\\n            line = strip(line)\\n            # m = match(r\\\"(o\\\\d+)\\\\s+(\\\\d+)\\\\s+(\\\\d+).*: \\\\w+( /FIXED)?\\\", line)\\n            m = match(r\\\"(X\\\\d+)\\\\s+(\\\\d+)\\\\s+(\\\\d+).*: \\\\w+( /FIXED)?\\\", line)\\n            if m != nothing\\n                id = m.captures[1]\\n                x = parse(Int, m.captures[2])\\n                y = parse(Int, m.captures[3])\\n                fixed = m.captures[4]\\n                # if fixed != nothing\\n                push!(res, (id, x, y, fixed))\\n                # end\\n            end\\n        end\\n    end\\n    return res\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"read_pos\":false}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

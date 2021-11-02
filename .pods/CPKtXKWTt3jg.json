@@ -1,0 +1,17 @@
+{
+  "id": "CPKtXKWTt3jg",
+  "parentId": "CP63Je4zKaFa",
+  "index": 13,
+  "content": "\"(define/IC (Crystal-4)\\n  #:FP (fp-smd-2520\\n        XIN GND XOUT GND))\\n\\n(define/IC (Crystal-2)\\n  #:auto-FP fp-smd-2012-2p\\n  #:LEFT 1\\n  #:RIGHT 2)\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": null,
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "null",
+  "exports": "{\"Crystal-4\":true,\"Crystal-2\":true}",
+  "midports": "null",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

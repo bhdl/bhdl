@@ -1,0 +1,17 @@
+{
+  "id": "CPn6raBKHdGr",
+  "parentId": "CPQU4nPmdVqN",
+  "index": 5,
+  "content": "\"(define-syntax (create-simple-Composite stx)\\n  (syntax-parse \\n    stx\\n    [(_ pin:pin-cls ...)\\n    #`(let ([res (Composite (make-hash) '())]\\n                 [pins (append (get-pin-names 'pin.name 'pin.num) ...)])\\n           (for ([pname pins]\\n                        [i (in-naturals 1)])\\n                (let ([p (Pin res pname)])\\n                  (hash-set! (Composite-pinhash res) pname p)\\n                  (hash-set! (Composite-pinhash res)\\n                             (string->symbol (~a \\\"index-\\\" i)) p)))\\n           res)]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"create-simple-Composite\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

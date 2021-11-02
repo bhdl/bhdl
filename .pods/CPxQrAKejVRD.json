@@ -1,0 +1,17 @@
+{
+  "id": "CPxQrAKejVRD",
+  "parentId": "CPHKPFTgKmQp",
+  "index": 6,
+  "content": "\"(define fp-fuse-1206\\n  (kicad-helper \\\"Fuse.pretty\\\" \\\"Fuse_1206_3216Metric.kicad_mod\\\"))\\n\\n(define (fp-fuse type)\\n  (case type\\n    [(\\\"1206\\\") fp-fuse-1206]\\n    [else (error \\\"fp-fuse: \\\" type)]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-fuse\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

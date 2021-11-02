@@ -1,0 +1,17 @@
+{
+  "id": "CPyq3DNbnidh",
+  "parentId": "CPtgV36e4DrU",
+  "index": 7,
+  "content": "\"(define footprint->offset\\n  (let ([cache (make-hash)])\\n    (λ (fp)\\n      (if (hash-has-key? cache fp)\\n          (hash-ref cache fp)\\n          (let ([offset (footprint->offset-uncached fp)])\\n            (hash-set! cache fp offset)\\n            offset)))))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"footprint->offset\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPwhiHHikiCz",
+  "parentId": "CPQU4nPmdVqN",
+  "index": 27,
+  "content": "\";; TODO set the resulting's left and right\\n;; TODO The resulting thing should be a circuit?\\n;; TODO allowing chaining and in-place component creation\\n; (define-syntax-rule (parallel a ...)\\n;   (begin (series a.1 ...)\\n;          (series a.2 ...)))\\n(define-syntax-rule (parallel a ...)\\n  (*< a ...))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"parallel\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

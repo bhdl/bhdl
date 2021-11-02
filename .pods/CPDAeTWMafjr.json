@@ -1,0 +1,17 @@
+{
+  "id": "CPDAeTWMafjr",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 19,
+  "content": "\"function visualize_density(vs, R)\\n    xs, ys, ws, hs = vs\\n    visualize(xs, ys, ws, hs, R)\\n    rho = rho_fast(gpu.(vs), R)\\n    phi, Ephix, Ephiy = phi_b(rho, R)\\n    # display_plot(Plots.heatmap(rho))\\n    display_plot(Plots.heatmap(reverse(rho, dims=1)))\\n    # display_plot(Plots.heatmap(permutedims(rho)))\\n    display_plot(Plots.heatmap(reverse(Ephix, dims=1)))\\n    display_plot(Plots.heatmap(reverse(Ephiy, dims=1)))\\n    # display_plot(Plots.bar(sort(bxs)))\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

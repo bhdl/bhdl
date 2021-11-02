@@ -1,0 +1,17 @@
+{
+  "id": "CPiLXXCYhGYP",
+  "parentId": "CPn9Kk3EhUPf",
+  "index": 7,
+  "content": "\"function isoverlap(poly0, polys...)\\n    isoverlap_clip(tuple2intpoint(poly0), map(tuple2intpoint, polys)...)\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"isoverlap\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPUDezjY7XaA",
+  "parentId": "CPQU4nPmdVqN",
+  "index": 22,
+  "content": "\"(define (get-range-names name num1 num2)\\n  (for/list ([i (in-range num1 (add1 num2))])\\n            (~a name \\\"--\\\" i)))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

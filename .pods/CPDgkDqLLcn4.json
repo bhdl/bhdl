@@ -1,0 +1,17 @@
+{
+  "id": "CPDgkDqLLcn4",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 24,
+  "content": "\"function accept(xs, ys, as, ws, hs, x, y, a, i, t, R)\\n    # calculate the xs[i], ys[i] conflicts with how many others\\n    c0 = cost_f(xs, ys, as, ws, hs,\\n                xs[i], ys[i], as[i], ws[i], hs[i],\\n                R, except=[i])\\n    # FIXME I should remove the conflict with itself\\n    c1 = cost_f(xs, ys, as, ws, hs,\\n                x, y, a, ws[i], hs[i],\\n                R, except=[i])\\n    if c1 < c0\\n        # @info \\\"cost improves from $c0 to $c1\\\"\\n        return true\\n    end\\n    p = exp(-(c1 - c0) / t)\\n    # @show p\\n    if rand() < p\\n        return true\\n    else\\n        return false\\n    end\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

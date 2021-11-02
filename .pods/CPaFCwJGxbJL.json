@@ -1,0 +1,17 @@
+{
+  "id": "CPaFCwJGxbJL",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 22,
+  "content": "\"function four_corners(x, y, w, h)\\n    # compute the 4 corners of the rectangle\\n    l1 = (x - w/2, y - h/2)\\n    l2 = (x + w/2, y - h/2)\\n    l3 = (x + w/2, y + h/2)\\n    l4 = (x - w/2, y + h/2)\\n    return l1, l2, l3, l4\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPAyjPBYxE3e",
+  "parentId": "CPHKPFTgKmQp",
+  "index": 15,
+  "content": "\"(define (fp-pin-header-2 ct)\\n  (kicad-helper \\\"Connector_PinHeader_2.54mm.pretty/\\\"\\n                (~a \\\"PinHeader_2x\\\"\\n                    (~r ct #:min-width 2 #:pad-string \\\"0\\\")\\n                    \\\"_P2.54mm_Vertical.kicad_mod\\\")))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-pin-header-2\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

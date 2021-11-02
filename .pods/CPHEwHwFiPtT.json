@@ -1,0 +1,17 @@
+{
+  "id": "CPHEwHwFiPtT",
+  "parentId": "CPYFdkyGhc6b",
+  "index": 2,
+  "content": "\"(circuit key-with-diode\\n      (pin left right)\\n      (part [d (1N4148W)]\\n            [key (kailh-socket 1)]\\n            [a (Resistor)])\\n      (wire (series self.left key d self.right))\\n      (layout (vstack key d)))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

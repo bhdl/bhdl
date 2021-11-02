@@ -1,0 +1,17 @@
+{
+  "id": "CPnzPj7LhVAX",
+  "parentId": "CP63Je4zKaFa",
+  "index": 29,
+  "content": "\"(define/IC (CP2102N)\\n  #:datasheet \\\"https://www.silabs.com/documents/public/data-sheets/cp2102n-datasheet.pdf\\\"\\n  \\n  ;; Manufacturer\\tSILICON LABS\\n  ;; Mfr.Part #\\tCP2102N-A01-GQFN28R\\n  ;; LCSC Part #\\tC428937\\n  ;; Package\\tQFN-28\\n  #:QFN (28 DCD RI GND D+ D- VDD VREGIN VBUS\\n            ;; FIXME RSTb?\\n            RSTb\\n            ;; FIXME special handle for NC?\\n            NC\\n            SUSPENDb SUSPEND CHREN CHR1\\n\\n            CHR0 GPIO3 GPIO2 GPIO1 GPIO0 GPIO6 GPIO5 GPIO4\\n            CTS RTS RXD TXD DSR DTR\\n            ;; FIXME this is pin 29, the pad\\n            ;; EP\\n            ))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"CP2102N\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CP9WpideiBhJ",
+  "parentId": "CPNKtDWP37zK",
+  "index": 5,
+  "content": "\"(define (parse-rect str)\\n  (match-let* ([(list _ x y w h other ...) (string-split str \\\"~\\\")]\\n               [(list x y w h) (map (lambda (x)\\n                                      (adapt-unit x))\\n                                    (list x y w h))]\\n               [(list x1 y1 x2 y2) (list x y (+ x w) (+ y h))]\\n               ;; FIXME there's no stroke in this command\\n               [stroke (adapt-unit 1)])\\n    ;; 4 segments\\n    ;; FIXME better use fp_poly\\n    ;; FIXME read fp_poly and others for kicad\\n    (list (line-spec x1 y1 x2 y1 stroke)\\n          (line-spec x2 y1 x2 y2 stroke)\\n          (line-spec x2 y2 x1 y2 stroke)\\n          (line-spec x1 y2 x1 y1 stroke))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

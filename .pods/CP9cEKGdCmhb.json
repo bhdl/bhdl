@@ -1,0 +1,17 @@
+{
+  "id": "CP9cEKGdCmhb",
+  "parentId": "CPXUzG9HHi8X",
+  "index": 0,
+  "content": "\"(require racket/file)\\n(define (footprint->pict-tmp fp)\\n  (let ([fname (make-temporary-file)])\\n    (println (~a \\\"DEBUG: \\\" fname))\\n    (call-with-output-file fname\\n      #:exists 'replace\\n      (λ (out)\\n        (write-string (footprint->gerber fp)\\n                      out)))\\n    (let-values ([(p) (gerber-file->pict fname)])\\n      p)))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

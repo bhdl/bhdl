@@ -1,0 +1,17 @@
+{
+  "id": "CPiV7VKYVdaa",
+  "parentId": "CPVMzLibHe9N",
+  "index": 0,
+  "content": "\"(require (for-syntax syntax/parse\\n                     racket/string)\\n         syntax/parse/define\\n         racket/match\\n         rackunit\\n         pict\\n         racket/draw)\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": null,
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "null",
+  "exports": "null",
+  "midports": "null",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CP7QBAKpAn8M",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 14,
+  "content": "\"function Region(xs, ys, ws, hs, diearea, M)\\n    xmin = 0\\n    ymin = 0\\n    xmax = diearea[1]\\n    ymax = diearea[2]\\n\\n    # M = 10\\n    bw = (xmax-xmin) / M + 1e-8\\n    bh = (ymax-ymin) / M + 1e-8\\n\\n    bx1s = reshape([xmin + bw * (i-1) for i in 1:M for j in 1:M], M, M)\\n    bx2s = reshape([xmin + bw * i for i in 1:M for j in 1:M], M, M)\\n    by1s = reshape([ymin + bh * (j-1) for i in 1:M for j in 1:M], M, M)\\n    by2s = reshape([ymin + bh * j for i in 1:M for j in 1:M], M, M)\\n    bx1s, by1s, bx2s, by2s = (bx1s, by1s, bx2s, by2s) .|> gpu\\n\\n    # this is slow, but only compute once\\n    wuv_f(uv) = 2 * pi * uv / M\\n    wu = reshape([wuv_f(u) for u in 1:M for v in 1:M], M, M);\\n    wv = reshape([wuv_f(v) for u in 1:M for v in 1:M], M, M);\\n    wuv2 = reshape([wuv_f(u)^2 + wuv_f(v)^2 for u in 1:M for v in 1:M], M, M);\\n\\n    Region(M, bw, bh, xmin, xmax, ymin, ymax,\\n           bx1s, by1s, bx2s, by2s,\\n           wu, wv, wuv2)\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

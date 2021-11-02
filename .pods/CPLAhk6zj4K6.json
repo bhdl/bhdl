@@ -1,0 +1,17 @@
+{
+  "id": "CPLAhk6zj4K6",
+  "parentId": "CP6M6tV7VJkb",
+  "index": 1,
+  "content": "\"(define (set-default-pict! atom)\\n  ;; I need to launder the pict becasue the footprint pict is cached. Otherwise\\n  ;; all the atoms with the same footprint will have the same location when upon\\n  ;; *-find function call\\n  (set-Atom-pict! atom (launder (atom->fp-pict atom))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"set-default-pict!\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

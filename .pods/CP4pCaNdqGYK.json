@@ -1,0 +1,17 @@
+{
+  "id": "CP4pCaNdqGYK",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 8,
+  "content": "\"function rho_v_many(pxs, pys, pws, phs, bx1s, by1s, bx2s, by2s)\\n    x1 = max.(pxs .- pws / 2, bx1s)\\n    y1 = max.(pys .- phs / 2, by1s)\\n    x2 = min.(pxs .+ pws / 2, bx2s)\\n    y2 = min.(pys .+ phs / 2, by2s)\\n    # max.(x2 - x1, 0) .* max.(y2 - y1, 0)\\n    sum(max.(x2 - x1, 0) .* max.(y2 - y1, 0), dims=3)\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

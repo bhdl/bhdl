@@ -1,0 +1,17 @@
+{
+  "id": "CPycedwAV4mr",
+  "parentId": "CPVMzLibHe9N",
+  "index": 1,
+  "content": "\"(define (gbr->instructions gbr-file)\\n  (filter\\n   identity\\n   (for/list ([line (filter non-empty-string? (port->lines (open-input-file gbr-file)))])\\n     (match line\\n       [(regexp #rx\\\"^G04 (.*)$\\\" (list _ a)) #f]\\n       [(pregexp\\n         \\\"%FSLAX(\\\\\\\\d)(\\\\\\\\d)Y(\\\\\\\\d)(\\\\\\\\d)\\\\\\\\*%\\\"\\n         (list _ x1 x2 y1 y2)) (list 'FS\\n                                     (string->number x1)\\n                                     (string->number x2)\\n                                     (string->number y1)\\n                                     (string->number y2))]\\n       [(regexp \\\"^%MO(..)\\\\\\\\*%$\\\" (list _ m)) (list 'MO m)]\\n       [(regexp \\\"^%LP(.)\\\\\\\\*%$\\\" (list _ m)) (list 'LP m)]\\n       [(pregexp \\\"^%ADD(\\\\\\\\d+)(\\\\\\\\w),(.*)\\\\\\\\*%$\\\" (list _ dcode shape attr))\\n        (list 'AD (string->number dcode) shape (map string->number (string-split attr \\\"X\\\")))]\\n       [(pregexp \\\"^D(\\\\\\\\d+)\\\\\\\\*$\\\" (list _ dcode))\\n        (list 'D (string->number dcode))]\\n       [(pregexp (~a \\\"^X(-?\\\\\\\\d+)Y(-?\\\\\\\\d+)\\\"\\n                     \\\"(?:I(-?\\\\\\\\d+))?(?:J(-?\\\\\\\\d+))\\\"\\n                     \\\"?D(\\\\\\\\d+)\\\\\\\\*$\\\")\\n                 (list _ x y i j d))\\n        (list 'XY\\n              (string->number x)\\n              (string->number y)\\n              (if i (string->number i) i)\\n              (if j (string->number j) j)\\n              (string->number d))]\\n       [(regexp \\\"^M02\\\\\\\\*$\\\") (list 'M02)]\\n       ))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"gbr->instructions\":false}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

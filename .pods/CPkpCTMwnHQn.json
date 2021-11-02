@@ -1,0 +1,17 @@
+{
+  "id": "CPkpCTMwnHQn",
+  "parentId": "CPNKtDWP37zK",
+  "index": 3,
+  "content": "\"(define (spec-offset spec offx offy)\\n  (match spec\\n    [(line-spec x1 y1 x2 y2 width)\\n     (line-spec (- x1 offx) (- y1 offy) (- x2 offx) (- y2 offy) width)]\\n    [(pad-spec name x y 0 mounting-type shape size dsize layer)\\n     (pad-spec name (- x offx) (- y offy) 0 mounting-type shape size dsize layer)]\\n    [else (error \\\"spec-offset\\\")]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

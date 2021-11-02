@@ -1,0 +1,17 @@
+{
+  "id": "CPr4gRzGzUmA",
+  "parentId": "CP63Je4zKaFa",
+  "index": 34,
+  "content": "\"(define/IC (USB-C-16)\\n  #:ALIAS ([A1 B12 GND]\\n          [A4 B9 VBUS]\\n          [B1 A12 GND]\\n          [B4 A9 VBUS]\\n          [A5 CC1]\\n          [A6 D+1]\\n          [A7 D-1]\\n          [A8 SBU1]\\n\\n          [B5 CC2]\\n          [B6 D+2]\\n          [B7 D-2]\\n          [B8 SBU2])\\n  #:FP ((lcsc->fp \\\"C393939\\\")\\n        A1 A4 A12 A9 B5 B8 B6 A7 A6 B7 A5 A8\\n        ;; FIXME what are these pads\\n        ;; FIXME this will conflict with numbers\\n        P4 P3 P2 P1))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"USB-C-16\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

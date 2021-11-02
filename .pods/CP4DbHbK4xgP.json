@@ -1,0 +1,17 @@
+{
+  "id": "CP4DbHbK4xgP",
+  "parentId": "CP9hPyBA9z8P",
+  "index": 17,
+  "content": "\"\\n(define (group-by-2 lst)\\n  \\\"group every 2 items\\\"\\n  (group-by-index (lambda (idx) (floor (/ idx 2))) lst))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"group-by-2\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

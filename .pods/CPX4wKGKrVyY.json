@@ -1,0 +1,17 @@
+{
+  "id": "CPX4wKGKrVyY",
+  "parentId": "CPQU4nPmdVqN",
+  "index": 26,
+  "content": "\"(define-syntax (*< stx)\\n  (syntax-parse stx\\n    [(_ node:maybe-dot ...)\\n     #'(*<-proc (list node.res ...))]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"*<\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

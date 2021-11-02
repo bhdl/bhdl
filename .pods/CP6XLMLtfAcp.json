@@ -1,0 +1,17 @@
+{
+  "id": "CP6XLMLtfAcp",
+  "parentId": "CPgeDcY8C9kA",
+  "index": 5,
+  "content": "\"function decode_place_spec(jobj)\\n    xs = jobj[\\\"xs\\\"]\\n    ys = jobj[\\\"ys\\\"]\\n    as = jobj[\\\"as\\\"]\\n    ws = jobj[\\\"ws\\\"]\\n    hs = jobj[\\\"hs\\\"]\\n    Es = jobj[\\\"Es\\\"]\\n    mask = jobj[\\\"mask\\\"]\\n    diearea = jobj[\\\"diearea\\\"]\\n    params = jobj[\\\"place-params\\\"]\\n    xs, ys, as, ws, hs, Es, mask, diearea, params\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"decode_place_spec\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPCnkNAG4mWK",
+  "parentId": "CPWtgTBEDKJd",
+  "index": 1,
+  "content": "\"(struct Macro\\n  (w h\\n     ;; this Hlocs is from pin name to offset Point\\n     Hlocs)\\n  #:prefab)\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"struct Macro\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

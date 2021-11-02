@@ -1,0 +1,17 @@
+{
+  "id": "CPUdej3ppCbL",
+  "parentId": "CPHKPFTgKmQp",
+  "index": 7,
+  "content": "\"(define fp-capacitor-0603\\n  (kicad-helper \\\"Capacitor_SMD.pretty/\\\"\\n                \\\"C_0603_1608Metric.kicad_mod\\\"))\\n(define fp-capacitor-0805\\n  (kicad-helper \\\"Capacitor_SMD.pretty/\\\"\\n                \\\"C_0805_2012Metric.kicad_mod\\\"))\\n\\n(define (fp-capacitor type)\\n  (case type\\n    [(\\\"0603\\\") fp-capacitor-0603]\\n    [(\\\"0805\\\") fp-capacitor-0805]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-capacitor\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

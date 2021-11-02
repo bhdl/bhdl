@@ -1,0 +1,17 @@
+{
+  "id": "CPae3wB9kJen",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 11,
+  "content": "\"function phi_b(rho, R)\\n    # auv = FFTW.dct(rho)\\n    auv = real.(FFTW.fft(rho))\\n\\n    # R.M,R.M matrix\\n    phi = FFTW.idct(auv ./ R.wuv2)\\n\\n    Ephix = imag.(FFTW.ifft(real.(FFTW.ifft(auv .* R.wv ./ R.wuv2, 1)), 2))\\n    Ephiy = real.(FFTW.ifft(imag.(FFTW.ifft(auv .* R.wu ./ R.wuv2, 1)), 2))\\n\\n    phi, Ephix, Ephiy\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

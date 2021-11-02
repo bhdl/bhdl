@@ -1,0 +1,17 @@
+{
+  "id": "CPKRbekYAe9c",
+  "parentId": "CPN8XE37ddzD",
+  "index": 0,
+  "content": "\"(require (for-syntax syntax/parse\\n                     racket/string\\n                     racket/list\\n                     racket/match)\\n         syntax/parse/define\\n         racket/list\\n         racket/set\\n         rackunit\\n        ;  \\\"utils.rkt\\\"\\n        ;  \\\"sch.rkt\\\"\\n         (prefix-in pict: pict)\\n         racket/draw)\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPfUKLaPe3AC",
+  "parentId": "CPgh3kxexKr7",
+  "index": 22,
+  "content": "\"(parameterize ([current-directory \\\"./out/demo-board/mcu-board\\\"]\\n               [padding-general 2])\\n    (circuit-export mcu-board\\n                    #:auto-place #t\\n                    #:formats '(kicad pdf bom png)))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

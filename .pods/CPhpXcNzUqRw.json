@@ -1,0 +1,17 @@
+{
+  "id": "CPhpXcNzUqRw",
+  "parentId": "CPckUrdGFJME",
+  "index": 30,
+  "content": "\"(define (Composite->netlist comp)\\n  \\\"From a Composite to a list netlist ((a b c) (d e f)).\\\"\\n  (filter (lambda (x) (> (length (Net-pins x)) 1))\\n          (Composite->netlist-1 comp)))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"Composite->netlist\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

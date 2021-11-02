@@ -1,0 +1,17 @@
+{
+  "id": "CPMW9Wqznp6F",
+  "parentId": "CP63Je4zKaFa",
+  "index": 22,
+  "content": "\"(define/IC (ATmega128)\\n  #:datasheet \\\"http://ww1.microchip.com/downloads/en/DeviceDoc/doc2467.pdf\\\"\\n  #:ALIAS ((VCC)\\n          (RESET) (AVCC)\\n          (GND) (XTAL2) (XTAL1) (AREF)\\n          (PA0 AD0) (PA1 AD1) (PA2 AD2) (PA3 AD3)\\n          (PA4 AD4) (PA5 AD5) (PA6 AD6) (PA7 AD7)\\n          (PB0 SS) (PB1 SCK) (PB2 MOSI) (PB3 MISO)\\n          (PB4 OC0) (PB5 OC1A) (PB6 OC1B) (PB7 OC2 OC1C)\\n          (PC0 A8) (PC1 A9) (PC2 A10) (PC3 A11)\\n          (PC4 A12) (PC5 A13) (PC6 A14) (PC7 A15)\\n          (PD0 SCL INT0) (PD1 SDA INT1) (PD2 RXD1 INT2) (PD3 TXD1 INT3)\\n          (PD4 ICP1) (PD5 XCK1) (PD6 T1) (PD7 T2)\\n          (PEN)\\n          (PE0 RXD0 PDI) (PE1 TXD0 PDO) (PE2 XCK0 AIN0) (PE3 OC3A AIN1)\\n          (PE4 OC3B INT4) (PE5 OC3C INT5) (PE6 T3 INT6) (PE7 ICP3 INT7)\\n          (PF0 ADC0) (PF1 ADC1) (PF2 ADC2) (PF3 ADC3) (PF4 ADC4 TCK)\\n          (PF5 ADC5 TMS) (PF6 ADC6 TDO) (PF7 ADC7 TDI)\\n          (PG0 WR) (PG1 RD) (PG2 ALE) (PG3 TOSC2) (PG4 TOSC1))\\n  #:QFN (64 PEN PE0 PE1 PE2 PE3 PE4 PE5 PE6 PE7 PB0 PB1 PB2 PB3 PB4 PB5 PB6\\n            PB7 PG3 PG4 RESET VCC GND XTAL1 XTAL1 PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7\\n            PG0 PG1 PC0 PC1 PC2 PC3 PC4 PC5 PC6 PC7 PG2 PA7 PA6 PA5 PA4 PA3\\n            PA2 PA1 PA0 VCC GND PF7 PF6 PF5 PF4 PF3 PF2 PF1 PF0 AREF GND AVCC))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"ATmega128\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

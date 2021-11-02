@@ -1,0 +1,17 @@
+{
+  "id": "CPMW3rVh6EDF",
+  "parentId": "CPWtgTBEDKJd",
+  "index": 6,
+  "content": "\"(define placer-url (make-parameter \\\"http://localhost:8082\\\"))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"placer-url\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPUQfa89EwrT",
+  "parentId": "CP63Je4zKaFa",
+  "index": 32,
+  "content": "\"(define/IC (USB-Type-C)\\n  ;; FIXME CAUTION the GND pins (A1 A12 might not be physically connected\\n  #:ALIAS ([A1 A12 B1 B12 GND]\\n          [A4 A9 B9 B4 VBUS]\\n          [A5 CC1]\\n          [B5 CC2]\\n          [A6 D+1]\\n          [B6 D+2]\\n          [A7 D-1]\\n          [B7 D-2]\\n\\n          [A8 SBU1]\\n          [B8 SBU2])\\n  #:FP ((fp-usb 'c-female)\\n\\n        ;; FIXME 4 more pads?\\n        A1 A2 A3 A4 A5 A6 A7 A8 A9 A10 A11 A12\\n        B1 B2 B3 B4 B5 B6 B7 B8 B9 B10 B11 B12))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"USB-Type-C\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

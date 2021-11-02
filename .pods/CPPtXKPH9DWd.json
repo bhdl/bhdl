@@ -1,0 +1,17 @@
+{
+  "id": "CPPtXKPH9DWd",
+  "parentId": "CPHXAGdqGGDF",
+  "index": 1,
+  "content": "\"(define (Composite->graph comp Hpin=>xy)\\n  ;; return a list of edges\\n  (define g (weighted-graph/undirected '()))\\n  ;; add vertex\\n  (for ([pin (collect-all-pins comp)])\\n    (add-vertex! g pin))\\n  ;; add pins\\n  (for ([net (Composite->netlist comp)])\\n    (for* ([pin1 (Net-pins net)]\\n           [pin2 (Net-pins net)])\\n      (when (not (equal? pin1 pin2))\\n        (match-let ([(list x1 y1) (hash-ref Hpin=>xy pin1)]\\n                    [(list x2 y2) (hash-ref Hpin=>xy pin2)])\\n          (add-edge! g pin1 pin2 (sqrt (+ (expt (- x1 x2) 2) (expt (- y1 y2) 2))))))))\\n  (get-vertices g)\\n  ;; to run MST outside\\n  ;; (min-st-kruskal g)\\n  g)\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"Composite->graph\":false}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

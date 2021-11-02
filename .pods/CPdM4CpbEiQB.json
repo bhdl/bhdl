@@ -1,0 +1,17 @@
+{
+  "id": "CPdM4CpbEiQB",
+  "parentId": "CPgeDcY8C9kA",
+  "index": 1,
+  "content": "\"function read_nodes(fname)\\n    res = []\\n    open(fname, \\\"r\\\") do io\\n        for line in eachline(io)\\n            line = strip(line)\\n            if startswith(line, \\\"#\\\")\\n                continue\\n            elseif startswith(line, \\\"NumNodes\\\")\\n                # TODO record\\n            elseif startswith(line, \\\"NumTerminals\\\")\\n                # TODO record\\n            else\\n                # match\\n                # m = match(r\\\"(o\\\\d+)\\\\t(\\\\d+)\\\\t(\\\\d+)(\\\\tterminal)?\\\", line)\\n                m = match(r\\\"(X\\\\d+)\\\\s+(\\\\d+(?:\\\\.\\\\d+)?)\\\\s+(\\\\d+(?:\\\\.\\\\d+)?)(\\\\s+terminal)?\\\", line)\\n                \\n                if m != nothing\\n                    id = m.captures[1]\\n                    # seems unimportant\\n                    width = parse(Float32, m.captures[2])\\n                    height = parse(Float32, m.captures[3])\\n                    # seems duplicate with .pl\\n                    terminal = m.captures[4]\\n                    # @show id, x, y, terminal\\n                    push!(res, (id, width, height, terminal))\\n                end\\n            end\\n        end\\n    end\\n    return res\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"read_nodes\":false}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

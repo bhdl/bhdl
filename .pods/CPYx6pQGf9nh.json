@@ -1,0 +1,17 @@
+{
+  "id": "CPYx6pQGf9nh",
+  "parentId": "CPHKPFTgKmQp",
+  "index": 16,
+  "content": "\"(define (fp-usb type)\\n  (case type\\n    [(c-male) fp-usb-c-male]\\n    [(c-female) fp-usb-c-female]\\n    [(a-male) fp-usb-a-male]\\n    [(a-female) fp-usb-a-female]\\n    [(micro-male) fp-usb-micro-male]\\n    [(micro-female) fp-usb-micro-female]\\n    [(mini-male) fp-usb-mini-male]\\n    [(mini-female) fp-usb-mini-female]\\n    [else (error (~a \\\"Unsupported usb type: \\\" type))]))\\n\\n(define fp-usb-c-male\\n  (kicad-helper \\\"Connector_USB.pretty/\\\"\\n                \\\"USB_C_Plug_Molex_105444.kicad_mod\\\"))\\n(define fp-usb-c-female\\n  (kicad-helper \\\"Connector_USB.pretty/\\\"\\n                \\\"USB_C_Receptacle_Palconn_UTC16-G.kicad_mod\\\"))\\n\\n;; FIXME usb3 different?\\n(define fp-usb-a-male\\n  (kicad-helper \\\"Connector_USB.pretty/\\\"\\n                \\\"USB_A_CNCTech_1001-011-01101_Horizontal.kicad_mod\\\"))\\n(define fp-usb-a-female\\n  (kicad-helper \\\"Connector_USB.pretty/\\\"\\n                \\\"USB_A_Molex_105057_Vertical.kicad_mod\\\"))\\n;; FIXME male or female, type and manufacture\\n(define fp-usb-micro-male\\n  (kicad-helper \\\"Connector_USB.pretty/\\\"\\n                \\\"USB_Micro-B_Wuerth_629105150521.kicad_mod\\\"))\\n(define fp-usb-micro-female\\n  (kicad-helper \\\"Connector_USB.pretty/\\\"\\n                \\\"USB_Micro-B_Molex-105017-0001.kicad_mod\\\"))\\n(define fp-usb-mini-male\\n  (kicad-helper \\\"Connector_USB.pretty/\\\"\\n                \\\"USB_Mini-B_Tensility_54-00023_Vertical.kicad_mod\\\"))\\n(define fp-usb-mini-female\\n  (kicad-helper \\\"Connector_USB.pretty/\\\"\\n                \\\"USB_Mini-B_Lumberg_2486_01_Horizontal.kicad_mod\\\"))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-usb\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

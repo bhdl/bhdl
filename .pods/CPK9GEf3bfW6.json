@@ -1,0 +1,17 @@
+{
+  "id": "CPK9GEf3bfW6",
+  "parentId": "CP63Je4zKaFa",
+  "index": 37,
+  "content": "\"(define/IC (WS2812B)\\n  #:FP (fp-WS2812B\\n        VDD DO VSS DI)\\n  #:PREFIX \\\"LED\\\")\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"WS2812B\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

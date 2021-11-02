@@ -1,0 +1,17 @@
+{
+  "id": "CPtAWgJ4FFwV",
+  "parentId": "CP63Je4zKaFa",
+  "index": 10,
+  "content": "\"(define/IC (1N4148W)\\n  #:FP ((lcsc->fp \\\"C466653\\\")\\n        - +)\\n  #:LEFT +\\n  #:RIGHT -\\n           #:ALIAS ([+ anode]\\n                    [- cathode])\\n  #:PREFIX \\\"D\\\")\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": null,
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "null",
+  "exports": "{\"1N4148W\":true}",
+  "midports": "null",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

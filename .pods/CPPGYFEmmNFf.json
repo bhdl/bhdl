@@ -1,0 +1,17 @@
+{
+  "id": "CPPGYFEmmNFf",
+  "parentId": "CP63Je4zKaFa",
+  "index": 33,
+  "content": "\"(define/IC (USB-C-6)\\n  ;; 6pin usb type c\\n  #:ALIAS ([A5 CC1]\\n          [B5 CC2]\\n          [A9 VBUS]\\n          [B9 VBUS]\\n          [A12 GND]\\n          [B12 GND])\\n  #:FP ((lcsc->fp \\\"C456012\\\")\\n        B12 B9 A5 B5 A9 A12 7 7 7 7))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"USB-C-6\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

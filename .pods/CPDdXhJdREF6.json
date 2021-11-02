@@ -1,0 +1,17 @@
+{
+  "id": "CPDdXhJdREF6",
+  "parentId": "CP63Je4zKaFa",
+  "index": 23,
+  "content": "\"(define/IC (ATmega48 ATmega88 ATmega168 ATmega328)\\n  #:datasheet \\\"http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf\\\"\\n  #:ALIAS ((VCC) (AVCC)\\n                (GND) (AREF)\\n\\n                (PB0 PCINT0 CLKO ICP1)\\n                (PB1 OC1A PCINT1)\\n                (PB2 SS OC1B PCINT2)\\n                (PB3 MOSI OC2A PCINT3)\\n                (PB4 MISO PCINT4)\\n                (PB5 SCK PCINT5)\\n                (PB6 PCINT6 XTAL1 TOSC1)\\n                (PB7 PCINT7 XTAL2 TOSC2)\\n\\n                (PC0 ADC0 PCINT8)\\n                (PC1 ADC1 PCINT9)\\n                (PC2 ADC2 PCINT10)\\n                (PC3 ADC3 PCINT11)\\n                (PC4 ADC4 SDA PCINT12)\\n                (PC5 ADC5 SCL PCINT13)\\n                (PC6 PCINT14 RESET)\\n\\n                (PD0 PCINT16 RXD)\\n                (PD1 PCINT17 TXD)\\n                (PD2 PCINT18 INT0)\\n                (PD3 PCINT19 OC2B INT1)\\n                (PD4 PCINT20 XCK T0)\\n                (PD5 PCINT1 OC0B T1)\\n                (PD6 PCINT22 OC0A AIN0)\\n                (PD7 PCINT23 AIN1))\\n  #:DIP (28 PC6 PD0 PD1 PD2 PD3 PD4 VCC GND PB6 PB7 PD5 PD6 PD7 PB0\\n            PB1 PB2 PB3 PB4 PB5 AVCC AREF GND PC0 PC1 PC2 PC3 PC4 PC5)\\n  #:QFN (28 PD3 PD4 VCC GND PB6 PB7 PD5\\n            PD6 PD7 PB0 PB1 PB2 PB3 PB4\\n            PB5 AVCC AREF GND PC0 PC1 PC2\\n            PC3 PC4 PC5 PC6 PD0 PD1 PD2)\\n  #:QFN (32 PD3 PD4 GND VCC GND VCC PB6 PB7\\n            PD5 PD6 PD7 PB0 PB1 PB2 PB3 PB4\\n            PB5 AVCC ADC6 AREF GND ADC7 PC0 PC1\\n            PC2 PC3 PC4 PC5 PC6 PD0 PD1 PD2))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"ATmega48\":true,\"ATmega88\":true,\"ATmega168\":true,\"ATmega328\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPWM8CC6Lea7",
+  "parentId": "CPQU4nPmdVqN",
+  "index": 8,
+  "content": "\"\\n(define-syntax (make-circuit stx)\\n  (syntax-parse \\n    stx\\n    [(_ (~alt\\n          (~optional (~seq #:external-pins (ext-pin ...))\\n                     #:defaults ([(ext-pin 1) null]))\\n          (~optional (~seq #:layout p-name))\\n          (~optional (~seq #:where where-clause)\\n                     #:defaults ([where-clause #'()]))\\n          (~seq #:vars (var-clause ...))\\n          (~seq #:connect connect-clause)) ...)\\n     #`(let ([self-obj (create-simple-Composite ext-pin ...)])\\n         (syntax-parameterize \\n           ([self (make-rename-transformer #'self-obj)])\\n           (match-let* (var-clause ... ...)\\n             #,(if (attribute p-name)\\n                 #'(set-Composite-pict! \\n                     self-obj \\n                     (maybe-atom->pict p-name))\\n                   #'(void))\\n               ;; do the connections\\n               (set-Composite-nets!\\n                 self-obj\\n                 (apply append \\n                   (map Composite-nets\\n                     (flatten \\n                       (list connect-clause ...)))))\\n               self-obj)))]))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"make-circuit\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

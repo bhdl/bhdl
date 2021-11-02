@@ -1,0 +1,17 @@
+{
+  "id": "CPiqPgMCKB8P",
+  "parentId": "CPrmYHr6Ux6K",
+  "index": 1,
+  "content": "\"(define (start-placement-engine [port 8082] [use-gpu #t])\\n  \\\"Launch placement engine on port. If already running, do nothing.\\\"\\n  ;; check the engine running.\\n  ;; TOOD whether the engine should be shalled for other processes? Looks like yes, because we are using a port\\n  ;; TODO whether to launch different engines on different port?\\n  ;; TODO choose to use GPU or not\\n  ;; TODO this will be launched asynchronizely, and I need a way to monitor the output. This output is probably better shown in a separate window.\\n  (when (not (get-8082-processid))\\n         ;; TODO change directory temporarily\\n      (debug \\\"Instantiating the julia project packages ..\\\")\\n      (shell \\\"cd ~/bhdl/placement && julia --project -e 'import Pkg; Pkg.instantiate(); Pkg.precompile();'\\\")\\n      (debug \\\"Starting the placement engine asynchronizely ..\\\")\\n    ;;         (list stdout stdin id stderr func)\\n             ;; TODO how to redirect the stdout to a file?\\n        (the-placement-process (process \\\"cd ~/bhdl/placement && julia --project main.jl > ~/bhdl/output.txt 2>&1\\\"))\\n            ;; I actually wanted to wait a little bit until the process is listening on that port\\n            (wait-for-8082)\\n      ))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"start-placement-engine\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

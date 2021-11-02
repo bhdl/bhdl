@@ -1,0 +1,17 @@
+{
+  "id": "CPgmdGAgwyHJ",
+  "parentId": "CPckUrdGFJME",
+  "index": 31,
+  "content": "\"(define (collect-all-atoms-random comp)\\n  \\\"Thsi version does not have a deterministic order.\\\"\\n  (set->list\\n   (list->set\\n    (apply append (for/list ([net (Composite->netlist-1 comp)])\\n                    (for/list ([pin (Net-pins net)])\\n                      (Pin-parent pin)))))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"collect-all-atoms-random\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

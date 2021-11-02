@@ -1,0 +1,17 @@
+{
+  "id": "CP3qQp4HQUGq",
+  "parentId": "CPrmYHr6Ux6K",
+  "index": 4,
+  "content": "\"(define (wait-for-8082)\\n  (for ([i (in-naturals)]\\n      #:break (get-8082-processid))\\n     (displayln (~a \\\"The TCP port is still \\\" (get-8082-processid) \\\", wainting for 1 sec ..\\\"))\\n;;      (flush-output)\\n     (sleep 1))\\n  (display (~a \\\"TCP port ready: \\\" (get-8082-processid))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPd6NrTxNCRV",
+  "parentId": "CP9hPyBA9z8P",
+  "index": 6,
+  "content": "\"(begin-for-syntax\\n  (define-splicing-syntax-class pipe\\n    (pattern (~seq #:> func)\\n             #:with func1 #`func)\\n    (pattern (~seq #:.> func)\\n             ;; #:with func1 #`(λ (x . rst) (apply map func x rst))\\n             #:with func1 #`(λ (x . rst) (map-recur func (cons x rst) #:num 1)))\\n    (pattern (~seq #:..> func)\\n             #:with func1 #`(λ (x . rst) (map-recur func (cons x rst) #:num 2)))\\n    (pattern (~seq #:...> func)\\n             #:with func1 #`(λ (x . rst) (map-recur func (cons x rst) #:num 3)))\\n    (pattern (~seq #:.*> func)\\n             #:with func1 #`(λ (x . rst) (map-recur func (cons x rst)))))\\n  (define-splicing-syntax-class expr-until-pipe\\n    (pattern (~seq e:expr ... func:pipe)\\n             #:with func1 #'func.func1)))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

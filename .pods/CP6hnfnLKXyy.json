@@ -1,0 +1,17 @@
+{
+  "id": "CP6hnfnLKXyy",
+  "parentId": "CP63Je4zKaFa",
+  "index": 47,
+  "content": "\"(define/IC (Arduino-MKR)\\n  #:ALIAS ([MOSI D8]\\n          [MISO D10]\\n          [SCK D9]\\n          [SDA D11]\\n          [SCL D12])\\n  #:FP ((fp-Arduino 'MKR)\\n        AREF A0 A1 A2 A3 A4 A5 A6 \\n        D0 D1 D2 D3 D4 D5\\n        \\n        ;; 28-15 is reverse in kicad\\n        5V VIN 3V3 GND RESET D14 D13 D12 D11 D10 D9 D8 D7 D6\\n        \\n;;         AREF A0 A1 A2 A3 A4 A5 A6 D0\\n;;         D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12\\n;;         D13 D14 RESET GND 3V3 VIN 5V\\n        ))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"Arduino-MKR\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

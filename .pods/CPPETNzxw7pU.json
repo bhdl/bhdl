@@ -1,0 +1,17 @@
+{
+  "id": "CPPETNzxw7pU",
+  "parentId": "CPNKtDWP37zK",
+  "index": 12,
+  "content": "\"(define (uuid->fp uuid)\\n  \\\"Cached version of getting easyeda file.\\\"\\n  ;; 1. check cache to see if uuid already built\\n  ;; 2. check if we have record of which file the uuid is from\\n  ;; 1. get fname from uuid\\n  ;; 2. if fname exist locally, directly\\n  ;;\\n  ;; https://easyeda.com/api/components/3e67c3e3b97b4ff38f0c80567ed48498\\n  (let ([fname (build-path (bhdl-footprints-path) \\\"easyeda\\\" (~a uuid \\\".json\\\"))])\\n    (when \\n      (not (file-exists? fname))\\n      (let* ([url (~a \\\"https://easyeda.com/api/components/\\\" uuid)]\\n             [_ (displayln (~a \\\"requesting \\\" url \\\" ..\\\"))]\\n             [obj (call/input-url \\n                    (string->url url)\\n                    get-pure-port\\n                    (lambda (in)\\n                      (let ([j (read-json in)])\\n                        (or (hash-ref-ref-noerr \\n                              j\\n                              'result\\n                              ;; FIXME seems to be inconsistent, some json doesn't have this\\n                              'packageDetail\\n                              'dataStr)\\n                            (hash-ref-ref \\n                              j 'result \\n                              'dataStr)))))])\\n            (call-with-output-file\\n              fname\\n              (lambda (out) (write-json obj out)))\\n            (debug \\\"Saved to\\\" fname)\\n            ;; TODO pretty print using python\\n            ;; (system (~a \\\"python -m json.tool \\\" fname))\\n            ))\\n    ;; at this point, the file should appear locally\\n    (read-easyeda fname)))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"uuid->fp\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

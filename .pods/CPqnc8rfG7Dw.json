@@ -1,0 +1,17 @@
+{
+  "id": "CPqnc8rfG7Dw",
+  "parentId": "CPadywggP7TT",
+  "index": 8,
+  "content": "\"(define (download-footprints)\\n  (let ([dir (bhdl-footprints-path)])\\n    (when (not (directory-exists? dir))\\n      (displayln (~a \\\"Downloading footprints to \\\" dir))\\n      (parameterize \\n        ([current-directory (build-path dir \\\"..\\\")])\\n        (system (~a \\\"git clone --recursive \\\"\\n                    \\\"https://github.com/lihebi/bhdl-footprints \\\"\\n                    ))))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"download-footprints\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

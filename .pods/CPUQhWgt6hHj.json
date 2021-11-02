@@ -1,0 +1,17 @@
+{
+  "id": "CPUQhWgt6hHj",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 2,
+  "content": "\"function sumexp(x, γ)\\n    aP = exp.((x .- maximum(x)) / γ)\\n    aN = exp.(- (x .- minimum(x)) / γ)\\n    sum(x .* aP) / sum(aP) - sum(x .* aN) / sum(aN)\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPP8L3CBU3a7",
+  "parentId": "CP63Je4zKaFa",
+  "index": 38,
+  "content": "\"(define/IC (SKRPACE010)\\n  #:FP ((lcsc->fp \\\"C139797\\\")\\n        ;; 1 2\\n        A1 A2\\n        ;; 3 4\\n        B1 B2)\\n  #:PREFIX \\\"KEY\\\"\\n  #:LEFT A1\\n  #:RIGHT B1)\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": null,
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "null",
+  "exports": "{\"SKRPACE010\":true}",
+  "midports": "null",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

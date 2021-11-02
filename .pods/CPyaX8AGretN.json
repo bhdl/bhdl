@@ -1,0 +1,17 @@
+{
+  "id": "CPyaX8AGretN",
+  "parentId": "CPnGUxmGW6Tz",
+  "index": 2,
+  "content": "\"(define (footprint->gerber-section fp select-ap-func (dx 0) (dy 0))\\n  ;; FIXME assuming line always comes first\\n  (let ([body-line (for/list ([line (footprint-lines fp)])\\n                     (let ([w (line-spec-width line)]\\n                           [x1 (line-spec-x1 line)]\\n                           [y1 (line-spec-y1 line)]\\n                           [x2 (line-spec-x2 line)]\\n                           [y2 (line-spec-y2 line)])\\n                       (string-append\\n                        (select-ap-func (~a \\\"R,\\\" w \\\"X\\\" w))\\n                        (gerber-format-xy (+ x1 dx) (+ y1 dy)) \\\"D02*\\\" \\\"\\\\n\\\"\\n                        (gerber-format-xy (+ x2 dx) (+ y2 dy)) \\\"D01*\\\")))]\\n        [body-pad (for/list ([pad (append (footprint-pads fp)\\n                                          ;; TODO flash the holes separately?\\n                                          (or (footprint-holes fp) '()))])\\n                    (let* ([size (pad-spec-size pad)]\\n                           [shape (pad-spec-shape pad)]\\n                           [s1 (first size)]\\n                           [s2 (second size)]\\n                           [x (pad-spec-x pad)]\\n                           [y (pad-spec-y pad)])\\n                      (string-append\\n                       (select-ap-func\\n                        (case shape\\n                          [(rect) (~a \\\"R,\\\" s1 \\\"X\\\" s2)]\\n                              ;; FIXME ellipse\\n                          [(oval ellipse) (~a \\\"O,\\\" s1 \\\"X\\\" s2)]\\n                          ;; TODO roundrect\\n                          [(roundrect) (~a \\\"R,\\\" s1 \\\"X\\\" s2)]\\n                          ;; TODO circle\\n                          [(circle) (~a \\\"O,\\\" s1 \\\"X\\\" s2)]\\n                          [else (error (format \\\"invalid shape: ~a\\\" shape))]))\\n                       (gerber-format-xy (+ x dx) (+ y dy)) \\\"D03*\\\")))])\\n    (string-join (append body-line body-pad) \\\"\\\\n\\\")))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"footprint->gerber-section\":false}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

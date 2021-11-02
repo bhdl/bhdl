@@ -1,0 +1,17 @@
+{
+  "id": "CPHirpbLNtXr",
+  "parentId": "CPdEhDa4hc4h",
+  "index": 7,
+  "content": "\"function W_grad_x(nets, x, xory)\\n    # batched by default\\n    # f = e->We_grad_x(e,x,xory)\\n    # res = spzeros(length(x))\\n    tmp = Array{Any}(nothing, length(nets))\\n\\n    # export JULIA_NUM_THREADS=4\\n    #\\n    # Threads.@threads\\n    for i in 1:length(nets)\\n        # tmp[i] = f(nets[i])\\n        tmp[i] = We_grad_x(nets[i], x, xory)\\n    end\\n    sum(tmp)\\nend\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

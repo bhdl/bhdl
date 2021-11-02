@@ -1,0 +1,17 @@
+{
+  "id": "CPRbmVbttqMA",
+  "parentId": "CP63Je4zKaFa",
+  "index": 42,
+  "content": "\"(define/IC (Arduino-Uno-ICSP)\\n  ;; FIXME the names of pads are different!\\n           #:ALIAS ([D18 SDA]\\n                    [D19 SCL]\\n                    [D13 SCK]\\n                    [D12 MISO]\\n                    [D11 MOSI]\\n                    [D10 SS])\\n  #:FP ((fp-Arduino 'Uno-ICSP)\\n        3V3\\n        ;; FIXME are they the same? 5V VCC VIN\\n        5V VCC\\n        A0 A1 A2 A3 A4 A5 AREF\\n        D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13\\n        GND GND GND GND\\n        ;; FIXME is this AREF?\\n        IOREF\\n        MISO MOSI\\n        NC RESET RESET\\n        RX SCK SCL SDA TX VIN))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"Arduino-Uno-ICSP\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

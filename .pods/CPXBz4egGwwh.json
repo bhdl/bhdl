@@ -1,0 +1,17 @@
+{
+  "id": "CPXBz4egGwwh",
+  "parentId": "CPQU4nPmdVqN",
+  "index": 19,
+  "content": "\"(define-syntax-rule (net a ...)\\n  (*- a ...))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"net\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

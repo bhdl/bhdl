@@ -1,0 +1,17 @@
+{
+  "id": "CPREGmWWd3Yr",
+  "parentId": "CPrmYHr6Ux6K",
+  "index": 5,
+  "content": "\"(define (stop-placement-engine)\\n  \\\"Close placement engine.\\\"\\n  ;; TODO I would also run a ps -ef | grep .. or a lsof of 8022 for any existing process\\n;;   (when (the-placement-process)\\n;;         ((list-ref (the-placement-process) 4) 'kill)\\n;;         (the-placement-process #f))\\n  ;; actually stop the process on 8082\\n  (stop-8082-process))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"stop-placement-engine\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

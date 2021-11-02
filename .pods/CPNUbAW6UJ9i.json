@@ -1,0 +1,17 @@
+{
+  "id": "CPNUbAW6UJ9i",
+  "parentId": "CPNKtDWP37zK",
+  "index": 13,
+  "content": "\"(define fp-kailh-socket-easyeda\\n  (uuid->fp \\\"bd8c6c64dc7b4d18806bb8859f9f2606\\\"))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"fp-kailh-socket-easyeda\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPyQTKar4DEN",
+  "parentId": "CPNKtDWP37zK",
+  "index": 9,
+  "content": "\"(define lcsc2uuid #f)\\n(define lcsc2uuid-json (build-path\\n                        (bhdl-footprints-path)\\n                        \\\"easyeda\\\" \\\"lcsc2uuid.json\\\"))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

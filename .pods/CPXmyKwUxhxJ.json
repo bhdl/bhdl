@@ -1,0 +1,17 @@
+{
+  "id": "CPXmyKwUxhxJ",
+  "parentId": "CP6KwDyj8wHg",
+  "index": 7,
+  "content": "\"(define (pict-path-element=? a b)\\n  (or (eq? a b)\\n      (if (converted-pict? a)\\n          (if (converted-pict? b)\\n              (eq? (converted-pict-parent a) (converted-pict-parent b))\\n              (eq? (converted-pict-parent a) b))\\n          (if (converted-pict? b)\\n              (eq? (converted-pict-parent b) a)\\n              #f))))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

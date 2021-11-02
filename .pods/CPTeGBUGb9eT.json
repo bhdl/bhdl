@@ -1,0 +1,17 @@
+{
+  "id": "CPTeGBUGb9eT",
+  "parentId": "CPN8XE37ddzD",
+  "index": 3,
+  "content": "\"(define-syntax (wrap-*-append stx)\\n  (syntax-parse\\n    stx\\n    [(_ name)\\n    (with-syntax \\n      ([pict:name (datum->syntax\\n                    stx\\n                    (string->symbol\\n                      (string-append\\n                        \\\"pict:\\\"\\n                        (symbol->string\\n                          (syntax->datum #'name)))))])\\n      #'(define (name sep . args)\\n          ;; prefix\\n          (apply pict:name\\n            (append\\n              ;; sep\\n              (if (number? sep)\\n                (list sep)\\n                (list (default-append-spacing)\\n                  (maybe-atom->pict sep)))\\n              (map maybe-atom->pict args)))))]))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": null,
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "null",
+  "exports": "null",
+  "midports": "null",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "CPUrUMgiiCih",
+  "parentId": "CPadywggP7TT",
+  "index": 10,
+  "content": "\"\\n(define (merge-fp fp1 fp2)\\n  (match-let ([(footprint lines1 pads1 texts1 holes1) fp1]\\n              [(footprint lines2 pads2 texts2 holes2) fp2])\\n             (footprint (append lines1 lines2)\\n                        (append pads1 pads2)\\n                        ;; actually I'm using the first texts\\n                        (append texts1 texts2)\\n                        (append holes1 holes2))))\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"merge-fp\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

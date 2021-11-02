@@ -1,0 +1,17 @@
+{
+  "id": "CP7x4tcU3hf4",
+  "parentId": "CPgeDcY8C9kA",
+  "index": 4,
+  "content": "\"function read_bench(folder, name)\\n    # http://www.ispd.cc/contests/05/ispd05-contest/announcement-jan-12.pdf\\n    # find\\n    @info \\\"reading nodes ..\\\"\\n    nodes = read_nodes(joinpath(folder, \\\"$name.nodes\\\"))\\n    @info \\\"reading nets ..\\\"\\n    nets = read_nets(joinpath(folder, \\\"$name.nets\\\"))\\n    @info \\\"reading pos ..\\\"\\n    pos = read_pos(joinpath(folder, \\\"$name.pl\\\"))\\n    # # FIXME there may not be solution\\n    # sol_pos = read_pos(joinpath(folder, \\\"$name.ntup.pl\\\"))\\n    # # change to x,y,w,h\\n    # dream_pos = read_pos(\\\"/home/hebi/data/VLSI-benchmarks/DREAMPlace/install/results/adaptec1/adaptec1.gp.pl\\\")\\n\\n    # FIXME sort?\\n    # FIXME assert names are in order\\n    @info \\\"manipulating ..\\\"\\n    name = [n[1] for n in nodes]\\n    name1 = [p[1] for p in pos]\\n    name == name1 || error(\\\"name order mismatch: $name vs. $name1\\\")\\n    # FIXME name starts from \\\"0\\\", but that doesn't really matter\\n    name_dict = Dict(Pair.(name, 1:length(name)))\\n    x = [p[2] for p in pos]\\n    y = [p[3] for p in pos]\\n    # fixed macros\\n    mask = [if isnothing(p[4]) 1 else 0 end for p in pos]\\n    mask_offx = [if isnothing(p[4]) 0 else p[2] end for p in pos]\\n    mask_offy = [if isnothing(p[4]) 0 else p[3] end for p in pos]\\n    # solution\\n    # solx = [p[2] for p in sol_pos]\\n    # soly = [p[3] for p in sol_pos]\\n    # dream_solx = [p[2] for p in dream_pos]\\n    # dream_soly = [p[3] for p in dream_pos]\\n    \\n    # w, h\\n    w = [n[2] for n in nodes]\\n    h = [n[3] for n in nodes]\\n    # nets\\n    E = [[name_dict[n[1]] for n in net[2:end]] for net in nets]\\n    # return x,y,w,h,E,solx,soly,mask,mask_offx,mask_offy, dream_solx, dream_soly\\n    return x,y,w,h,E,mask\\nend\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "julia",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"read_bench\":false}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

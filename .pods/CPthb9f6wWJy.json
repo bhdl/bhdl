@@ -1,0 +1,17 @@
+{
+  "id": "CPthb9f6wWJy",
+  "parentId": "CPKCKwcMXwfd",
+  "index": 1,
+  "content": "\"(struct IC\\n  ;; this tells nothing about the fields. I really need type\\n  (name prefix datasheet alts fps left right)\\n  #:prefab)\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"struct IC\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}

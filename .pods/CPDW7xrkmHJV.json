@@ -1,0 +1,17 @@
+{
+  "id": "CPDW7xrkmHJV",
+  "parentId": "CPWtgTBEDKJd",
+  "index": 3,
+  "content": "\"(define (annotate-atoms atoms)\\n  \\\"Return hash table from (atom . 1-based-index)\\\"\\n  ;; annotate cells and macros\\n  ;; I actually only need to annotate atoms, and I can create one macro for each atom\\n  (for/hash ([atom atoms]\\n             [i (in-naturals)])\\n    (values atom (add1 i))))\\n\"",
+  "column": 1,
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": "",
+  "lang": "racket",
+  "type": "CODE",
+  "imports": "{}",
+  "exports": "{\"annotate-atoms\":true}",
+  "midports": "{}",
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+}
