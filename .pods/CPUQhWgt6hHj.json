@@ -1,7 +1,7 @@
 {
   "id": "CPUQhWgt6hHj",
   "parentId": "CPdEhDa4hc4h",
-  "index": 2,
+  "index": 4,
   "content": "\"function sumexp(x, γ)\\n    aP = exp.((x .- maximum(x)) / γ)\\n    aN = exp.(- (x .- minimum(x)) / γ)\\n    sum(x .* aP) / sum(aP) - sum(x .* aN) / sum(aN)\\nend\"",
   "column": 1,
   "fold": false,

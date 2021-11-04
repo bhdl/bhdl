@@ -1,7 +1,7 @@
 {
   "id": "CPm4reAKC3Ex",
   "parentId": "CPdEhDa4hc4h",
-  "index": 4,
+  "index": 6,
   "content": "\"function W(nets, xs, ys)\\n    f = (e)->We(e, xs, ys)\\n    sum(f.(nets))\\nend\"",
   "column": 1,
   "fold": false,

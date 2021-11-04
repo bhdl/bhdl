@@ -1,7 +1,7 @@
 {
   "id": "CPtENBTFtThF",
   "parentId": "CPdEhDa4hc4h",
-  "index": 12,
+  "index": 14,
   "content": "\"function density(vs, R)\\n    # vs = xs, ys, ws, hs\\n    xs, ys, ws, hs = gpu.(vs)\\n    # 1. calculate rho\\n    @debug \\\"calculating rho ..\\\"\\n    # rho = rho_all(vs, R)\\n    # rho = rho_fast(vs, R)\\n#     @time\\n    rho = rho_fast((xs, ys, ws, hs), R);\\n    # 2. calculate potential and field using FFT\\n    @debug \\\"calculating potential and field ..\\\"\\n#     @time \\n    phi, Ephix, Ephiy = phi_b(rho, R);\\n    # calculate for each v\\n\\n    # M,M,N\\n#     @time \\n    rrr = rho_cells((xs, ys, ws, hs), R);\\n    d = dropdims(sum(rrr .* gpu(phi), dims=(1,2)), dims=(1,2))\\n    dx = dropdims(sum(rrr .* gpu(Ephix), dims=(1,2)), dims=(1,2))\\n    dy = dropdims(sum(rrr .* gpu(Ephiy), dims=(1,2)), dims=(1,2))\\n    return d, dx, dy\\nend\"",
   "column": 1,
   "fold": false,

@@ -1,7 +1,7 @@
 {
   "id": "CPYnP7CEEFjw",
   "parentId": "CPdEhDa4hc4h",
-  "index": 26,
+  "index": 28,
   "content": "\"function compute_conflicts(xs, ys, as, ws, hs, mask, R)\\n    # conflicted items\\n    items = []\\n    for i in 1:length(xs)\\n        # TODO if the i-th item is fixed, then, skip it.\\n        if mask[i] == 0 continue end\\n        c = cost_f(xs, ys, as, ws, hs,\\n                   xs[i], ys[i], as[i], ws[i], hs[i],\\n                   R, except=[i])\\n        if c > 0\\n            append!(items, i)\\n        end\\n    end\\n    return items\\nend\"",
   "column": 1,
   "fold": false,

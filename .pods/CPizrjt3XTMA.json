@@ -1,8 +1,8 @@
 {
   "id": "CPizrjt3XTMA",
   "parentId": "CPdf6Vq6d4Pw",
-  "index": 7,
-  "content": "\"jstr = open(f->read(f, String), \\\"spec.json\\\")\\nnothing\"",
+  "index": 8,
+  "content": "\"# jstr = open(f->read(f, String), \\\"spec.json\\\")\\nnothing\"",
   "column": 1,
   "fold": false,
   "thundar": false,

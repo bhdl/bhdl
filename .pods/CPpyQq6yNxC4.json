@@ -1,7 +1,7 @@
 {
   "id": "CPpyQq6yNxC4",
   "parentId": "CPdEhDa4hc4h",
-  "index": 21,
+  "index": 23,
   "content": "\"function cost_f(xs, ys, as, ws, hs, x, y, a, w, h, R; except=[])\\n    # scale everything down\\n    #\\n    # UPDATE I don't need to scale it anymore due to use of Clipper\\n    l1, l2, l3, l4 = four_corners(x, y, a, w, h)\\n\\n    # check for all the other rectangles\\n    ct = 0\\n    for i in 1:length(xs)\\n        if i in except continue end\\n        m1, m2, m3, m4 = four_corners(xs[i], ys[i], as[i], ws[i], hs[i])\\n        if isoverlap([l1, l2, l3, l4],\\n                     [m1, m2, m3, m4])\\n            ct += 1\\n        end\\n    end\\n    return ct\\nend\"",
   "column": 1,
   "fold": false,

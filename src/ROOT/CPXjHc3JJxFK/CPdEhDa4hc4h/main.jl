@@ -6,9 +6,25 @@ using Statistics: mean
 # import Plots
 import CUDA: cu, allowscalar
 allowscalar(false)
-using Flux: gpu, cpu
+# using Flux: gpu, cpu
 
 using ProgressMeter
+
+import CUDA
+CUDA.has_cuda()
+# CUDA.version()
+# CUDA.versioninfo()
+
+if CUDA.has_cuda()
+    gpu(x) = CUDA.cu(x)
+else
+    gpu(x) = x
+end
+cpu(x) = Array(x)
+
+# cpu(x) = Array(x)
+# gpu(x) = CUDA.cu(x)
+# gpu(x) = x
 
 γ = 0.5
 

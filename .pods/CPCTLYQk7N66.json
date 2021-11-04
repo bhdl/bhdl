@@ -2,7 +2,7 @@
   "id": "CPCTLYQk7N66",
   "parentId": "CPdEhDa4hc4h",
   "index": 0,
-  "content": "\"import FFTW\\nusing SparseArrays: sparse, spzeros\\nimport ForwardDiff\\nimport Zygote\\nusing Statistics: mean\\n# import Plots\\nimport CUDA: cu, allowscalar\\nallowscalar(false)\\nusing Flux: gpu, cpu\\n\\nusing ProgressMeter\"",
+  "content": "\"import FFTW\\nusing SparseArrays: sparse, spzeros\\nimport ForwardDiff\\nimport Zygote\\nusing Statistics: mean\\n# import Plots\\nimport CUDA: cu, allowscalar\\nallowscalar(false)\\n# using Flux: gpu, cpu\\n\\nusing ProgressMeter\"",
   "column": 1,
   "fold": false,
   "thundar": false,

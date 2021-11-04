@@ -1,7 +1,7 @@
 {
   "id": "CPn6D3nHQm8W",
   "parentId": "CPdEhDa4hc4h",
-  "index": 5,
+  "index": 7,
   "content": "\"function We_grad_x_impl(x)\\n    aP = exp.((x .- maximum(x)) / γ)\\n    aN = exp.(- (x .- minimum(x)) / γ)\\n    bP = sum(aP)\\n    bN = sum(aN)\\n    cP = sum(x .* aP)\\n    cN = sum(x .* aN)\\n    res = (1 .+ x / γ) * bP .- 1/γ * cP\\n    res2 = (1 .- x / γ) * bN .+ 1 / γ * cN\\n    return res / (bP ^ 2) .* aP .- res2 / (bN .^ 2) .* aN\\nend\"",
   "column": 1,
   "fold": false,

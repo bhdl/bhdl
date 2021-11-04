@@ -1,7 +1,7 @@
 {
   "id": "CPeYPBNqH9WU",
   "parentId": "CPdEhDa4hc4h",
-  "index": 16,
+  "index": 18,
   "content": "\"function display_plot(p)\\n    path = tempname() * \\\".png\\\"\\n    Plots.savefig(p, path)\\n    println(\\\"$(path)\\\")\\n    println(\\\"#<Image: $(path)>\\\")\\nend\"",
   "column": 1,
   "fold": false,

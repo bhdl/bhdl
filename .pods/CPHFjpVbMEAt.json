@@ -1,7 +1,7 @@
 {
   "id": "CPHFjpVbMEAt",
   "parentId": "CPdEhDa4hc4h",
-  "index": 23,
+  "index": 25,
   "content": "\"function four_corners(x, y, a, w, h)\\n    r = sqrt((h/2)^2 + (w/2)^2)\\n    return map([h/2, h/2, -h/2, -h/2],\\n               [w/2, -w/2, -w/2, w/2]) do Δh, Δw\\n                   # 1. compute theta\\n                   θ = atan(Δh, Δw)\\n                   x1 = x - cos(θ + a) * r\\n                   y1 = y + sin(θ + a) * r\\n                   (x1, y1)\\n               end\\nend\"",
   "column": 1,
   "fold": false,

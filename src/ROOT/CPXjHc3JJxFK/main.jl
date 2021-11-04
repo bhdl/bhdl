@@ -20,9 +20,9 @@ function web_server()
         jstr = String(payload)
 
         # DEBUG write for future de use
-        open("spec.json", "w") do io
-           write(io, jstr)
-       end
+        #open("spec.json", "w") do io
+        #   write(io, jstr)
+        #end
 
         jobj = JSON.parse(jstr)
         xs, ys, as, ws, hs, Es, mask, diearea, params = decode_place_spec(jobj)

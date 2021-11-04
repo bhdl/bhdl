@@ -1,7 +1,7 @@
 {
   "id": "CPaFCwJGxbJL",
   "parentId": "CPdEhDa4hc4h",
-  "index": 22,
+  "index": 24,
   "content": "\"function four_corners(x, y, w, h)\\n    # compute the 4 corners of the rectangle\\n    l1 = (x - w/2, y - h/2)\\n    l2 = (x + w/2, y - h/2)\\n    l3 = (x + w/2, y + h/2)\\n    l4 = (x - w/2, y + h/2)\\n    return l1, l2, l3, l4\\nend\"",
   "column": 1,
   "fold": false,

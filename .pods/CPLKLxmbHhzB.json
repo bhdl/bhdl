@@ -1,7 +1,7 @@
 {
   "id": "CPLKLxmbHhzB",
   "parentId": "CPdEhDa4hc4h",
-  "index": 10,
+  "index": 12,
   "content": "\"function rho_fast(vs, R)\\n    xs, ys, ws, hs = vs\\n    # OK, I need to use batch\\n    pxs = reshape(xs, 1, 1, length(xs))\\n    pys = reshape(ys, 1, 1, length(ys))\\n    pws = reshape(ws, 1, 1, length(ws))\\n    phs = reshape(hs, 1, 1, length(hs))\\n    # FIXME whether to use GPU or not for small scale\\n    res = rho_v_many(pxs, pys, pws, phs,\\n                     R.bx1s, R.by1s, R.bx2s, R.by2s)\\n    dropdims(res, dims=3) |> cpu\\nend\"",
   "column": 1,
   "fold": false,

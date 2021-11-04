@@ -1,8 +1,8 @@
 {
-  "id": "CPGNezLiaRLm",
+  "id": "CPQm7PgahfFA",
   "parentId": "CPdEhDa4hc4h",
-  "index": 27,
-  "content": "\"function temperature(step)\\n    1 / log(step)\\nend\"",
+  "index": 1,
+  "content": "\"import CUDA\\nCUDA.has_cuda()\\n# CUDA.version()\\n# CUDA.versioninfo()\\n\\nif CUDA.has_cuda()\\n    gpu(x) = CUDA.cu(x)\\nelse\\n    gpu(x) = x\\nend\\ncpu(x) = Array(x)\"",
   "column": 1,
   "fold": false,
   "thundar": false,

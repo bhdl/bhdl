@@ -1,8 +1,8 @@
 {
-  "id": "CPGNezLiaRLm",
-  "parentId": "CPdEhDa4hc4h",
-  "index": 27,
-  "content": "\"function temperature(step)\\n    1 / log(step)\\nend\"",
+  "id": "CPQwY7xVVadx",
+  "parentId": "CPdf6Vq6d4Pw",
+  "index": 0,
+  "content": "\"import Random\\nusing HTTP\\nimport JSON\"",
   "column": 1,
   "fold": false,
   "thundar": false,
