@@ -1,8 +1,8 @@
 {
   "id": "CPMTrYnaJiTN",
   "parentId": "CPPVAQ3PqWjt",
-  "index": 0,
-  "content": "\"import Pkg\\nPkg.add(\\\"Luxor\\\")\\nPkg.add(\\\"ProgressMeter\\\")\\nPkg.add(\\\"JSON\\\")\\nPkg.add(\\\"FFTW\\\")\\nPkg.add(\\\"HTTP\\\")\\nPkg.add(\\\"ForwardDiff\\\")\"",
+  "index": 1,
+  "content": "\"import Pkg\\nPkg.add(\\\"Luxor\\\")\\nPkg.add(\\\"Clipper\\\")\\nPkg.add(\\\"ProgressMeter\\\")\\nPkg.add(\\\"JSON\\\")\\nPkg.add(\\\"FFTW\\\")\\nPkg.add(\\\"HTTP\\\")\\nPkg.add(\\\"ForwardDiff\\\")\"",
   "column": 1,
   "fold": false,
   "thundar": false,

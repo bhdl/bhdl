@@ -38,8 +38,6 @@ Resistor
   ;  (layout)
    ))
 
-(begin)
-
 ; Atom
 CODEPOD-link
 
@@ -93,9 +91,6 @@ Composite->place-spec
                    #:connect (*= (self (MISO VCC SCK MOSI RESET GND))
                                  (h [1 2 3 4 5 6]))
                    #:layout h))
-
-(Atom-pinhash (PinHeader2 3))
-; (pin-ref (PinHeader2 3) 4)
 
 (icsp-header)
 
@@ -159,9 +154,31 @@ Composite->place-spec
 ;; "http://localhost:8082"
 (placer-url)
 
+(placer-url "http://cpkernel_codepod_aaa_aaa_BHDL_julia:8082")
+
 (placer-url "http://bhdl-place:8082")
 
+
+
 (show-layout mcu-board)
+
+(require json)
+(define (save-for-placement2 specs fname)
+  (let ([tmp (make-temporary-file)])
+    (call-with-output-file tmp
+      (λ (out)
+        (write-bytes
+         (jsexpr->bytes specs)
+         out))
+      ;; make-temporary-file creates the file
+      #:exists 'replace)
+    (CODEPOD-link tmp
+    )))
+
+;; generate place.json
+(save-for-placement2 (Composite->place-spec mcu-board) "")
+
+
 
 (parameterize ([current-directory "./out/demo-board/mcu-board"]
                [padding-general 2])

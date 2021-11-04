@@ -4,7 +4,7 @@
   "index": 1,
   "content": "null",
   "column": 1,
-  "fold": false,
+  "fold": true,
   "thundar": false,
   "utility": false,
   "name": "library",

@@ -1,10 +1,14 @@
 import Random
 using HTTP
+import JSON
+
+place
+simulated_annealing_legalization
 
 function web_server()
     @info "Listening on localhost:8082 .."
     # FIXME 8081 seems to be used by jupyterhub, I'm thus using 8082
-    HTTP.serve(HTTP.Sockets.localhost, 8082) do request::HTTP.Request
+    HTTP.serve("0.0.0.0", 8082) do request::HTTP.Request
         @show request
         @show request.method
 
@@ -14,6 +18,12 @@ function web_server()
 
         @info "parsing payload .."
         jstr = String(payload)
+
+        # DEBUG write for future de use
+        open("spec.json", "w") do io
+           write(io, jstr)
+       end
+
         jobj = JSON.parse(jstr)
         xs, ys, as, ws, hs, Es, mask, diearea, params = decode_place_spec(jobj)
         @info "running placement .."
@@ -75,3 +85,5 @@ function web_server()
         end
     end
 end
+
+decode_place_spec

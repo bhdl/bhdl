@@ -1,7 +1,7 @@
 {
   "id": "CPdEhDa4hc4h",
   "parentId": "CPXjHc3JJxFK",
-  "index": 3,
+  "index": 5,
   "content": null,
   "column": 1,
   "fold": true,
@@ -11,7 +11,7 @@
   "lang": "julia",
   "type": "DECK",
   "imports": "{}",
-  "exports": "{}",
+  "exports": "{\"self\":true}",
   "midports": "{}",
   "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
 }

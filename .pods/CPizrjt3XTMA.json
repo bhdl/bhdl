@@ -1,8 +1,8 @@
 {
-  "id": "CP8zwmyzCdwe",
-  "parentId": "CPPVAQ3PqWjt",
-  "index": 4,
-  "content": "\"Pkg.add(\\\"Flux\\\")\\nPkg.add(\\\"Zygote\\\")\"",
+  "id": "CPizrjt3XTMA",
+  "parentId": "CPdf6Vq6d4Pw",
+  "index": 7,
+  "content": "\"jstr = open(f->read(f, String), \\\"spec.json\\\")\\nnothing\"",
   "column": 1,
   "fold": false,
   "thundar": false,

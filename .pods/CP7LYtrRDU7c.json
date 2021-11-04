@@ -1,7 +1,7 @@
 {
   "id": "CP7LYtrRDU7c",
   "parentId": "CPgh3kxexKr7",
-  "index": 12,
+  "index": 11,
   "content": "\";; connect the matrix\\n(define matrix-module\\n  (make-circuit0\\n    #:external-pins (row[4] col[5])\\n    ;; col in, row out\\n    #:connect \\n    (for*/list ([i (in-range 4)]\\n                [j (in-range 5)])\\n               (debug \\\"connecting\\\" i j)\\n               (*- self.col[j]\\n                   (list-ref (list-ref matrix i) j)\\n                   self.row[i]))\\n    #:layout (inset (apply vc-append\\n                      (for/list ([row matrix])\\n                        (apply hc-append row)\\n                        ))\\n                    20)))\"",
   "column": 1,
   "fold": false,

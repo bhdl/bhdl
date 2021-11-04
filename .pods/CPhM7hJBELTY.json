@@ -11,7 +11,7 @@
   "lang": "julia",
   "type": "CODE",
   "imports": "{}",
-  "exports": "{\"simulated_annealing_legalization\":false}",
+  "exports": "{\"simulated_annealing_legalization\":true}",
   "midports": "{}",
   "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
 }

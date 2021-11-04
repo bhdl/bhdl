@@ -1,5 +1,9 @@
 import Pkg
+Pkg.status()
+
+import Pkg
 Pkg.add("Luxor")
+Pkg.add("Clipper")
 Pkg.add("ProgressMeter")
 Pkg.add("JSON")
 Pkg.add("FFTW")
@@ -15,3 +19,4 @@ import CUDA
 
 
 Pkg.add("Flux")
+Pkg.add("Zygote")

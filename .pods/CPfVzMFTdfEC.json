@@ -1,7 +1,7 @@
 {
   "id": "CPfVzMFTdfEC",
   "parentId": "CPPVAQ3PqWjt",
-  "index": 2,
+  "index": 3,
   "content": "\"import CUDA\\n# This will download CUDA\\n@info CUDA.version()\\n@info CUDA.has_cuda()\\n\"",
   "column": 1,
   "fold": false,

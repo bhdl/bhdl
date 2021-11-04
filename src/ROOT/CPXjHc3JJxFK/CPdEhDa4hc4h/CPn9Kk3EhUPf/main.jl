@@ -1,5 +1,5 @@
 import Luxor: Point
-
+using Clipper
 
 isinside(p, a, b) = (b.x - a.x) * (p.y - a.y) > (b.y - a.y) * (p.x - a.x)
 
