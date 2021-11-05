@@ -7,7 +7,7 @@
   "fold": false,
   "thundar": false,
   "utility": false,
-  "name": "julia",
+  "name": "placer",
   "lang": "julia",
   "type": "DECK",
   "imports": "{}",
