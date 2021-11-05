@@ -1,4 +1,14 @@
-import JSON
+
+  
+  eval(:(module $(Symbol("ROOT/placer/engine/bench"))
+    using Reexport
+
+    
+    
+
+    export decode_place_spec
+
+    import JSON
 
 
 function read_nodes(fname)
@@ -147,3 +157,8 @@ function decode_place_spec(jobj)
     params = jobj["place-params"]
     xs, ys, as, ws, hs, Es, mask, diearea, params
 end
+
+  end))
+
+  
+  

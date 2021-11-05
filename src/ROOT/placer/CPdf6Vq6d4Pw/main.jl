@@ -1,4 +1,14 @@
-import Random
+
+  
+  eval(:(module $(Symbol("ROOT/placer/CPdf6Vq6d4Pw"))
+    using Reexport
+
+    
+    
+
+    
+
+    import Random
 using HTTP
 import JSON
 
@@ -26,3 +36,8 @@ simulated_annealing_legalization(
             nsteps=params["sa-nsteps"],
             stepsize=params["sa-stepsize"],
             theta_stepsize=params["sa-theta-stepsize"])
+
+  end))
+
+  
+  

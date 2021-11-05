@@ -1,0 +1,10 @@
+
+name = "BHDL"
+uuid = "ae4c3d25-d30d-4e89-bfe5-309ddd2aabcb"
+version = "0.0.1"
+authors = ["Some One <someone@email.com>"]
+
+[deps]
+ProgressMeter
+CUDA
+    

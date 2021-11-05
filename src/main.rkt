@@ -1,3 +1,3 @@
 #lang racket
-(require "ROOT/main.rkt")
-(provide (all-from-out "ROOT/main.rkt"))
+(require "ROOT/BHDL/main.rkt")
+(provide (all-from-out "ROOT/BHDL/main.rkt"))
