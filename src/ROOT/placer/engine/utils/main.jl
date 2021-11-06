@@ -1,14 +1,17 @@
 
+  module utils
+
+  using Reexport
+
   
-  eval(:(module $(Symbol("ROOT/placer/engine/utils"))
-    using Reexport
 
+  
+
+  
     
-    
+  export isinside,intersection,clipSH,tuple2intpoint,isoverlap
 
-    export isinside,intersection,clipSH,tuple2intpoint,isoverlap
-
-    import Luxor: Point
+  import Luxor: Point
 using Clipper
 
 isinside(p, a, b) = (b.x - a.x) * (p.y - a.y) > (b.y - a.y) * (p.x - a.x)
@@ -93,7 +96,5 @@ function isoverlap(poly0, polys...)
     isoverlap_clip(tuple2intpoint(poly0), map(tuple2intpoint, polys)...)
 end
 
-  end))
-
-  
+  end
   

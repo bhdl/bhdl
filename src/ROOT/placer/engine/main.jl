@@ -1,4 +1,8 @@
 
+  module engine
+
+  using Reexport
+
   
   include("../../../ROOT/placer/engine/bench/main.jl")
   
@@ -8,25 +12,24 @@
 
   include("../../../ROOT/placer/engine/utils/main.jl")
   
-  eval(:(module $(Symbol("ROOT/placer/engine"))
-    using Reexport
 
+  
+    using .bench
+
+    using .vis
+
+    using .utils
+
+  
+    @reexport using .bench
+
+    @reexport using .vis
+
+    @reexport using .utils
     
-      eval(:(using $(:Main).$(Symbol("ROOT/placer/engine/bench"))))
+  export place,simulated_annealing_legalization
 
-      eval(:(using $(:Main).$(Symbol("ROOT/placer/engine/vis"))))
-
-      eval(:(using $(:Main).$(Symbol("ROOT/placer/engine/utils"))))
-    
-      eval(:(@reexport using $(:Main).$(Symbol("ROOT/placer/engine/bench"))))
-
-      eval(:(@reexport using $(:Main).$(Symbol("ROOT/placer/engine/vis"))))
-
-      eval(:(@reexport using $(:Main).$(Symbol("ROOT/placer/engine/utils"))))
-
-    export place,simulated_annealing_legalization
-
-    import FFTW
+  import FFTW
 using SparseArrays: sparse, spzeros
 import ForwardDiff
 import Zygote
@@ -571,7 +574,5 @@ function simulated_annealing_legalization(xs, ys, as, ws, hs, mask, diearea;
     return xs, ys, as, conflicts
 end
 
-  end))
-
-  
+  end
   

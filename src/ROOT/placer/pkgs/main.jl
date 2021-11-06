@@ -1,14 +1,17 @@
 
+  module pkgs
+
+  using Reexport
+
   
-  eval(:(module $(Symbol("ROOT/placer/pkgs"))
-    using Reexport
 
-    
-    
+  
 
+  
     
+  
 
-    import Pkg
+  import Pkg
 Pkg.status()
 
 import Pkg
@@ -31,7 +34,5 @@ import CUDA
 Pkg.add("Flux")
 Pkg.add("Zygote")
 
-  end))
-
-  
+  end
   

@@ -1,18 +1,21 @@
 
+  module placer
+
+  using Reexport
+
   
   include("../../ROOT/placer/engine/main.jl")
   
-  eval(:(module $(Symbol("ROOT/placer"))
-    using Reexport
 
+  
+    using .engine
+
+  
+    @reexport using .engine
     
-      eval(:(using $(:Main).$(Symbol("ROOT/placer/engine"))))
-    
-      eval(:(@reexport using $(:Main).$(Symbol("ROOT/placer/engine"))))
+  export web_server
 
-    export web_server
-
-    import Random
+  import Random
 using HTTP
 import JSON
 
@@ -102,7 +105,5 @@ end
 
 decode_place_spec
 
-  end))
-
-  
+  end
   

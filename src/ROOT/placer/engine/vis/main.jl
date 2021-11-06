@@ -1,14 +1,17 @@
 
+  module vis
+
+  using Reexport
+
   
-  eval(:(module $(Symbol("ROOT/placer/engine/vis"))
-    using Reexport
 
-    
-    
+  
 
+  
     
+  
 
-    using Luxor
+  using Luxor
 import Dates
 using ProgressMeter
 
@@ -57,7 +60,5 @@ function visualize(x, y, w, h, R)
     end
 end
 
-  end))
-
-  
+  end
   

@@ -1,14 +1,17 @@
 
+  module CPdf6Vq6d4Pw
+
+  using Reexport
+
   
-  eval(:(module $(Symbol("ROOT/placer/CPdf6Vq6d4Pw"))
-    using Reexport
 
-    
-    
+  
 
+  
     
+  
 
-    import Random
+  import Random
 using HTTP
 import JSON
 
@@ -37,7 +40,5 @@ simulated_annealing_legalization(
             stepsize=params["sa-stepsize"],
             theta_stepsize=params["sa-theta-stepsize"])
 
-  end))
-
-  
+  end
   
