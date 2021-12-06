@@ -1,7 +1,5 @@
 {
   "id": "CP76Gx6ARhWK",
-  "parentId": "CPQU4nPmdVqN",
-  "index": 21,
   "content": "\"(define (*=-proc lst-of-nodepins)\\n  (let ([res\\n         ;; FIXME this composite has no external pins. In fact, it should have\\n         ;; the same numbr of external pins as the lenght of the \\\"vector\\\"\\n         (make-circuit0)])\\n\\n    ;; construct net\\n    ;;\\n    ;; get the length of the vector\\n    (let ([len (length (first lst-of-nodepins))])\\n      (apply hook-proc! res\\n             (for/list ([i (range len)])\\n               (Net (filter-not\\n                     void?\\n                     (for/list ([nodepins lst-of-nodepins])\\n                       (list-ref nodepins i)))))))\\n    res))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPQU4nPmdVqN",
+  "children": []
 }

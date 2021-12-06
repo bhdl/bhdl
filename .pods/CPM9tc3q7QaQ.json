@@ -1,7 +1,5 @@
 {
   "id": "CPM9tc3q7QaQ",
-  "parentId": "CP6KwDyj8wHg",
-  "index": 10,
   "content": "\"(define (single-pict-angle pict subbox Δa)\\n  (let floop ([box pict]\\n              [found values]\\n              [not-found (lambda () (error 'find-XX\\n                                           \\\"sub-pict: ~a not found in: ~a\\\" \\n                                           subbox pict))])\\n    (if (pict-path-element=? subbox box)\\n        (found Δa)\\n        (let loop ([c (pict-children box)])\\n          (if (null? c)\\n              (not-found)\\n              (floop (child-pict (car c))\\n                     (lambda (Δa)\\n                       (let ([c (car c)])\\n                         (let-values ([(Δa)\\n                                       ;; FIXME (transform ...) ?\\n                                       ;;\\n                                       ;; or simply add the offset angle?\\n                                       (+ Δa (compute-child-theta box))])\\n                           (found Δa))))\\n                     (lambda ()\\n                       (loop (cdr c)))))))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP6KwDyj8wHg",
+  "children": []
 }

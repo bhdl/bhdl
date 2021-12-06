@@ -1,7 +1,5 @@
 {
   "id": "CPpenj8M8dGq",
-  "parentId": "CPgeDcY8C9kA",
-  "index": 2,
   "content": "\"function read_nets(fname)\\n    res = []\\n    cur = []\\n    open(fname, \\\"r\\\") do io\\n        for line in eachline(io)\\n            line = strip(line)\\n            if startswith(line, \\\"#\\\")\\n                continue\\n            elseif startswith(line, \\\"NumNodes\\\")\\n                # TODO record\\n            elseif startswith(line, \\\"NumTerminals\\\")\\n                # TODO record\\n            elseif startswith(line, \\\"NetDegree\\\")\\n                m = match(r\\\".*:\\\\s*(\\\\d+)\\\\s*(\\\\w+)\\\", line)\\n                name = m.captures[2]\\n                push!(res, cur)\\n                cur = []\\n                push!(cur, name)\\n            else\\n                # match\\n                # FIXME what is B? see n112279\\n                # m = match(r\\\"(o\\\\d+)\\\\s*([IOB]) : (-?\\\\d+\\\\.\\\\d+)\\\\s+(-?\\\\d+\\\\.\\\\d+)\\\", line)\\n                m = match(r\\\"(X\\\\d+)\\\\s*([IOB]) : (-?(?:\\\\d+\\\\.)?\\\\d+)\\\\s+(-?(?:\\\\d+\\\\.)?\\\\d+)\\\", line)\\n                if m != nothing\\n                    id = m.captures[1]\\n                    io = m.captures[2]\\n                    xoff = parse(Float64, m.captures[3])\\n                    yoff = parse(Float64, m.captures[4])\\n                    push!(cur, (id, io, xoff, yoff))\\n                end\\n            end\\n        end\\n    end\\n    push!(res, cur)\\n    # the first is empty\\n    return res[2:end]\\nend\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"read_nets\":false}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPgeDcY8C9kA",
+  "children": []
 }

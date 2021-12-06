@@ -1,7 +1,5 @@
 {
   "id": "CPRYmXmQh9zC",
-  "parentId": "CP63Je4zKaFa",
-  "index": 14,
   "content": "\"(define/IC (PinHeader-in)\\n  ;; FIXME remove duplication\\n  #:auto-named-FP (1 (fp-pin-header 1))\\n  #:auto-named-FP (2 (fp-pin-header 2))\\n  #:auto-named-FP (3 (fp-pin-header 3))\\n  #:auto-named-FP (4 (fp-pin-header 4))\\n  #:auto-named-FP (5 (fp-pin-header 5))\\n  #:auto-named-FP (6 (fp-pin-header 6))\\n  #:auto-named-FP (7 (fp-pin-header 7))\\n  #:auto-named-FP (8 (fp-pin-header 8)))\\n\\n(define (PinHeader num)\\n  (PinHeader-in #:FP num))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "null",
   "exports": "{\"PinHeader\":true}",
   "midports": "null",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

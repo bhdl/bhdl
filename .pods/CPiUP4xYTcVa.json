@@ -1,7 +1,5 @@
 {
   "id": "CPiUP4xYTcVa",
-  "parentId": "CPYFdkyGhc6b",
-  "index": 4,
   "content": "\"(show-layout \\n  (make-circuit\\n    (pin left right)\\n    (part [d (1N4148W)]\\n          [key (kailh-socket 1)])\\n    (wire (series self.left key d self.right))\\n    ;; FIXME actually I cannot use d twice\\n    (layout (at key 80 80 (hstack d d)))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPYFdkyGhc6b",
+  "children": []
 }

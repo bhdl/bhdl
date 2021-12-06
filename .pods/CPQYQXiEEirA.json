@@ -1,7 +1,5 @@
 {
   "id": "CPQYQXiEEirA",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 24,
   "content": "\"(define (fp-TQFP ct)\\n  ;;TQFP-32_7x7mm_P0.8mm.kicad_mod\\n  ;;TQFP-44_10x10mm_P0.8mm.kicad_mod\\n  ;;TQFP-48_7x7mm_P0.5mm.kicad_mod\\n  ;;TQFP-64_10x10mm_P0.5mm.kicad_mod\\n  ;;TQFP-80_12x12mm_P0.5mm.kicad_mod\\n  ;;TQFP-100_14x14mm_P0.5mm.kicad_mod\\n  ;;TQFP-120_14x14mm_P0.4mm.kicad_mod\\n  ;;TQFP-128_14x14mm_P0.4mm.kicad_mod\\n  ;;TQFP-144_20x20mm_P0.5mm.kicad_mod\\n  ;;TQFP-176_24x24mm_P0.5mm.kicad_mod\\n  (let ([data (case ct\\n                ;; FIXME kicad file wrong\\n                [(32) '(7 0.8)]\\n                ;; kicad file wrong\\n                [(44) '(10 0.8)]\\n                ;; kicad file wrong\\n                [(48) '(7 0.5)]\\n                [(64) '(10 0.5)]\\n                ;; kicad file wrong\\n                [(80) '(12 0.5)]\\n                [(100) '(14 0.5)]\\n                ;; kicad file wrong\\n                [(120) '(14 0.4)]\\n                ;; kicad file wrong\\n                [(128) '(14 0.4)]\\n                [(144) '(20 0.5)]\\n                [(176) '(24 0.5)])])\\n    (kicad-helper \\\"Package_QFP.pretty/\\\"\\n                  (~a \\\"TQFP-\\\" ct \\\"_\\\"\\n                      (first data) \\\"x\\\" (first data)\\n                      \\\"mm_P\\\" (second data) \\\"mm.kicad_mod\\\"))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-TQFP\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

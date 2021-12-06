@@ -1,7 +1,5 @@
 {
   "id": "CPCxbUtNLVjK",
-  "parentId": "CPQU4nPmdVqN",
-  "index": 22,
   "content": "\"(define (node-pins->nodepins node pins)\\n  (for/list ([pin pins])\\n    (when (not (eq? pin '-))\\n      (pin-ref node pin))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPQU4nPmdVqN",
+  "children": []
 }

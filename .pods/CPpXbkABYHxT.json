@@ -1,7 +1,5 @@
 {
   "id": "CPpXbkABYHxT",
-  "parentId": "CPN8XE37ddzD",
-  "index": 5,
   "content": "\"(define-for-syntax (syntax-add-prefix prefix stx)\\n  (datum->syntax\\n   stx\\n   (string->symbol\\n    (string-append prefix\\n                   (symbol->string\\n                    (syntax->datum stx))))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPN8XE37ddzD",
+  "children": []
 }

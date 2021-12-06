@@ -1,7 +1,5 @@
 {
   "id": "CP7jFi7UNkqK",
-  "parentId": "CPN8XE37ddzD",
-  "index": 1,
   "content": "\"(define default-append-spacing (make-parameter 20))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "null",
   "exports": "{\"default-append-spacing\":true}",
   "midports": "null",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPN8XE37ddzD",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CP6M6tV7VJkb",
-  "parentId": "CPgPrJLFpatC",
-  "index": 1,
   "content": "\"\"",
   "column": 1,
   "fold": true,
@@ -13,5 +11,11 @@
   "imports": "{}",
   "exports": "{\"self\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPgPrJLFpatC",
+  "children": [
+    "CPNAz4K9aTUU",
+    "CPLAhk6zj4K6",
+    "CPGHh3CbVz4n"
+  ]
 }

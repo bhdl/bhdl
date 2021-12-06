@@ -1,7 +1,5 @@
 {
   "id": "CPRabaGTKRQ6",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 17,
   "content": "\"(define fp-1602\\n  (kicad-helper \\\"Display.pretty/\\\"\\n                \\\"LCD-016N002L.kicad_mod\\\"))\\n\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-1602\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

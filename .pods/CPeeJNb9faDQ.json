@@ -1,7 +1,5 @@
 {
   "id": "CPeeJNb9faDQ",
-  "parentId": "CPckUrdGFJME",
-  "index": 35,
   "content": "\"(define mylsts '((1 2 3) (4 5 6) (1 7 8) (4 9 10)))\\n(get-neighbors mylsts 1)\\n(get-all-connected mylsts (seteq 1) (seteq))\\n(my-merge mylsts)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPckUrdGFJME",
+  "children": []
 }

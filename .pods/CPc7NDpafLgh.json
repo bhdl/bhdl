@@ -1,7 +1,5 @@
 {
   "id": "CPc7NDpafLgh",
-  "parentId": "CPdEhDa4hc4h",
-  "index": 17,
   "content": "\"function hpwl(xs, ys, Es)\\n    res = map(Es) do e\\n        ns = [ei for (ei,offx,offy) in e]\\n        # max delta x\\n        abs(maximum((i->xs[i]).(ns)) - minimum((i->xs[i]).(ns))) +\\n            abs(maximum((i->ys[i]).(ns)) - minimum((i->ys[i]).(ns)))\\n    end\\n    sum(res)\\nend\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPdEhDa4hc4h",
+  "children": []
 }

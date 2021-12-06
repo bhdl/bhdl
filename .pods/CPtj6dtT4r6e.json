@@ -1,7 +1,5 @@
 {
   "id": "CPtj6dtT4r6e",
-  "parentId": "CP6KwDyj8wHg",
-  "index": 8,
   "content": "\"(define (compute-child-theta p)\\n  ;; FIXME assuming one child\\n  (let ([child (car (pict-children p))])\\n    ;; FIXME should be fixed by d88cd6, the correct one should be child-sxy now\\n    (let ([sinθ (child-syx child)]\\n          [cosθ (child-sx child)])\\n      (sincos->theta sinθ cosθ))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP6KwDyj8wHg",
+  "children": []
 }

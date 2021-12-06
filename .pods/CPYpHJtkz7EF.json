@@ -1,7 +1,5 @@
 {
   "id": "CPYpHJtkz7EF",
-  "parentId": "CPWtgTBEDKJd",
-  "index": 9,
   "content": "\"(define (send-for-detailed-place circuit global-place-result)\\n  \\\"Given global placement result, run detailed placement.\\\"\\n  ;; modify (by-copy) the place result with updated place params\\n  (let* ([spec (Composite->place-spec\\n                 circuit\\n                 #:place-nsteps 0\\n                 ;; When cycle increases, the temperature cools down,\\n                 ;; and the later cycles are not very useful to\\n                 ;; remove conflicts. Thus, for this application, I\\n                 ;; might consider using only the first few cycles,\\n                 ;; and use a large number of steps (per cycle)\\n                 #:sa-ncycles 10\\n                 #:sa-nsteps 3000\\n                 #:sa-stepsize 10\\n                 ;; to support rotation, use non-0 e.g. 0.3\\n                 #:sa-theta-stepsize 0)]\\n         [spec (hash-set* \\n                 spec\\n                 'xs (hash-ref global-place-result 'xs)\\n                 'ys (hash-ref global-place-result 'ys)\\n                 'as (hash-ref global-place-result 'as))])\\n    (send-for-placement spec)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"send-for-detailed-place\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPWtgTBEDKJd",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CPQJLUmmAK9D",
-  "parentId": "CP9hPyBA9z8P",
-  "index": 13,
   "content": "\"\\n(define (debug . args)\\n  (displayln (~a #:separator \\\" \\\" \\\"DEBUG: \\\" args)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"debug\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP9hPyBA9z8P",
+  "children": []
 }

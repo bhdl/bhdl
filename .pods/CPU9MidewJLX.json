@@ -1,7 +1,5 @@
 {
   "id": "CPU9MidewJLX",
-  "parentId": "CPdejYwLiFFk",
-  "index": 0,
   "content": "\"(define (Composite->BOM circuit)\\n  (string-append\\n    \\\"Annotation, Name, Footprint, Values\\\\n\\\"\\n    (let* ([atoms (collect-all-atoms circuit)]\\n           [Hatom=>index (for/hash ([atom atoms]\\n                                    [i (in-naturals 1)])\\n                                   (values atom i))])\\n      (string-join \\n        (for/list ([atom atoms])\\n          (~a (atom->ID atom Hatom=>index)\\n              \\\",\\\" (IC-name (ICAtom-ic atom))\\n              \\\",\\\" (FpSpec-name (ic-select-fpspec \\n                                 (ICAtom-ic atom) \\n                                 (ICAtom-which-fp atom)))\\n                  \\\",\\\" (ICAtom-attrs atom))\\n          )\\n        \\\"\\\\n\\\"))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"Composite->BOM\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPdejYwLiFFk",
+  "children": []
 }

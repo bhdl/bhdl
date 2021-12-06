@@ -1,7 +1,5 @@
 {
   "id": "CPpNHVWf4TW4",
-  "parentId": "CP9hPyBA9z8P",
-  "index": 16,
   "content": "\"(define (group-by-index key lst)\\n  \\\"Group lst by key(index).\\\"\\n  (map (lambda (x) (map car x))\\n       (group-by (lambda (p)\\n                   (key (cdr p)))\\n                 (for/list ([x lst]\\n                            [i (in-naturals)])\\n                   (cons x i)))))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"group-by-index\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP9hPyBA9z8P",
+  "children": []
 }

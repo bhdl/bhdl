@@ -1,7 +1,5 @@
 {
   "id": "CPEKiTFGRPjG",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 22,
   "content": "\"(define (fp-PQFP ct)\\n  ;; PQFP-44_10x10mm_P0.8mm.kicad_mod\\n  ;; PQFP-80_14x20mm_P0.8mm.kicad_mod\\n  ;; PQFP-100_14x20mm_P0.65mm.kicad_mod\\n  ;; PQFP-112_20x20mm_P0.65mm.kicad_mod\\n  ;; PQFP-144_28x28mm_P0.65mm.kicad_mod\\n  ;; PQFP-256_28x28mm_P0.4mm.kicad_mod\\n  (let ([data (case ct\\n                [(44) '(10 10 0.8)]\\n                [(80) '(14 20 0.8)]\\n                [(100) '(14 20 0.65)]\\n                [(112) '(20 20 0.65)]\\n                [(144) '(28 28 0.65)]\\n                [(256) '(28 28 0.4)])])\\n    (kicad-helper \\\"Package_QFP.pretty/\\\"\\n                  (~a \\\"PQFP-\\\" ct \\\"_\\\"\\n                      (first data) \\\"x\\\" (second data)\\n                      \\\"mm_P\\\" (third data) \\\"mm.kicad_mod\\\"))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "null",
   "exports": "{\"fp-PQFP\":true}",
   "midports": "null",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

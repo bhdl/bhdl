@@ -1,7 +1,5 @@
 {
   "id": "CPxCVVt4R9fX",
-  "parentId": "CP63Je4zKaFa",
-  "index": 19,
   "content": "\"(define/IC (MountingHole)\\n           #:auto-named-FP (2 (fp-mounting-hole 2))\\n           #:auto-named-FP (3 (fp-mounting-hole 3))\\n           #:auto-named-FP (4 (fp-mounting-hole 4))\\n           #:auto-named-FP (5 (fp-mounting-hole 5))\\n           #:auto-named-FP (6 (fp-mounting-hole 6))\\n           #:LEFT 1\\n           )\\n\\n(define (mounting-hole d)\\n  (MountingHole #:FP d))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"MountingHole\":true,\"mounting-hole\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

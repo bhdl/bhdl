@@ -1,7 +1,5 @@
 {
   "id": "CPCTLYQk7N66",
-  "parentId": "CPdEhDa4hc4h",
-  "index": 0,
   "content": "\"import FFTW\\nusing SparseArrays: sparse, spzeros\\nimport ForwardDiff\\nimport Zygote\\nusing Statistics: mean\\n# import Plots\\nimport CUDA: cu, allowscalar\\nallowscalar(false)\\n# using Flux: gpu, cpu\\n\\nusing ProgressMeter\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPdEhDa4hc4h",
+  "children": []
 }

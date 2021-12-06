@@ -1,7 +1,5 @@
 {
   "id": "CPjprY4g6xAX",
-  "parentId": "CPadywggP7TT",
-  "index": 11,
   "content": "\"(define (get-corner lines x-or-y min-or-max)\\n  (apply min-or-max (for/list ([line lines])\\n                              (match-let ([(line-spec x1 y1 x2 y2 stroke) line])\\n                                         (case x-or-y\\n                                               [(x) (min-or-max x1 x2)]\\n                                               [(y) (min-or-max y1 y2)])))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"get-corner\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPadywggP7TT",
+  "children": []
 }

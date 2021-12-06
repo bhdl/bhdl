@@ -1,10 +1,8 @@
 {
   "id": "CPdf6Vq6d4Pw",
-  "parentId": "CPXjHc3JJxFK",
-  "index": 6,
-  "content": null,
+  "content": "null",
   "column": 1,
-  "fold": false,
+  "fold": true,
   "thundar": true,
   "utility": false,
   "name": "",
@@ -13,5 +11,18 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPXjHc3JJxFK",
+  "children": [
+    "CPQwY7xVVadx",
+    "CPQWAKxnT689",
+    "CPTGQtnUn9xU",
+    "CPizrjt3XTMA",
+    "CPnPGRDQzPTf",
+    "CPeiFEpLKeHR",
+    "CPLLdK8Pp4VX"
+  ],
+  "result": "null",
+  "stdout": null,
+  "error": "null"
 }

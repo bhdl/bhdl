@@ -1,7 +1,5 @@
 {
   "id": "CPbyjDr48YmT",
-  "parentId": "CPadywggP7TT",
-  "index": 4,
   "content": "\"(struct line-spec\\n  (x1 y1 x2 y2 width)\\n  #:prefab)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"struct line-spec\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPadywggP7TT",
+  "children": []
 }

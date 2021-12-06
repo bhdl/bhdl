@@ -1,7 +1,5 @@
 {
   "id": "CPeXDRfWREhe",
-  "parentId": "CPadywggP7TT",
-  "index": 12,
   "content": "\"(define (get-4-corners lines)\\n  (list (get-corner lines 'x min)\\n        (get-corner lines 'y min)\\n        (get-corner lines 'x max)\\n        (get-corner lines 'y max)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"get-4-corners\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPadywggP7TT",
+  "children": []
 }

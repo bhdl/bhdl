@@ -1,7 +1,5 @@
 {
   "id": "CPa97yVgDHDE",
-  "parentId": "CPrmYHr6Ux6K",
-  "index": 2,
   "content": "\"(define (get-8082-processid)\\n  ;; HACK I'm depending on the behavior that if the sting is not a number, string->number will return #f\\n  (string->number (string-trim (with-output-to-string (lambda () (shell \\\"lsof -i :8082 | awk '{print $2}' | tail -n 1\\\"))))))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPrmYHr6Ux6K",
+  "children": []
 }

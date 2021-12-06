@@ -1,7 +1,5 @@
 {
   "id": "CPU8CViigcM7",
-  "parentId": "CPnGUxmGW6Tz",
-  "index": 1,
   "content": "\"(define (gerber-format-xy x y)\\n  (format \\\"X~aY~a\\\"\\n          (~r (* x 1e6) #:precision 0)\\n          (~r (* y 1e6) #:precision 0)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"gerber-format-xy\":false}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPnGUxmGW6Tz",
+  "children": []
 }

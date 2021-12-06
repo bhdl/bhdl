@@ -1,7 +1,5 @@
 {
   "id": "CPRXPTYKKE3a",
-  "parentId": "CPNKtDWP37zK",
-  "index": 4,
   "content": "\"(define (parse-track str)\\n  (match-let ([(list _ stroke layer net points ID\\n                     ;; the last field seems to be optional, HACK using ID\\n                     ;; ... to handle the optional value\\n                     ...)\\n               (string-split str \\\"~\\\")])\\n    (let ([points (group-by-2 (string-split points))])\\n      (for/list ([a points]\\n                 [b (rest points)])\\n        (line-spec (adapt-unit (first a))\\n                   (adapt-unit (second a))\\n                   (adapt-unit (first b))\\n                   (adapt-unit (second b))\\n                   (adapt-unit stroke))))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPNKtDWP37zK",
+  "children": []
 }

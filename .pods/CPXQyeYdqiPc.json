@@ -1,7 +1,5 @@
 {
   "id": "CPXQyeYdqiPc",
-  "parentId": "CPKCKwcMXwfd",
-  "index": 3,
   "content": "\"(define (ic-select-fpspec ic which-fp)\\n  (if which-fp\\n      ;; FIXME fail to find?\\n      (findf (lambda (x) (equal? (FpSpec-name x) which-fp))\\n             (IC-fps ic))\\n      ;; if #f, pass in the first\\n      (first (IC-fps ic))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"ic-select-fpspec\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPKCKwcMXwfd",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CPMiwrH7Rhke",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 28,
   "content": "\"(define fp-SOT-23\\n  (kicad-helper \\\"Package_TO_SOT_SMD.pretty\\\" \\\"SOT-23.kicad_mod\\\"))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-SOT-23\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

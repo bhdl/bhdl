@@ -1,10 +1,8 @@
 {
   "id": "CPeFthKVBcHR",
-  "parentId": null,
-  "index": 0,
-  "content": null,
+  "content": "null",
   "column": 1,
-  "fold": false,
+  "fold": true,
   "thundar": false,
   "utility": false,
   "name": "CP_CONFIG",
@@ -13,5 +11,13 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "ROOT",
+  "children": [
+    "CPbzKCVwkKEK",
+    "CP8iLCGVBKKT"
+  ],
+  "result": "null",
+  "stdout": null,
+  "error": "null"
 }

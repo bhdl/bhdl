@@ -1,7 +1,5 @@
 {
   "id": "CPfgz9T6ydq9",
-  "parentId": "CPN8XE37ddzD",
-  "index": 10,
   "content": "\"(define vstack vc-append)\\n(define hstack hc-append)\\n; (define rotate )\\n(define at pin-over)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"vstack\":true,\"hstack\":true,\"at\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPN8XE37ddzD",
+  "children": []
 }

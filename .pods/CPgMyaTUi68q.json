@@ -1,7 +1,5 @@
 {
   "id": "CPgMyaTUi68q",
-  "parentId": "CP7f8k4k7kLU",
-  "index": 1,
   "content": "\"(define (fix-atom-xy atom loc)\\n  ;; this is origin offset\\n  (match-let* \\n    ([(Point xmin ymin _) (footprint->offset (atom->fp atom))]\\n     [(Point x y a) loc]\\n     [w (exact->inexact (Macro-w (atom->macro atom)))]\\n     [h (exact->inexact (Macro-h (atom->macro atom)))]\\n     [fixed-x-old (- (/ (- x (/ w 2)) (fp-scale)) xmin)]\\n     [fixed-y-old (- (/ (- y (/ h 2)) (fp-scale)) ymin)]\\n     [scaled-x (/ x (fp-scale))]\\n     [scaled-y (/ y (fp-scale))]\\n     [Δx (- (+ (/ (/ w 2) (fp-scale)) xmin))]\\n     [Δy (- (+ (/ (/ h 2) (fp-scale)) ymin))]\\n     [r (sqrt (+ (expt Δx 2) (expt Δy 2)))]\\n     ;; CAUTION negative\\n     [sinθ (/ (- Δy) r)]\\n     [cosθ (/ Δx r)]\\n     [θ (sincos->theta sinθ cosθ)]\\n     [fixed-θ (+ θ a)]\\n     [fixed-x (+ scaled-x (* r (cos fixed-θ)))]\\n     ;; CAUTION negative\\n     [fixed-y (- scaled-y (* r (sin fixed-θ)))])\\n    (if (= r 0)\\n        ;; CAUTION r might be 0, i.e. the origin is at the\\n        ;; center. divide-by-zero will happen, and we need to just return the\\n        ;; scaled coordinates\\n        (Point scaled-x scaled-y a)\\n        (Point\\n          ;; fixed-x-old fixed-y-old\\n          fixed-x fixed-y\\n          ;; (/ (- x (/ w 2)) (fp-scale))\\n          ;; (/ (- y (/ h 2)) (fp-scale))\\n          ;; the result angle should be calculated according to the footprint origin\\n          a))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fix-atom-xy\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP7f8k4k7kLU",
+  "children": []
 }

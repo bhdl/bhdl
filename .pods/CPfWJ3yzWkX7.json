@@ -1,7 +1,5 @@
 {
   "id": "CPfWJ3yzWkX7",
-  "parentId": "CPYFdkyGhc6b",
-  "index": 5,
   "content": "\"show-layout\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPYFdkyGhc6b",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CP4KbMM4j4de",
-  "parentId": "CP63Je4zKaFa",
-  "index": 18,
   "content": "\"(define/IC (stabilizer-2u)\\n           ;; Note: I'm only using the footprint. In other words, this IC has 0 pins\\n  #:auto-FP fp-stabilizer-2u)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"stabilizer-2u\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

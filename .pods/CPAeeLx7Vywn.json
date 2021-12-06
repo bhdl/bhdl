@@ -1,7 +1,5 @@
 {
   "id": "CPAeeLx7Vywn",
-  "parentId": "CPgh3kxexKr7",
-  "index": 18,
   "content": "\";; connect MCU\\n(define mcu-board\\n  (make-circuit0 \\n   #:layout (inset (cb-superimpose mcu-module) 50 0)\\n   #:connect mcu-module))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPgh3kxexKr7",
+  "children": []
 }

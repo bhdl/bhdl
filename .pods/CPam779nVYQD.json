@@ -1,7 +1,5 @@
 {
   "id": "CPam779nVYQD",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 31,
   "content": "\"(define (fp-Arduino type)\\n  (case type\\n    ;; sparkfun boards\\n    [(Uno)\\n     (kicad-helper \\\"Boards.pretty/\\\"\\n                   \\\"UNO_R3_SHIELD.kicad_mod\\\")]\\n    [(Uno-ICSP)\\n     (kicad-helper \\\"Boards.pretty/\\\"\\n                   \\\"UNO_R3_SHIELD_ICSP.kicad_mod\\\")]\\n    [(Micro)\\n     (kicad-helper \\\"Boards.pretty/\\\"\\n                   \\\"SPARKFUN_PRO_MICRO.kicad_mod\\\")]\\n    [(Mini)\\n     (kicad-helper \\\"Boards.pretty/\\\"\\n                   \\\"ARDUINO_PRO_MINI.kicad_mod\\\")]\\n    ;; Arduino boards\\n    [(MKR)\\n     (kicad-helper \\\"Arduino.pretty/\\\" \\\"Arduino_MKR.kicad_mod\\\")]\\n    [(Nano)\\n     (kicad-helper \\\"Arduino.pretty/\\\" \\\"Arduino_Nano_Socket.kicad_mod\\\")]\\n    [else (error \\\"Unsupported Arduino form factor.\\\")]))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-Arduino\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

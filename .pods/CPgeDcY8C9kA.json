@@ -1,7 +1,5 @@
 {
   "id": "CPgeDcY8C9kA",
-  "parentId": "CPdEhDa4hc4h",
-  "index": 30,
   "content": null,
   "column": 1,
   "fold": true,
@@ -13,5 +11,14 @@
   "imports": "{}",
   "exports": "{\"self\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPdEhDa4hc4h",
+  "children": [
+    "CPPL9VYTkcNf",
+    "CPdM4CpbEiQB",
+    "CPpenj8M8dGq",
+    "CPGy9qiLAt33",
+    "CP7x4tcU3hf4",
+    "CP6XLMLtfAcp"
+  ]
 }

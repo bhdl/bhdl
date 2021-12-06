@@ -1,7 +1,5 @@
 {
   "id": "CPBMjpLr9hpR",
-  "parentId": "CPN8XE37ddzD",
-  "index": 4,
   "content": "\"(wrap-*-append vl-append)\\n(wrap-*-append vc-append)\\n(wrap-*-append vr-append)\\n(wrap-*-append ht-append)\\n(wrap-*-append hc-append)\\n(wrap-*-append hb-append)\\n(wrap-*-append htl-append)\\n(wrap-*-append hbl-append)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"vl-append\":true,\"vc-append\":true,\"vr-append\":true,\"ht-append\":true,\"hc-append\":true,\"hb-append\":true,\"htl-append\":true,\"hbl-append\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPN8XE37ddzD",
+  "children": []
 }

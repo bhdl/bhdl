@@ -1,7 +1,5 @@
 {
   "id": "CPGia333iyQn",
-  "parentId": "CP63Je4zKaFa",
-  "index": 27,
   "content": "\"(define/IC (GD32VF103CBT6)\\n  #:ALIAS ([PC13 TAMPER RTC]\\n          [PC14 OSC32IN OSC32out]\\n          [PD0 OSCIN]\\n          [PD1 OSCOUT]\\n          [PA11 USBD-]\\n          [PA12 USBD+]\\n          [PA10 UART0_RX]\\n          [PA9 UART0_TX USB_VBUS]\\n          [PB12 SPI1_CS]\\n          [PB14 SPI1_MISO]\\n          [PB13 SPI1_SCLK]\\n          [PB15 SPI1_MOSI]\\n\\n          [PB2 BOOT1])\\n  #:LQFP (48 VBAT PC13 PC14 PC15 PD0 PD1 NRST VSSA VDDA PA0 PA1 PA2\\n             PA3 PA4 PA5 PA6 PA7 PB0 PB1 PB2 PB10 PB11 VSS1 VDD1\\n             PB12 PB13 PB14 PB15 PA8 PA9 PA10 PA11 PA12 PA13 VSS2 VDD2\\n             PA14 PA15 PB3 PB4 PB5 PB6 PB7 BOOT0 PB8 PB9 VSS3 VDD3))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"GD32VF103CBT6\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

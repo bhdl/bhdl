@@ -1,7 +1,5 @@
 {
   "id": "CPfXRDp4x6aA",
-  "parentId": "CPadywggP7TT",
-  "index": 7,
   "content": "\"\\n(define bhdl-footprints-path\\n  ;; FIXME make this configurable\\n  (make-parameter\\n    (expand-user-path\\n      ;  \\\"/mount/shared/bhdl-footprints\\\"\\n      (build-path \\n        (case (system-type)\\n          [(unix) \\\"~/.config/bhdl\\\"]\\n          [(macosx) \\\"~/Library/Application Support/bhdl\\\"]\\n          [(windows) \\n           \\\"C:\\\\\\\\Users\\\\\\\\%USER%\\\\\\\\AppData\\\\\\\\Roaming\\\\\\\\bhdl\\\"]\\n           [else (error \\\"System type error\\\")])\\n        \\\"bhdl-footprints\\\")\\n      )))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"bhdl-footprints-path\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPadywggP7TT",
+  "children": []
 }

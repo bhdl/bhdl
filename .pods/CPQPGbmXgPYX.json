@@ -1,7 +1,5 @@
 {
   "id": "CPQPGbmXgPYX",
-  "parentId": "CPn9Kk3EhUPf",
-  "index": 6,
   "content": "\"function tuple2intpoint(t)\\n    map(t) do (x,y)\\n        IntPoint(round(x*1e6),round(y*1e6))\\n    end\\nend\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"tuple2intpoint\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPn9Kk3EhUPf",
+  "children": []
 }

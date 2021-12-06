@@ -1,7 +1,5 @@
 {
   "id": "CPyQMN4FHxac",
-  "parentId": "CPckUrdGFJME",
-  "index": 6,
   "content": "\"(define (maybe-atom->pict atom-or-pict)\\n  (cond\\n    [(Atom? atom-or-pict) (Atom-pict atom-or-pict)]\\n    [(Composite? atom-or-pict) (Composite-pict atom-or-pict)]\\n    ;  [(pict? atom-or-pict) atom-or-pict]\\n    ;  [else (error \\\"Must be Atom, Composite, or just pict.\\\")]\\n    [else atom-or-pict]\\n    ))\\n\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"maybe-atom->pict\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPckUrdGFJME",
+  "children": []
 }

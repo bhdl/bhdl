@@ -1,7 +1,5 @@
 {
   "id": "CPcWX9TYJAdb",
-  "parentId": "CPckUrdGFJME",
-  "index": 3,
   "content": "\"(struct Composite\\n  (pinhash nets [pict #:auto])\\n  #:mutable\\n  #:methods gen:custom-write\\n  [(define (write-proc self port mode)\\n     (write-string (~a \\\"#<Composite-\\\" (eq-hash-code self) \\\">\\\")\\n                   port))])\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"struct Composite\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPckUrdGFJME",
+  "children": []
 }

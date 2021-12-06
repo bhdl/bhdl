@@ -1,7 +1,5 @@
 {
   "id": "CPYppJdHGVXF",
-  "parentId": "CPadywggP7TT",
-  "index": 9,
   "content": "\";; warning downloading\\n;; remove output from (require bhdl)\\n(void\\n  (download-footprints))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPadywggP7TT",
+  "children": []
 }

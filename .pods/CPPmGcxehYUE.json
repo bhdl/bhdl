@@ -1,7 +1,5 @@
 {
   "id": "CPPmGcxehYUE",
-  "parentId": "CP9hPyBA9z8P",
-  "index": 8,
   "content": "\"(define-syntax (let-local stx)\\n  (syntax-parse stx\\n    [(_ ([var1 expr1] ...)\\n        ([var expr] ...)\\n        body ...)\\n     #`(match-let ([(list var ...) (let ([var1 expr1] ...)\\n                                     (list expr ...))])\\n         body ...)]))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "null",
   "exports": "{\"let-local\":true}",
   "midports": "null",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP9hPyBA9z8P",
+  "children": []
 }

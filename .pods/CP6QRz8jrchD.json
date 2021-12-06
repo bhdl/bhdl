@@ -1,7 +1,5 @@
 {
   "id": "CP6QRz8jrchD",
-  "parentId": "CPXjHc3JJxFK",
-  "index": 0,
   "content": "\"import Random\\nusing HTTP\\nimport JSON\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPXjHc3JJxFK",
+  "children": []
 }

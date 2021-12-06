@@ -1,7 +1,5 @@
 {
   "id": "CPbX7eLUmMCU",
-  "parentId": "CP63Je4zKaFa",
-  "index": 28,
   "content": "\"(define/IC (AMS1117-3.3)\\n  ;; SOT-223\\n  ;; FIXME the 223 is not the pin count\\n  #:FP (fp-SOT-223\\n        GND VOUT VIN VOUT))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"AMS1117-3.3\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

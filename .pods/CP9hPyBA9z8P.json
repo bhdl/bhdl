@@ -1,7 +1,5 @@
 {
   "id": "CP9hPyBA9z8P",
-  "parentId": "CPVHDqKYNUwz",
-  "index": 2,
   "content": "null",
   "column": 1,
   "fold": true,
@@ -13,5 +11,29 @@
   "imports": "{}",
   "exports": "{\"self\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPVHDqKYNUwz",
+  "children": [
+    "CPU6e34W6JYD",
+    "CPaUepzPhFzk",
+    "CPxmwdAFwMp6",
+    "CPF7cAXxKeit",
+    "CPKqKPDPHieE",
+    "CPzHHBPJbC9Y",
+    "CPd6NrTxNCRV",
+    "CPWLJNjGUxny",
+    "CPPmGcxehYUE",
+    "CPqhn6FRhBpW",
+    "CP4m3fhM8V7J",
+    "CP7DpWxdBzTd",
+    "CPb9JhkUdbjL",
+    "CPQJLUmmAK9D",
+    "CPyMkQfeDM74",
+    "CPfgA6XPmwCf",
+    "CPpNHVWf4TW4",
+    "CP4DbHbK4xgP",
+    "CPtAPTQkBJn7",
+    "CPwQezjKfQaj",
+    "CP9EieDjGcKX"
+  ]
 }

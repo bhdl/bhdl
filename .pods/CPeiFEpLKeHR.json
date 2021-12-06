@@ -1,7 +1,5 @@
 {
   "id": "CPeiFEpLKeHR",
-  "parentId": "CPdf6Vq6d4Pw",
-  "index": 10,
   "content": "\"solxs, solys = place(xs, ys, ws, hs, Es, mask, diearea,\\n                        nsteps=params[\\\"place-nsteps\\\"],\\n                        nbins=params[\\\"place-nbins\\\"])\\nnothing\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPdf6Vq6d4Pw",
+  "children": []
 }

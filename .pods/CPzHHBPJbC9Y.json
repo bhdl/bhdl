@@ -1,7 +1,5 @@
 {
   "id": "CPzHHBPJbC9Y",
-  "parentId": "CP9hPyBA9z8P",
-  "index": 5,
   "content": "\"(define (map-recur foo lst #:num [num #f])\\n  ;; check the shape\\n  (case num\\n    ;; if number is not specified, parse agressively\\n    [(#f) (let ([lst (map-recur-normalize lst)])\\n            (if (list? (first (first lst)))\\n                (apply map\\n                       (λ (v . rst) (map-recur foo (cons v rst)))\\n                       lst)\\n                (apply map foo lst)))]\\n    ;; if number is specified, don't try to make up the list\\n    [else\\n     (cond\\n       [(= num 0) (apply foo lst)]\\n       ;; [(= num 1) (apply map foo lst)]\\n       [(> num 0) (apply map\\n                         (λ (v . rst)\\n                           (map-recur foo (cons v rst) #:num (sub1 num)))\\n                         (map-recur-normalize lst))])]))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"map-recur\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP9hPyBA9z8P",
+  "children": []
 }

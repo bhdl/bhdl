@@ -1,7 +1,5 @@
 {
   "id": "CPfg8FJxXcai",
-  "parentId": "CPadywggP7TT",
-  "index": 0,
   "content": "\"(require racket/system)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPadywggP7TT",
+  "children": []
 }

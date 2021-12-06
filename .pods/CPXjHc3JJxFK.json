@@ -1,10 +1,8 @@
 {
   "id": "CPXjHc3JJxFK",
-  "parentId": null,
-  "index": 1,
-  "content": null,
+  "content": "null",
   "column": 1,
-  "fold": false,
+  "fold": true,
   "thundar": false,
   "utility": false,
   "name": "placer",
@@ -13,5 +11,18 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "ROOT",
+  "children": [
+    "CP6QRz8jrchD",
+    "CPUEq98RXJmt",
+    "CPX4trcfdtnb",
+    "CPTBUGjMa7nR",
+    "CPPVAQ3PqWjt",
+    "CPdEhDa4hc4h",
+    "CPdf6Vq6d4Pw"
+  ],
+  "result": "null",
+  "stdout": null,
+  "error": "null"
 }

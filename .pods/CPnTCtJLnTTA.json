@@ -1,7 +1,5 @@
 {
   "id": "CPnTCtJLnTTA",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 25,
   "content": "\"(define (fp-DIP ct)\\n  ;; DIP-4_W7.62mm.kicad_mod\\n  ;; DIP-6_W7.62mm.kicad_mod\\n  ;; DIP-8_W7.62mm.kicad_mod\\n  ;; DIP-40_W15.24mm.kicad_mod\\n  ;; DIP-42_W15.24mm.kicad_mod\\n  ;; DIP-48_W15.24mm.kicad_mod\\n  ;; DIP-64_W15.24mm.kicad_mod\\n  (let ([width (case ct\\n                 [(4 6 8 10 12 14 16 18 20 22 24 28 32)\\n                  7.62]\\n                 [(40 42 48 64)\\n                  15.24])])\\n    (kicad-helper \\\"Package_DIP.pretty/\\\"\\n                  (~a \\\"DIP-\\\" ct \\\"_W\\\" width \\\"mm.kicad_mod\\\"))))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-DIP\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

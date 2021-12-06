@@ -1,7 +1,5 @@
 {
   "id": "CP4qXEkzqwKp",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 34,
   "content": "\"(define fp-WS2812B\\n  (kicad-helper \\\"LED_SMD.pretty\\\" \\\"LED_WS2812B_PLCC4_5.0x5.0mm_P3.2mm.kicad_mod\\\"))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-WS2812B\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

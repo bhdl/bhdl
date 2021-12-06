@@ -1,7 +1,5 @@
 {
   "id": "CPcVLkg8Cgya",
-  "parentId": "CPn9Kk3EhUPf",
-  "index": 2,
   "content": "\"function intersection(a, b, s, f)\\n    dc = [a.x - b.x, a.y - b.y]\\n    dp = [s.x - f.x, s.y - f.y]\\n    n1 = a.x * b.y - a.y * b.x\\n    n2 = s.x * f.y - s.y * f.x\\n    n3 = 1.0 / (dc[1] * dp[2] - dc[2] * dp[1])\\n    Point((n1 * dp[1] - n2 * dc[1]) * n3, (n1 * dp[2] - n2 * dc[2]) * n3)\\nend\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"intersection\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPn9Kk3EhUPf",
+  "children": []
 }

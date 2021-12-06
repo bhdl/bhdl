@@ -1,7 +1,5 @@
 {
   "id": "CPPfFGF7XD4j",
-  "parentId": "CP63Je4zKaFa",
-  "index": 46,
   "content": "\"(define/IC (Arduino-Nano)\\n  ;; TODO I actually should unify the library of IC atom definition, the pin\\n  ;; definition, and footprint specification\\n  #:DUMMY (VIN GND2 RST2 5V AREF 3V3 GND1 RST1\\n               A0 A1 A2 A3 A4 A5 A6 A7\\n               D0 D1 D2 D3 D4 D5 D6 D7 D8 D9 D10 D11 D12 D13)\\n  #:FP ((fp-Arduino 'Nano)\\n        VIN GND RESET 5V\\n        A7 A6 A5 A4 A3 A2 A1 A0\\n        AREF 3V3\\n        D13 D12 D11 D10 D9 D8 D7 D6 D5 D4 D3 D2\\n        GND RESET\\n        D0 D1))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"Arduino-Nano\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

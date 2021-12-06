@@ -1,7 +1,5 @@
 {
   "id": "CP3hmWjTUHre",
-  "parentId": "CPnGUxmGW6Tz",
-  "index": 4,
   "content": "\"(define (footprint->gerber fp)\\n  \\\"Given a kicad footprint expr, write a gerber file. This will parse\\nthe kicad footprint format and generate gerber.\\\"\\n  (let-values ([(select-aperture gen-ADD) (get-new-ap-funcs)])\\n    (let ([body (footprint->gerber-section fp select-aperture)])\\n      (let ([prelude (string-join '(\\\"G04 This is a comment*\\\"\\n                                    \\\"G04 gerber for kicad mod, generated from Racketmatic*\\\"\\n                                    \\\"%FSLAX46Y46*%\\\"\\n                                    \\\"%MOMM*%\\\"\\n                                    \\\"%LPD*%\\\")\\n                                  \\\"\\\\n\\\")]\\n            [ADD (gen-ADD)]\\n            [postlude \\\"M02*\\\"])\\n        (string-join (list prelude ADD body postlude) \\\"\\\\n\\\")))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"footprint->gerber\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPnGUxmGW6Tz",
+  "children": []
 }

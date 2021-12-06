@@ -1,7 +1,5 @@
 {
   "id": "CPHLAVUDndyR",
-  "parentId": "CP6KwDyj8wHg",
-  "index": 11,
   "content": "\"(define (angle-find pict subbox-path)\\n  (if (pict-convertible? subbox-path)\\n      (single-pict-angle pict subbox-path 0)\\n      (let loop ([l (cons pict subbox-path)])\\n        (if (null? (cdr l))\\n            (values 0)\\n            (let-values ([(Δa) (loop (cdr l))])\\n              (single-pict-angle (car l) (cadr l) Δa))))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"angle-find\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP6KwDyj8wHg",
+  "children": []
 }

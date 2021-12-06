@@ -1,7 +1,5 @@
 {
   "id": "CP7JCeddfftK",
-  "parentId": "CPQU4nPmdVqN",
-  "index": 6,
   "content": "\"(define-syntax-parameter self\\n  (lambda (stx)\\n    (raise-syntax-error (syntax-e stx) \\\"can only be used inside make-circuit\\\")))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"self\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPQU4nPmdVqN",
+  "children": []
 }

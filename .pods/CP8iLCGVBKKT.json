@@ -1,7 +1,5 @@
 {
   "id": "CP8iLCGVBKKT",
-  "parentId": "CPeFthKVBcHR",
-  "index": 1,
   "content": "\"{\\n    \\\"lang\\\": \\\"julia\\\",\\n    \\\"root\\\": \\\"ROOT/placer\\\",\\n    \\\"name\\\": \\\"BHDL\\\",\\n    \\\"version\\\": \\\"0.0.1\\\",\\n    \\\"uuid\\\": \\\"ae4c3d25-d30d-4e89-bfe5-309ddd2aabcb\\\",\\n    \\\"pkgs\\\": [\\n        \\\"ProgressMeter\\\",\\n        \\\"CUDA\\\"\\n    ]\\n}\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPeFthKVBcHR",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CPyjYAkxt69q",
-  "parentId": "CP63Je4zKaFa",
-  "index": 16,
   "content": "\"(define/IC (Cherry)\\n  #:auto-named-FP (1 (fp-switch-keyboard 1 'pcb))\\n  #:auto-named-FP (1.25 (fp-switch-keyboard 1.25 'pcb))\\n  #:auto-named-FP (1.5 (fp-switch-keyboard 1.5 'pcb))\\n  #:auto-named-FP (1.75 (fp-switch-keyboard 1.75 'pcb))\\n  #:auto-named-FP (2 (fp-switch-keyboard 2 'pcb))\\n  #:auto-named-FP (2.25 (fp-switch-keyboard 2.25 'pcb))\\n  #:auto-named-FP (2.75 (fp-switch-keyboard 2.75 'pcb))\\n  #:auto-named-FP (6.25 (fp-switch-keyboard 6.25 'pcb))\\n  #:LEFT 1\\n  #:RIGHT 2)\\n\\n(define (Cherry-out spacing)\\n  (Cherry #:FP spacing))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"Cherry\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

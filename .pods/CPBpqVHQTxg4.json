@@ -1,7 +1,5 @@
 {
   "id": "CPBpqVHQTxg4",
-  "parentId": "CP63Je4zKaFa",
-  "index": 24,
   "content": "\"(define/IC (ATmega8U2 ATmega16U2 ATmega32U2)\\n  #:datasheet \\\"http://ww1.microchip.com/downloads/en/DeviceDoc/doc7799.pdf\\\"\\n  #:ALIAS ((VCC)\\n          (GND) (AVCC)\\n          ;; FIXME PAD\\n          ;; (PAD)\\n          (XTAL1)\\n          (UCAP) (UVCC) (UGND) (D-) (D+)\\n          (PB0 SS PCINT0) (PB1 SCLK PCINT1) (PB2 PD1 MOSI PCINT2)\\n          (PB3 PD0 MISO PCINT3) (PB4 T1 PCINT4)\\n          (PB5 PCINT5) (PB6 PCINT6) (PB7 PCINT7 OC0A OC1C)\\n          (PC0 XTAL2) (PC1 RESET DW) (PC2 AIN2 PCINT11) (PC4 PCINT10)\\n          (PC5 PCINT9 OC1B) (PC6 OC1A PCINT8) (PC7 INT4 ICP1 CLK0)\\n          (PD0 OC0B INT0) (PD1 AIN0 INT1) (PD2 RXD1 AIN1 INT2) (PD3 TXD1 INT3)\\n          (PD4 INT5 AIN3) (PD5 XCK AIN4 PCINT12)\\n          (PD6 RTS AIN5 INT6) (PD7 CTS HWB AIN6 TO INT7))\\n  #:QFN (32 XTAL1 XTAL2 GND VCC PC2 PD0 PD1 PD2\\n            PD3 PD4 PD5 PD6 PD7 PB0 PB1 PB2\\n            PB3 PB4 PB5 PB6 PB7 PC7 PC6 RESET\\n            PC5 PC4 UCAP UGND D+ D- UVCC AVCC))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"ATmega8U2\":true,\"ATmega16U2\":true,\"ATmega32U2\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

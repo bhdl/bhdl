@@ -1,7 +1,5 @@
 {
   "id": "CP4a4yQ4ewCT",
-  "parentId": "CPtgV36e4DrU",
-  "index": 11,
   "content": "\"(define (Atom->Hpad=>altstr atom)\\n  \\\"Given fp pad index/name, get all the alternative names.\\n  This is currently used for generating pad names on footprint in KiCAD export.\\\"\\n  ;; 1. get all pins\\n  (let* ([H (Atom-pinhash atom)]\\n         ;; 2. get the fp-XXX name of all pins\\n         [fp-XXs (filter (lambda (x) (string-prefix?  (~a x) \\\"fp-\\\"))\\n                         (hash-keys H))]\\n         ;; 3. for each XXX, get the index. But this is not useful\\n         ;; 4. for each XXX, get the names other than index and fp-XXX. These are the alts\\n         [revdict (for/multidict ([key (hash-keys (Atom-pinhash atom))])\\n                                 (entry (hash-ref (Atom-pinhash atom) key) key))]\\n         )\\n    (hash-set (for/hash ([fp-XX fp-XXs])\\n      (let* ([keys (multidict-ref revdict (hash-ref (Atom-pinhash atom) fp-XX))]\\n             [keys (filter (lambda (x) (not (or (string-prefix? (~a x) \\\"fp-\\\")\\n                                                (string-prefix? (~a x) \\\"index-\\\"))))\\n                           (set->list keys))]\\n             [key-str (string-join (map ~a keys) \\\"/\\\")]\\n             [XX (substring (symbol->string fp-XX) 3)])\\n        (values XX key-str)))\\n              \\\"\\\" \\\"\\\")\\n    ))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"Atom->Hpad=>altstr\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPtgV36e4DrU",
+  "children": []
 }

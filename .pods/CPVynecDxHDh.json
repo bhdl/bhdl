@@ -1,7 +1,5 @@
 {
   "id": "CPVynecDxHDh",
-  "parentId": "CPTWFby3RYrV",
-  "index": 0,
   "content": "\"using Luxor\\nimport Dates\\nusing ProgressMeter\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPTWFby3RYrV",
+  "children": []
 }

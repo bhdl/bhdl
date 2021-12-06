@@ -1,7 +1,5 @@
 {
   "id": "CPCMDwTkRqFL",
-  "parentId": "CP6KwDyj8wHg",
-  "index": 1,
   "content": "\"(define (draw-shape/border w h draw-fun\\n                           color [border-color #f] [border-width #f]\\n                           #:draw-border? [draw-border? #t]\\n                           #:transparent? [transparent? #f])\\n  (dc (λ (dc dx dy)\\n        (define old-brush (send dc get-brush))\\n        (define old-pen   (send dc get-pen))\\n        (send dc set-brush\\n              (send the-brush-list find-or-create-brush\\n                    (cond [transparent? \\\"white\\\"]\\n                          [color        color]\\n                          [else         (send old-pen get-color)])\\n                    (if transparent? 'transparent 'solid)))\\n        (if draw-border?\\n            (when (or border-color border-width)\\n              ;; otherwise, leave pen as is\\n              (send dc set-pen (send the-pen-list\\n                                     find-or-create-pen\\n                                     (or border-color\\n                                         (send old-pen get-color))\\n                                     (or border-width\\n                                         (send old-pen get-width))\\n                                     (send old-pen get-style))))\\n            (send dc set-pen \\\"black\\\" 1 'transparent))\\n        (draw-fun dc dx dy)\\n        (send dc set-brush old-brush)\\n        (send dc set-pen   old-pen))\\n      w h))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP6KwDyj8wHg",
+  "children": []
 }

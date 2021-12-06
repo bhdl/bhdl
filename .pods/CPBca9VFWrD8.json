@@ -1,7 +1,5 @@
 {
   "id": "CPBca9VFWrD8",
-  "parentId": "CPckUrdGFJME",
-  "index": 27,
   "content": "\"(define (collect-all-composites comp)\\n  (collect-all-composites-helper \\n    (seteq comp) \\n    (seteq)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"collect-all-composites\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPckUrdGFJME",
+  "children": []
 }

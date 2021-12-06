@@ -1,7 +1,5 @@
 {
   "id": "CPaPeVLjJ8Wt",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 21,
   "content": "\"(define (fp-QFN ct)\\n  ;; QFN-12-1EP_3x3mm_P0.5mm_EP1.65x1.65mm.kicad_mod\\n  ;; QFN-16-1EP_3x3mm_P0.5mm_EP1.45x1.45mm.kicad_mod\\n  ;; QFN-20-1EP_3.5x3.5mm_P0.5mm_EP2x2mm.kicad_mod\\n  ;; QFN-24-1EP_4x4mm_P0.5mm_EP2.65x2.65mm.kicad_mod\\n  ;; QFN-28-1EP_5x5mm_P0.5mm_EP3.35x3.35mm.kicad_mod\\n  ;; QFN-32-1EP_5x5mm_P0.5mm_EP3.1x3.1mm.kicad_mod\\n  ;; QFN-44-1EP_7x7mm_P0.5mm_EP5.15x5.15mm.kicad_mod\\n  ;; QFN-72-1EP_10x10mm_P0.5mm_EP6x6mm.kicad_mod\\n  (let ([data (case ct\\n                [(12) '(3 1.65)]\\n                [(16) '(3 1.45)]\\n                [(20) '(3.5 2)]\\n                [(24) '(4 2.65)]\\n                [(28) '(5 3.35)]\\n                [(32) '(5 3.1)]\\n                [(44) '(7 5.15)]\\n                [(64) '(9 4.7)]\\n                [(72) '(10 6)])])\\n    (let ([fp (kicad-helper \\\"Package_DFN_QFN.pretty/\\\"\\n                            (~a \\\"QFN-\\\" ct \\\"-1EP_\\\"\\n                                (first data) \\\"x\\\" (first data)\\n                                \\\"mm_P0.5mm_EP\\\"\\n                                (second data) \\\"x\\\" (second data)\\n                                \\\"mm.kicad_mod\\\"))])\\n      ;; adjust fp to remove the last pads\\n      (or (= (length (footprint-pads fp)) (add1 ct))\\n          (error \\\"The QFN's kicad footprint is not CT+1\\\"))\\n      (struct-copy footprint fp\\n                   [pads (drop-right (footprint-pads fp) 1)]))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-QFN\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

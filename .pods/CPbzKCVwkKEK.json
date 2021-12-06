@@ -1,7 +1,5 @@
 {
   "id": "CPbzKCVwkKEK",
-  "parentId": "CPeFthKVBcHR",
-  "index": 0,
   "content": "\"{\\n    \\\"lang\\\": \\\"racket\\\",\\n    \\\"name\\\": \\\"bhdl\\\",\\n    \\\"root\\\": \\\"ROOT/BHDL\\\",\\n    \\\"deps\\\": [\\n        \\\"base\\\",\\n        \\\"graph\\\",\\n        \\\"rebellion\\\",\\n        \\\"uuid\\\"\\n    ],\\n    \\\"build-deps\\\": [\\n        \\\"rackunit-lib\\\"\\n    ],\\n    \\\"pkg-desc\\\": \\\"BHDL: A Programming Language for making PCBs\\\",\\n    \\\"version\\\": \\\"0.1\\\"\\n}\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPeFthKVBcHR",
+  "children": []
 }

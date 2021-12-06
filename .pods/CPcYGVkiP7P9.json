@@ -1,7 +1,5 @@
 {
   "id": "CPcYGVkiP7P9",
-  "parentId": "CPgh3kxexKr7",
-  "index": 14,
   "content": "\"(parameterize ([current-directory \\\"./out/demo-board/matrix\\\"]\\n               [padding-general 2])\\n    (circuit-export matrix-module\\n                    #:auto-place #f\\n                    #:formats '(kicad pdf png svg)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPgh3kxexKr7",
+  "children": []
 }

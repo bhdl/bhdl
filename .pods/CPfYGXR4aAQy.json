@@ -1,7 +1,5 @@
 {
   "id": "CPfYGXR4aAQy",
-  "parentId": "CPnGUxmGW6Tz",
-  "index": 3,
   "content": "\"(define (get-new-ap-funcs)\\n  (let ([cur-aperture \\\"\\\"]\\n        [aperture-lst '()])\\n    (values\\n     (λ (ap)\\n       \\\"If the ap is not in the list, add it. If the ap is not\\ncurrently selected, return a gerber string to select it.\\\"\\n       (unless (member ap aperture-lst)\\n         (set! aperture-lst (append aperture-lst (list ap))))\\n       (if (string=? ap cur-aperture) \\\"\\\"\\n           (begin\\n             (set! cur-aperture ap)\\n             (let ([idx (index-of aperture-lst ap)])\\n               (~a \\\"D\\\" (+ 10 idx) \\\"*\\\\n\\\")))))\\n     (λ ()\\n       \\\"Generate a list of ADD gerber instructions. This must be\\ncalled after all apertures have been added.\\\"\\n       (string-join\\n        (for/list ([ap aperture-lst]\\n                   [i (in-naturals 10)])\\n          (~a \\\"%ADD\\\" i ap \\\"*%\\\"))\\n        \\\"\\\\n\\\")))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"get-new-ap-funcs\":false}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPnGUxmGW6Tz",
+  "children": []
 }

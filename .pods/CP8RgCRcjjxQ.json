@@ -1,7 +1,5 @@
 {
   "id": "CP8RgCRcjjxQ",
-  "parentId": "CPdEhDa4hc4h",
-  "index": 20,
   "content": "\"function place(xs, ys, ws, hs, Es, mask, diearea; vis=false, nsteps=50, nbins=300)\\n    xs = Float32.(xs)\\n    ys = Float32.(ys)\\n    ws = Float32.(ws)\\n    hs = Float32.(hs)\\n\\n    # first, devide into bins\\n    # FIXME use a more formal way of deciding the bouding box\\n    # FIXME more bins\\n    R = Region(xs, ys, ws, hs, diearea, nbins)\\n\\n    # loss: HPWL and density penalty\\n    hpwl(xs, ys, Es)\\n    mask\\n\\n    # move all to the middle\\n    midx = (R.xmin + R.xmax) / 2\\n    midy = (R.ymin + R.ymax) / 2\\n    xs[mask.==1] .= midx\\n    ys[mask.==1] .= midy\\n\\n    # iteratively solve the loss\\n    # 800 * 10 / 3600 = 2.2 hour\\n    # FIXME stop criteria: when the update is small enough for several epochs\\n    @showprogress 0.1 \\\"Running for $nsteps steps ..\\\" for step in 1:nsteps\\n        @debug \\\"step: $step\\\"\\n        \\n        @debug \\\"calculating W ..\\\"\\n        w = W(Es, xs, ys)\\n        @debug \\\"calculating W gradient ..\\\"\\n        wgradx = W_grad_x(Es, xs, :x)\\n        wgrady = W_grad_x(Es, ys, :y)\\n        wgradx[mask .== 0] .= 0\\n        wgrady[mask .== 0] .= 0\\n        # remove the grad for fixed values\\n\\n        # FIXME this density impl seems to be wrong\\n        @debug \\\"Calculating fft density ..\\\"\\n        d, dx, dy = density((xs, ys, ws, hs), R) .|> cpu\\n        dx[mask .== 0] .= 0\\n        dy[mask .== 0] .= 0\\n        # weights HP here\\n        dx .*= 0.001\\n        dy .*= 0.001\\n        wgradx .*= 10\\n        wgrady .*= 10\\n\\n        deltax = wgradx .- dx\\n        deltay = wgrady .- dy\\n        # do a cap\\n        # deltax[deltax .> 10] .= 10\\n        # deltax[deltax .< -10] .= -10\\n        # deltay[deltay .> 10] .= 10\\n        # deltay[deltay .< -10] .= -10\\n        loss = w + sum(d)\\n\\n        # DEBUG use only wgrad\\n        # deltax = wgradx\\n        # deltay = wgrady\\n        # loss = w\\n\\n        @debug(\\\"data\\\", step, loss,\\n              mean(abs.(d)), mean(abs.(wgradx)),\\n              mean(abs.(dx)), hpwl(xs, ys, Es))\\n\\n        # apply mask for fixed macros\\n        xs .-= deltax .* mask\\n        ys .-= deltay .* mask\\n\\n        # map back to valid region\\n        # validate_region!(xs, ys, ws, hs, R)\\n        let idx = (xs .- ws ./ 2 .< R.xmin) .& (mask .== 1)\\n            xs[idx] .= (ws ./ 2 .+ R.xmin)[idx]\\n        end\\n        let idx = (xs .+ ws ./ 2 .> R.xmax) .& (mask .== 1)\\n            xs[idx] .= (ws ./ 2 .- R.xmax)[idx]\\n        end\\n        let idx = (ys .- hs ./ 2 .< R.ymin) .& (mask .== 1)\\n            ys[idx] .= (hs ./ 2 .+ R.ymin)[idx]\\n        end\\n        let idx = (ys .+ hs ./ 2 .> R.ymax) .& (mask .== 1)\\n            ys[idx] .= (hs ./ 2 .- R.ymax)[idx]\\n        end\\n        if vis display(visualize(xs, ys, ws, hs, R)) end\\n    end\\n    # if vis visualize_density((xs, ys, ws, hs), R) end\\n    xs, ys\\nend\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"place\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPdEhDa4hc4h",
+  "children": []
 }

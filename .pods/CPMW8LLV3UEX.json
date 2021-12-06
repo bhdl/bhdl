@@ -1,7 +1,5 @@
 {
   "id": "CPMW8LLV3UEX",
-  "parentId": "CPgh3kxexKr7",
-  "index": 12,
   "content": "\"(show-layout matrix-module)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPgh3kxexKr7",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CP4hFnxrqmWG",
-  "parentId": "CPWtgTBEDKJd",
-  "index": 10,
   "content": "\"(define (send-for-global-and-detailed-place circuit)\\n  \\\"Return global placement result.\\\"\\n  (send-for-placement (Composite->place-spec\\n                      circuit\\n                      #:place-nsteps 50\\n                      #:place-nbins 300\\n                        ;; do not do detailed placement\\n                      #:sa-ncycles 10\\n                      #:sa-nsteps 3000\\n                      #:sa-stepsize 10\\n                      ;; to support rotation, use non-0 e.g. 0.3\\n                      #:sa-theta-stepsize 0)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"send-for-global-and-detailed-place\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPWtgTBEDKJd",
+  "children": []
 }

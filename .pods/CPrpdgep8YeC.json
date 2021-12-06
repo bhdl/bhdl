@@ -1,7 +1,5 @@
 {
   "id": "CPrpdgep8YeC",
-  "parentId": "CP63Je4zKaFa",
-  "index": 30,
   "content": "\"(define/IC (SS8050-G)\\n  ;; SOT-23 Plastic-Encapsulate Transistors\\n\\n  ;; Manufacturer\\tChangjiang Electronics Tech (CJ)\\n  ;; Mfr.Part #\\tSS8050-G\\n  ;; LCSC Part #\\tC164885\\n  ;; Package\\tSOT-23(SOT-23-3)\\n  #:FP (fp-SOT-23\\n        ;; left bottom top\\n        B E C))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"SS8050-G\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

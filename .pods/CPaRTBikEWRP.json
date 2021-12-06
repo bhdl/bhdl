@@ -1,7 +1,5 @@
 {
   "id": "CPaRTBikEWRP",
-  "parentId": "CPQU4nPmdVqN",
-  "index": 10,
   "content": "\"(define-syntax (make-circuit stx)\\n  (syntax-parse\\n    stx\\n    #:datum-literals (pin part wire layout)\\n    [(_ (~alt (~optional (pin ext-pin ...) \\n                         #:defaults ([(ext-pin 1) null]))\\n              (~optional (part dv ...)\\n                         #:defaults ([(dv 1) null]))\\n              (~optional (wire w ...)\\n                         #:defaults ([(w 1) null]))\\n              (~optional (layout l) #:defaults ([l #'#f]))) ...)\\n     #`(make-circuit0 #:external-pins (ext-pin ...)\\n                     #:vars (dv ...)\\n                     #:connect (list w ...)\\n                     #:layout l\\n                     )]))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"make-circuit\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPQU4nPmdVqN",
+  "children": []
 }

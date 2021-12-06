@@ -1,7 +1,5 @@
 {
   "id": "CPWzhhGe8P39",
-  "parentId": "CPNKtDWP37zK",
-  "index": 10,
   "content": "\"(define (lcsc->uuid lcsc-id)\\n  \\\"From lcsc component ID number to footprint UUID\\\"\\n  ;; only symbol is allowed as keys for json package to recognize it as jsexpr?\\n  (when (string? lcsc-id)\\n    (set! lcsc-id (string->symbol lcsc-id)))\\n  (when (not lcsc2uuid)\\n    (if (file-exists? lcsc2uuid-json)\\n        (set! lcsc2uuid\\n              (call-with-input-file lcsc2uuid-json\\n                (lambda (in)\\n                  (read-json in))))\\n        (set! lcsc2uuid (make-hash))))\\n  (when (not (hash-has-key? lcsc2uuid lcsc-id))\\n    ;; read from network\\n    ;; https://easyeda.com/api/products/C440457/svgs\\n    ;;\\n    ;; or probably use the CN site: https://lceda.cn/api/products/C114587/svgs\\n    (let* ([url (~a \\\"https://easyeda.com/api/products/\\\" lcsc-id \\\"/svgs\\\")]\\n           [_ (displayln (~a \\\"requesting \\\" url \\\" ..\\\"))]\\n           [jobj (call/input-url (string->url url)\\n                                 get-pure-port\\n                                 (lambda (in)\\n                                   (read-json in)))]\\n           ;; extract information\\n           [uuid (hash-ref (list-ref (hash-ref jobj 'result) 1) 'component_uuid)])\\n      ;; save uuid\\n      ;;\\n      ;; CAUTION hash-set! does not work because the hashtable from read-json is\\n      ;; immutable\\n      (set! lcsc2uuid (hash-set lcsc2uuid lcsc-id uuid))\\n      (call-with-output-file lcsc2uuid-json\\n        (lambda (out) (write-json lcsc2uuid out))\\n        #:exists 'replace)))\\n  ;; FIXME this will through error if still not found\\n  (hash-ref lcsc2uuid lcsc-id))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"lcsc->uuid\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPNKtDWP37zK",
+  "children": []
 }

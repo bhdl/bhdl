@@ -1,7 +1,5 @@
 {
   "id": "CPKhiCKm3yA9",
-  "parentId": "CPtgV36e4DrU",
-  "index": 0,
   "content": "\"(require pict\\n         rebellion/collection/entry\\n         rebellion/collection/multidict)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPtgV36e4DrU",
+  "children": []
 }

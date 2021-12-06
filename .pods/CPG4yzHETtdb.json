@@ -1,7 +1,5 @@
 {
   "id": "CPG4yzHETtdb",
-  "parentId": "CPckUrdGFJME",
-  "index": 31,
   "content": "\"(define (collect-all-atoms comp)\\n  \\\"This version sort the atoms based on their eq-hash-code.\\\"\\n  (sort (collect-all-atoms-random comp) < #:key eq-hash-code))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"collect-all-atoms\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPckUrdGFJME",
+  "children": []
 }

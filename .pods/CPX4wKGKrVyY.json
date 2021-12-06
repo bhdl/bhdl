@@ -1,7 +1,5 @@
 {
   "id": "CPX4wKGKrVyY",
-  "parentId": "CPQU4nPmdVqN",
-  "index": 27,
   "content": "\"(define-syntax (*< stx)\\n  (syntax-parse stx\\n    [(_ node:maybe-dot ...)\\n     #'(*<-proc (list node.res ...))]))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"*<\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPQU4nPmdVqN",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CPPbakBJEPiH",
-  "parentId": "CPKCKwcMXwfd",
-  "index": 2,
   "content": "\"(struct ICAtom\\n  (ic which-fp attrs)\\n  #:super struct:Atom\\n  #:methods gen:custom-write\\n        [(define (write-proc self port mode)\\n           (write-string (~a \\\"#<ICAtom:\\\"\\n                             (IC-name (ICAtom-ic self))\\n                             \\\"-\\\"\\n                             (eq-hash-code self)\\n;;                              \\\"/\\\" \\n;;                              (IC-attrs self)\\n                             \\\">\\\")\\n                         port))])\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"struct ICAtom\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPKCKwcMXwfd",
+  "children": []
 }

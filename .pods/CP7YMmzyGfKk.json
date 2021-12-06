@@ -1,7 +1,5 @@
 {
   "id": "CP7YMmzyGfKk",
-  "parentId": "CPWtgTBEDKJd",
-  "index": 7,
   "content": "\"(define (send-for-placement specs)\\n  \\\"FIXME detect whether the server is alive, and report meaningful errors and\\nrecover with appropriate default.\\\"\\n  (let ([in (post-pure-port\\n             (string->url (placer-url))\\n             (jsexpr->bytes specs))])\\n    (begin0\\n        ;; TODO parse the placement results\\n        ;;\\n        ;; well, this has header. I need to remote the header, so maybe just use\\n        ;; pure port\\n        (string->jsexpr (port->string in))\\n      (close-input-port in))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"send-for-placement\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPWtgTBEDKJd",
+  "children": []
 }

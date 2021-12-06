@@ -1,7 +1,5 @@
 {
   "id": "CPNgVpci7ytc",
-  "parentId": "CPN8XE37ddzD",
-  "index": 8,
   "content": "\"(define (rotate p degree)\\n  (pict:rotate (maybe-atom->pict p) degree))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"rotate\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPN8XE37ddzD",
+  "children": []
 }

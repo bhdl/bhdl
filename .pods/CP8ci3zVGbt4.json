@@ -1,7 +1,5 @@
 {
   "id": "CP8ci3zVGbt4",
-  "parentId": "CP63Je4zKaFa",
-  "index": 4,
   "content": "\"(define/IC (Resistor R)\\n  #:auto-named-FP (\\\"0603\\\" (fp-resistor \\\"0603\\\"))\\n  #:auto-named-FP (\\\"0805\\\" (fp-resistor \\\"0805\\\"))\\n  #:PREFIX \\\"R\\\"\\n  #:LEFT 1\\n  #:RIGHT 2)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"Resistor\":true,\"R\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

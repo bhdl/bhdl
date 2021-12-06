@@ -1,7 +1,5 @@
 {
   "id": "CPBUCD3ERw3Q",
-  "parentId": "CPtgV36e4DrU",
-  "index": 3,
   "content": "\"(define (IC->fp-pict+Hlocs ic which-fp)\\n  ;; generate footprint for ic\\n  ;; 1. get the first footprint spec that matches selection\\n  (let* ([spec (ic-select-fpspec ic which-fp)]\\n         [fp (FpSpec-fp spec)]\\n         [pad-names (map pad-spec-name (footprint-pads fp))]\\n         [pins (FpSpec-pins spec)]\\n         [Hpin->pad (for/hash ([pin pins]\\n                               [pad pad-names])\\n                      (values pin pad))])\\n    ;; CAUTION p is scaled here\\n    (or (= (length pins) (length pad-names))\\n        (error \\\"pins and pad-names do not match: \\\"\\n               (length pins) (length pad-names)))\\n    (let-values ([(p Hlocs) (footprint->pict+Hlocs fp)])\\n      ;; 1. compute the new Hlocs using pin name instead of number index,\\n      ;; because the number index is different across different footprint\\n      ;; packagings\\n      ;;\\n      ;; UPDATE but actually many footprint has already the pin name as index.\\n      (let ([Hlocs (for/hash ([pin pins])\\n                     ;; FIXME the pin here may duplicate, e.g. there may be\\n                     ;; multiple 5V and GND, and they actually maps to multiple\\n                     ;; connected pins of the chip\\n                     (values pin (hash-ref Hlocs (hash-ref Hpin->pad pin))))])\\n        (values p Hlocs)))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"IC->fp-pict+Hlocs\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPtgV36e4DrU",
+  "children": []
 }

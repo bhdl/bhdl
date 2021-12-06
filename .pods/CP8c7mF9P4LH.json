@@ -1,7 +1,5 @@
 {
   "id": "CP8c7mF9P4LH",
-  "parentId": "CPENFUAttyc7",
-  "index": 2,
   "content": "\"(define (fp-kailh-socket [unit 1])\\n  (match-let* ([(list x1 y1 x2 y2) (get-4-corners (footprint-lines kailh-socket-fp-1))]\\n              [u1 (- x2 x1)]\\n              [Δx (/ (* (- unit 1) u1) 2)]\\n              [stroke (line-spec-width (car (footprint-lines kailh-socket-fp-1)))]\\n              [(list x1n x2n) (list (- x1 Δx) (+ x2 Δx))])\\n             ;; more lines\\n            (footprint (append (footprint-lines kailh-socket-fp-1)\\n                               (list (line-spec x1n y1 x2n y1 stroke)\\n                                   (line-spec x2n y1 x2n y2 stroke)\\n                                   (line-spec x2n y2 x1n y2 stroke)\\n                                   (line-spec x1n y2 x1n y1 stroke)))\\n                       (footprint-pads kailh-socket-fp-1)\\n                       ;; not place at the middle, but bottom right\\n                       (list (text-spec (+ x1 (* u1 0.75))\\n                                        (+ y1 (* (- y2 y1) 0.75))))\\n                       (footprint-holes kailh-socket-fp-1))\\n             ))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-kailh-socket\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPENFUAttyc7",
+  "children": []
 }

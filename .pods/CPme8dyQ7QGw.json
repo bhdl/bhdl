@@ -1,7 +1,5 @@
 {
   "id": "CPme8dyQ7QGw",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 27,
   "content": "\"(define (fp-TSSOP ct)\\n  ;; TSSOP-56_6.1x14mm_P0.5mm.kicad_mod\\n  (let ([data (case ct\\n                [(8) '(4.4 3 0.65)]\\n                [(14) '(4.4 5 0.65)]\\n                [(16) '(4.4 5 0.65)]\\n                [(20) '(4.4 6.5 0.65)]\\n                [(24) '(4.4 7.8 0.65)]\\n                [(28) '(4.4 9.7 0.65)]\\n\\n                [(30) '(4.4 7.8 0.5)]\\n                [(32) '(6.1 11 0.65)]\\n                [(38) '(6.1 12.5 0.65)]\\n                [(48) '(6.1 12.5 0.5)]\\n                [(56) '(6.1 14 0.5)])])\\n    (kicad-helper \\\"Package_SO.pretty/\\\"\\n                  (~a \\\"TSSOP-\\\" ct \\\"_\\\"\\n                      (first data) \\\"x\\\" (second data)\\n                      \\\"mm_P\\\" (third data) \\\"mm.kicad_mod\\\"))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-TSSOP\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CPcTE4rin7wt",
-  "parentId": "CPQU4nPmdVqN",
-  "index": 12,
   "content": "\"(define-syntax (circuit stx)\\n  (syntax-parse\\n    stx\\n    [(_ name x ...)\\n     #`(define (name)\\n         (make-circuit x ...))]))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"circuit\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPQU4nPmdVqN",
+  "children": []
 }

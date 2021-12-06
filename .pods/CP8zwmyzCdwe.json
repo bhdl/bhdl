@@ -1,7 +1,5 @@
 {
   "id": "CP8zwmyzCdwe",
-  "parentId": "CPPVAQ3PqWjt",
-  "index": 4,
   "content": "\"Pkg.add(\\\"Flux\\\")\\nPkg.add(\\\"Zygote\\\")\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPPVAQ3PqWjt",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CP3TRkHCaCrr",
-  "parentId": "CP7f8k4k7kLU",
-  "index": 2,
   "content": "\"(define (fix-atom-xy-pin atom loc offset)\\n  ;; this is pin offset\\n  (match-let* ([(Point x y a) loc]\\n               [(Point offx offy _) offset]\\n               [macro (atom->macro atom)]\\n               [w (Macro-w macro)]\\n               [h (Macro-h macro)]\\n               ;; FIXME duplicate code\\n               [Δx (+ (- (/ w 2)) offx)]\\n               [Δy (+ (- (/ h 2)) offy)]\\n               [r (sqrt (+ (expt Δx 2) (expt Δy 2)))]\\n               [sinθ (/ Δy r)]\\n               [cosθ (/ Δx r)]\\n               [θ (sincos->theta sinθ cosθ)]\\n               [fixed-θ (+ θ a)]\\n               [fixed-x (+ x (* r (cos fixed-θ)))]\\n               [fixed-y (+ y (* r (sin fixed-θ)))])\\n    ;; FIXME well, I'm using the old code. But both the old and new is not\\n    ;; precise for the pin location. But that doesn't matter, because KiCAD and\\n    ;; .dsn files do not use the pin locations, this is only for visualization\\n    ;; purpose.\\n    (Point\\n     ;; CAUTION this macro pin offset is not centered, to keep consistent with\\n     ;; gerber file convention.\\n     (+ (- x (/ w 2)) offx)\\n     (+ (- y (/ h 2)) offy)\\n    0)\\n    #;(Point fixed-x fixed-y a)\\n    ))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fix-atom-xy-pin\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP7f8k4k7kLU",
+  "children": []
 }

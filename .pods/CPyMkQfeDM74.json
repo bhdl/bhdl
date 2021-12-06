@@ -1,7 +1,5 @@
 {
   "id": "CPyMkQfeDM74",
-  "parentId": "CP9hPyBA9z8P",
-  "index": 14,
   "content": "\"(define (hash-ref-ref hash . keys)\\n  (for/fold ([acc hash])\\n      ([key keys])\\n    (hash-ref acc key)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"hash-ref-ref\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP9hPyBA9z8P",
+  "children": []
 }

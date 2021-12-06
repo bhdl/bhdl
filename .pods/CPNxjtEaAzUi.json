@@ -1,7 +1,5 @@
 {
   "id": "CPNxjtEaAzUi",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 3,
   "content": "\"(define kicad-footprint-paths\\n  (make-parameter (map (lambda (x)\\n                         (build-path (bhdl-footprints-path)\\n                                     x))\\n                       '(\\\"kicad-footprints\\\"\\n                         \\\"arduino-kicad-library\\\"\\n                         \\\"SparkFun-KiCad-Libraries/Footprints\\\"\\n                         \\\".\\\"))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

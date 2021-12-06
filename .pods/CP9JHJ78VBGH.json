@@ -1,7 +1,5 @@
 {
   "id": "CP9JHJ78VBGH",
-  "parentId": "CPrmYHr6Ux6K",
-  "index": 6,
   "content": "\"(define (output-placement-engine)\\n  (when (the-placement-process)\\n        ;; read the stdin\\n        ;; FIXME however this can read only once\\n        ;; FIXME this is blocking\\n        (port->string (list-ref (the-placement-process) 0)\\n                      #:close? #f)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"output-placement-engine\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPrmYHr6Ux6K",
+  "children": []
 }

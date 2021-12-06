@@ -1,7 +1,5 @@
 {
   "id": "CPLbcR6VDWMm",
-  "parentId": "CPQU4nPmdVqN",
-  "index": 17,
   "content": "\"(define (*--proc lst)\\n  (let ([item-1 (first lst)]\\n        [item-n (last lst)]\\n        \\n        [res (make-circuit0 #:external-pins (left right))])\\n    ;; connect res.2 with first.1\\n    (hook-proc! res (Net (list (pin-ref res 'left)\\n                               (pin-ref item-1 'left))))\\n    ;; end\\n    (hook-proc! res (Net (list (pin-ref item-n 'right)\\n                               (pin-ref res 'right))))\\n    (for/fold ([prev (first lst)])\\n        ([cur (rest lst)])\\n      (hook-proc! res (Net (list (pin-ref prev 'right)\\n                                 (pin-ref cur 'left))))\\n      cur)\\n    res))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "null",
   "exports": "null",
   "midports": "null",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPQU4nPmdVqN",
+  "children": []
 }

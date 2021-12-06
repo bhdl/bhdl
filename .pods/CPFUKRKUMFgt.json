@@ -1,7 +1,5 @@
 {
   "id": "CPFUKRKUMFgt",
-  "parentId": "CPdEhDa4hc4h",
-  "index": 11,
   "content": "\"function rho_cells(vs, R)\\n    xs, ys, ws, hs = vs\\n\\n    # bx1s = reshape([R.xmin + R.bw * (i-1) for i in 1:R.M for j in 1:R.M], R.M, R.M)\\n    # bx2s = reshape([R.xmin + R.bw * i for i in 1:R.M for j in 1:R.M], R.M, R.M)\\n    # by1s = reshape([R.ymin + R.bh * (j-1) for i in 1:R.M for j in 1:R.M], R.M, R.M)\\n    # by2s = reshape([R.ymin + R.bh * j for i in 1:R.M for j in 1:R.M], R.M, R.M)\\n    \\n    pxs = reshape(xs, 1, 1, length(xs))\\n    pys = reshape(ys, 1, 1, length(ys))\\n    pws = reshape(ws, 1, 1, length(ws))\\n    phs = reshape(hs, 1, 1, length(hs))\\n\\n    # FIXME moving data between cpu and gpu\\n    x1 = max.(pxs .- pws / 2, R.bx1s)\\n    y1 = max.(pys .- phs / 2, R.by1s)\\n    x2 = min.(pxs .+ pws / 2, R.bx2s)\\n    y2 = min.(pys .+ phs / 2, R.by2s)\\n\\n    max.(x2 - x1, 0) .* max.(y2 - y1, 0)\\nend\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPdEhDa4hc4h",
+  "children": []
 }

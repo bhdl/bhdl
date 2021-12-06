@@ -1,7 +1,5 @@
 {
   "id": "CPcK7kndEYfX",
-  "parentId": "CPNKtDWP37zK",
-  "index": 7,
   "content": "\"(define (parse-pad str)\\n  (match-let ([(list _ shape x y\\n                     ;; seems to be in reverse order???\\n                     width height\\n                     layer net name\\n                     hole-radius points rotation ID\\n                     ;; HACK\\n                     ;; ...\\n                     hole-length hole-points\\n                     other ...)\\n               (string-split str \\\"~\\\")])\\n    (let* ([type (if (= (string->number hole-length) 0) 'smd 'thru_hole)]\\n           [dsize (case type\\n                    [(smd) (list 0)]\\n                    [(thru_hole) (match-let ([(list x1 y1 x2 y2)\\n                                              (map string->number\\n                                                   (string-split hole-points))])\\n                                   (let ([w (adapt-unit (- x2 x1))]\\n                                         [h (adapt-unit (abs (- y2 y1)))])\\n                                     ;; CAUTION x2 seems to be reasonable size ..\\n                                     (list 'oval (adapt-unit\\n                                                    (* 2 (adapt-unit hole-radius)))\\n                                           (adapt-unit hole-length))))])]\\n           [layer (case (string->number layer)\\n                        [(1) 'top]\\n                        [(2) 'bottom]\\n                        [(11) 'multi]\\n                        [else (error \\\"layer not 1,2,11: \\\" layer)])])\\n      (pad-spec (->padname name)\\n                (adapt-unit x)\\n                (adapt-unit y)\\n                0\\n                type\\n                ;; FIXME shape corresponding to kicad\\n                ;; KiCAD has no ellipse pads, using oval instead\\n                (if (string=? (string-downcase shape) \\\"ellipse\\\") \\n                    'oval\\n                    (string->symbol (string-downcase shape)))\\n                (list (adapt-unit width)\\n                      (adapt-unit height))\\n                ;; hole? shape?\\n                ;; d size is also a 2 size, same when round, differ when oval\\n                ;; (10mil->mm (string->number hole-radius))\\n                ;; not the hole-radius, but hole-points\\n                ;;\\n                ;; FIXME rotation seems to follow the pad\\n                dsize\\n                layer))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPNKtDWP37zK",
+  "children": []
 }

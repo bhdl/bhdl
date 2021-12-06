@@ -1,7 +1,5 @@
 {
   "id": "CPHrtCRKF3Xp",
-  "parentId": "CP63Je4zKaFa",
-  "index": 45,
   "content": "\"(define/IC (Arduino-Mini)\\n  ;; FIXME the sparkfun kicad library is very messy (e.g. see PRO_MINI symbol\\n  ;; library and footprint mismatch). I need to figure them out.\\n           #:ALIAS ([A5 SCL]\\n                   [A4 SDA])\\n  #:FP ((fp-Arduino 'Mini)\\n        TX RX RESET GND\\n        D2 D3 D4 D5 D6 D7\\n        D8 D9 D10 D11 D12 D13\\n        A0 A1 A2 A3 \\n        VCC RESET GND VIN\\n        A4 A5 A6 A7\\n        ;; FIXME ??? these pins are probably not useful\\n        NC NC NC NC NC NC))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"Arduino-Mini\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

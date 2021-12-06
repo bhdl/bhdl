@@ -1,7 +1,5 @@
 {
   "id": "CP4mfpFXQ6TM",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 18,
   "content": "\";; CAUTION FIXME this is completely a dummy fp to ease development placeholders\\n(define fp-dummy fp-1602)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-dummy\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

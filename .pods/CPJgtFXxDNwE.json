@@ -1,7 +1,5 @@
 {
   "id": "CPJgtFXxDNwE",
-  "parentId": "CP63Je4zKaFa",
-  "index": 6,
   "content": "\"(define/IC (Fuse)\\n  #:auto-FP (fp-fuse \\\"1206\\\")\\n  #:PREFIX \\\"F\\\"\\n  #:LEFT 1\\n  #:RIGHT 2)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"Fuse\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

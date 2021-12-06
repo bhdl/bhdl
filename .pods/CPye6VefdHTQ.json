@@ -1,7 +1,5 @@
 {
   "id": "CPye6VefdHTQ",
-  "parentId": "CP63Je4zKaFa",
-  "index": 25,
   "content": "\"(define/IC (ATmega16U4 ATmega32U4)\\n  ;; it is very similar to the U2 edition\\n  #:datasheet \\\"http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7766-8-bit-AVR-ATmega16U4-32U4_Datasheet.pdf\\\"\\n  #:ALIAS ([PB0 SS PCINT0]\\n          [PB1 PCINT1 SCLK]\\n          [PB2 PDI PCINT2 MOSI]\\n          [PB3 PDO PCINT3 MISO]\\n          (PB4 PCINT4 ADC11)\\n          ;; FIXME ADC12, ADC13, OC4B  ???\\n          (PB5 PCINT5 OC1A OC4A ADC12)\\n          (PB6 PCINT6 OC1B OC4B ADC13)\\n          [PB7 PCINT7 OC0A OC1C RTS]\\n\\n          (PC6 OC3A OC4A)\\n          (PC7 ICP3 CLK0 OC4A)\\n\\n          (PD0 OC0B SCL INT0)\\n          (PD1 SDA INT1)\\n          (PD2 RXD1 INT2)\\n          (PD3 TXD1 INT3)\\n          (PD4 ICP1 ADC8)\\n          (PD5 XCK1 CTS)\\n          (PD6 T1 OC4D ADC9)\\n          (PD7 T0 OC4D ADC10)\\n\\n          (PE2 HWB)\\n          [PE6 INT6 AIN0]\\n\\n          (PF0 ADC0)\\n          (PF1 ADC1)\\n          (PF4 ADC4 TCK)\\n          (PF5 ADC5 TMS)\\n          (PF6 ADC6 TDO)\\n          (PF7 ADC7 TDI))\\n  #:QFN (44 PE6 UVCC D- D+ UGND UCAP VBUS PB0 PB1 PB2 PB3\\n            PB7 RESET VCC GND XTAL2 XTAL1 PD0 PD1 PD2 PD3 PD5\\n            GND AVCC PD4 PD6 PD7 PB4 PB5 PB6 PC6 PC7 PE2\\n            VCC GND PF7 PF6 PF5 PF4 PF1 PF0 AREF GND AVCC)\\n  #:TQFP (44\\n        PE6 UVCC D- D+ UGND UCAP VBUS PB0 PB1 PB2 PB3\\n            PB7 RESET VCC GND XTAL2 XTAL1 PD0 PD1 PD2 PD3 PD5\\n            GND AVCC PD4 PD6 PD7 PB4 PB5 PB6 PC6 PC7 PE2\\n            VCC GND PF7 PF6 PF5 PF4 PF1 PF0 AREF GND AVCC)\\n  #:named-FP ((lcsc->fp \\\"C44854\\\")\\n              \\\"TQFP-44-lcsc\\\"\\n        ;; QFP-44_10x10x08P\\n        ;; ATMEGA32U4-AU\\n              ;; FIXME KiCAD QFP-44 contains rotated pads\\n        PE6 UVCC D- D+ UGND UCAP VBUS PB0 PB1 PB2 PB3\\n            PB7 RESET VCC GND XTAL2 XTAL1 PD0 PD1 PD2 PD3 PD5\\n            GND AVCC PD4 PD6 PD7 PB4 PB5 PB6 PC6 PC7 PE2\\n            VCC GND PF7 PF6 PF5 PF4 PF1 PF0 AREF GND AVCC))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"ATmega16U4\":true,\"ATmega32U4\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

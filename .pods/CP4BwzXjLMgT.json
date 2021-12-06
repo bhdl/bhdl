@@ -1,7 +1,5 @@
 {
   "id": "CP4BwzXjLMgT",
-  "parentId": "CPN8XE37ddzD",
-  "index": 2,
   "content": "\"(define (pin-over base dx dy p)\\n  (pict:panorama \\n    (pict:pin-over (maybe-atom->pict  base)\\n                 dx dy\\n                 (maybe-atom->pict  p))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"pin-over\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPN8XE37ddzD",
+  "children": []
 }

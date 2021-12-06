@@ -1,7 +1,5 @@
 {
   "id": "CPtVmN68gV3F",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 14,
   "content": "\"(define (fp-pin-header ct)\\n  ;; available ct: 1,2,3,4,5,6,7,8\\n  (kicad-helper \\\"Connector_PinHeader_2.54mm.pretty/\\\"\\n                (~a \\\"PinHeader_1x\\\"\\n                    (~r ct #:min-width 2 #:pad-string \\\"0\\\")\\n                    \\\"_P2.54mm_Vertical.kicad_mod\\\")))\\n\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-pin-header\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

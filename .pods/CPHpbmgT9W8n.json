@@ -1,7 +1,5 @@
 {
   "id": "CPHpbmgT9W8n",
-  "parentId": "CPckUrdGFJME",
-  "index": 21,
   "content": "\"(define (get-neighbors lsts item)\\n  \\\"Get the (direct) neighbors of item inside the lsts.\\\"\\n  (set-remove (for/fold ([res (seteq)])\\n                        ([lst lsts])\\n                (if (member item lst eq?)\\n                    (set-union res (list->seteq lst))\\n                    res))  item))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"get-neighbors\":false}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPckUrdGFJME",
+  "children": []
 }

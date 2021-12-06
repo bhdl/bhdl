@@ -1,7 +1,5 @@
 {
   "id": "CPUCVGnHxDwP",
-  "parentId": "CP63Je4zKaFa",
-  "index": 20,
   "content": "\"(define/IC (ATtiny25 ATtiny45 ATtiny85)\\n  #:datasheet \\\"http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf\\\"\\n  #:ALIAS ([VCC]\\n          [GND]\\n          [PB0 MOSI DI SDA AIN0 OC0A OC1A AREF PCINT0]\\n          [PB2 SCK USCK SCL ADC1 T0 INT0 PCINT2]\\n          [PB3 PCINT3 XTAL1 CLKI OC1B ADC3]\\n          [PB4 PCINT4 XTAL2 CLKO OC1B ADC2]\\n          [PB5 PCINT5 RESET ADC0 DW])\\n  #:DIP (8 PB5 PB3 PB4 GND PB0 PB1 PB2 VCC)\\n  #:QFN (20 PB5 PB3 DNC DNC PB4\\n            DNC DNC GND DNC DNC\\n            PB0 PB1 DNC PB2 VCC\\n            DNC DNC DNC DNC DNC))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"ATtiny25\":true,\"ATtiny45\":true,\"ATtiny85\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

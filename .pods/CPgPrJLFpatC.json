@@ -1,7 +1,5 @@
 {
   "id": "CPgPrJLFpatC",
-  "parentId": "CPBmYNgbhetq",
-  "index": 2,
   "content": null,
   "column": 1,
   "fold": true,
@@ -13,5 +11,11 @@
   "imports": "{}",
   "exports": "{\"self\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPBmYNgbhetq",
+  "children": [
+    "CPTKzXCURbig",
+    "CP6M6tV7VJkb",
+    "CP63Je4zKaFa"
+  ]
 }

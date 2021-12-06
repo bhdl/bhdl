@@ -1,7 +1,5 @@
 {
   "id": "CPfwxh3gLJqC",
-  "parentId": "CPdEhDa4hc4h",
-  "index": 22,
   "content": "\"function cost_f_fast(xs, ys, ws, hs, x, y, w, h, R)\\n    x1 = x - w/2\\n    y1 = y - h/2\\n    x2 = x + w/2\\n    y2 = y + h/2\\n\\n    x1s = xs .- ws ./ 2\\n    y1s = ys .- hs ./ 2\\n\\n    x2s = xs .+ ws ./ 2\\n    y2s = ys .+ hs ./ 2\\n\\n    return sum((x1s .< x2) .& (y1s .< y2) .& (x2s .> x1) .& (y2s .> y1))\\nend\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPdEhDa4hc4h",
+  "children": []
 }

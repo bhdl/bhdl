@@ -1,7 +1,5 @@
 {
   "id": "CPKqKPDPHieE",
-  "parentId": "CP9hPyBA9z8P",
-  "index": 4,
   "content": "\"(define (map-recur-normalize lst)\\n  ;; 1. get length\\n  (if (empty? (filter list? lst))\\n      lst\\n      (let ([len (length (first (filter list? lst)))])\\n        (map (λ (x) (if (list? x) x (make-list len x))) lst))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"map-recur-normalize\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP9hPyBA9z8P",
+  "children": []
 }

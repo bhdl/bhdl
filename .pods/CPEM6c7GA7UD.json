@@ -1,7 +1,5 @@
 {
   "id": "CPEM6c7GA7UD",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 11,
   "content": "\"\\n(define fp-sw-push (kicad-helper \\\"Button_Switch_THT.pretty/\\\"\\n                                 \\\"SW_PUSH_6mm.kicad_mod\\\"))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-sw-push\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

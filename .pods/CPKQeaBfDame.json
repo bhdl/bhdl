@@ -1,7 +1,5 @@
 {
   "id": "CPKQeaBfDame",
-  "parentId": "CPNKtDWP37zK",
-  "index": 2,
   "content": "\"(define (read-easyeda fname)\\n  \\\"Read EasyEDA json file.\\\"\\n  (let ([jobj (call-with-input-file fname\\n                                    (lambda (in) (read-json in)))])\\n    (match-let* \\n      ([origin-x (adapt-unit (hash-ref-ref jobj 'head 'x))]\\n       [origin-y (adapt-unit (hash-ref-ref jobj 'head 'y))]\\n       [pre (hash-ref-ref jobj 'head 'c_para 'pre)]\\n       [canvas (hash-ref jobj 'canvas)]\\n       [shapes (hash-ref jobj 'shape)]\\n       [tracks (filter (lambda (x) (string-prefix? x \\\"TRACK\\\")) shapes)]\\n       [rects (filter (lambda (x) (string-prefix? x \\\"RECT\\\")) shapes)]\\n       [pads (filter (lambda (x) (string-prefix? x \\\"PAD\\\")) shapes)]\\n       [holes (filter (lambda (x) (string-prefix? x \\\"HOLE\\\")) shapes)]\\n       [_ (for ([shape (filter-not \\n                         (lambda (x) \\n                           (or (string-prefix? x \\\"TRACK\\\")\\n                               (string-prefix? x \\\"RECT\\\")\\n                               (string-prefix? x \\\"PAD\\\")\\n                               (string-prefix? x \\\"HOLE\\\"))) shapes)])\\n            ;; FIXME HOLEs\\n            ;; FIXME removing debug output for verbosity\\n            ; (debug \\\"unrecognized shape: \\\" (first (string-split shape \\\"~\\\")))\\n            (void)\\n            )]\\n       ;; FIXME more shapes, like \\\"PL ...\\\"\\n       ;; FIXME report warnings for unrecognized shapes\\n       [(hash-table ('x x) ('y y) ('width width) ('height height))\\n        (hash-ref jobj 'BBox)])\\n      ;; FIXME unit\\n      (match-let* ([line-specs (flatten (list (for/list ([track tracks])\\n                                                (parse-track track))\\n                                              (for/list ([rect rects])\\n                                                (parse-rect rect))))]\\n                   [pad-specs (for/list ([pad pads])\\n                                (parse-pad pad))]\\n                   [hole-specs (for/list ([hole holes])\\n                                 (parse-hole hole))]\\n                   [fn (lambda (item) (spec-offset item origin-x origin-y))]\\n                   [(list x1 y1 x2 y2) (get-4-corners (map fn line-specs))])\\n                  (footprint (map fn line-specs)\\n                             (map fn pad-specs)\\n                             ;; by default, place at left\\n                             ;; FIXME hard-coded \\\"3\\\" what's the unit? mm?\\n                             (list (text-spec (- x1 3) (* 0.5 (+ y1 y2)))\\n                                   (text-spec 0 0))\\n                             (map fn hole-specs))))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPNKtDWP37zK",
+  "children": []
 }

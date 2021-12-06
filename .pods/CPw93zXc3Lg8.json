@@ -1,7 +1,5 @@
 {
   "id": "CPw93zXc3Lg8",
-  "parentId": "CPRfakBVH9q6",
-  "index": 2,
   "content": "\"(define (padstack-spec pad)\\n  (match pad\\n    [(pad-spec name x y a mounting-type\\n               shape (list s1 s2) dsize layer)\\n     ;; return PADSTACK-ID\\n     (case shape\\n       ;; FIXME treat roundrect as rect\\n       [(rect roundrect)\\n        (let ([ID (padstack-id pad)])\\n          `(padstack \\n             ,ID\\n             ;; FIXME these F.Cu and B.Cu are almost certainly wrong\\n             (shape (rect F.Cu\\n                          ,(- (/ (* s1 1000) 2))\\n                          ,(- (/ (* s2 1000) 2))\\n                          ,(/ (* s1 1000) 2)\\n                          ,(/ (* s2 1000) 2)))\\n             ,@(case mounting-type\\n                 [(thru_hole np_thru_hole)\\n                  `((shape (rect B.Cu\\n                                 ,(- (/ (* s1 1000) 2))\\n                                 ,(- (/ (* s2 1000) 2))\\n                                 ,(/ (* s1 1000) 2)\\n                                 ,(/ (* s2 1000) 2))))]\\n                 [(smd) null]\\n                 [else (error \\\"Mounting type error.\\\")])\\n               (attach off)))]\\n       ;; FIXME\\n       [(circle) \\n        (let ([ID (padstack-id pad)])\\n          `(padstack \\n             ,ID\\n             (shape (circle F.Cu ,(* s1 1000)))\\n             ,@(case mounting-type\\n                 [(thru_hole np_thru_hole)\\n                  `((shape (circle B.Cu ,(* s1 1000))))]\\n                 [(smd) null]\\n                 [else (error \\\"Mounting type error.\\\")])\\n               (attach off)))]\\n       [(oval)\\n        (let ([ID (padstack-id pad)])\\n          `(padstack \\n             ,ID\\n                     (shape (path F.Cu ,(* s2 1000)\\n                                  ;; FIXME not always 0\\n                                  0 0 0 0))\\n                     ,@(case mounting-type\\n                         [(thru_hole np_thru_hole) \\n                         `((shape (path B.Cu ,(* s2 1000)\\n                                                                  ;; FIXME not always 0\\n                                                                  0 0 0 0)))]\\n                         [(smd) null]\\n                         [else (error \\\"Mounting type error.\\\")])\\n                       (attach off)))])]))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPRfakBVH9q6",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CPbkNmCKBKq4",
-  "parentId": "CPRfakBVH9q6",
-  "index": 3,
   "content": "\"(define (dsn-prefix w h)\\n  `((parser (parser\\n             (string_quote #\\\\\\\")\\n             (space_in_quoted_tokens on)\\n             (host_cad \\\"KiCad's Pcbnew\\\")\\n             (host_version \\\"5.1.4+dfsg1-1\\\")))\\n    ;; CAUTION small value (e.g. 1) doesn't work, leave many unrouted\\n    (resolution um 10)\\n    (unit um)\\n    (structure\\n     (layer F.Cu\\n            (type signal)\\n            (property\\n             (index 0)))\\n     (layer B.Cu\\n            (type signal)\\n            (property\\n             (index 1)))\\n     (boundary\\n      (rect pcb\\n            ;; CAUTION negative!\\n            0 ,(- (* h 1000))\\n            ,(* w 1000) 0))\\n     (via \\\"Via[0-1]_1000:400_um\\\")\\n     (rule\\n      (width 250)\\n      (clearance 203.3)\\n      (clearance 203.3 (type default_smd))\\n      (clearance 50.8 (type smd_smd))))))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPRfakBVH9q6",
+  "children": []
 }

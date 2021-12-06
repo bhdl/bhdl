@@ -1,7 +1,5 @@
 {
   "id": "CPKiqRJDULRA",
-  "parentId": "CP63Je4zKaFa",
-  "index": 11,
   "content": "\"(define/IC (LED0603)\\n  #:PREFIX \\\"LED\\\"\\n  #:FP ((lcsc->fp \\\"C192316\\\")\\n        - +)\\n  #:LEFT +\\n  #:RIGHT -)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "null",
   "exports": "{\"LED0603\":true}",
   "midports": "null",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CPc7tKwbVmHM",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 26,
   "content": "\"(define (fp-SOIC ct)\\n  ;; SOIC-8_3.9x4.9mm_P1.27mm.kicad_mod\\n  ;; SOIC-14_3.9x8.7mm_P1.27mm.kicad_mod\\n  ;; SOIC-16W_7.5x10.3mm_P1.27mm.kicad_mod\\n  ;; SOIC-18W_7.5x11.6mm_P1.27mm.kicad_mod\\n  ;; SOIC-20W_7.5x12.8mm_P1.27mm.kicad_mod\\n  ;; SOIC-24W_7.5x15.4mm_P1.27mm.kicad_mod\\n  ;; SOIC-28W_7.5x17.9mm_P1.27mm.kicad_mod\\n  (kicad-helper \\\"Package_SO.pretty/\\\"\\n                (~a \\\"SOIC-\\\" ct \\\"W_7.5x\\\"\\n                    (case ct\\n                      [(16) 10.3]\\n                      [(18) 11.6]\\n                      [(20) 12.8]\\n                      [(24) 15.4]\\n                      [(28) 17.9])\\n                    \\\"mm_P1.27mm.kicad_mod\\\")))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-SOIC\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

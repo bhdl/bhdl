@@ -1,7 +1,5 @@
 {
   "id": "CPwfMtikxrrJ",
-  "parentId": "CPckUrdGFJME",
-  "index": 32,
   "content": "\"(define (collect-all-pins comp)\\n  (remove-duplicates\\n   (apply append (for/list ([net (Composite->netlist-1 comp)])\\n                   (for/list ([pin (Net-pins net)])\\n                     pin)))))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"collect-all-pins\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPckUrdGFJME",
+  "children": []
 }

@@ -1,7 +1,5 @@
 {
   "id": "CPjVHGiRNnQ9",
-  "parentId": "CP63Je4zKaFa",
-  "index": 1,
   "content": "\"(require (for-syntax syntax/parse\\n                     racket/list\\n                     racket/format\\n                     racket/string)\\n         pict)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

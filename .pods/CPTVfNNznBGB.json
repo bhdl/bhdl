@@ -1,7 +1,5 @@
 {
   "id": "CPTVfNNznBGB",
-  "parentId": "CPQU4nPmdVqN",
-  "index": 2,
   "content": "\"(begin-for-syntax\\n (define-splicing-syntax-class\\n  pin-cls\\n  (pattern (~seq name [num]))\\n  (pattern (~seq name)\\n           #:with num -1)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPQU4nPmdVqN",
+  "children": []
 }

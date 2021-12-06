@@ -1,7 +1,5 @@
 {
   "id": "CP6xjzmeCgRF",
-  "parentId": "CPNKtDWP37zK",
-  "index": 8,
   "content": "\"(define (parse-hole str)\\n  (match-let ([(list _ x y d other ...)\\n               (string-split str \\\"~\\\")])\\n             ;; HACK a pad with \\\"\\\" as name is a hole, doesn't have electrical pads,\\n             ;; but only footprint. On the footprint, it should not be red.\\n             (pad-spec \\\"\\\" (adapt-unit x)\\n                              (adapt-unit y)\\n                       0\\n                       'thru_hole\\n                       'circle\\n                       (list (* 2 (adapt-unit d)) (* 2 (adapt-unit d)))\\n                       (list (* 2 (adapt-unit d)))\\n                       'multi)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPNKtDWP37zK",
+  "children": []
 }

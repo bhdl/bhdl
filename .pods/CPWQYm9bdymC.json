@@ -1,7 +1,5 @@
 {
   "id": "CPWQYm9bdymC",
-  "parentId": "CP6KwDyj8wHg",
-  "index": 5,
   "content": "\"(define (save-file p filename)\\n  (let ([out (open-output-file filename\\n                               #:mode 'binary\\n                               #:exists 'replace)])\\n    ;; depends on the filename extension\\n    (write-bytes (convert p (case (filename-extension filename)\\n                              [(#\\\"pdf\\\") 'pdf-bytes]\\n                              [(#\\\"svg\\\") 'svg-bytes]\\n                              [(#\\\"png\\\") 'png-bytes]\\n                              [else (error \\\"Not supported\\\")]))\\n                 out)\\n    (close-output-port out)))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"save-file\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP6KwDyj8wHg",
+  "children": []
 }

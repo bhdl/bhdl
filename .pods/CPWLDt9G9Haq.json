@@ -1,7 +1,5 @@
 {
   "id": "CPWLDt9G9Haq",
-  "parentId": "CPHKPFTgKmQp",
-  "index": 4,
   "content": "\"(define (kicad-helper . lst)\\n  ;; libpath is a list of path\\n  ;;\\n  ;; FIXME the first match will be returned. This is problematic when different\\n  ;; path contains same name\\n  (or (for/or ([d (kicad-footprint-paths)])\\n        (let ([p (expand-user-path (apply build-path d lst))])\\n          (if (file-exists? p)\\n              (read-kicad-mod p)\\n              #f)))\\n      (error \\\"Cannot find the kicad file for: \\\" lst)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPHKPFTgKmQp",
+  "children": []
 }

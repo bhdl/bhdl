@@ -1,7 +1,5 @@
 {
   "id": "CPLTjrywPwTP",
-  "parentId": "CPENFUAttyc7",
-  "index": 3,
   "content": "\"(define fp-kailh-socket-merge\\n  (merge-fp fp-kailh-socket-kicad\\n            fp-stabilizer-2u))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"fp-kailh-socket-merge\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPENFUAttyc7",
+  "children": []
 }

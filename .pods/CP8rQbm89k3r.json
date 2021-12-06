@@ -1,7 +1,5 @@
 {
   "id": "CP8rQbm89k3r",
-  "parentId": "CP6KwDyj8wHg",
-  "index": 3,
   "content": "\"(define (mytext txt [size 12])\\n  ;; allow size to be real number\\n  (scale (text txt 'default\\n               ;; the maximum size is 1024\\n               1024)\\n         (/ size 1024)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"mytext\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP6KwDyj8wHg",
+  "children": []
 }

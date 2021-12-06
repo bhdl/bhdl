@@ -1,7 +1,5 @@
 {
   "id": "CPDiz8DxnnaM",
-  "parentId": "CPQU4nPmdVqN",
-  "index": 1,
   "content": "\"(define (show-layout x)\\n  (cond\\n   [(Atom? x) (Atom-pict x)]\\n   [(Composite? x) (Composite-pict x)]\\n   [else (error \\\"show-layout error:\\\" x)]))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"show-layout\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPQU4nPmdVqN",
+  "children": []
 }

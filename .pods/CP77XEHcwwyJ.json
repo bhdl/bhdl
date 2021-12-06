@@ -1,7 +1,5 @@
 {
   "id": "CP77XEHcwwyJ",
-  "parentId": "CPtgV36e4DrU",
-  "index": 5,
   "content": "\"(define footprint->pict+Hlocs\\n  (let ([cache (make-hash)])\\n    (λ (fp)\\n      ;; FIXME hash the footprint struct?\\n      (if (hash-has-key? cache fp)\\n          (match-let ([(list p locs) (hash-ref cache fp)])\\n            (values p locs))\\n          (let-values ([(p locs) (footprint->pict+Hlocs-uncached fp)])\\n            (hash-set! cache fp (list p locs))\\n            (values p locs))))))\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"footprint->pict+Hlocs\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPtgV36e4DrU",
+  "children": []
 }

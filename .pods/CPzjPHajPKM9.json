@@ -1,7 +1,5 @@
 {
   "id": "CPzjPHajPKM9",
-  "parentId": "CPN8XE37ddzD",
-  "index": 9,
   "content": "\"\\n(define (inset p . amts)\\n  (apply pict:inset\\n    (append \\n      (list (maybe-atom->pict p))\\n      amts)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"inset\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPN8XE37ddzD",
+  "children": []
 }

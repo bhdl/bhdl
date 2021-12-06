@@ -1,7 +1,5 @@
 {
   "id": "CPe3EAVcgdeT",
-  "parentId": "CPn9Kk3EhUPf",
-  "index": 1,
   "content": "\"isinside(p, a, b) = (b.x - a.x) * (p.y - a.y) > (b.y - a.y) * (p.x - a.x)\\n\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"isinside\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPn9Kk3EhUPf",
+  "children": []
 }

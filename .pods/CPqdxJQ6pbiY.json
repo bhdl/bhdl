@@ -1,7 +1,5 @@
 {
   "id": "CPqdxJQ6pbiY",
-  "parentId": "CPgh3kxexKr7",
-  "index": 24,
   "content": "\"(require json)\\n(define (save-for-placement2 specs fname)\\n  (let ([tmp (make-temporary-file)])\\n    (call-with-output-file tmp\\n      (λ (out)\\n        (write-bytes\\n         (jsexpr->bytes specs)\\n         out))\\n      ;; make-temporary-file creates the file\\n      #:exists 'replace)\\n    (CODEPOD-link tmp\\n    )))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPgh3kxexKr7",
+  "children": []
 }

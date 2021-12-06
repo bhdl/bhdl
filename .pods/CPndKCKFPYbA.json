@@ -1,7 +1,5 @@
 {
   "id": "CPndKCKFPYbA",
-  "parentId": "CPn9Kk3EhUPf",
-  "index": 0,
   "content": "\"import Luxor: Point\\nusing Clipper\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPn9Kk3EhUPf",
+  "children": []
 }

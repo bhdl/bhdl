@@ -1,7 +1,5 @@
 {
   "id": "CPDXpFFcwTYH",
-  "parentId": "CP63Je4zKaFa",
-  "index": 48,
   "content": "\"(define/IC (LM555-sym)\\n  #:datasheet \\\"\\\"\\n  ;; FIXME when there're no alts, I should be able to just leave it blank\\n  #:ALIAS ()\\n  #:DIP (8 GND TR OUTPUT RESET CV THR DIS VCC))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"LM555-sym\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP63Je4zKaFa",
+  "children": []
 }

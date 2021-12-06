@@ -1,7 +1,5 @@
 {
   "id": "CPqhn6FRhBpW",
-  "parentId": "CP9hPyBA9z8P",
-  "index": 9,
   "content": "\"(define-syntax (begin-where stx)\\n  (syntax-parse stx\\n    [(_ TODO ...) #'(void)]))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "null",
   "exports": "{\"begin-where\":true}",
   "midports": "null",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CP9hPyBA9z8P",
+  "children": []
 }

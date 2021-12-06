@@ -1,7 +1,5 @@
 {
   "id": "CPizrjt3XTMA",
-  "parentId": "CPdf6Vq6d4Pw",
-  "index": 8,
   "content": "\"# jstr = open(f->read(f, String), \\\"spec.json\\\")\\nnothing\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPdf6Vq6d4Pw",
+  "children": []
 }

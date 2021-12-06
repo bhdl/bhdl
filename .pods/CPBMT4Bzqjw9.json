@@ -1,7 +1,5 @@
 {
   "id": "CPBMT4Bzqjw9",
-  "parentId": "CPgh3kxexKr7",
-  "index": 6,
   "content": "\"(define global\\n  (make-circuit\\n   (pin GND 3V3 5V VCC USB5V)\\n  ;  (part)\\n  ;  (wire)\\n  ;  (layout)\\n   ))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPgh3kxexKr7",
+  "children": []
 }

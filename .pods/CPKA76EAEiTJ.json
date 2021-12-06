@@ -1,7 +1,5 @@
 {
   "id": "CPKA76EAEiTJ",
-  "parentId": "CPadywggP7TT",
-  "index": 3,
   "content": "\"\\n(struct footprint\\n  ;; line will have start (x,y), end (x,y), width\\n  ;; pads will have num, mounting-type, (shape attr), (x y)\\n  (lines\\n   pads\\n   texts\\n   holes)\\n  #:prefab)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"struct footprint\":true}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPadywggP7TT",
+  "children": []
 }

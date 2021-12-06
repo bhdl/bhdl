@@ -1,7 +1,5 @@
 {
   "id": "CP7TRixQjXH8",
-  "parentId": "CPeiY7cLzrUT",
-  "index": 1,
   "content": "\"(circuit key-with-diode\\n   (pin left right)\\n   (part [d (1N4148W)]\\n         [key (kailh-socket 1)])\\n   (wire (series self.left key d self.right))\\n   (layout (vstack key d)))\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPeiY7cLzrUT",
+  "children": []
 }

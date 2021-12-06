@@ -1,7 +1,5 @@
 {
   "id": "CPQa6GQHJRGT",
-  "parentId": "CPXUzG9HHi8X",
-  "index": 1,
   "content": "\"(require pict)\\n(scale (footprint->pict-tmp fp-kailh-socket-easyeda) 10)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPXUzG9HHi8X",
+  "children": []
 }

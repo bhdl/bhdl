@@ -1,7 +1,5 @@
 {
   "id": "CPDzDTDMwDNf",
-  "parentId": "CPN8XE37ddzD",
-  "index": 7,
   "content": "\"(wrap-*-superimpose lt-superimpose)\\n(wrap-*-superimpose lb-superimpose)\\n(wrap-*-superimpose lc-superimpose)\\n(wrap-*-superimpose ltl-superimpose)\\n(wrap-*-superimpose lbl-superimpose)\\n(wrap-*-superimpose rt-superimpose)\\n(wrap-*-superimpose rb-superimpose)\\n(wrap-*-superimpose rc-superimpose)\\n(wrap-*-superimpose rtl-superimpose)\\n(wrap-*-superimpose rbl-superimpose)\\n(wrap-*-superimpose ct-superimpose)\\n(wrap-*-superimpose cb-superimpose)\\n(wrap-*-superimpose cc-superimpose)\\n(wrap-*-superimpose ctl-superimpose)\\n(wrap-*-superimpose cbl-superimpose)\"",
   "column": 1,
   "fold": false,
@@ -13,5 +11,7 @@
   "imports": "{}",
   "exports": "{\"lt-superimpose\":true,\"lb-superimpose\":true,\"lc-superimpose\":true,\"ltl-superimpose\":true,\"lbl-superimpose\":true,\"rt-superimpose\":true,\"rb-superimpose\":true,\"rc-superimpose\":true,\"rtl-superimpose\":true,\"rbl-superimpose\":true,\"ct-superimpose\":true,\"cb-superimpose\":true,\"cc-superimpose\":true,\"ctl-superimpose\":true,\"cbl-superimpose\":false}",
   "midports": "{}",
-  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf"
+  "repoId": "102c7cad-cc6a-4ac2-b30c-d5e168c069bf",
+  "parent": "CPN8XE37ddzD",
+  "children": []
 }
