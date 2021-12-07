@@ -1,0 +1,15 @@
+{
+  "id": "CPfbgeTwJe37",
+  "type": "CODE",
+  "lang": "racket",
+  "parent": "CPHKPFTgKmQp",
+  "children": [],
+  "content": "\"(define kicad->fp kicad-helper)\"",
+  "imports": "{}",
+  "exports": "{\"kicad->fp\":true}",
+  "midports": "{}",
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": ""
+}

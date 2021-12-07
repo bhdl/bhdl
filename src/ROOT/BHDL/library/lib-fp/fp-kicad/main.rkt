@@ -3,7 +3,7 @@
   (require rackunit 
     "../../../../../codepod.rkt"
     "../../../../../ROOT/BHDL/system/main.rkt")
-  (provide fp-resistor fp-fuse fp-capacitor fp-crystal fp-diode fp-sw-spst fp-sw-push fp-jack-audio fp-jack-barrel fp-pin-header fp-pin-header-2 fp-usb fp-1602 fp-dummy fp-mounting-hole fp-switch-keyboard fp-QFN fp-PQFP fp-LQFP fp-TQFP fp-DIP fp-SOIC fp-TSSOP fp-SOT-23 fp-SOT-223 fp-SOT-23-5 fp-Arduino fp-smd-2520 fp-smd-2012-2p fp-WS2812B fp-stabilizer-2u fp-kailh-socket-kicad
+  (provide kicad->fp fp-resistor fp-fuse fp-capacitor fp-crystal fp-diode fp-sw-spst fp-sw-push fp-jack-audio fp-jack-barrel fp-pin-header fp-pin-header-2 fp-usb fp-1602 fp-dummy fp-mounting-hole fp-switch-keyboard fp-QFN fp-PQFP fp-LQFP fp-TQFP fp-DIP fp-SOIC fp-TSSOP fp-SOT-23 fp-SOT-223 fp-SOT-23-5 fp-Arduino fp-smd-2520 fp-smd-2012-2p fp-WS2812B fp-stabilizer-2u fp-kailh-socket-kicad
     
     
     )
@@ -126,6 +126,8 @@
               (read-kicad-mod p)
               #f)))
       (error "Cannot find the kicad file for: " lst)))
+
+(define kicad->fp kicad-helper)
 
 (define fp-resistor-0603
   (kicad-helper "Resistor_SMD.pretty/"
