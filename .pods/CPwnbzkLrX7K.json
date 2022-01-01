@@ -1,0 +1,15 @@
+{
+  "id": "CPwnbzkLrX7K",
+  "type": "CODE",
+  "lang": "racket",
+  "parent": "CPaD3zYEybMf",
+  "children": [],
+  "content": "\"(expand-once\\n   #'(make-circuit\\n     (pin A B C)\\n     (part [r1 (R 10 #:wire A B)]))\\n     )\"",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": ""
+}

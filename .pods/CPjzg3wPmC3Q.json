@@ -1,0 +1,15 @@
+{
+  "id": "CPjzg3wPmC3Q",
+  "type": "CODE",
+  "lang": "racket",
+  "parent": "CP4GtRpU44iR",
+  "children": [],
+  "content": "\"(require (prefix-in pict: pict))\\n(pict:rectangle 20 20)\"",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": ""
+}

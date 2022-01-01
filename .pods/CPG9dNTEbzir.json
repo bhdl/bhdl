@@ -1,0 +1,15 @@
+{
+  "id": "CPG9dNTEbzir",
+  "type": "CODE",
+  "lang": "racket",
+  "parent": "CP4GtRpU44iR",
+  "children": [],
+  "content": "\"(C #:FP \\\"0603\\\")\"",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": ""
+}

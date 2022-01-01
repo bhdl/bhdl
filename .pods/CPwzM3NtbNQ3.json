@@ -1,0 +1,15 @@
+{
+  "id": "CPwzM3NtbNQ3",
+  "type": "CODE",
+  "lang": "racket",
+  "parent": "CP4GtRpU44iR",
+  "children": [],
+  "content": "\"(circuit-export (RC-button)\\n                #:auto-place #t\\n                #:formats '(kicad pdf)))\"",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": ""
+}

@@ -1,0 +1,15 @@
+{
+  "id": "CPFWDrLht63E",
+  "type": "CODE",
+  "lang": "racket",
+  "parent": "CPaD3zYEybMf",
+  "children": [],
+  "content": "\"(expand-once #'(make-circuit0))\"",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": ""
+}

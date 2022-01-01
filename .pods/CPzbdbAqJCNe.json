@@ -1,0 +1,15 @@
+{
+  "id": "CPzbdbAqJCNe",
+  "type": "CODE",
+  "lang": "racket",
+  "parent": "CP4GtRpU44iR",
+  "children": [],
+  "content": "\"(circuit RC-button\\n    (pin Vcc Out GND)\\n    (part \\n      [rc1 (RC #:wire _ Out GND)]\\n      [btn1 (Switch #:wire Vcc _)]\\n      [r2 (R 10 #:FP \\\"0805\\\" #:wire _ GND)]\\n    ; [rc1 (RC #:wire _ Out GND)]\\n        ; [btn1 (Switch #:wire)]\\n        ; [r2 (R 10 #:wire)]\\n      )\\n    (wire (net r2.1 btn1.2 rc1.In))\\n    ; (layout (hstack rc1 btn1 r2))\\n    (layout (pict:rectangle 100 100))\\n    )\"",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": ""
+}

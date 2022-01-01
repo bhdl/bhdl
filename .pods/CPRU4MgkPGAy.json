@@ -1,0 +1,15 @@
+{
+  "id": "CPRU4MgkPGAy",
+  "type": "CODE",
+  "lang": "racket",
+  "parent": "CP4GtRpU44iR",
+  "children": [],
+  "content": "\"(circuit RC\\n         (pin In Out GND)\\n         (part \\n           [r1 (R 10 #:FP \\\"0805\\\" #:wire In Out)]\\n           [c1 (C 10  #:wire Out GND)]\\n           )\\n        ;  (layout (vstack r1 c1))\\n         )\"",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": ""
+}

@@ -63,7 +63,14 @@
                 (let ([p (Pin res pname)])
                   (hash-set! (Composite-pinhash res) pname p)
                   (hash-set! (Composite-pinhash res)
-                             (string->symbol (~a "index-" i)) p)))
+                            ;  (string->symbol 
+                            ;   ;  to support r.1
+                            ;   ;  (~a "index-" i)
+                            ;    (~a i))
+                              i
+                              p)
+                  (hash-set! (Composite-pinhash res) '_ (Pin res "NULL"))
+                  ))
            res)]))
 
 (define-syntax-parameter self
@@ -75,7 +82,6 @@
 
     )
 
-
 (define-syntax (make-circuit0 stx)
   (syntax-parse 
     stx
@@ -86,12 +92,13 @@
                      #:defaults ([p-name #'#f]))
           (~optional (~seq #:where where-clause)
                      #:defaults ([where-clause #'()]))
-          (~seq #:vars (var-clause ...))
+          (~optional (~seq #:tmp v))
+          (~seq #:vars (dv ...))
           (~seq #:connect connect-clause)) ...)
      #`(let ([self-obj (create-simple-Composite ext-pin ...)])
          (syntax-parameterize 
            ([self (make-rename-transformer #'self-obj)])
-           (match-let* (var-clause ... ...)
+           (match-let* (dv ... ...)
              (when p-name
                (set-Composite-pict! 
                  self-obj 
@@ -102,8 +109,11 @@
                (apply append 
                       (map Composite-nets
                            (flatten 
-                             (list connect-clause ...)))))
+                             (list connect-clause ...
+                                   )))))
              self-obj)))]))
+
+
 
 (module+ test
      
@@ -112,22 +122,43 @@
 ; 2
     )
 
+(begin-for-syntax
+  (define-syntax-class
+    wirevalue
+    (pattern (fun arg ... #:wire wirepin ...)
+             #:with v #'(fun arg ...)
+             #:with nature (range 1 (+ 1 (length (syntax-e #'(wirepin ...))))))
+    ; (pattern v
+    ;          #:with wirepins #'())
+    ))
+
 (define-syntax (make-circuit stx)
   (syntax-parse
     stx
     #:datum-literals (pin part wire layout)
     [(_ (~alt (~optional (pin ext-pin ...) 
                          #:defaults ([(ext-pin 1) null]))
-              (~optional (part dv ...)
-                         #:defaults ([(dv 1) null]))
+              (~optional (part [dvl dvr:wirevalue] ...)
+                         ;  #:defaults ([(dv 1) null])
+                         )
               (~optional (wire w ...)
                          #:defaults ([(w 1) null]))
               (~optional (layout l) #:defaults ([l #'#f]))) ...)
-     #`(make-circuit0 #:external-pins (ext-pin ...)
-                     #:vars (dv ...)
-                     #:connect (list w ...)
-                     #:layout l
-                     )]))
+     #`(make-circuit0 
+         #:external-pins (ext-pin ...)
+         #:vars ([dvl dvr.v] ...)
+         #:tmp (list dvr.nature ...)
+         #:connect (list w ... 
+                         (bus (self [dvr.wirepin ...])
+                              ; (dvl [1 2])
+                              (dvl dvr.nature)
+                              )
+                         ...
+                         
+                         )
+                   #:layout l
+                   )
+       ]))
 
 (module+ test
      ; (expand-once #'

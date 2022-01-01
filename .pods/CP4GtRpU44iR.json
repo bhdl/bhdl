@@ -1,0 +1,25 @@
+{
+  "id": "CP4GtRpU44iR",
+  "type": "DECK",
+  "lang": "racket",
+  "parent": "CPhCWc9MMHQV",
+  "children": [
+    "CPG9dNTEbzir",
+    "CPRU4MgkPGAy",
+    "CPzbdbAqJCNe",
+    "CPjzg3wPmC3Q",
+    "CPhhrdrQLaGh",
+    "CPBBr33gRqWc",
+    "CPwzM3NtbNQ3",
+    "CPaKiQcJfLBR",
+    "CPf3NWpmDzpt"
+  ],
+  "content": "\"\"",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "fold": false,
+  "thundar": true,
+  "utility": false,
+  "name": "RC"
+}

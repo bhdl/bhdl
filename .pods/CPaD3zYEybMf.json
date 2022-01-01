@@ -1,0 +1,22 @@
+{
+  "id": "CPaD3zYEybMf",
+  "type": "DECK",
+  "lang": "racket",
+  "parent": "CPhCWc9MMHQV",
+  "children": [
+    "CPFWDrLht63E",
+    "CPxPkH3nBiQV",
+    "CPMfeKxaxLkc",
+    "CPwnbzkLrX7K",
+    "CPjPPFH8GL6f",
+    "CPyGBrriiB4h"
+  ],
+  "content": "\"\"",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "fold": false,
+  "thundar": true,
+  "utility": false,
+  "name": ""
+}

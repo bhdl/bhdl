@@ -1,0 +1,15 @@
+{
+  "id": "CPjPPFH8GL6f",
+  "type": "CODE",
+  "lang": "racket",
+  "parent": "CPaD3zYEybMf",
+  "children": [],
+  "content": "\"(Composite-nets (make-circuit\\n     (pin A B C)\\n     (part [r1 (R 10 #:wire A B)])))\"",
+  "imports": "{}",
+  "exports": "{}",
+  "midports": "{}",
+  "fold": false,
+  "thundar": false,
+  "utility": false,
+  "name": ""
+}
