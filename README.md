@@ -54,8 +54,7 @@ In the future, you can update the package if there're updates upstream via:
 raco pkg update src
 ```
 
-:::note TODO package name should be `bhdl`
-:::
+> note TODO package name should be `bhdl`
 
 ## JupyterLab IDE
 
@@ -71,16 +70,14 @@ The [iracket](https://github.com/rmculpepper/iracket) kernel requires on libzero
 sudo apt install libzmq5
 ```
 
-:::note MacOS
+> note for MacOS
 
-On MacOS, it is a little [trickier](https://github.com/rmculpepper/racket-zeromq/issues/6) to setup libzmq. Specifically, you need to copy the library to the racket's library path, otherwise racket won't find it:
+> On MacOS, it is a little [trickier](https://github.com/rmculpepper/racket-zeromq/issues/6) to setup libzmq. Specifically, you need to copy the library to the racket's library path, otherwise racket won't find it:
 
-```shell
-brew install zmq
-cp /opt/homebrew/Cellar/zeromq/4.3.4/lib/libzmq.5.dylib Library/Racket/8.2/lib
-```
-
-:::
+> ```shell
+> brew install zmq
+> cp /opt/homebrew/Cellar/zeromq/4.3.4/lib/libzmq.5.dylib Library/Racket/8.2/lib
+> ```
 
 Then install the kernel itself:
 
