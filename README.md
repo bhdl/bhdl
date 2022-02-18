@@ -86,16 +86,13 @@ raco pkg install iracket
 raco iracket install
 ```
 
-:::note
-
-iracket does not allow write access to file system by default. So you have to
-modify the kernel file with a [`-t`
-parameter](https://github.com/rmculpepper/iracket/issues/13). In short, you need
-to modify the content of `~/.local/share/jupyter/kernels/racket/kernel.json` on
-your system from `["racket","-l","iracket/iracket","--","{connection_file}"]` to
-`["racket","-l","iracket/iracket","--","-t","{connection_file}"]`
-
-:::
+> note:
+> iracket does not allow write access to file system by default. So you have to
+> modify the kernel file with a [`-t`
+> parameter](https://github.com/rmculpepper/iracket/issues/13). In short, you need
+> to modify the content of `~/.local/share/jupyter/kernels/racket/kernel.json` on
+> your system from `["racket","-l","iracket/iracket","--","{connection_file}"]` to
+> `["racket","-l","iracket/iracket","--","-t","{connection_file}"]`
 
 Then start the jupyterlab server:
 
